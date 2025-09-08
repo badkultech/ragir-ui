@@ -121,3 +121,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add this to your globals.css or component CSS */
+.admin-register * {
+  font-family: 'Poppins', sans-serif !important;
+}
