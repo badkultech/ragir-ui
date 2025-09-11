@@ -17,6 +17,10 @@ export const ENDPOINTS = {
 
   // invite and password reset
   SETUP_PASSWORD: "/public/invite/setup-password",
+
+  // super admin dashboard
+ GET_ALL_ADMINS: (organizationId : string) => `/org/${organizationId}/admin/admins`,
+ GET_NEXT_NUMBER: (organizationId : string) => `/org/${organizationId}/number-series/next-employee-number`,
 } as const;
 
 // utils/roles.ts (or wherever you keep these)
