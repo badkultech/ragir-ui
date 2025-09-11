@@ -1,11 +1,9 @@
 // services/api.ts
-import { baseAPI, publicBaseAPI } from '..';
 import { ApiResponse } from '../common-types';
 import { ENDPOINTS } from '@/lib/utils';
 import { LoginDTO } from '../otp/types';
 import { loginRequest } from './types';
-
-
+import { baseAPI } from '..';
 
 export const loginAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
