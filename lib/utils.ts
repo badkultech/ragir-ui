@@ -12,6 +12,9 @@ export const ENDPOINTS = {
   GENERATE_OTP: "/otp/generate",
   VALIDATE_OTP: "/otp/validate",
 
+  // login
+  LOGIN: "/auth/login",
+
   // invite and password reset
   SETUP_PASSWORD: "/public/invite/setup-password",
 } as const;
@@ -81,7 +84,7 @@ export function isAllowedRoutes(route: string, role?: RoleType): boolean {
 export const getDashboardPath = (role?: string) => {
   switch (role) {
     case ROLES.SYSTEM_ADMIN:
-      return "/admin";
+      return "/superadmin";
     case ROLES.ORGANIZER:
       return "/organizer";
     case ROLES.USER:

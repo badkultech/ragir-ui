@@ -53,7 +53,7 @@ export default function HydratedAuth({
   const PUBLIC_ROUTES = [
     "/login",
     "/superadmin/login",
-    "admin/login",
+    "/admin/login",
     "/register",
     "/user/landing",
   ];
