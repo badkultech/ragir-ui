@@ -1,16 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Eye, EyeOff, XCircle } from "lucide-react";
+import LoadingOverlay from "@/components/common/LoadingOverlay";
+import { useSearchParams } from "next/navigation";
+import { useSetupPasswordMutation } from "@/lib/services/setup-password";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { selectAuthState, setCredentials } from "@/lib/slices/auth";
+import { getDashboardPath } from "@/lib/utils";
+import { GradientButton } from "@/components/gradient-button";
+import { useToast } from "@/hooks/use-toast";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 export default function AdminRegister() {
+  const searchParams = useSearchParams();
+  const emailFromParams = searchParams.get("email") || "";
+  const tokenFromParams = searchParams.get("token") || "";
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [setupPassword] = useSetupPasswordMutation();
+  const { userData } = useSelector(selectAuthState);
 
+  // populate email from query params
+  useEffect(() => {
+    if (emailFromParams) setEmail(emailFromParams);
+  }, [emailFromParams]);
+
+  // password rules
   const rules = {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
@@ -18,38 +43,63 @@ export default function AdminRegister() {
     special: /[!@#$]/.test(password),
   };
 
-  const strength = Object.values(rules).filter(Boolean).length;
-
-  const strengthColors = [
-    "bg-gray-300", // 0
-    "bg-red-500", // 1
-    "bg-orange-400", // 2
-    "bg-yellow-400", // 3
-    "bg-green-500", // 4
-  ];
-
-  // Email validation regex
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  
-  // Form validation
-  const isFormValid = emailValid && 
-    Object.values(rules).every(Boolean) && 
-    password === confirmPassword && 
+  const isFormValid =
+    emailValid &&
+    Object.values(rules).every(Boolean) &&
+    password === confirmPassword &&
     confirmPassword.length > 0;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+  // handle form submit
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // prevent page reload
+
     if (!isFormValid) return;
-    
-    setIsLoading(true);
+
     try {
-      // Add your registration logic here
-      console.log('Registering admin:', { email, password });
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    } catch (error) {
-      console.error('Registration error:', error);
+      setIsLoading(true);
+
+      // call setup password mutation
+      const result = await setupPassword({
+        token: tokenFromParams,
+        password,
+      }).unwrap();
+
+      console.log("raw mutation result:", result);
+
+      // save tokens in localStorage & redux
+      if (result.accessToken && result.refreshToken) {
+        localStorage.setItem("accessToken", result.accessToken);
+        localStorage.setItem("refreshToken", result.refreshToken);
+
+        dispatch(
+          setCredentials({
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
+          })
+        );
+
+        // redirect based on role
+        const dashboardPath = getDashboardPath(userData?.userType);
+        router.replace(dashboardPath);
+      }
+    } catch (err) {
+      console.error("mutation failed:", err);
+      // Use your custom toast for backend error messages
+      const fetchError = err as FetchBaseQueryError;
+
+      const message =
+        "status" in fetchError &&
+        fetchError.data &&
+        typeof fetchError.data === "object"
+          ? (fetchError.data as any).message
+          : "Something went wrong. Please try again.";
+
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -62,18 +112,6 @@ export default function AdminRegister() {
         <div className="flex items-center">
           <img src="/logo.png" alt="Ragir" className="h-8 mr-2" />
         </div>
-        <div className="flex items-center space-x-4">
-          <img
-            src="/notification-icon.png"
-            alt="Notifications"
-            className="h-8 w-8 rounded-full border"
-          />
-          <img
-            src="/user-avatar.png"
-            alt="User"
-            className="h-8 w-8 rounded-full border"
-          />
-        </div>
       </header>
 
       {/* Background */}
@@ -82,25 +120,28 @@ export default function AdminRegister() {
         style={{ backgroundImage: "url('/OrgRegisterBg.jpg')" }}
       >
         {/* Card */}
-        <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-          <h1 className="text-2xl font-poppins font-bold mb-6 text-gray-900">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8"
+        >
+          <h1 className="text-2xl font-bold mb-6 text-gray-900">
             Admin Register
           </h1>
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block text-sm font-poppins font-medium text-gray-700 mb-2">
-              Enter Email
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 font-poppins"
+              disabled
+              className="w-full bg-gray-100 text-gray-500 cursor-not-allowed rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
             />
             {email.length > 0 && !emailValid && (
-              <p className="text-[#FF804C] text-sm mt-1 font-poppins">
+              <p className="text-[#FF804C] text-sm mt-1">
                 Enter valid email address
               </p>
             )}
@@ -108,7 +149,7 @@ export default function AdminRegister() {
 
           {/* Password */}
           <div className="mb-4">
-            <label className="block text-sm font-poppins font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Create Password
             </label>
             <div className="relative">
@@ -117,7 +158,7 @@ export default function AdminRegister() {
                 placeholder="Enter a strong password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 font-poppins"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
               />
               <button
                 type="button"
@@ -128,51 +169,46 @@ export default function AdminRegister() {
               </button>
             </div>
 
-            {/* Password Requirements - Always Show */}
-            <div className="mt-4">
-              <p className="text-[#FF804C] text-sm mb-2 font-poppins">
-                For a strong password, includes:
-              </p>
-              <div className="space-y-1">
-                <div className="flex items-center text-sm">
-                  {rules.length ? (
-                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                  ) : (
-                    <XCircle className="text-gray-400 mr-2" size={16} />
-                  )}
-                  <span className="text-gray-600 font-poppins">8+ characters</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  {rules.uppercase ? (
-                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                  ) : (
-                    <XCircle className="text-gray-400 mr-2" size={16} />
-                  )}
-                  <span className="text-gray-600 font-poppins">1 uppercase letter</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  {rules.number ? (
-                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                  ) : (
-                    <XCircle className="text-gray-400 mr-2" size={16} />
-                  )}
-                  <span className="text-gray-600 font-poppins">1 number</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  {rules.special ? (
-                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                  ) : (
-                    <XCircle className="text-gray-400 mr-2" size={16} />
-                  )}
-                  <span className="text-gray-600 font-poppins">1 special symbol (!@#$)</span>
-                </div>
+            {/* Password Strength */}
+            <div className="mt-4 space-y-1">
+              <div className="flex items-center text-sm">
+                {rules.length ? (
+                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                ) : (
+                  <XCircle className="text-gray-400 mr-2" size={16} />
+                )}
+                <span className="text-gray-600">8+ characters</span>
+              </div>
+              <div className="flex items-center text-sm">
+                {rules.uppercase ? (
+                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                ) : (
+                  <XCircle className="text-gray-400 mr-2" size={16} />
+                )}
+                <span className="text-gray-600">1 uppercase letter</span>
+              </div>
+              <div className="flex items-center text-sm">
+                {rules.number ? (
+                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                ) : (
+                  <XCircle className="text-gray-400 mr-2" size={16} />
+                )}
+                <span className="text-gray-600">1 number</span>
+              </div>
+              <div className="flex items-center text-sm">
+                {rules.special ? (
+                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                ) : (
+                  <XCircle className="text-gray-400 mr-2" size={16} />
+                )}
+                <span className="text-gray-600">1 special symbol (!@#$)</span>
               </div>
             </div>
           </div>
 
           {/* Confirm Password */}
           <div className="mb-6">
-            <label className="block text-sm font-poppins font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Confirm Password
             </label>
             <div className="relative">
@@ -181,7 +217,7 @@ export default function AdminRegister() {
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 font-poppins"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
               />
               <button
                 type="button"
@@ -192,20 +228,20 @@ export default function AdminRegister() {
               </button>
             </div>
             {confirmPassword && confirmPassword !== password && (
-              <p className="text-[#FF804C] text-sm mt-1 font-poppins">
+              <p className="text-[#FF804C] text-sm mt-1">
                 Password didn't match
               </p>
             )}
           </div>
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={!isFormValid || isLoading}
-            className="w-full font-poppins font-semibold py-3 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FD401A] text-white hover:opacity-90"
-          >
-            {isLoading ? 'Creating Account...' : 'Create Admin Account'}
-          </button>
+          <GradientButton type="submit" disabled={!isFormValid || isLoading}>
+            Create Admin Account
+            <LoadingOverlay
+              isLoading={isLoading}
+              message="Creating Admin Account"
+            />
+          </GradientButton>
         </form>
       </div>
     </div>

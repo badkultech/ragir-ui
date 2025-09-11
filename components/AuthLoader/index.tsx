@@ -50,15 +50,20 @@ export default function HydratedAuth({
     }
   }, [dispatch]);
 
+  const PUBLIC_ROUTES = ["/login", "/register", "/user/landing"];
+
   useEffect(() => {
     if (!hydrated) return;
 
     const isAuthenticated = !!accessToken;
 
+    // Allow public routes always
+    if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+      return; // ✅ do not redirect
+    }
+
     if (!isAuthenticated) {
-      if (pathname !== "/login") {
-        router.replace("/login"); // ✅ fixed leading slash
-      }
+      router.replace("/login");
       return;
     }
 

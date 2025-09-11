@@ -7,6 +7,7 @@ import { ReduxProvider } from '@/lib/redux-provider';
 import HydratedAuth from '@/components/AuthLoader';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata = {
   title: 'Ragir - Organizer Dashboard',
@@ -22,7 +23,9 @@ export default function RootLayout({
     <html lang='en' className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className='font-sans antialiased'>
         <ReduxProvider>
-          <HydratedAuth>{children}</HydratedAuth>
+          <HydratedAuth>{children}
+            <Toaster /> 
+          </HydratedAuth>
         </ReduxProvider>
       </body>
     </html>

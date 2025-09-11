@@ -7,6 +7,13 @@ export function cn(...inputs: Array<ClassValue>) {
 
 export const ENDPOINTS = {
   GET_POST: '/posts',
+
+    // otp
+  GENERATE_OTP: "/otp/generate",
+  VALIDATE_OTP: "/otp/validate",
+
+  // invite and password reset
+  SETUP_PASSWORD: "/public/invite/setup-password",
 } as const;
 
 // utils/roles.ts (or wherever you keep these)
@@ -14,6 +21,8 @@ export const ROLES = {
   SYSTEM_ADMIN: 'SYSTEM_ADMIN',
   USER: 'USER',
   ORGANIZER: 'ORGANIZATION_ADMIN',
+
+
 } as const;
 
 export type RoleType = (typeof ROLES)[keyof typeof ROLES];
@@ -66,4 +75,18 @@ export function isAllowedRoutes(route: string, role?: RoleType): boolean {
 
     return false;
   });
+  
 }
+
+export const getDashboardPath = (role?: string) => {
+  switch (role) {
+    case ROLES.SYSTEM_ADMIN:
+      return "/admin";
+    case ROLES.ORGANIZER:
+      return "/organizer";
+    case ROLES.USER:
+      return "/user/dashboard"; // adjust to your actual path
+    default:
+      return "/user/landing";
+  }
+};
