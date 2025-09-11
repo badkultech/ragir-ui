@@ -50,7 +50,13 @@ export default function HydratedAuth({
     }
   }, [dispatch]);
 
-  const PUBLIC_ROUTES = ["/login", "/register", "/user/landing"];
+  const PUBLIC_ROUTES = [
+    "/login",
+    "/superadmin/login",
+    "admin/login",
+    "/register",
+    "/user/landing",
+  ];
 
   useEffect(() => {
     if (!hydrated) return;
