@@ -12,6 +12,9 @@ import { getDashboardPath } from "@/lib/utils";
 import { GradientButton } from "@/components/gradient-button";
 import { useToast } from "@/hooks/use-toast";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { showApiError } from "@/lib/utils/toastHelpers";
+import App from "next/app";
+import { AppHeader } from "@/components/app-header";
 
 export default function AdminRegister() {
   const searchParams = useSearchParams();
@@ -87,19 +90,7 @@ export default function AdminRegister() {
       console.error("mutation failed:", err);
       // Use your custom toast for backend error messages
       const fetchError = err as FetchBaseQueryError;
-
-      const message =
-        "status" in fetchError &&
-        fetchError.data &&
-        typeof fetchError.data === "object"
-          ? (fetchError.data as any).message
-          : "Something went wrong. Please try again.";
-
-      toast({
-        title: "Error",
-        description: message,
-        variant: "destructive",
-      });
+      showApiError(err);
     } finally {
       setIsLoading(false);
     }
@@ -108,11 +99,7 @@ export default function AdminRegister() {
   return (
     <div className="min-h-screen flex flex-col font-poppins">
       {/* Header */}
-      <header className="w-full bg-white shadow-sm flex items-center justify-between px-6 py-3">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="Ragir" className="h-8 mr-2" />
-        </div>
-      </header>
+      <AppHeader showAvatar={false} />
 
       {/* Background */}
       <div

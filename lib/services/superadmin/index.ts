@@ -22,7 +22,21 @@ export const adminAPI = baseAPI.injectEndpoints({
         response.data,
       providesTags: [TAGS.admins],
     }),
+     activateSuperAdmin: builder.mutation<void, string>({
+      query: (publicId) => ({
+        url: ENDPOINTS.SUPER_ADMIN_ACTIVATE(publicId),
+        method: "PUT",
+      }),
+      invalidatesTags: [TAGS.admins],
+    }),
+     suspendSuperAdmin: builder.mutation<void, string>({
+      query: (publicId) => ({
+        url: ENDPOINTS.SUPER_ADMIN_SUSPEND(publicId),
+        method: "PUT",
+      }),
+      invalidatesTags: [TAGS.admins],
+    }),
   }),
 });
 
-export const { useGetAdminsQuery } = adminAPI;
+export const { useGetAdminsQuery, useActivateSuperAdminMutation, useSuspendSuperAdminMutation } = adminAPI;

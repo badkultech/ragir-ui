@@ -1,27 +1,46 @@
 "use client";
 
-import type React from "react";
-
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { GradientButton } from "@/components/gradient-button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import LoadingOverlay from "@/components/common/LoadingOverlay";
+import {
+  useGenerateOtpMutation,
+  useValidateOtpMutation,
+} from "@/lib/services/otp";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/lib/slices/auth";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 
 export default function VerifyOTPPage() {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
+  const [validateOtp] = useValidateOtpMutation();
+  const [generateOtp] = useGenerateOtpMutation();
+
+  // ✅ Pre-fill phone from query params
   useEffect(() => {
     const phone = searchParams.get("phone");
-    if (phone) {
-      setPhoneNumber(phone);
-    }
+    if (phone) setPhoneNumber(phone);
   }, [searchParams]);
+
+  // ✅ Countdown timer effect
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length <= 1 && /^\d*$/.test(value)) {
@@ -29,7 +48,6 @@ export default function VerifyOTPPage() {
       newOtp[index] = value;
       setOtp(newOtp);
 
-      // Auto-focus next input
       if (value && index < 5) {
         const nextInput = document.getElementById(`otp-${index + 1}`);
         nextInput?.focus();
@@ -44,16 +62,56 @@ export default function VerifyOTPPage() {
     }
   };
 
-  const handleVerify = () => {
-    const otpValue = otp.join("");
-    if (otpValue.length === 6) {
-      router.push("/join-community");
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const result = await validateOtp({
+        identifier: phoneNumber,
+        otp: otp.join(""),
+        type: "MOBILE",
+        organization: false,
+      }).unwrap();
+
+      if (result.accessToken && result.refreshToken) {
+        localStorage.setItem("accessToken", result.accessToken);
+        localStorage.setItem("refreshToken", result.refreshToken);
+        router.replace("/travler/profile");
+      }
+      dispatch(
+        setCredentials({
+          accessToken: result.accessToken || null,
+          refreshToken: result.refreshToken || null,
+        })
+      );
+    } catch (err) {
+      console.error("❌ OTP validation failed", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleBack = () => {
-    router.back();
+  const handleResendOtp = async () => {
+    if (!phoneNumber) return;
+    try {
+      const result = await generateOtp({
+        identifier: phoneNumber,
+        type: "MOBILE",
+        organization: false,
+      }).unwrap();
+
+      if (result.success) {
+        setResendTimer(60); // start countdown
+      }
+      showSuccess("OTP resent successfully");
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      showApiError(error as any);
+    }
   };
+
+  const handleBack = () => router.back();
 
   return (
     <div
@@ -65,7 +123,7 @@ export default function VerifyOTPPage() {
         backgroundBlendMode: "overlay",
       }}
     >
-      <AppHeader />
+      <AppHeader showAvatar={false} />
 
       <div className="flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl">
@@ -85,7 +143,7 @@ export default function VerifyOTPPage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-4">
-                  Enter Phone No.
+                  Enter OTP
                 </label>
                 <div className="flex gap-3 justify-center">
                   {otp.map((digit, index) => (
@@ -96,7 +154,7 @@ export default function VerifyOTPPage() {
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
-                      className="w-12 h-12 text-center text-xl font-semibold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      className="w-12 h-12 text-center text-xl font-semibold border border-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                       maxLength={1}
                     />
                   ))}
@@ -104,12 +162,20 @@ export default function VerifyOTPPage() {
               </div>
 
               <div className="text-center">
-                <p className="text-gray-600">
-                  {"Didn't recieve OTP? "}
-                  <button className="text-orange-500 font-semibold hover:underline">
-                    Resend
+                <span className="text-gray-600"> Didn't receive OTP? </span>
+                {resendTimer > 0 ? (
+                  <p className="text-gray-600">
+                    Resend OTP in{" "}
+                    <span className="font-semibold">{resendTimer}s</span>
+                  </p>
+                ) : (
+                  <button
+                    className="text-orange-500 font-semibold hover:underline"
+                    onClick={handleResendOtp}
+                  >
+                    Resend OTP
                   </button>
-                </p>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -122,13 +188,15 @@ export default function VerifyOTPPage() {
                   Back
                 </GradientButton>
 
-                <LoadingOverlay
-                  isLoading={isLoading}
-                  message="Verifying OTP"
-                />
+                <LoadingOverlay isLoading={isLoading} message="Verifying OTP" />
                 <GradientButton
                   onClick={handleVerify}
-                  className="flex items-center justify-center gap-2"
+                  disabled={otp.some((digit) => !digit)} // disables if any digit is empty
+                  className={`flex items-center justify-center gap-2 ${
+                    otp.some((digit) => !digit)
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                 >
                   Verify and Continue
                   <ArrowRight className="h-5 w-5" />

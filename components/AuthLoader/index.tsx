@@ -56,6 +56,7 @@ export default function HydratedAuth({
     "/admin/login",
     "/register",
     "/user/landing",
+    "/admin/forgot-password"
   ];
 
   useEffect(() => {
@@ -74,12 +75,12 @@ export default function HydratedAuth({
     }
 
     if (!userData?.userType) {
-      router.replace("/unauthorized");
+      router.replace("/login");
       return;
     }
 
     if (!isAllowedRoutes(pathname, userData.userType)) {
-      router.replace("/unauthorized");
+      router.replace("/login");
     }
   }, [hydrated, accessToken, userData, pathname, router]);
 
