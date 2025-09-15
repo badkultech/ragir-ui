@@ -6,12 +6,10 @@ import {
   Mail,
   UserCheck,
   UserX,
-  Users,
   Users2,
 } from "lucide-react";
 import Link from "next/link";
 import { Sidebar } from "@/components/superadmin/sidebar";
-import { Header } from "@/components/superadmin/header";
 import { useState } from "react";
 
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
@@ -22,6 +20,7 @@ import {
   useResendOrganizationInviteMutation,
   useSuspendOrganizationMutation,
 } from "@/lib/services/superadmin/organizations";
+import { AppHeader } from "@/components/app-header";
 
 // Modal Component (same as in Admins page)
 interface ActionModalProps {
@@ -194,7 +193,7 @@ export default function OrganizationsPage() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1">
-        <Header title="Organizers" />
+        <AppHeader title="Organizers" />
 
         <main className="p-8">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">

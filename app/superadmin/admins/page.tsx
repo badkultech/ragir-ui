@@ -17,6 +17,7 @@ import { toast } from "@/hooks/use-toast";
 import { useResendInviteMutation } from "@/lib/services/setup-password";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import { AppHeader } from "@/components/app-header";
 
 // Modal Component
 interface ActionModalProps {
@@ -328,7 +329,7 @@ export default function Dashboard() {
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex-1">
-          <Header title="Dashboard" />
+          <AppHeader title="Dashboard" />
           <main className="p-8">
             <div className="text-center py-12">
               <div className="text-red-600 mb-4">
@@ -353,7 +354,7 @@ export default function Dashboard() {
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex-1">
-          <Header title="Dashboard" />
+          <AppHeader title="Dashboard" />
           <main className="p-8">
             <div className="text-center py-12">
               <div className="text-gray-600 mb-4">Loading user data...</div>
@@ -434,7 +435,7 @@ export default function Dashboard() {
       <Sidebar />
 
       <div className="flex-1">
-        <Header title="Dashboard" />
+        <AppHeader title="Dashboard" />
 
         <main className="p-8">
           {/* Top Section */}

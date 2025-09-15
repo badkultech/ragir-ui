@@ -6,7 +6,6 @@ import { ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Sidebar } from "@/components/superadmin/sidebar";
-import { Header } from "@/components/superadmin/header";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -25,12 +24,11 @@ import { useSelector } from "react-redux";
 import { GradientButton } from "@/components/gradient-button";
 import {
   CreateSuperAdminRequest,
-  UserDTO,
 } from "@/lib/services/superadmin/add-admin/types";
-import { toast } from "@/hooks/use-toast";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { useRouter } from "next/navigation";
+import { AppHeader } from "@/components/app-header";
 
 export default function AddAdmin() {
   const [formData, setFormData] = useState({
@@ -111,7 +109,7 @@ export default function AddAdmin() {
 
       {/* Main Content */}
       <div className="flex-1">
-        <Header title="Add Admin" />
+        <AppHeader title="Add Admin" />
 
         {/* Main Content Area */}
         <main className="flex-1 p-8">

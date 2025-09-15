@@ -72,7 +72,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen flex flex-col !font-poppins">
       {/* ✅ Shared AppHeader */}
-      <AppHeader showAvatar={false} title="Admin Login" />
+      <AppHeader showAvatar={false} showLogo={true}  />
 
       {/* Background with form */}
       <div

@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { Sidebar } from "@/components/superadmin/sidebar";
 import { Header } from "@/components/superadmin/header";
+import { AppHeader } from "@/components/app-header";
 
 export default function Dashboard() {
   return (
@@ -18,7 +19,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1">
-        <Header title="Dashboard" />
+        <AppHeader title="Dashboard" />
 
         {/* Main Content Area */}
         <main className="flex-1 p-8">

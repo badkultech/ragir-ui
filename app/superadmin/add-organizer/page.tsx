@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Sidebar } from "@/components/superadmin/sidebar";
-import { Header } from "@/components/superadmin/header";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,6 +27,7 @@ import {
   RegisterOrganizerRequest,
 } from "@/lib/services/superadmin/add-organizer/type";
 import LoadingOverlay from "@/components/common/LoadingOverlay";
+import { AppHeader } from "@/components/app-header";
 
 type FormFields = {
   organizerId: string;
@@ -112,7 +112,7 @@ export default function RegisterOrganizer() {
       <Sidebar />
 
       <div className="flex-1">
-        <Header title="Register New Organizer" />
+        <AppHeader title="Register New Organizer" />
 
         <main className="flex-1 p-6 sm:p-8">
           <div className="max-w-5xl mx-auto">
