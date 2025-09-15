@@ -12,6 +12,8 @@ import Link from "next/link";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header"; // ✅ import your shared header
 import LoadingOverlay from "@/components/common/LoadingOverlay";
+import { AuthTokenPayload } from "@/hooks/useDecodedToken";
+import { jwtDecode } from "jwt-decode";
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -43,6 +45,9 @@ export default function AdminLogin() {
         localStorage.setItem("accessToken", result.accessToken);
         localStorage.setItem("refreshToken", result.refreshToken);
 
+        // decode immediately instead of waiting for Redux
+        const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
+
         dispatch(
           setCredentials({
             accessToken: result.accessToken,
@@ -51,7 +56,7 @@ export default function AdminLogin() {
         );
 
         // redirect based on role
-        const dashboardPath = getDashboardPath(userData?.userType);
+        const dashboardPath = getDashboardPath(decodedData?.userType);
         showSuccess("Login successful!");
         router.replace(dashboardPath);
       }

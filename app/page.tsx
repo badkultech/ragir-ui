@@ -7,6 +7,7 @@ import { GradientButton } from "@/components/gradient-button";
 import { ArrowRight } from "lucide-react";
 import { useGenerateOtpMutation } from "@/lib/services/otp";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import LoadingOverlay from "@/components/common/LoadingOverlay";
 
 export default function PhoneEntryPage() {
   const [loginMethod, setLoginMethod] = useState<"EMAIL" | "MOBILE">("MOBILE");
@@ -126,6 +127,8 @@ export default function PhoneEntryPage() {
                 onClick={handleGenerateOTP}
                 className="flex items-center justify-center gap-2"
               >
+                <LoadingOverlay isLoading={isSendingOtp}  message="Sending OTP..."/>
+
                 Generate OTP
                 <ArrowRight className="h-5 w-5" />
               </GradientButton>

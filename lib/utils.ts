@@ -73,6 +73,7 @@ export const PublicRoutes = [
   "/register",
   "/user/landing",
   "/admin/forgot-password",
+  "/verify-otp",
 ];
 
 // ✅ Always arrays. Use ["*"] to mean unrestricted access.

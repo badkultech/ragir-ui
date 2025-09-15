@@ -77,7 +77,7 @@ export default function VerifyOTPPage() {
       if (result.accessToken && result.refreshToken) {
         localStorage.setItem("accessToken", result.accessToken);
         localStorage.setItem("refreshToken", result.refreshToken);
-        router.replace("/travler/profile");
+        router.replace("/traveler/profile");
       }
       dispatch(
         setCredentials({
@@ -188,7 +188,7 @@ export default function VerifyOTPPage() {
                   Back
                 </GradientButton>
 
-                <LoadingOverlay isLoading={isLoading} message="Verifying OTP" />
+                
                 <GradientButton
                   onClick={handleVerify}
                   disabled={otp.some((digit) => !digit)} // disables if any digit is empty
@@ -198,6 +198,7 @@ export default function VerifyOTPPage() {
                       : ""
                   }`}
                 >
+                  <LoadingOverlay isLoading={isLoading} message="Verifying OTP" />
                   Verify and Continue
                   <ArrowRight className="h-5 w-5" />
                 </GradientButton>

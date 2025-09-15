@@ -20,7 +20,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    return href === "/traveler/profile"
+    return href === "/traveler"
       ? pathname === href
       : pathname.startsWith(href);
   };
