@@ -70,17 +70,17 @@ export default function HydratedAuth({
     }
 
     if (!isAuthenticated) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
 
     if (!userData?.userType) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
 
     if (!isAllowedRoutes(pathname, userData.userType)) {
-      router.replace("/login");
+      router.replace("/");
     }
   }, [hydrated, accessToken, userData, pathname, router]);
 
