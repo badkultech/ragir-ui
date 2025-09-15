@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Grid3X3, Plus, User, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  Grid3X3,
+  Plus,
+  User,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 
 type NavItem = {
@@ -38,7 +44,11 @@ const nav: NavItem[] = [
   },
 ];
 
-export function Sidebar() {
+type SidebarProps = {
+  showLogo?: boolean; // 👈 new prop
+};
+
+export function Sidebar({ showLogo = true }: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
@@ -64,12 +74,14 @@ export function Sidebar() {
 
   return (
     <aside className="w-72 min-h-screen bg-white border-r border-gray-200 flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="Ragir" className="h-8 mr-2" />
+      {/* Logo (optional) */}
+      {showLogo && (
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center">
+            <img src="/logo.png" alt="Ragir" className="h-8 mr-2" />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Nav */}
       <nav className="p-4 space-y-3">

@@ -1,6 +1,6 @@
 "use client"
-import { SuperAdminProfileDropdown } from "./profileDropdown"
-import { NotificationDropdown } from "./notificationDropdown"
+import { SuperAdminProfileDropdown } from "../profileDropdowns/superAdminProfileDropdown"
+import { NotificationDropdown } from "../notificationDropdowns/superAdminNotificationDropdown"
 import { selectAuthState } from "@/lib/slices/auth"
 import { useSelector } from "react-redux"
 

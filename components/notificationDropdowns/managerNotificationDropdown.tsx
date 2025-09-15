@@ -21,7 +21,7 @@ interface NotificationDropdownProps {
   role?: string;
 }
 
-export function NotificationDropdown({
+export function ManagerNotificationDropdown({
   organizationId,
   userId,
   role,

@@ -123,7 +123,7 @@ export default function VerifyOTPPage() {
         backgroundBlendMode: "overlay",
       }}
     >
-      <AppHeader showAvatar={false} />
+      <AppHeader showAvatar={false}  showLogo={true}/>
 
       <div className="flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl">
