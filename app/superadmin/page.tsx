@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Plus,
   Users,
@@ -9,10 +11,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Sidebar } from "@/components/superadmin/sidebar";
-import { Header } from "@/components/superadmin/header";
 import { AppHeader } from "@/components/app-header";
+import { useGetTenantStatsQuery } from "@/lib/services/superadmin";
 
 export default function Dashboard() {
+  const {
+  data: tenantStatsData,
+  isLoading: loading,
+  error,
+} = useGetTenantStatsQuery();
+  
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -31,7 +39,9 @@ export default function Dashboard() {
                 <div className="p-2 bg-green-100 rounded-lg mb-4">
                   <UserCheck className="w-6 h-6 text-green-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">24</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                 {tenantStatsData?.activeAdmins ?? 0}
+                </h3>
                 <p className="text-gray-600 text-sm">Active Admins</p>
               </div>
 
@@ -42,7 +52,9 @@ export default function Dashboard() {
                     <Clock className="w-6 h-6 text-orange-600" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">8</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  {tenantStatsData?.pendingAdmins ?? 0}
+                </h3>
                 <p className="text-gray-600 text-sm">Pending Admins</p>
               </div>
 
@@ -53,7 +65,9 @@ export default function Dashboard() {
                     <Building2 className="w-6 h-6 text-blue-600" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">156</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  {tenantStatsData?.activeOrganizations ?? 0}
+                </h3>
                 <p className="text-gray-600 text-sm">Active Organizers</p>
               </div>
 
@@ -64,7 +78,9 @@ export default function Dashboard() {
                     <TrendingUp className="w-6 h-6 text-purple-600" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">23</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  {tenantStatsData?.pendingOrganizations ?? 0}
+                </h3>
                 <p className="text-gray-600 text-sm">Pending Organizers</p>
               </div>
             </div>

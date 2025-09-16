@@ -3,7 +3,6 @@
 import { Plus, Users, UserCheck, UserX, Mail } from "lucide-react";
 import Link from "next/link";
 import { Sidebar } from "@/components/superadmin/sidebar";
-import { Header } from "@/components/superadmin/header";
 import { useState } from "react";
 import { Admin } from "@/lib/services/superadmin/types";
 import {

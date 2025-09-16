@@ -31,6 +31,7 @@ export const ENDPOINTS = {
     `/tenant/dashboard/user/${publicId}/activate`,
   SUPER_ADMIN_SUSPEND: (publicId: string) =>
     `/tenant/dashboard/user/${publicId}/suspend`,
+  SUPER_ADMIN_STATS: "/tenant/tenantStats",
 
   // users
   USER_PROFILE: (organizationId: string, userId: string) =>
