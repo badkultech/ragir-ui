@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
-import { ROLE_ROUTE_ACCESS, ROLES, RoleType } from "@/lib/utils";
+import { PublicRoutes, ROLE_ROUTE_ACCESS, ROLES, RoleType } from "@/lib/utils";
 
 /**
  * Utility to check if a given route is allowed for the role
@@ -50,13 +50,7 @@ export default function HydratedAuth({
     }
   }, [dispatch]);
 
-  const PUBLIC_ROUTES = [
-    "/login",
-    "/superadmin/login",
-    "/admin/login",
-    "/register",
-    "/user/landing",
-  ];
+
 
   useEffect(() => {
     if (!hydrated) return;
@@ -64,22 +58,22 @@ export default function HydratedAuth({
     const isAuthenticated = !!accessToken;
 
     // Allow public routes always
-    if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+    if (PublicRoutes.some((route) => pathname.startsWith(route))) {
       return; // ✅ do not redirect
     }
 
     if (!isAuthenticated) {
-      router.replace("/login");
+      router.replace("/");
       return;
     }
 
     if (!userData?.userType) {
-      router.replace("/unauthorized");
+      router.replace("/");
       return;
     }
 
     if (!isAllowedRoutes(pathname, userData.userType)) {
-      router.replace("/unauthorized");
+      router.replace("/");
     }
   }, [hydrated, accessToken, userData, pathname, router]);
 

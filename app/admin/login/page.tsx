@@ -7,8 +7,13 @@ import { selectAuthState, setCredentials } from "@/lib/slices/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { getDashboardPath } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import Link from "next/link";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import { AppHeader } from "@/components/app-header"; // ✅ import your shared header
+import LoadingOverlay from "@/components/common/LoadingOverlay";
+import { AuthTokenPayload } from "@/hooks/useDecodedToken";
+import { jwtDecode } from "jwt-decode";
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +33,7 @@ export default function AdminLogin() {
 
   const [login] = useLoginMutation();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isFormValid) return;
@@ -36,10 +41,12 @@ export default function AdminLogin() {
     setIsLoading(true);
     try {
       const result = await login({ email, password }).unwrap();
-      console.log("Login result:", result);
       if (result.accessToken && result.refreshToken) {
         localStorage.setItem("accessToken", result.accessToken);
         localStorage.setItem("refreshToken", result.refreshToken);
+
+        // decode immediately instead of waiting for Redux
+        const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
 
         dispatch(
           setCredentials({
@@ -49,26 +56,14 @@ export default function AdminLogin() {
         );
 
         // redirect based on role
-        const dashboardPath = getDashboardPath(userData?.userType);
+        const dashboardPath = getDashboardPath(decodedData?.userType);
+        showSuccess("Login successful!");
         router.replace(dashboardPath);
       }
     } catch (error) {
-      console.error("Login error:", error); console.error("mutation failed:", error);
-      // Use your custom toast for backend error messages
+      console.error("Login error:", error);
       const fetchError = error as FetchBaseQueryError;
-
-      const message =
-        "status" in fetchError &&
-        fetchError.data &&
-        typeof fetchError.data === "object"
-          ? (fetchError.data as any).message
-          : "Something went wrong. Please try again.";
-
-      toast({
-        title: "Error",
-        description: message,
-        variant: "destructive",
-      });
+      showApiError(error);
     } finally {
       setIsLoading(false);
     }
@@ -76,50 +71,14 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex flex-col !font-poppins">
-      {/* Header */}
-      <header className="w-full bg-white shadow-sm flex items-center justify-between px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="Ragir" className="h-8 mr-2" />
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="relative">
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-5 h-5 text-gray-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 17h5l-3.405-3.405A2.032 2.032 0 0118 12.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v1.159c0 .538-.214 1.055-.595 1.436L2 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />
-              </svg>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></div>
-            </div>
-          </div>
-          <div className="w-10 h-10 rounded-full border-2 border-gray-300 overflow-hidden">
-            <img
-              src="/user-avatar.png"
-              alt="User Avatar"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.src =
-                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0iIzlDQTNBRiIvPgo8cGF0aCBkPSJNMzIgMzJDMzIgMjYuNDc3MSAyNy41MjI5IDIyIDIyIDIySDhDMTIuNDc3MSAyMiA4IDI2LjQ3NzEgOCAzMlYzMkgzMloiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cg==";
-              }}
-            />
-          </div>
-        </div>
-      </header>
+      {/* ✅ Shared AppHeader */}
+      <AppHeader showAvatar={false} showLogo={true}  />
 
       {/* Background with form */}
       <div
         className="flex-1 flex items-center justify-center bg-cover bg-center p-4 min-h-screen"
         style={{ backgroundImage: "url('/OrgRegisterBg.jpg')" }}
       >
-        {/* Card Container - Same minimal design as register */}
         <div className="w-full max-w-lg bg-white rounded-3xl shadow-lg p-8">
           <h1 className="text-4xl !font-poppins font-bold mb-8 text-gray-900">
             Admin Login
@@ -168,7 +127,7 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {/* Remember Me Checkbox */}
+            {/* Remember Me */}
             <div className="flex items-center pt-2">
               <input
                 id="remember-me"
@@ -192,21 +151,19 @@ export default function AdminLogin() {
                 disabled={!isFormValid || isLoading}
                 className="w-full !font-poppins font-semibold text-xl py-4 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FD401A] text-white hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] shadow-md"
               >
-                {isLoading ? "Logging in..." : "Login to Dashboard"}
+                <LoadingOverlay isLoading={isLoading} message="Logging in..." />
+                Login to Dashboard
               </button>
             </div>
 
-            {/* Forgot Password Link */}
+            {/* Forgot Password */}
             <div className="text-center pt-2">
-              <button
-                type="button"
-                className="text-[#FF804C] text-base !font-poppins hover:underline focus:outline-none"
-                onClick={() => {
-                  console.log("Forgot password clicked");
-                }}
+              <Link
+                href="/admin/forgot-password"
+                className="text-[#FF804C] text-base !font-poppins hover:underline font-medium"
               >
                 Forgot password?
-              </button>
+              </Link>
             </div>
           </form>
         </div>
