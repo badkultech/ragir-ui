@@ -699,11 +699,11 @@ export default function Dashboard() {
         confirmColor={modalConfig.confirmColor}
       />
 
-      <DetailsModal
+      {/* <DetailsModal
         isOpen={detailsModalOpen}
         onClose={closeDetailsModal}
         admin={selectedAdmin}
-      />
+      /> */}
     </div>
   );
 }
