@@ -15,6 +15,8 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError } from "@/lib/utils/toastHelpers";
 import App from "next/app";
 import { AppHeader } from "@/components/app-header";
+import { jwtDecode } from "jwt-decode";
+import { AuthTokenPayload } from "@/hooks/useDecodedToken";
 
 export default function AdminRegister() {
   const searchParams = useSearchParams();
@@ -68,9 +70,6 @@ export default function AdminRegister() {
         password,
       }).unwrap();
 
-      // decode immediately instead of waiting for Redux
-      const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
-
       console.log("raw mutation result:", result);
 
       // save tokens in localStorage & redux
@@ -84,6 +83,8 @@ export default function AdminRegister() {
             refreshToken: result.refreshToken,
           })
         );
+        // decode immediately instead of waiting for Redux
+        const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
 
         // redirect based on role
         const dashboardPath = getDashboardPath(decodedData?.userType);
