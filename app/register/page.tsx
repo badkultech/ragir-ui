@@ -68,6 +68,9 @@ export default function AdminRegister() {
         password,
       }).unwrap();
 
+      // decode immediately instead of waiting for Redux
+      const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
+
       console.log("raw mutation result:", result);
 
       // save tokens in localStorage & redux
@@ -83,7 +86,7 @@ export default function AdminRegister() {
         );
 
         // redirect based on role
-        const dashboardPath = getDashboardPath(userData?.userType);
+        const dashboardPath = getDashboardPath(decodedData?.userType);
         router.replace(dashboardPath);
       }
     } catch (err) {
