@@ -95,7 +95,7 @@ export default function OrganizerRegisterPage() {
           style={{
             background:
               "linear-gradient(135deg, rgba(255,189,189,0.35) 0%, rgba(255,145,125,0.35) 35%, rgba(253,112,97,0.35) 60%, rgba(255,182,120,0.35) 100%)",
-            backgroundImage: "url('/OrgRegisterBg.jpg')",
+            backgroundImage: "url('/bg.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}

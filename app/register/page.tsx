@@ -107,7 +107,7 @@ export default function AdminRegister() {
       {/* Background */}
       <div
         className="flex-1 flex items-center justify-center bg-cover bg-center pt-10"
-        style={{ backgroundImage: "url('/OrgRegisterBg.jpg')" }}
+        style={{ backgroundImage: "url('/bg.jpg')" }}
       >
         {/* Card */}
         <form

@@ -79,7 +79,7 @@ export default function PhoneEntryPage() {
     <div
       className="min-h-screen bg-gradient-to-br from-orange-200 via-pink-200 to-red-200"
       style={{
-        backgroundImage: "url(/orgRegisterBg.jpg)",
+        backgroundImage: "url(/bg.jpg)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundBlendMode: "overlay",

@@ -76,7 +76,7 @@ export default function AdminLogin() {
       <main className="relative flex-1">
         {/* Background image placed in an absolute container so it always covers the viewport */}
         <div className="absolute inset-0 -z-10">
-          {/* IMPORTANT: file is pulled from /public/orgRegisterBg.jpg (case-sensitive) */}
+          {/* IMPORTANT: file is pulled from /public/bg.jpg (case-sensitive) */}
           <Image
             src="/bg.jpg"
             alt="Background"

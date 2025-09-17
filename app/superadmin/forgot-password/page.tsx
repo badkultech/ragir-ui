@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
       {/* Background and card (same structure as Admin Login) */}
       <div
         className="flex-1 flex items-center justify-center bg-cover bg-center p-4 min-h-screen"
-        style={{ backgroundImage: "url('/OrgRegisterBg.jpg')" }}
+        style={{ backgroundImage: "url('/bg.jpg')" }}
       >
         <div className="w-full max-w-lg bg-white rounded-3xl shadow-lg p-8">
           {!isSubmitted ? (
