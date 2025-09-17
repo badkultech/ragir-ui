@@ -4,7 +4,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
-import { getDashboardPath, PublicRoutes, ROLE_ROUTE_ACCESS, ROLES, RoleType } from "@/lib/utils";
+import {
+  getDashboardPath,
+  PublicRoutes,
+  ROLE_ROUTE_ACCESS,
+  ROLES,
+  RoleType,
+} from "@/lib/utils";
 
 /**
  * Utility to check if a given route is allowed for the role
@@ -33,7 +39,8 @@ export default function HydratedAuth({
 
   const [hydrated, setHydrated] = useState(false);
 
-  const { accessToken, userData, isTokenExpired } = useSelector(selectAuthState);
+  const { accessToken, userData, isTokenExpired } =
+    useSelector(selectAuthState);
 
   useEffect(() => {
     try {
@@ -54,14 +61,14 @@ export default function HydratedAuth({
     if (!hydrated) return;
 
     const isAuthenticated = !!accessToken;
-    if (pathname.includes('/login')) {
+    if (pathname.includes("/login")) {
       if ((accessToken || !isTokenExpired) && userData?.userType) {
         const dashboardPath = getDashboardPath(userData?.userType);
         router.replace(dashboardPath);
       }
     }
     // Allow public routes always
-    if (PublicRoutes.some((route) => pathname.startsWith(route))) {
+    if (PublicRoutes.some((route) => pathname === (route))) {
       return; // ✅ do not redirect
     }
 
@@ -76,7 +83,8 @@ export default function HydratedAuth({
     }
 
     if (!isAllowedRoutes(pathname, userData.userType)) {
-      router.replace("/");
+      const path = getDashboardPath(userData.userType);
+      router.replace(path + "/dashboard");
     }
   }, [hydrated, accessToken, userData, pathname, router]);
 

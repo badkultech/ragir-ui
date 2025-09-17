@@ -94,13 +94,13 @@ export const ROLE_ROUTE_ACCESS: Record<RoleType, string[]> = {
 
   [ROLES.ORGANIZER]: [
     "/organizer/notifications",
-    "/organizer/team",
-    "/organizer/settings",
-    "/organizer/create-trip",
-    "/organizer/trips", // base
-    "/organizer/trips/*", // dynamic children
-    "/organizer/queries",
-    "/organizer/queries/*",
+    "/organizers/team",
+    "/organizers/settings",
+    "/organizers/create-trip",
+    "/organizers/trips", // base
+    "/organizers/trips/*", // dynamic children
+    "/organizers/queries",
+    "/organizers/queries/*",
   ],
 };
 
