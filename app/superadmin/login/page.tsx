@@ -71,7 +71,7 @@ export default function AdminLogin() {
       {/* Fill remaining height without extra scroll */}
       <div
         className="flex-1 overflow-hidden"
-        style={{ backgroundImage: "url('/OrgRegisterBg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{ backgroundImage: "url('/bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}
       >
         {/* Center the card; prevent internal scroll by letting form wrap */}
         <div className="h-full w-full flex items-center justify-center p-3 md:p-4">
