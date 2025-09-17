@@ -20,6 +20,11 @@ export const ENDPOINTS = {
   RESEND_INVITE: "/public/invite/resend-invite",
   FORGOT_PASSWORD: "/public/invite/forgot-password",
 
+    // invite and password reset
+  SETUP_ORGANIZER_PASSWORD: "/public/invite/setup-organizer-password",
+  RESEND_ORGANIZER_INVITE: "/public/invite/resend-invite",
+  FORGOT_ORGANIZER_PASSWORD: "/public/invite/forgot-password",
+
   // super admin dashboard
   GET_ALL_ADMINS: (organizationId: string) =>
     `/org/${organizationId}/admin/admins`,
@@ -129,7 +134,7 @@ export const getDashboardPath = (role?: string) => {
     case ROLES.SYSTEM_ADMIN:
       return "/superadmin";
     case ROLES.ORGANIZER:
-      return "/organizer";
+      return "/organizers";
     case ROLES.USER:
       return "/traveler/profile"; // adjust to your actual path
     default:

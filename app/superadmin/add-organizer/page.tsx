@@ -116,24 +116,17 @@ export default function RegisterOrganizer() {
 
         <main className="flex-1 p-6 sm:p-8">
           <div className="max-w-5xl mx-auto">
-            {/* Back + Title */}
-            <div className="flex items-center mb-6">
-              <Link
-                href="/superadmin/organizers"
-                className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </Link>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Register New Organizer
-              </h1>
-            </div>
-
             <form
               onSubmit={onSubmit}
               className="bg-white rounded-lg shadow-sm border p-6 sm:p-8"
             >
               <div className="space-y-6 max-w-2xl">
+                {/* Back + Title */}
+                <div className="flex items-center mb-6">
+                  <h1 className="text-2xl font-semibold text-gray-900">
+                    Register New Organizer
+                  </h1>
+                </div>
                 {/* Organizer ID */}
                 <div>
                   <Label
@@ -287,9 +280,11 @@ export default function RegisterOrganizer() {
                         "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
                     }}
                   >
-                    <LoadingOverlay isLoading={submitting} message="Registering..." />
-
-                   Register Organizer
+                    <LoadingOverlay
+                      isLoading={submitting}
+                      message="Registering..."
+                    />
+                    Register Organizer
                   </button>
                 </div>
               </div>

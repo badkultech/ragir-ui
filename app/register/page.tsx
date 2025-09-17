@@ -93,7 +93,6 @@ export default function AdminRegister() {
     } catch (err) {
       console.error("mutation failed:", err);
       // Use your custom toast for backend error messages
-      const fetchError = err as FetchBaseQueryError;
       showApiError(err);
     } finally {
       setIsLoading(false);
