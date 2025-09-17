@@ -55,7 +55,7 @@ export default function HydratedAuth({
 
     const isAuthenticated = !!accessToken;
     if (pathname.includes('/login')) {
-      if (accessToken || !isTokenExpired) {
+      if ((accessToken || !isTokenExpired) && userData?.userType) {
         const dashboardPath = getDashboardPath(userData?.userType);
         router.replace(dashboardPath);
       }
