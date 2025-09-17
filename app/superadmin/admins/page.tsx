@@ -328,7 +328,7 @@ export default function Dashboard() {
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex-1">
-          <AppHeader title="Dashboard" />
+          <AppHeader title="Admins" />
           <main className="p-8">
             <div className="text-center py-12">
               <div className="text-red-600 mb-4">
@@ -353,7 +353,7 @@ export default function Dashboard() {
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex-1">
-          <AppHeader title="Dashboard" />
+          <AppHeader title="Admins" />
           <main className="p-8">
             <div className="text-center py-12">
               <div className="text-gray-600 mb-4">Loading user data...</div>
@@ -434,7 +434,7 @@ export default function Dashboard() {
       <Sidebar />
 
       <div className="flex-1">
-        <AppHeader title="Dashboard" />
+        <AppHeader title="Admins" />
 
         <main className="p-8">
           {/* Top Section */}

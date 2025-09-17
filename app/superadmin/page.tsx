@@ -16,11 +16,11 @@ import { useGetTenantStatsQuery } from "@/lib/services/superadmin";
 
 export default function Dashboard() {
   const {
-  data: tenantStatsData,
-  isLoading: loading,
-  error,
-} = useGetTenantStatsQuery();
-  
+    data: tenantStatsData,
+    isLoading: loading,
+    error,
+  } = useGetTenantStatsQuery();
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -35,54 +35,59 @@ export default function Dashboard() {
             {/* Dashboard Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {/* Active Admins */}
-              <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                <div className="p-2 bg-green-100 rounded-lg mb-4">
-                  <UserCheck className="w-6 h-6 text-green-600" />
+              <Link href={"/superadmin/admins"}>
+                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
+                  <div className="p-2 bg-green-100 rounded-lg mb-4">
+                    <UserCheck className="w-6 h-6 text-green-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                    {tenantStatsData?.activeAdmins ?? 0}
+                  </h3>
+                  <p className="text-gray-600 text-sm">Active Admins</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                 {tenantStatsData?.activeAdmins ?? 0}
-                </h3>
-                <p className="text-gray-600 text-sm">Active Admins</p>
-              </div>
-
+              </Link>
               {/* Pending Admins */}
-              <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <Clock className="w-6 h-6 text-orange-600" />
+              <Link href={"/superadmin/admins"}>
+                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Clock className="w-6 h-6 text-orange-600" />
+                    </div>
                   </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                    {tenantStatsData?.pendingAdmins ?? 0}
+                  </h3>
+                  <p className="text-gray-600 text-sm">Pending Admins</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                  {tenantStatsData?.pendingAdmins ?? 0}
-                </h3>
-                <p className="text-gray-600 text-sm">Pending Admins</p>
-              </div>
-
+              </Link>
               {/* Active Organizations */}
-              <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Building2 className="w-6 h-6 text-blue-600" />
+              <Link href={"/superadmin/organizers"}>
+                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Building2 className="w-6 h-6 text-blue-600" />
+                    </div>
                   </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                    {tenantStatsData?.activeOrganizations ?? 0}
+                  </h3>
+                  <p className="text-gray-600 text-sm">Active Organizers</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                  {tenantStatsData?.activeOrganizations ?? 0}
-                </h3>
-                <p className="text-gray-600 text-sm">Active Organizers</p>
-              </div>
-
-              {/* Pending Organizations */}
-              <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <TrendingUp className="w-6 h-6 text-purple-600" />
+              </Link>
+              <Link href={"/superadmin/organizers"}>
+                {/* Pending Organizations */}
+                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <TrendingUp className="w-6 h-6 text-purple-600" />
+                    </div>
                   </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                    {tenantStatsData?.pendingOrganizations ?? 0}
+                  </h3>
+                  <p className="text-gray-600 text-sm">Pending Organizers</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                  {tenantStatsData?.pendingOrganizations ?? 0}
-                </h3>
-                <p className="text-gray-600 text-sm">Pending Organizers</p>
-              </div>
+              </Link>
             </div>
             {/* Add Sections Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
