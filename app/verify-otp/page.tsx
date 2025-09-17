@@ -123,7 +123,7 @@ export default function VerifyOTPPage() {
         backgroundBlendMode: "overlay",
       }}
     >
-      <AppHeader showAvatar={false}  showLogo={true}/>
+      <AppHeader showAvatar={false} showLogo={true} />
 
       <div className="flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl">
@@ -145,20 +145,21 @@ export default function VerifyOTPPage() {
                 <label className="block text-sm font-semibold text-gray-900 mb-4">
                   Enter OTP
                 </label>
-                <div className="flex gap-3 justify-center">
-                  {otp.map((digit, index) => (
-                    <input
-                      key={index}
-                      id={`otp-${index}`}
-                      type="text"
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(index, e)}
-                      className="w-12 h-12 text-center text-xl font-semibold border border-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                      maxLength={1}
-                    />
-                  ))}
-                </div>
+                <div className="flex justify-center gap-2 sm:gap-3">
+  {otp.map((digit, index) => (
+    <input
+      key={index}
+      id={`otp-${index}`}
+      type="text"
+      value={digit}
+      onChange={(e) => handleOtpChange(index, e.target.value)}
+      onKeyDown={(e) => handleKeyDown(index, e)}
+      className="w-10 sm:w-12 h-12 text-center text-lg font-semibold border border-gray-400 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+      maxLength={1}
+    />
+  ))}
+</div>
+
               </div>
 
               <div className="text-center">
@@ -188,7 +189,6 @@ export default function VerifyOTPPage() {
                   Back
                 </GradientButton>
 
-                
                 <GradientButton
                   onClick={handleVerify}
                   disabled={otp.some((digit) => !digit)} // disables if any digit is empty
@@ -198,7 +198,10 @@ export default function VerifyOTPPage() {
                       : ""
                   }`}
                 >
-                  <LoadingOverlay isLoading={isLoading} message="Verifying OTP" />
+                  <LoadingOverlay
+                    isLoading={isLoading}
+                    message="Verifying OTP"
+                  />
                   Verify and Continue
                   <ArrowRight className="h-5 w-5" />
                 </GradientButton>
