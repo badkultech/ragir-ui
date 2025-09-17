@@ -70,7 +70,6 @@ export const PublicRoutes = [
   "/",
   "/login",
   "/superadmin/login",
-  "/admin/login",
   "/register",
   "/user/landing",
   "/admin/forgot-password",

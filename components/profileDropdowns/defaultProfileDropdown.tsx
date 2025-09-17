@@ -61,7 +61,7 @@ export function DefaultProfileDropdown() {
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
             // Optionally redirect
-            window.location.href = "/admin/login";
+            window.location.href = "/superadmin/login";
           }}
         >
           Log out

@@ -4,7 +4,7 @@ import { ApiResponse } from '../common-types';
 import { ENDPOINTS } from '@/lib/utils';
 import { LoginDTO } from '../otp/types';
 import { method } from 'lodash';
-import ForgotPasswordPage from '@/app/admin/forgot-password/page';
+import ForgotPasswordPage from '@/app/superadmin/forgot-password/page';
 
 export interface SetupPasswordRequest {
   token: string;

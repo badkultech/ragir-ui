@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
               <div className="flex items-center mb-6">
                 <button
                   type="button"
-                  onClick={() => router.replace("/admin/login")}
+                  onClick={() => router.replace("/superadmin/login")}
                   className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
                   <span className="text-sm text-gray-600 !font-poppins">
                     Remember your password?{" "}
                     <Link
-                      href="/admin/login"
+                      href="/superadmin/login"
                       className="text-[#FF804C] hover:underline font-medium"
                     >
                       Sign in here
