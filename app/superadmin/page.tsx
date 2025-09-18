@@ -13,8 +13,10 @@ import Link from "next/link";
 import { Sidebar } from "@/components/superadmin/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { useGetTenantStatsQuery } from "@/lib/services/superadmin";
+import { useState } from "react";
 
 export default function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
     data: tenantStatsData,
     isLoading: loading,
@@ -23,11 +25,14 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Content */}
       <div className="flex-1">
-        <AppHeader title="Dashboard" />
+        <AppHeader
+          title="Dashboard"
+          onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
+        />
 
         {/* Main Content Area */}
         <main className="flex-1 p-8">

@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 
 export default function AddAdmin() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
@@ -105,11 +106,14 @@ export default function AddAdmin() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+     <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Content */}
       <div className="flex-1">
-        <AppHeader title="Add Admin" />
+        <AppHeader
+          title="Add Admins"
+          onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
+        />
 
         {/* Main Content Area */}
         <main className="flex-1 p-8">

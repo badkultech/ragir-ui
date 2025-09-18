@@ -1,6 +1,7 @@
 "use client";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import { Menu } from "lucide-react";
 
 // Profile dropdowns
 import { SuperAdminProfileDropdown } from "./profileDropdowns/superAdminProfileDropdown";
@@ -17,10 +18,16 @@ import { DefaultNotificationDropdown } from "./notificationDropdowns/defaultNoti
 type AppHeaderProps = {
   title?: string;
   showAvatar?: boolean;
-  showLogo?: boolean; // 👈
+  showLogo?: boolean;
+  onMenuClick?: () => void; // 👈 new prop
 };
 
-export function AppHeader({ title, showAvatar = true,  showLogo = false, }: AppHeaderProps) {
+export function AppHeader({
+  title,
+  showAvatar = true,
+  showLogo = false,
+  onMenuClick,
+}: AppHeaderProps) {
   const { userData } = useSelector(selectAuthState);
 
   // choose ProfileDropdown
@@ -56,23 +63,34 @@ export function AppHeader({ title, showAvatar = true,  showLogo = false, }: AppH
   }
 
   return (
-    <header className="w-full bg-white border-b border-gray-200 shadow-sm flex items-center justify-between px-6 py-3">
+    <header className="w-full bg-white border-b border-gray-200 shadow-sm flex items-center justify-between px-4 md:px-6 py-3">
       <div className="flex items-center gap-4 flex-1">
-       {/* Logo (optional) */}
+        {/* Hamburger (mobile only) */}
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="p-2 rounded-md hover:bg-gray-100 md:hidden"
+          >
+            <Menu className="w-6 h-6 text-gray-700" />
+          </button>
+        )}
+
+        {/* Logo (optional, shown if showLogo=true) */}
         {showLogo && (
           <div className="flex items-center">
             <img src="/logo.png" alt="Ragir" className="h-8" />
           </div>
         )}
-     
-      {/* Title */}
-      {title && (
-        <div className="flex-1">
-          <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-        </div>
-      )}
 
-      {/* Right side */}
+        {/* Title */}
+        {title && (
+          <h1 className="text-lg md:text-xl font-semibold text-gray-900">
+            {title}
+          </h1>
+        )}
+      </div>
+
+      {/* Right side (Notifications + Profile) */}
       {showAvatar && (
         <div className="flex items-center space-x-4">
           {userData?.organizationPublicId && userData?.userPublicId ? (
@@ -87,7 +105,6 @@ export function AppHeader({ title, showAvatar = true,  showLogo = false, }: AppH
           <ProfileDropdown />
         </div>
       )}
-      </div>
     </header>
   );
 }

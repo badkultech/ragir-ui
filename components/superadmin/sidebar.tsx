@@ -8,6 +8,7 @@ import {
   User,
   ChevronDown,
   ChevronRight,
+  X,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -25,9 +26,7 @@ const nav: NavItem[] = [
     label: "Admins",
     href: "/superadmin/admins",
     icon: User,
-    children: [
-      { label: "Add Admin", href: "/superadmin/add-admin", icon: Plus },
-    ],
+    children: [{ label: "Add Admin", href: "/superadmin/add-admin", icon: Plus }],
   },
   {
     label: "Organizers",
@@ -45,10 +44,12 @@ const nav: NavItem[] = [
 ];
 
 type SidebarProps = {
-  showLogo?: boolean; // 👈 new prop
+  showLogo?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
-export function Sidebar({ showLogo = true }: SidebarProps) {
+export function Sidebar({ showLogo = true, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
@@ -59,7 +60,6 @@ export function Sidebar({ showLogo = true }: SidebarProps) {
         : pathname.startsWith(href)
       : false;
 
-  // auto-open menu if child is active
   useEffect(() => {
     nav.forEach((item) => {
       if (item.children?.some((child) => isActive(child.href))) {
@@ -73,63 +73,81 @@ export function Sidebar({ showLogo = true }: SidebarProps) {
   };
 
   return (
-    <aside className="w-72 min-h-screen bg-white border-r border-gray-200 flex flex-col">
-      {/* Logo (optional) */}
-      {showLogo && (
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center">
-            <img src="/logo.png" alt="Ragir" className="h-8 mr-2" />
-          </div>
-        </div>
+    <>
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={onClose}
+        />
       )}
 
-      {/* Nav */}
-      <nav className="p-4 space-y-3">
-        {nav.map(({ label, href, icon: Icon, boxedPlus, children }) => {
-          const active = isActive(href);
+      <aside
+        className={`fixed md:static top-0 left-0 z-50 h-full w-72 bg-white border-r border-gray-200 flex flex-col transform transition-transform duration-300
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+      >
+        {/* Mobile close button */}
+        <div className="flex items-center justify-between p-4 md:hidden">
+          {showLogo && <img src="/logo.png" alt="Ragir" className="h-8" />}
+          <button
+            onClick={onClose}
+            className="p-2 rounded-md hover:bg-gray-100"
+          >
+            <X className="w-6 h-6 text-gray-600" />
+          </button>
+        </div>
 
-          return (
-            <div key={label}>
-              {/* Top-level with link + expand arrow */}
-              <div className="flex items-center justify-between">
-                <Link
-                  href={href || "#"}
-                  className={[
-                    "group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all",
-                    active
-                      ? "bg-gray-900 text-white shadow-sm"
-                      : "text-gray-700 hover:bg-gray-100",
-                  ].join(" ")}
-                >
-                  <Icon
+        {/* Logo (desktop) */}
+        {showLogo && (
+          <div className="hidden md:block p-6 border-b border-gray-100">
+            <img src="/logo.png" alt="Ragir" className="h-8" />
+          </div>
+        )}
+
+        {/* Navigation */}
+        <nav className="p-4 space-y-3 overflow-y-auto">
+          {nav.map(({ label, href, icon: Icon, boxedPlus, children }) => {
+            const active = isActive(href);
+
+            return (
+              <div key={label}>
+                <div className="flex items-center justify-between">
+                  <Link
+                    href={href || "#"}
                     className={[
-                      "w-5 h-5",
+                      "group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all",
                       active
-                        ? "text-white"
-                        : "text-gray-700 group-hover:text-gray-900",
+                        ? "bg-gray-900 text-white shadow-sm"
+                        : "text-gray-700 hover:bg-gray-100",
                     ].join(" ")}
-                  />
-                  <span className="font-medium">{label}</span>
-                </Link>
-                {children && (
-                  <button
-                    onClick={() => toggle(label)}
-                    className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-200 transition-colors"
                   >
-                    {open[label] ? (
-                      <ChevronDown className="w-5 h-5 text-gray-700" />
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-gray-700" />
-                    )}
-                  </button>
-                )}
-              </div>
+                    <Icon
+                      className={[
+                        "w-5 h-5",
+                        active
+                          ? "text-white"
+                          : "text-gray-700 group-hover:text-gray-900",
+                      ].join(" ")}
+                    />
+                    <span className="font-medium">{label}</span>
+                  </Link>
+                  {children && (
+                    <button
+                      onClick={() => toggle(label)}
+                      className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-200 transition-colors"
+                    >
+                      {open[label] ? (
+                        <ChevronDown className="w-5 h-5 text-gray-700" />
+                      ) : (
+                        <ChevronRight className="w-5 h-5 text-gray-700" />
+                      )}
+                    </button>
+                  )}
+                </div>
 
-              {/* Submenu */}
-              {children && open[label] && (
-                <div className="ml-6 mt-1 space-y-2">
-                  {children.map(
-                    ({ label, href, icon: ChildIcon, boxedPlus }) => {
+                {children && open[label] && (
+                  <div className="ml-6 mt-1 space-y-2">
+                    {children.map(({ label, href, icon: ChildIcon, boxedPlus }) => {
                       const childActive = isActive(href);
                       return (
                         <Link
@@ -159,18 +177,14 @@ export function Sidebar({ showLogo = true }: SidebarProps) {
                           <span>{label}</span>
                         </Link>
                       );
-                    }
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-
-      <div className="mt-auto p-4">
-        <div className="text-xs text-gray-400">Super Admin</div>
-      </div>
-    </aside>
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 }

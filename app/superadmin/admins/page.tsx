@@ -12,11 +12,12 @@ import {
 } from "@/lib/services/superadmin";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useResendInviteMutation } from "@/lib/services/setup-password";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
+import { Pagination } from "@/components/common/Pagination";
 
 // Modal Component
 interface ActionModalProps {
@@ -67,6 +68,7 @@ const ActionModal: React.FC<ActionModalProps> = ({
 };
 
 export default function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -80,7 +82,7 @@ export default function Dashboard() {
     email: null,
   });
 
-  const pageSize = 10;
+  const pageSize = 1;
   const userData = useSelector(selectAuthState).userData;
 
   const {
@@ -326,9 +328,14 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+        {/* Main Content */}
         <div className="flex-1">
-          <AppHeader title="Admins" />
+          <AppHeader
+            title="Admins"
+            onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
+          />
           <main className="p-8">
             <div className="text-center py-12">
               <div className="text-red-600 mb-4">
@@ -351,9 +358,14 @@ export default function Dashboard() {
   if (!userData?.organizationPublicId) {
     return (
       <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+        {/* Main Content */}
         <div className="flex-1">
-          <AppHeader title="Admins" />
+          <AppHeader
+            title="Admins"
+            onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
+          />
           <main className="p-8">
             <div className="text-center py-12">
               <div className="text-gray-600 mb-4">Loading user data...</div>
@@ -431,10 +443,14 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
+      {/* Main Content */}
       <div className="flex-1">
-        <AppHeader title="Admins" />
+        <AppHeader
+          title="Admins"
+          onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
+        />
 
         <main className="p-8">
           {/* Top Section */}
@@ -501,41 +517,42 @@ export default function Dashboard() {
           </div>
 
           {/* Admins Table */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
-                All Administrators
-              </h2>
-            </div>
+          <div className="hidden sm:block overflow-x-auto">
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  All Administrators
+                </h2>
+              </div>
 
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-              </div>
-            ) : admins.length === 0 ? (
-              <div className="text-center py-12">
-                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No administrators found
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Get started by adding your first admin user.
-                </p>
-                <Link
-                  href="/superadmin/add-admin"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white shadow-lg"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
-                  }}
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Add First Admin
-                </Link>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+                </div>
+              ) : admins.length === 0 ? (
+                <div className="text-center py-12">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No administrators found
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Get started by adding your first admin user.
+                  </p>
+                  <Link
+                    href="/superadmin/add-admin"
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white shadow-lg"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
+                    }}
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Add First Admin
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  {/* Hide on mobile, show on sm+ */}
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
@@ -617,73 +634,23 @@ export default function Dashboard() {
                       ))}
                     </tbody>
                   </table>
-                </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                    <div className="flex-1 flex justify-between sm:hidden">
-                      <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 0}
-                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        type="button"
-                      >
-                        Previous
-                      </button>
-                      <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages - 1}
-                        className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        type="button"
-                      >
-                        Next
-                      </button>
-                    </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm text-gray-700">
-                          Showing{" "}
-                          <span className="font-medium">
-                            {currentPage * pageSize + 1}
-                          </span>{" "}
-                          to{" "}
-                          <span className="font-medium">
-                            {Math.min(
-                              (currentPage + 1) * pageSize,
-                              totalElements
-                            )}
-                          </span>{" "}
-                          of{" "}
-                          <span className="font-medium">{totalElements}</span>{" "}
-                          results
-                        </p>
-                      </div>
-                      <div>
-                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                          {Array.from({ length: totalPages }, (_, i) => (
-                            <button
-                              key={i}
-                              onClick={() => handlePageChange(i)}
-                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                currentPage === i
-                                  ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
-                                  : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                              } ${i === 0 ? "rounded-l-md" : ""} ${
-                                i === totalPages - 1 ? "rounded-r-md" : ""
-                              }`}
-                              type="button"
-                            >
-                              {i + 1}
-                            </button>
-                          ))}
-                        </nav>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+                  {/* Pagination stays visible always */}
+                  {!loading && !error && admins.length > 0 && (
+                    <>
+                      {/* Reusable Pagination */}
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        pageSize={pageSize}
+                        totalElements={totalElements}
+                        onPageChange={setCurrentPage}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </main>
       </div>

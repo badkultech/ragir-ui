@@ -1,17 +1,10 @@
 "use client";
 
-import {
-  Building2,
-  Plus,
-  Mail,
-  UserCheck,
-  UserX,
-  Users2,
-} from "lucide-react";
+import { Building2, Plus, Mail, UserCheck, UserX, Users2 } from "lucide-react";
 import Link from "next/link";
 import { Sidebar } from "@/components/superadmin/sidebar";
 import { useState } from "react";
-
+import { Pagination } from "@/components/common/Pagination";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import {
@@ -70,6 +63,7 @@ const ActionModal: React.FC<ActionModalProps> = ({
 };
 
 export default function OrganizationsPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -83,7 +77,7 @@ export default function OrganizationsPage() {
     email: null,
   });
 
-  const pageSize = 10;
+  const pageSize = 1;
 
   const {
     data: orgData,
@@ -114,7 +108,7 @@ export default function OrganizationsPage() {
     }
   };
 
-  const handleResendInvite = async (orgId : string ,email : string) => {
+  const handleResendInvite = async (orgId: string, email: string) => {
     try {
       await resendInvite({ orgId, email }).unwrap();
       showSuccess("Invitation resent successfully");
@@ -142,7 +136,8 @@ export default function OrganizationsPage() {
         handleSuspend(modalState.orgPublicId);
         break;
       case "resend":
-        modalState.email && handleResendInvite(modalState.orgPublicId, modalState.email);
+        modalState.email &&
+          handleResendInvite(modalState.orgPublicId, modalState.email);
         break;
     }
     closeModal();
@@ -191,122 +186,123 @@ export default function OrganizationsPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1">
-        <AppHeader title="Organizers" />
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <main className="p-8">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        <AppHeader
+          title="Organizers"
+          onMenuClick={() => setSidebarOpen(true)}
+        />
+
+        <main className="p-4 sm:p-6 lg:p-8 flex-1">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Cards Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
               {/* Add Organizer */}
-              <div className="bg-white rounded-xl shadow-sm p-8">
-                <div className="text-center">
-                  <div className="mb-6 flex justify-center">
-                    <div className="relative">
-                      <div className="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-gray-300" />
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-full flex items-center justify-center">
-                        <Link href="/superadmin/add-organizer">
-                          <Plus className="w-4 h-4 text-white" />
-                        </Link>
-                      </div>
+              <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center text-center">
+                <div className="mb-6 flex justify-center">
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-gray-300" />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                      <Link href="/superadmin/add-organizer">
+                        <Plus className="w-4 h-4 text-white" />
+                      </Link>
                     </div>
                   </div>
-
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                    Add organizer
-                  </h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">
-                    Manage event organizers and assign responsibilities
-                  </p>
-
-                  <Link
-                    href="/superadmin/add-organizer"
-                    className="inline-flex items-center justify-center px-8 py-3 rounded-full font-medium border-2 border-white shadow-lg text-white hover:shadow-xl transition-shadow"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Organizer
-                  </Link>
                 </div>
-              </div>
-
-              {/* System Organizer Count */}
-              <div className="bg-white rounded-xl shadow-sm p-8">
-                <div className="text-center">
-                  <div className="mb-6 flex justify-center">
-                    <div className="p-4 rounded-full bg-green-100">
-                      {/* <Users className="w-8 h-8 text-green-600" /> */}
-                      <Users2 className="w-8 h-8 text-green-600" />
-                    </div>
-                  </div>
-
-                  <h3 className="text-4xl font-bold text-gray-900 mb-2">
-                    {orgData?.totalElements || 0}
-                  </h3>
-                  <p className="text-gray-600 text-lg mb-4">Organizers</p>
-
-                  <div className="text-sm text-gray-500">
-                    Total Organizers: {totalElements}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
-                All Organizers
-              </h2>
-            </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-              </div>
-            ) : error ? (
-              <div className="text-center py-12">
-                <div className="text-red-600 mb-4">
-                  Failed to load organizations
-                </div>
-                <button
-                  onClick={() => refetch()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : organizations.length === 0 ? (
-              <div className="text-center py-12">
-                <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No organizers found
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Add organizer
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  Get started by adding your first organizer.
+                <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                  Manage event organizers and assign responsibilities
                 </p>
+                <Link
+                  href="/superadmin/add-organizer"
+                  className="inline-flex items-center justify-center px-6 py-2 rounded-full font-medium border-2 border-white shadow-lg text-white hover:shadow-xl transition-shadow text-sm sm:text-base"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Organizer
+                </Link>
               </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
+
+              {/* Organizers Count */}
+              <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center text-center">
+                <div className="mb-6 flex justify-center">
+                  <div className="p-4 rounded-full bg-green-100">
+                    <Users2 className="w-8 h-8 text-green-600" />
+                  </div>
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">
+                  {orgData?.totalElements || 0}
+                </h3>
+                <p className="text-gray-600 text-base mb-2">Organizers</p>
+                <div className="text-sm text-gray-500">
+                  Total Organizers: {totalElements}
+                </div>
+              </div>
+            </div>
+
+            {/* Section Title */}
+            <div className="hidden sm:block overflow-x-auto">
+              <div className="px-6 py-4 border-t border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  All Organizers
+                </h2>
+              </div>
+
+              {/* Table Section */}
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+                </div>
+              ) : error ? (
+                <div className="text-center py-12">
+                  <div className="text-red-600 mb-4">
+                    Failed to load organizations
+                  </div>
+                  <button
+                    onClick={() => refetch()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : organizations.length === 0 ? (
+                <div className="text-center py-12">
+                  <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No organizers found
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Get started by adding your first organizer.
+                  </p>
+                </div>
+              ) : (
+                <>
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Name
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Email
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Created Date
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                           Actions
                         </th>
                       </tr>
@@ -314,13 +310,13 @@ export default function OrganizationsPage() {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {organizations.map((org) => (
                         <tr key={org.publicId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {org.entityName}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {org.email}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                             <span
                               className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
                                 org.status
@@ -329,7 +325,7 @@ export default function OrganizationsPage() {
                               {org.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {new Date(org.createdDate).toLocaleDateString(
                               "en-US",
                               {
@@ -339,7 +335,7 @@ export default function OrganizationsPage() {
                               }
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex space-x-2 justify-end">
+                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex space-x-2 justify-end">
                             <button
                               onClick={() =>
                                 openModal("activate", org.publicId, org.email)
@@ -372,48 +368,24 @@ export default function OrganizationsPage() {
                       ))}
                     </tbody>
                   </table>
-                </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
-                    <div className="text-sm text-gray-700">
-                      Showing{" "}
-                      <span className="font-medium">
-                        {currentPage * pageSize + 1}
-                      </span>{" "}
-                      to{" "}
-                      <span className="font-medium">
-                        {Math.min((currentPage + 1) * pageSize, totalElements)}
-                      </span>{" "}
-                      of <span className="font-medium">{totalElements}</span>{" "}
-                      results
-                    </div>
-                    <nav className="inline-flex -space-x-px rounded-md shadow-sm">
-                      {Array.from({ length: totalPages }, (_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setCurrentPage(i)}
-                          className={`px-4 py-2 border text-sm font-medium ${
-                            currentPage === i
-                              ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
-                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                          } ${i === 0 ? "rounded-l-md" : ""} ${
-                            i === totalPages - 1 ? "rounded-r-md" : ""
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-                    </nav>
-                  </div>
-                )}
-              </>
-            )}
+                  {/* Pagination */}
+
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    totalElements={totalElements}
+                    onPageChange={setCurrentPage}
+                  />
+                </>
+              )}
+            </div>
           </div>
         </main>
       </div>
 
+      {/* Confirmation Modal */}
       <ActionModal
         isOpen={modalState.isOpen}
         onClose={closeModal}
