@@ -26,6 +26,7 @@ import {
   useGetTravelerProfileQuery,
   useUpdateTravelerProfileFormMutation,
 } from "@/lib/services/user";
+import { useRouter } from "next/navigation";
 
 type MoodsState = {
   mountain: boolean;
@@ -43,6 +44,7 @@ export default function TravelerProfile() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const onPickAvatar = () => fileRef.current?.click();
 
@@ -91,6 +93,10 @@ export default function TravelerProfile() {
     } as MoodsState,
   });
 
+   const handleChangeClick = () => {
+    router.push("/"); // or "/login" depending on your route
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -117,6 +123,7 @@ export default function TravelerProfile() {
       secondaryEmail: data.email ?? "",
       emergencyContactName: data.emergencyContactName ?? "",
       emergencyContactPhone: data.emergencyContactNumber ?? "",
+      profileImage: data.profileImageUrl ?? null,
       moods: {
         mountain: data.moodPreferences?.includes("mountain") ?? false,
         adventure: data.moodPreferences?.includes("adventure") ?? false,
@@ -128,10 +135,10 @@ export default function TravelerProfile() {
   }, [data]);
 
   useEffect(() => {
-  return () => {
-    if (avatarPreview) URL.revokeObjectURL(avatarPreview)
-  }
-}, [avatarPreview])
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
 
   const handleSaveProfile = async () => {
     if (!orgId || !userPublicId) return;
@@ -196,10 +203,21 @@ export default function TravelerProfile() {
                 <div className="relative">
                   <Avatar className="w-20 h-20">
                     <AvatarImage
-                      src={avatarPreview || "/adventure-traveler-in-nature.jpg"}
+                      src={
+                        avatarPreview || // newly selected file preview
+                        data?.profileImageUrl || // URL from GET traveler profile
+                        "/adventure-traveler-in-nature.jpg" // fallback asset
+                      }
                       alt={formData.fullName || "Avatar"}
                     />
-                    <AvatarFallback>AK</AvatarFallback>
+                    <AvatarFallback>
+                      {(formData.fullName || "A")
+                        .split(" ")
+                        .map((s) => s[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
 
                   <button
@@ -346,6 +364,7 @@ export default function TravelerProfile() {
                     <Input
                       id="phoneNumber"
                       value={formData.phoneNumber}
+                      disabled
                       onChange={(e) =>
                         handleInputChange("phoneNumber", e.target.value)
                       }
@@ -354,6 +373,7 @@ export default function TravelerProfile() {
                     <Button
                       variant="outline"
                       className="ml-2 h-10 rounded-xl px-4 text-orange-500 border-orange-500 hover:bg-orange-50 bg-transparent"
+                      onClick={handleChangeClick}
                     >
                       Change
                     </Button>

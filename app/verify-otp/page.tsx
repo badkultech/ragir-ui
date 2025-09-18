@@ -65,6 +65,7 @@ export default function VerifyOTPPage() {
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    const userPublicId = searchParams.get("userId") || "";
 
     try {
       const result = await validateOtp({
@@ -72,6 +73,7 @@ export default function VerifyOTPPage() {
         otp: otp.join(""),
         type: "MOBILE",
         organization: false,
+        userPublicId:userPublicId,
       }).unwrap();
 
       if (result.accessToken && result.refreshToken) {

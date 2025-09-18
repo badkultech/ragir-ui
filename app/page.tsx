@@ -8,6 +8,8 @@ import { ArrowRight } from "lucide-react";
 import { useGenerateOtpMutation } from "@/lib/services/otp";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import LoadingOverlay from "@/components/common/LoadingOverlay";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 export default function PhoneEntryPage() {
   const [loginMethod, setLoginMethod] = useState<"EMAIL" | "MOBILE">("MOBILE");
@@ -20,6 +22,8 @@ export default function PhoneEntryPage() {
   const [userType, setUserType] = useState<string>("user");
 
   const [phoneNumber, setPhoneNumber] = useState("");
+  const {userData} = useSelector(selectAuthState);
+  const userPublicId = userData?.userPublicId || "";
 
   const handleGenerateOTP = async () => {
     const target = loginMethod === "MOBILE" ? phoneNumber : email;
@@ -36,19 +40,20 @@ export default function PhoneEntryPage() {
         identifier: target,
         type: loginMethod,
         organization: userType === "org-admin",
+        userPublicId : userPublicId
       }).unwrap();
 
       if (result.success) {
         setOtpSent(true);
 
         if (loginMethod === "MOBILE") {
-          const v = phoneNumber
+          const phone = phoneNumber
             .replace(/[^+\d]/g, "")
             .replace(/(?!^)\+/g, "")
             .slice(0, 13);
 
-          setPhoneNumber(v);
-          router.push(`/verify-otp?phone=${encodeURIComponent(v)}`);
+          setPhoneNumber(phone);
+          router.push(`/verify-otp?phone=${encodeURIComponent(phone)}&userId=${userPublicId}`);
         } else {
           router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
         }
