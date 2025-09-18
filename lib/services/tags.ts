@@ -8,4 +8,5 @@ export const TAGS = {
   user : 'user',
   otp: 'otp',
   notifications: 'notifications',
+  travelerProfile: 'travelerProfile',
 } as const;

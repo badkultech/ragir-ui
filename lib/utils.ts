@@ -41,6 +41,8 @@ export const ENDPOINTS = {
   // users
   USER_PROFILE: (organizationId: string, userId: string) =>
     `/org/${organizationId}/user/${userId}/profile`,
+  TRAVELER_PROFILE: (organizationId: string, userPublicId: string) =>
+    `/org/${organizationId}/user/${userPublicId}/travel-profile`,
 
   // organization
   CREATE_ORGANIZATION: "/tenant/create-organization",
