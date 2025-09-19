@@ -94,7 +94,7 @@ export default function TravelerProfile() {
   });
 
    const handleChangeClick = () => {
-    router.push("/"); // or "/login" depending on your route
+    router.push("/traveler/profile/change-mobile"); // or "/login" depending on your route
   };
 
   const handleInputChange = (field: string, value: string) => {

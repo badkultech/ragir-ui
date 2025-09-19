@@ -34,9 +34,12 @@ export default function OrganizerRegisterPage() {
     agree: false,
   });
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFromParams || form.email);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    emailFromParams || form.email
+  );
   const handle = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }));
-  const isValid = emailValid &&
+  const isValid =
+    emailValid &&
     form.firstName.trim() &&
     form.lastName.trim() &&
     form.password.length >= 8 &&
@@ -73,7 +76,7 @@ export default function OrganizerRegisterPage() {
 
         // redirect based on role
         const dashboardPath = getDashboardPath(decodedData?.userType);
-        router.replace(dashboardPath+"/dashboard");
+        router.replace(dashboardPath + "/dashboard");
       }
     } catch (err) {
       console.error("mutation failed:", err);
@@ -101,7 +104,7 @@ export default function OrganizerRegisterPage() {
           }}
         >
           {/* Card */}
-          <div className="w-full max-w-[720px] bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-gray-100">
+          <div className="w-full max-w-[500px] bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-gray-100">
             <form onSubmit={onSubmit} className="p-5 md:p-8 lg:p-10">
               <h1 className="text-2xl md:text-[26px] font-semibold text-gray-900 mb-6">
                 Complete Your Registration
@@ -136,7 +139,7 @@ export default function OrganizerRegisterPage() {
                 </div>
 
                 {/* First / Last name */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
                   <div>
                     <label className="block text-sm font-medium text-gray-800 mb-2">
                       First Name
@@ -145,9 +148,11 @@ export default function OrganizerRegisterPage() {
                       value={form.firstName}
                       onChange={(e) => handle("firstName", e.target.value)}
                       placeholder="Enter first name"
-                      className="w-full rounded-xl bg-gray-100/70 border border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      className="w-full rounded-xl bg-white border border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     />
                   </div>
+                </div>
+                <div>
                   <div>
                     <label className="block text-sm font-medium text-gray-800 mb-2">
                       Last Name
@@ -156,11 +161,10 @@ export default function OrganizerRegisterPage() {
                       value={form.lastName}
                       onChange={(e) => handle("lastName", e.target.value)}
                       placeholder="Enter last name"
-                      className="w-full rounded-xl bg-gray-100/70 border border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      className="w-full rounded-xl bg-white border border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     />
                   </div>
                 </div>
-
                 {/* Password */}
                 <div>
                   <label className="block text-sm font-medium text-gray-800 mb-2">
@@ -172,7 +176,7 @@ export default function OrganizerRegisterPage() {
                       value={form.password}
                       onChange={(e) => handle("password", e.target.value)}
                       placeholder="Enter a strong password"
-                      className="w-full rounded-xl bg-gray-100/70 border border-gray-200 px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      className="w-full rounded-xl bg-white border border-gray-200 px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     />
                     <button
                       type="button"
@@ -198,7 +202,7 @@ export default function OrganizerRegisterPage() {
                         handle("confirmPassword", e.target.value)
                       }
                       placeholder="Confirm your password"
-                      className="w-full rounded-xl bg-gray-100/70 border border-gray-200 px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      className="w-full rounded-xl bg-white border border-gray-200 px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     />
                     <button
                       type="button"
