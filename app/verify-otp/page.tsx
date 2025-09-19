@@ -13,6 +13,7 @@ import {
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/lib/slices/auth";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 export default function VerifyOTPPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -89,6 +90,7 @@ export default function VerifyOTPPage() {
       );
     } catch (err) {
       console.error("❌ OTP validation failed", err);
+      showApiError(err as FetchBaseQueryError);
     } finally {
       setIsLoading(false);
     }
