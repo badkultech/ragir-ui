@@ -74,13 +74,12 @@ export default function VerifyOTPPage() {
         otp: otp.join(""),
         type: "MOBILE",
         organization: false,
-        userPublicId:userPublicId,
+        userPublicId: userPublicId,
       }).unwrap();
 
       if (result.accessToken && result.refreshToken) {
         localStorage.setItem("accessToken", result.accessToken);
         localStorage.setItem("refreshToken", result.refreshToken);
-        router.replace("/traveler/profile");
       }
       dispatch(
         setCredentials({
@@ -88,6 +87,7 @@ export default function VerifyOTPPage() {
           refreshToken: result.refreshToken || null,
         })
       );
+      router.replace("/traveler/profile");
     } catch (err) {
       console.error("❌ OTP validation failed", err);
       showApiError(err as FetchBaseQueryError);
@@ -150,20 +150,19 @@ export default function VerifyOTPPage() {
                   Enter OTP
                 </label>
                 <div className="flex justify-center gap-2 sm:gap-3">
-  {otp.map((digit, index) => (
-    <input
-      key={index}
-      id={`otp-${index}`}
-      type="text"
-      value={digit}
-      onChange={(e) => handleOtpChange(index, e.target.value)}
-      onKeyDown={(e) => handleKeyDown(index, e)}
-      className="w-10 sm:w-12 h-12 text-center text-lg font-semibold border border-gray-400 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-      maxLength={1}
-    />
-  ))}
-</div>
-
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      id={`otp-${index}`}
+                      type="text"
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      className="w-10 sm:w-12 h-12 text-center text-lg font-semibold border border-gray-400 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      maxLength={1}
+                    />
+                  ))}
+                </div>
               </div>
 
               <div className="text-center">

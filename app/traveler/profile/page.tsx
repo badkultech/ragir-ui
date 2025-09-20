@@ -71,7 +71,13 @@ export default function TravelerProfile() {
     [orgId, userPublicId]
   );
 
-  const { data, isFetching } = useGetTravelerProfileQuery(queryArgs as any);
+  const { data, isFetching, refetch } = useGetTravelerProfileQuery(
+    queryArgs as any,
+    {
+      refetchOnMountOrArgChange: true, // ✅ forces fresh fetch on page load
+    }
+  );
+
   const [updateTravelerProfileForm, { isLoading: saving }] =
     useUpdateTravelerProfileFormMutation();
 
@@ -93,7 +99,7 @@ export default function TravelerProfile() {
     } as MoodsState,
   });
 
-   const handleChangeClick = () => {
+  const handleChangeClick = () => {
     router.push("/traveler/profile/change-mobile"); // or "/login" depending on your route
   };
 
