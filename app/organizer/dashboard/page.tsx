@@ -1,7 +1,7 @@
 "use client";
 
 import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar} from "@/components/organizers/organizer-sidebar";
+import { OrganizerSidebar} from "@/components/organizer/organizer-sidebar";
 //
 export default function OrganizerDashboardPage() {
   return (

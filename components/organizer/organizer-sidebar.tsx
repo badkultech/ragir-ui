@@ -28,7 +28,7 @@ const nav: NavItem[] = [
     href: "/trip",
     icon: FolderOpen,
     children: [
-      { label: "Create New Trip", href: "/trip/create", icon: MapPinned },
+      { label: "Create New Trip", href: "/organizer/create-trip", icon: MapPinned },
       { label: "Library", href: "/trip/library", icon: LibraryIcon },
     ],
   },

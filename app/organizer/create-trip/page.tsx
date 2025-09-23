@@ -5,22 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar } from "@/components/organizers/organizer-sidebar";
-import { RichTextEditor } from "@/components/common/RichTextEditor";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { GroupLeaders } from "@/components/common/group-leaders";
 import { DateTimePicker } from "@/components/common/date-time-picker";
-import { DateRangePicker } from "@/components/common/DateRangePicker";
 import MDEditor from "@uiw/react-md-editor";
-import { se } from "date-fns/locale";
+import { Stepper } from "@/components/trip/stepper";
+import { usePathname, useRouter } from "next/navigation";
+import { tripSteps } from "@/lib/common/stepperConfig";
 
-const steps = [
-  { id: 1, label: "Trip Overview", active: true },
-  { id: 2, label: "Itinerary", active: false },
-  { id: 3, label: "Exclusions", active: false },
-  { id: 4, label: "FAQs", active: false },
-  { id: 5, label: "Pricing", active: false },
-  { id: 6, label: "Review", active: false },
-];
 
 const moodTags = [
   { id: "mountain", label: "Mountain", icon: "🏔️" },
@@ -44,6 +36,7 @@ const moodTags = [
 export default function CreateTripPage() {
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-GB");
+  const pathname = usePathname();
 
   const [formData, setFormData] = useState({
     tripTitle: "Himalayan group",
@@ -67,6 +60,7 @@ export default function CreateTripPage() {
   ]);
   const [cityInput, setCityInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
 
   // -------------------
   // Auto-calculate totalDays whenever startDate or endDate changes
@@ -135,11 +129,10 @@ export default function CreateTripPage() {
   };
 
   const handleSaveAndNext = () => {
-    console.log("Saving and proceeding:", {
-      ...formData,
-      selectedMoodTags,
-      cityTags,
-    });
+    const currentIndex = tripSteps.findIndex((s) => s.path === pathname);
+    if (currentIndex < tripSteps.length - 1) {
+      router.push(tripSteps[currentIndex + 1].path);
+    }
   };
 
   return (
@@ -151,27 +144,7 @@ export default function CreateTripPage() {
           <div className="max-w-4xl mx-auto">
             {/* Steps */}
             <div className="flex items-center justify-between mb-8">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-medium ${
-                        step.active
-                          ? "bg-orange-500 text-white"
-                          : "bg-gray-300 text-gray-600"
-                      }`}
-                    >
-                      {step.id.toString().padStart(2, "0")}
-                    </div>
-                    <span className="text-sm text-gray-600 mt-2">
-                      {step.label}
-                    </span>
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className="w-16 h-px bg-gray-300 mx-4 mt-[-20px]" />
-                  )}
-                </div>
-              ))}
+              <Stepper />
             </div>
 
             {/* Trip Title */}
@@ -466,8 +439,9 @@ export default function CreateTripPage() {
                     </span>
                   </div>
                 </div>
-                <GroupLeaders />
-
+                <div className="mt-6">
+                  <GroupLeaders />
+                </div>
                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
                   <Button
                     variant="outline"

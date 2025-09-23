@@ -96,13 +96,13 @@ export const ROLE_ROUTE_ACCESS: Record<RoleType, string[]> = {
 
   [ROLES.ORGANIZER]: [
     "/organizer/notifications",
-    "/organizers/team",
-    "/organizers/settings",
-    "/organizers/create-trip",
-    "/organizers/trips", // base
-    "/organizers/trips/*", // dynamic children
-    "/organizers/queries",
-    "/organizers/queries/*",
+    "/organizer/team",
+    "/organizer/settings",
+    "/organizer/create-trip",
+    "/organizer/trips", // base
+    "/organizer/trips/*", // dynamic children
+    "/organizer/queries",
+    "/organizer/queries/*",
   ],
 };
 
@@ -136,7 +136,7 @@ export const getDashboardPath = (role?: string) => {
     case ROLES.SYSTEM_ADMIN:
       return "/superadmin";
     case ROLES.ORGANIZER:
-      return "/organizers";
+      return "/organizer";
     case ROLES.USER:
       return "/traveler/profile"; // adjust to your actual path
     default:

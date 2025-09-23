@@ -98,7 +98,7 @@ export default function RegisterOrganizer() {
       };
 
       await createOrganization({ payload }).unwrap();
-      router.push("/superadmin/organizers");
+      router.push("/superadmin/organizer");
       showSuccess("Organizer registered successfully!");
     } catch (error) {
       console.error("Error registering organizer:", error);
