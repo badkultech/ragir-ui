@@ -140,7 +140,7 @@ export default function EventsPage() {
       <AddNewItemModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        initialStep="faq" // 👈 opens AddStayForm directly
+        initialStep="event" // 👈 opens AddStayForm directly
       />
     </div>
   );

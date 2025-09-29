@@ -81,13 +81,13 @@ export default function LibraryOverviewPage() {
           />
 
           {/* Search */}
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <Input
               type="text"
               placeholder="Search Library..."
               className="w-full max-w-md border-orange-300 focus:border-orange-500 focus:ring-orange-500"
             />
-          </div>
+          </div> */}
 
           {/* Categories Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
