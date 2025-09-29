@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar } from "@/components/organizers/organizer-sidebar";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { Input } from "@/components/ui/input";
 import {
   PlusCircle,
@@ -19,10 +19,10 @@ import { useState } from "react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 
 const categories = [
-  { label: "Events", href: "/organizers/library/events", icon: Calendar },
-  { label: "Stays", href: "/organizers/library/stays", icon: Hotel },
-  { label: "Transit", href: "/organizers/library/transit", icon: Bus },
-  { label: "Meals", href: "/organizers/library/meals", icon: Utensils },
+  { label: "Events", href: "/organizer/library/events", icon: Calendar },
+  { label: "Stays", href: "/organizer/library/stays", icon: Hotel },
+  { label: "Transit", href: "/organizer/library/transits", icon: Bus },
+  { label: "Meals", href: "/organizer/library/meals", icon: Utensils },
   {
     label: "Activities",
     href: "/organizer/library/activities",

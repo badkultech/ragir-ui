@@ -30,7 +30,7 @@ const nav: NavItem[] = [
   },
   {
     label: "Organizers",
-    href: "/superadmin/organizers",
+    href: "/superadmin/organizer",
     icon: User,
     children: [
       {

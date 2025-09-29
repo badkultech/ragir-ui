@@ -66,7 +66,7 @@ export default function Dashboard() {
                 </div>
               </Link>
               {/* Active Organizations */}
-              <Link href={"/superadmin/organizers"}>
+              <Link href={"/superadmin/organizer"}>
                 <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-2 bg-blue-100 rounded-lg">
@@ -79,7 +79,7 @@ export default function Dashboard() {
                   <p className="text-gray-600 text-sm">Active Organizers</p>
                 </div>
               </Link>
-              <Link href={"/superadmin/organizers"}>
+              <Link href={"/superadmin/organizer"}>
                 {/* Pending Organizations */}
                 <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
                   <div className="flex items-center justify-between mb-4">

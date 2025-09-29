@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar } from "@/components/organizers/organizer-sidebar";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, MapPin, Pencil, Eye, Trash2 } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
+import { LibraryHeader } from "@/components/library/LibraryHeader";
 
 const mockStays = [
   {
     id: 1,
     title: "Taj Hotel",
     location: "Mumbai, Maharashtra",
-    description: "Luxury 5-star hotel with ocean view rooms and premium amenities",
+    description:
+      "Luxury 5-star hotel with ocean view rooms and premium amenities",
     image: null, // or image URL if available
   },
   {
@@ -35,6 +37,7 @@ const mockStays = [
 export default function StaysPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const filtered = mockStays.filter((stay) =>
     stay.title.toLowerCase().includes(search.toLowerCase())
@@ -43,7 +46,10 @@ export default function StaysPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <OrganizerSidebar />
+      <OrganizerSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
@@ -51,21 +57,11 @@ export default function StaysPage() {
 
         <main className="flex-1 p-6 md:p-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Ragir Library</h1>
-              <p className="text-sm text-gray-500">
-                Manage your travel content and organize into custom collections
-              </p>
-            </div>
-            <Button
-              onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white"
-            >
-              <PlusCircle className="w-4 h-4" />
-              Add Item
-            </Button>
-          </div>
+          <LibraryHeader
+            buttonLabel="Add stay"
+            onAddClick={() => setModalOpen(true)}
+            title="Ragir Library"
+          />
 
           {/* Search */}
           <div className="mb-6">
@@ -134,7 +130,11 @@ export default function StaysPage() {
       </div>
 
       {/* Add New Item Modal */}
-      <AddNewItemModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <AddNewItemModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        initialStep="stay"
+      />
     </div>
   );
 }

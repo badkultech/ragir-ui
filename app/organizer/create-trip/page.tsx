@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { OrganizerSidebar } from "@/components/organizers/organizer-sidebar";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { AppHeader } from "@/components/app-header";
 
 const moodTags = [

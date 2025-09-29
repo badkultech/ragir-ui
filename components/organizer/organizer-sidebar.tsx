@@ -40,7 +40,7 @@ const nav: NavItem[] = [
   },
   {
     label: "Organizers",
-    href: "/organizer/organizers",
+    href: "/organizer/organizer",
     icon: User,
     children: [
       {
@@ -58,7 +58,7 @@ const nav: NavItem[] = [
     children: [
       { label: "Events", href: "/organizer/library/events", icon: Calendar },
       { label: "Stays", href: "/organizer/library/stays", icon: Hotel },
-      { label: "Transit", href: "/organizer/library/transit", icon: Bus },
+      { label: "Transit", href: "/organizer/library/transits", icon: Bus },
       { label: "Meals", href: "/organizer/library/meals", icon: Utensils },
       { label: "Activities", href: "/organizer/library/activities", icon: Activity },
       { label: "Trip Leaders", href: "/organizer/library/trip-leaders", icon: Users },

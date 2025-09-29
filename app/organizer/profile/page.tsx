@@ -1,7 +1,7 @@
 "use client";
 
 import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar } from "@/components/organizers/organizer-sidebar";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -30,7 +30,7 @@ export default function OrganizerProfilePage() {
                   Discard
                 </Button>
 
-                <Link href="/organizers/profile/edit">
+                <Link href="/organizer/profile/edit">
                   <Button className="rounded-full px-5 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white">
                     Edit Profile
                   </Button>
@@ -46,7 +46,7 @@ export default function OrganizerProfilePage() {
                   Add your details to showcase your identity and manage your events seamlessly.
                 </p>
 
-                <Link href="/organizers/profile/edit">
+                <Link href="/organizer/profile/edit">
                   <Button className="rounded-full px-6 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white">
                     Add Details +
                   </Button>

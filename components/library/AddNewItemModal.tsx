@@ -71,9 +71,14 @@ function StepHeader({ title }: { title: string }) {
 type AddNewItemModalProps = {
   open: boolean;
   onClose: () => void;
+  initialStep?: Step;
 };
 
-export function AddNewItemModal({ open, onClose }: AddNewItemModalProps) {
+export function AddNewItemModal({
+  open,
+  onClose,
+  initialStep = "select",
+}: AddNewItemModalProps) {
   const [step, setStep] = useState<Step>("select");
   const [selected, setSelected] = useState<CategoryItem | null>(null);
 
@@ -81,9 +86,21 @@ export function AddNewItemModal({ open, onClose }: AddNewItemModalProps) {
     if (selected) setStep(selected.step);
   };
 
+  React.useEffect(() => {
+    if (open) {
+      setStep(initialStep);
+      setSelected(null);
+    }
+  }, [open, initialStep]);
+
   const handleBack = () => {
-    setStep("select");
-    setSelected(null);
+    // If modal was opened directly with initialStep (not select), then close on back
+    if (initialStep !== "select") {
+      onClose();
+    } else {
+      setStep("select");
+      setSelected(null);
+    }
   };
 
   return (

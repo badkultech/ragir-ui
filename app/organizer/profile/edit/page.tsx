@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar } from "@/components/organizers/organizer-sidebar";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

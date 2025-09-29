@@ -81,7 +81,7 @@ export const PublicRoutes = [
   "/user/landing",
   "/admin/forgot-password",
   "/verify-otp",
-  "/organizers/register",
+  "/organizer/register",
 ];
 
 // ✅ Always arrays. Use ["*"] to mean unrestricted access.
@@ -97,16 +97,16 @@ export const ROLE_ROUTE_ACCESS: Record<RoleType, string[]> = {
 
   [ROLES.ORGANIZER]: [
     "/organizer/notifications",
-    "/organizers/team",
-    "/organizers/settings",
-    "/organizers/create-trip",
-    "/organizers/trips", // base
-    "/organizers/trips/*", // dynamic children
-    "/organizers/queries",
-    "/organizers/queries/*",
-    "/organizers/profile",
+    "/organizer/team",
+    "/organizer/settings",
+    "/organizer/create-trip",
+    "/organizer/trips", // base
+    "/organizer/trips/*", // dynamic children
+    "/organizer/queries",
+    "/organizer/queries/*",
+    "/organizer/profile",
     ...PublicRoutes,
-    "/organizers/profile/edit",
+    "/organizer/profile/edit",
   ],
 };
 
@@ -140,7 +140,7 @@ export const getDashboardPath = (role?: string) => {
     case ROLES.SYSTEM_ADMIN:
       return "/superadmin";
     case ROLES.ORGANIZER:
-      return "/organizers";
+      return "/organizer";
     case ROLES.USER:
       return "/traveler/profile"; // adjust to your actual path
     default:

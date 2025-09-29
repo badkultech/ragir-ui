@@ -75,7 +75,7 @@ export default function OrganizerRegisterPage() {
         const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
 
    
-        router.replace("/organizers/profile/empty");
+        router.replace("/organizer/profile/empty");
       }
     } catch (err) {
       console.error("mutation failed:", err);
