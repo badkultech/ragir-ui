@@ -23,9 +23,7 @@ export function isAllowedRoutes(route: string, role?: RoleType): boolean {
   if (!allowedRoutes) return false;
 
   // ✅ exact match or prefix match (for dynamic routes)
-  return allowedRoutes.some(
-    (allowed) => route === allowed || route.startsWith(allowed)
-  );
+  return allowedRoutes.some((allowed) => route === allowed);
 }
 
 export default function HydratedAuth({
@@ -60,20 +58,26 @@ export default function HydratedAuth({
   useEffect(() => {
     if (!hydrated) return;
 
-    const isAuthenticated = !!accessToken;
-    if (pathname.includes("/login")) {
-      if ((accessToken || !isTokenExpired) && userData?.userType) {
-        const dashboardPath = getDashboardPath(userData?.userType);
+    const isAuthenticated = accessToken && !tokenExpired(accessToken);
+
+    // Case 1: User on a login page (root `/` or `/something/login`)
+    const isLoginPage = pathname === "/" || pathname.includes("/login");
+    if (isLoginPage) {
+      if (isAuthenticated && userData?.userType) {
+        const dashboardPath = getDashboardPath(userData.userType);
         router.replace(dashboardPath);
       }
-    }
-    // Allow public routes always
-    if (PublicRoutes.some((route) => pathname === (route))) {
-      return; // ✅ do not redirect
+      return; // ✅ Don't process further if already on login page
     }
 
+    // Case 2: Always allow public routes
+    if (PublicRoutes.some((route) => pathname.startsWith(route))) {
+      return;
+    }
+
+    // Case 3: Guarded routes
     if (!isAuthenticated) {
-      router.replace("/");
+      router.replace("/"); // redirect to root login
       return;
     }
 
@@ -82,13 +86,43 @@ export default function HydratedAuth({
       return;
     }
 
+    // Case 4: Not allowed route → send to dashboard
     if (!isAllowedRoutes(pathname, userData.userType)) {
-      const path = getDashboardPath(userData.userType);
-      router.replace(path + "/dashboard");
+      const dashboardPath = getDashboardPath(userData.userType);
+      router.replace(dashboardPath + "/dashboard");
     }
   }, [hydrated, accessToken, userData, pathname, router]);
 
   if (!hydrated) return null;
 
   return <>{children}</>;
+
+  /**
+   * Checks whether a JWT access token is expired.
+   * @param token - The JWT string (access token).
+   * @returns true if expired, false if still valid.
+   */
+   function tokenExpired(token: string | null | undefined): boolean {
+    if (!token) return true;
+
+    try {
+      // JWT format: header.payload.signature
+      const [, payload] = token.split(".");
+      if (!payload) return true;
+
+      // Decode base64 payload
+      const decoded = JSON.parse(
+        atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+      );
+
+      if (!decoded.exp) return true;
+
+      // exp is in seconds → compare with current time in seconds
+      const expiry = decoded.exp * 1000;
+      return Date.now() >= expiry;
+    } catch (error) {
+      console.error("Failed to parse token", error);
+      return true; // Treat invalid tokens as expired
+    }
+  }
 }

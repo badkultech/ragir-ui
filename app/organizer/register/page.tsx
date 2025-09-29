@@ -74,9 +74,8 @@ export default function OrganizerRegisterPage() {
         // decode immediately instead of waiting for Redux
         const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
 
-        // redirect based on role
-        const dashboardPath = getDashboardPath(decodedData?.userType);
-        router.replace(dashboardPath + "/dashboard");
+   
+        router.replace("/organizer/profile/empty");
       }
     } catch (err) {
       console.error("mutation failed:", err);

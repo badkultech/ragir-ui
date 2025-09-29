@@ -81,6 +81,7 @@ export const PublicRoutes = [
   "/user/landing",
   "/admin/forgot-password",
   "/verify-otp",
+  "/organizer/register",
 ];
 
 // ✅ Always arrays. Use ["*"] to mean unrestricted access.
@@ -103,6 +104,9 @@ export const ROLE_ROUTE_ACCESS: Record<RoleType, string[]> = {
     "/organizer/trips/*", // dynamic children
     "/organizer/queries",
     "/organizer/queries/*",
+    "/organizer/profile",
+    ...PublicRoutes,
+    "/organizer/profile/edit",
   ],
 };
 
