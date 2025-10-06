@@ -5,6 +5,9 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { AppHeader } from "@/components/app-header";
 import { GradientButton } from "@/components/gradient-button";
+// ✅ import mutation
+import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 
 export default function JoinAsPartner() {
     const [phone, setPhone] = useState("");
@@ -12,19 +15,12 @@ export default function JoinAsPartner() {
     const [emailError, setEmailError] = useState("");
     const [name, setName] = useState("");
 
+    const [joinAsPartner, { isLoading }] = useJoinAsPartnerMutation();
+
     // --- Handle phone input with validation ---
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value;
-
-        // Remove all non-digit characters
-        value = value.replace(/[^0-9]/g, "");
-
-        // Remove leading zeros
-        value = value.replace(/^0+/, "");
-
-        // Limit to 10 digits
+        let value = e.target.value.replace(/[^0-9]/g, "").replace(/^0+/, "");
         if (value.length > 10) value = value.slice(0, 10);
-
         setPhone(value);
     };
 
@@ -32,40 +28,55 @@ export default function JoinAsPartner() {
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setEmail(value);
-
-        // Simple email regex pattern
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!value) {
-            setEmailError("");
-        } else if (!emailRegex.test(value)) {
+        if (!value) setEmailError("");
+        else if (!emailRegex.test(value))
             setEmailError("Please enter a valid email address");
-        } else {
-            setEmailError("");
-        }
+        else setEmailError("");
     };
 
     // --- On submit validation ---
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (emailError) {
-            alert("Please fix the email address before submitting.");
+        if (!name.trim()) {
+            showApiError("Please enter your name.");
+            return;
+        }
+
+        if (name.length > 50) {
+            showApiError("Name cannot exceed 50 characters.");
+            return;
+        }
+
+        if (emailError || !email) {
+            showApiError("Please enter a valid email address.");
             return;
         }
 
         if (phone.length !== 10) {
-            alert("Please enter a valid 10-digit phone number.");
+            showApiError("Please enter a valid 10-digit phone number.");
             return;
         }
 
-        if (!email) {
-            alert("Please enter your email address.");
-            return;
-        }
+        try {
+            const result = await joinAsPartner({
+                organizerName: name.trim(),
+                email,
+                phone,
+            }).unwrap();
 
-        console.log("Form submitted:", { phone, email });
-        // TODO: submit form logic
+            showSuccess("🎉 Successfully registered as a partner!");
+            console.log("Partner registered:", result);
+
+            // Reset form
+            setName("");
+            setEmail("");
+            setPhone("");
+        } catch (error: any) {
+            console.error("Error submitting form:", error);
+            showApiError(error?.data || "Something went wrong. Please try again.");
+        }
     };
 
     return (
@@ -82,7 +93,6 @@ export default function JoinAsPartner() {
 
             <main
                 className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] bg-cover bg-center px-4 sm:px-6 lg:px-8 overflow-y-auto"
-                style={{ backgroundImage: "url('/images/join-partner-bg.png')" }}
             >
                 <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6 sm:p-8">
                     <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
@@ -102,7 +112,7 @@ export default function JoinAsPartner() {
                                 type="text"
                                 placeholder="Enter name"
                                 className="rounded-lg"
-                                maxLength={50} // ✅ limits input to 50 chars
+                                maxLength={50}
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                             />
@@ -159,9 +169,11 @@ export default function JoinAsPartner() {
                         {/* Submit */}
                         <GradientButton
                             type="submit"
-                            className="mt-4 w-full rounded-full text-white py-2 font-medium hover:opacity-90 transition"
+                            disabled={isLoading}
+                            className={`mt-4 w-full rounded-full text-white py-2 font-medium transition ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
+                                }`}
                         >
-                            Join as Partner
+                            {isLoading ? "Submitting..." : "Join as Partner"}
                         </GradientButton>
                     </form>
                 </div>

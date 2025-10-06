@@ -25,6 +25,8 @@ export const ENDPOINTS = {
   RESEND_ORGANIZER_INVITE: "/public/invite/resend-invite",
   FORGOT_ORGANIZER_PASSWORD: "/public/invite/forgot-password",
 
+  PARTNER: "/public/join_as_partner",
+
   // super admin dashboard
   GET_ALL_ADMINS: (organizationId: string) =>
     `/org/${organizationId}/admin/admins`,
@@ -82,6 +84,7 @@ export const PublicRoutes = [
   "/admin/forgot-password",
   "/verify-otp",
   "/organizer/register",
+  "/join-as-partner",
 ];
 
 // ✅ Always arrays. Use ["*"] to mean unrestricted access.
