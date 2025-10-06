@@ -70,6 +70,8 @@ const ActionModal: React.FC<ActionModalProps> = ({
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     type: "activate" | "deactivate" | "resend" | null;
@@ -382,8 +384,7 @@ export default function Dashboard() {
     admin: Admin | null;
   }
 
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
+  
 
   const openDetailsModal = (admin: Admin) => {
     setSelectedAdmin(admin);
