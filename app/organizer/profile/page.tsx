@@ -4,15 +4,18 @@ import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 // fake profile toggle (replace with API data later)
 const hasProfile = true;
 
 export default function OrganizerProfilePage() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <OrganizerSidebar />
-
+      <OrganizerSidebar isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
       <div className="flex-1 flex flex-col">
         <AppHeader title="Organizer Profile" />
 
