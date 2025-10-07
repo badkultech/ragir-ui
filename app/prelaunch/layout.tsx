@@ -83,7 +83,7 @@ export default function RootLayout({
   return (
     
       
-      < div className={`${styles.root} antialiased`}
+      < div className={`${barlow.variable} ${poppins.variable} antialiased`}
       >
         {children}
 
