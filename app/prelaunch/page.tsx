@@ -9,8 +9,7 @@ import Content from "./components/how_it_works/Content";
 import Feature from "./components/more_about_ragir/Feature";
 import Tile from "./components/why_choose_ragir/Tile";
 import styles from "./prelaunch.module.css"
-
-// import { BsArrowRight } from "react-icons/bs";
+import { MoveRight } from "lucide-react";
 
 /**
  * Home Page Component
@@ -21,14 +20,14 @@ export default function Home() {
   return (
     <>  
     <Header />
-    <main className="px-[4rem] relative w-full overflow-hidden max-w-[1400px] mx-auto">
+    <main className="px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
       {/* Hero Section */}
       <Hero />
 
 
       {/* We are here to Offer you */}
       <Section heading="We are here to Offer you" child={
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[3rem] max-md:justify-center mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[2.5rem] max-md:justify-center">
           <Card 
           heading="Community Growth" 
           img="/prelaunch-page-imgs/community.png" 
@@ -60,7 +59,7 @@ export default function Home() {
       {/* How It Works */}
       <Section heading="How It Works" child= {
           <div className="flex flex-col items-center justify-center">
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-[80%]">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-y-[2rem] w-[90%]">
               {/* Step 1 */}
               <div className="px-6 order-1">
                 <Image src="/prelaunch-page-imgs/hiw-1.png" alt="How It Works Image" width={2000} height={1000} className="w-full"/>
@@ -89,10 +88,12 @@ export default function Home() {
 
 
       {/* More About Ragir */}
-      <Section heading={<>More About <span className={styles.grad_txt}>Ragir</span></>} child= {
+      <Section heading={<>More About <span className={styles.grad_txt}>Ragir</span>
+      <p className="text-[2rem] barlow font-[550] italic text-center text-[#575757] mt-6"> Ragir is the only one in India! That...</p>
+      </>} child= {
         <>
-        <p className="text-[2rem] barlow font-[550] italic text-center sub-txt opacity-80 mb-[4rem]"> Ragir is the only one in India! That...</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
           <Feature img="/prelaunch-page-imgs/mar-group.png" 
           title="enables you to list your group trips on a platform dedicated to fixed departure group trips."
            description="So that your every seat is booked on time" />
@@ -136,7 +137,7 @@ export default function Home() {
             <p className="text-[1.5rem] text-white py-[2rem]">Get started today and be discovered by millions of eager travelers</p>
             <button className="bg-white group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500">
              <span className="group-hover:opacity-0 transition-all duration-300 text-[1.25rem] font-[500]"> Join as Partner</span>  
-              {/* <BsArrowRight className="inline-block group-hover:block group-hover:translate-x-[-5rem] transition-all duration-500 group-hover:scale-x-150" size={24} /> */}
+              <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-5rem] transition-all duration-500 group-hover:scale-x-150" size={24} />
             </button>
           </div>
         </div>

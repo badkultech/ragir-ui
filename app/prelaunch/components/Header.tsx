@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import styles from "../prelaunch.module.css";
-// import { BsArrowRight } from "react-icons/bs";
+import { MoveRight } from 'lucide-react';
 
 /**
  * Header Component
@@ -34,7 +34,7 @@ export default function Header(): React.JSX.Element {
         <Link href="/trivial">
           <button className={`${styles.theme_btn_1} group rounded-full px-4 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500`}>
             <span className="group-hover:opacity-0 transition-all duration-300"> For Travelers</span>
-            {/* <BsArrowRight className="inline-block group-hover:block group-hover:translate-x-[-3rem] transition-all duration-500 group-hover:scale-x-150" size={24} /> */}
+            <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-3rem] transition-all duration-500 group-hover:scale-x-150" size={24}/>
           </button>
         </Link>
       </nav>
