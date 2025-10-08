@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowUpRight, Eye, EyeOff, X } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSetupOrganizerPasswordMutation } from "@/lib/services/setup-organizer-password";
@@ -11,6 +11,13 @@ import { jwtDecode } from "jwt-decode";
 import { AuthTokenPayload } from "@/hooks/useDecodedToken";
 import { getDashboardPath } from "@/lib/utils";
 import { showApiError } from "@/lib/utils/toastHelpers";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+
+// Dynamically import your privacy page so it doesn’t load until needed
+const PrivacyPolicyPage = dynamic(() => import("@/app/organizer/privacy-policy/page"), {
+  ssr: false,
+});
 
 export default function OrganizerRegisterPage() {
   const [showPwd, setShowPwd] = useState(false);
@@ -19,6 +26,7 @@ export default function OrganizerRegisterPage() {
   const emailFromParams = searchParams.get("email") || "";
   const orgNameFromParams = searchParams.get("orgName") || "";
   const tokenFromParams = searchParams.get("token") || "";
+  const [showPolicy, setShowPolicy] = useState(false);
   const [setupOrganizerPassword] = useSetupOrganizerPasswordMutation();
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
@@ -74,7 +82,7 @@ export default function OrganizerRegisterPage() {
         // decode immediately instead of waiting for Redux
         const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
 
-   
+
         router.replace("/organizer/profile/empty");
       }
     } catch (err) {
@@ -225,7 +233,13 @@ export default function OrganizerRegisterPage() {
                   <span className="text-sm text-gray-700">
                     I agree to all the{" "}
                     <span className="font-semibold">Terms</span> and{" "}
-                    <span className="font-semibold">Privacy Policy</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowPolicy(true)}
+                      className="font-semibold text-blue-600 hover:underline"
+                    >
+                      Privacy Policy
+                    </button>
                   </span>
                 </label>
 
@@ -237,6 +251,45 @@ export default function OrganizerRegisterPage() {
                 >
                   Complete Registration
                 </button>
+
+                {/* Modal */}
+                {showPolicy && (
+                  <div
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+                    onClick={() => setShowPolicy(false)} // closes on outside click
+                  >
+                    <div
+                      className="bg-white rounded-2xl shadow-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto relative p-6"
+                      onClick={(e) => e.stopPropagation()} // prevents closing when clicking inside
+                    >
+                      {/* Top right corner controls */}
+                      <div className="absolute top-4 right-4 flex gap-3 items-center">
+                        {/* Open in new tab */}
+                        <a
+                          href="/organizer/privacy-policy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-400 hover:text-gray-600"
+                          title="Open in new tab"
+                        >
+                          <ArrowUpRight className="w-5 h-5" />
+                        </a>
+                        {/* Close */}
+                        <button
+                          onClick={() => setShowPolicy(false)}
+                          className="text-gray-400 hover:text-gray-600"
+                          title="Close"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div className="pr-4 mt-2">
+                        <PrivacyPolicyPage />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </form>
           </div>
