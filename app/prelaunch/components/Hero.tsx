@@ -73,18 +73,17 @@ export default function Hero(): React.JSX.Element {
       </section>
 
       {/* Intro Section */}
-      <section
-        className={`${styles.poppins} intro_section w-full grid grid-cols-1 md:grid-cols-2 gap-[5rem] mt-[5rem]`}
-      >
-        <div className="img order-2 md:order-1">
+      <section className="intro_section w-full grid grid-cols-1 md:grid-cols-2 gap-[2rem] md:gap-[5rem] mt-[3rem] md:mt-[5rem]">
+        <div className="img order-2 md:order-1 flex justify-center">
           <Image
             src="/prelaunch-page-imgs/intro-hero.webp"
             alt="Image showing travellers having fun"
             width={2412}
             height={1996}
-            className="w-[110%] md:w-full"
+            className="w-[90%] sm:w-[80%] md:w-full h-auto"
           />
         </div>
+
         <div className="content max-md:text-center order-1 md:order-2">
           <h1
             className={`${styles.poppins} text-[3.5rem] md:text-[4.5rem] font-[700] pb-5  `}
