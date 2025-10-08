@@ -10,6 +10,7 @@ import Feature from "./components/more_about_ragir/Feature";
 import Tile from "./components/why_choose_ragir/Tile";
 import styles from "./prelaunch.module.css"
 import { MoveRight } from "lucide-react";
+import Link from "next/link";
 
 /**
  * Home Page Component
@@ -136,8 +137,10 @@ export default function Home() {
             </h1>
             <p className="text-[1.5rem] text-white py-[2rem]">Get started today and be discovered by millions of eager travelers</p>
             <button className="bg-white group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500">
+              <Link href="/organizer/join-as-partner" className="absolute inset-0 z-0" >
              <span className="group-hover:opacity-0 transition-all duration-300 text-[1.25rem] font-[500]"> Join as Partner</span>  
               <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-5rem] transition-all duration-500 group-hover:scale-x-150" size={24} />
+              </Link>
             </button>
           </div>
         </div>

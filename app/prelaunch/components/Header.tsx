@@ -31,7 +31,7 @@ export default function Header(): React.JSX.Element {
             className="md:hidden"
           />
         </Link>
-        <Link href="/trivial">
+        <Link href="/prelaunch/travelers">
           <button className={`${styles.theme_btn_1} group rounded-full px-4 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500`}>
             <span className="group-hover:opacity-0 transition-all duration-300"> For Travelers</span>
             <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-3rem] transition-all duration-500 group-hover:scale-x-150" size={24}/>

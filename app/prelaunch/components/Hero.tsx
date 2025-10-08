@@ -30,7 +30,7 @@ digital partner to build community and maximize growth.</span>
 get lifetime perks of being our Day 1s
 </h2>
 <div className="max-lg:justify-center flex">
-    <Link href="/trivial">
+    <Link href="/organizer/join-as-partner">
     {/* Intentionaly left empty, content set by css for that gradeint text*/}
         <button className={`${styles.btn}  text-[1.5rem] rounded-full font-[500] px-6 py-3 mt-8 poppins`}></button>
     </Link>
