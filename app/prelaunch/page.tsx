@@ -142,7 +142,7 @@ export default function Home() {
             </h1>
             <p className="text-[1.25rem] md:text-[1.5rem] text-white py-6 md:py-[2rem]">Get started today and be discovered by millions of eager travelers</p>
            
-            <Link href="/oraganizer/join-as-partner" >
+            <Link href="/organizer/join-as-partner" >
             <button className="bg-white max-md:justify-center max-md:w-full group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500">
              <span className="group-hover:opacity-0 transition-all duration-300 text-[1.25rem] font-[500]"> Join as Partner</span>  
               <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-5rem] transition-all duration-500 group-hover:scale-x-150" size={24} />
