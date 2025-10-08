@@ -5,5 +5,5 @@ export interface OrganizationDTO {
   primaryPhone: string;
   businessType: string;
   status: "PENDING" | "ACTIVE" | "INACTIVE" | "REJECTED";
-  createdDate: string;
+  dateOfEstablishment: string;
 }
