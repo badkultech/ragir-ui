@@ -10,6 +10,7 @@ import Feature from "./components/more_about_ragir/Feature";
 import Tile from "./components/why_choose_ragir/Tile";
 import styles from "./prelaunch.module.css"
 import { MoveRight } from "lucide-react";
+import Link from "next/link";
 
 /**
  * Home Page Component
@@ -19,7 +20,12 @@ import { MoveRight } from "lucide-react";
 export default function Home() {
   return (
     <>  
-    <Header />
+    <Header 
+    button = {{
+    link: "/prelaunch/travelers",
+    text: "For Travelers"
+    
+   }}/>
     <main className="px-[1rem] md:px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
       {/* Hero Section */}
       <Hero />
@@ -135,10 +141,14 @@ export default function Home() {
               Join the Movement!
             </h1>
             <p className="text-[1.25rem] md:text-[1.5rem] text-white py-6 md:py-[2rem]">Get started today and be discovered by millions of eager travelers</p>
+           
+            <Link href="/oraganizer/join-as-partner" >
             <button className="bg-white max-md:justify-center max-md:w-full group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500">
              <span className="group-hover:opacity-0 transition-all duration-300 text-[1.25rem] font-[500]"> Join as Partner</span>  
               <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-5rem] transition-all duration-500 group-hover:scale-x-150" size={24} />
             </button>
+            </Link>
+          
           </div>
         </div>
       } />
