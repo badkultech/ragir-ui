@@ -8,10 +8,10 @@ export default function Content({Heading, content, direction, optional = ''}: {H
   
   const isString = typeof content === "string";
   return (
-    <div className={`flex flex-col justify-center ${optional} ${direction === "left" ? "items-start pl-8" : "items-center"}`}>
+    <div className={`flex flex-col justify-center max-md:pl-8 ${optional} ${direction === "left" ? "items-start pl-8" : "items-center"}`}>
       <div className={isString ? "sm:max-w-[350px]" : "w-full"}>
-        <h3 className="text-[2.5rem] font-[500] mb-4">{Heading}</h3>
-        <p className=" text-[1.5rem] text-[#575757]">{content}</p>
+        <h3 className="text-[1.75rem] md:text-[2.5rem] font-[500] mb-4">{Heading}</h3>
+        <p className="text-[1.25rem] md:text-[1.5rem] text-[#575757]">{content}</p>
       </div>
       </div>
   );

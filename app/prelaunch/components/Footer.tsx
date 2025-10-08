@@ -3,7 +3,7 @@ import { Facebook, Linkedin, Instagram } from "lucide-react";
 
 export default function Footer(): React.JSX.Element {
   return (
-    <footer className="bg-black text-white px-[5rem] py-[1.75rem] flex justify-between items-center">
+    <footer className="bg-black text-white p-4 md:px-[5rem] md:py-[1.75rem] flex max-md:gap-4 max-md:flex-col-reverse  justify-between items-center">
       <p className="text-center text-[1rem]">© 2025 Copyright. All rights reserved.</p>
       <div className="flex items-center gap-4">
         <a href="#" aria-label="Follow us on LinkedIn" className="hover:scale-110 transition-transform duration-200">

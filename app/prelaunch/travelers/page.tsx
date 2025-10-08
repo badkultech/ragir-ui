@@ -6,16 +6,12 @@ import {useRef} from 'react'
 import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import Hero from "../components/Hero";
 import Section from "../components/Section";
-import Card from "../components/Card";
 import Content from "../components/how_it_works/Content";
-import Feature from "../components/more_about_ragir/Feature";
-import Tile from "../components/why_choose_ragir/Tile";
 import styles from "../prelaunch.module.css"
 import {MoveRight} from "lucide-react";
 import WhyRagirCard from "../components/WhyRagirCard";
-import { divide } from "lodash";
+
 
 const Travelers = () => {
     const emailRef = useRef<HTMLInputElement>(null);
@@ -29,30 +25,37 @@ const Travelers = () => {
   return (
    <>
    <Header/>
-    <main className="px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
+    <main className="px-[1rem] md:px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
         {/* Hero Section */}
-     <section className={`${styles.poppins} intro_section w-full grid grid-cols-1 md:grid-cols-2 gap-[5rem] mt-[5rem]`}>
-        <div className="content max-md:text-center">
-            <h1 className={`${styles.poppins} text-[4.5rem] font-[700] pb-5  `}>India’s Travel Scene is about to get a Glow Up✨</h1>
-            <p className="text-[1.5rem] font-[400] text-[#575757] py-4">
+     <section className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-[5rem] mt-[1.5rem] md:mt-[5rem]`}>
+        <div className="content ">
+            <h1 className={`md:${styles.poppins}  ${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[600] md:font-[700] pb-5  `}>India’s Travel Scene is about to get a Glow Up✨</h1>
+            <p className="text-[1.25rem] md:text-[1.5rem] font-[400] text-[#575757] py-4">
                At Ragir, we are building the <span className="font-[600] italic">Biggest </span> and <span className="italic font-[600] "> Most diverse hub of fixed departure group trips </span>in India
             </p>
-            <p className="text-[2.5rem]  font-[500] pt-4">
+            <p className="text-[2rem] md:text-[2.5rem]  font-[500] pt-4">
                 Don’t miss the drop. Get notified when it’s live!
             </p>
 
-            <form onSubmit={handleSubmit} className="flex mt-[4rem] max-w-[90%] border rounded-[100px] p-3 overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex max-md:flex-col mt-[2.5rem] md:mt-[4rem] justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:p-3 overflow-hidden">
                 <input
                     ref={emailRef}
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 px-4 py-4 focus:outline-none"
+                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none"
                 />
-                <button className={`${styles.theme_btn_1} group rounded-full px-5 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500`}>
+                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={20}/>
                 </button>
             </form>
+             <button className={`${styles.theme_btn_1} max-md:flex hidden justify-center mt-4 group rounded-full px-[2rem] py-4 text-[1.25rem] items-center gap-2 w-full transition-all duration-500`}>
+                    <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
+                    <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={24}/>
+              </button>
+              <p className="max-md:text-center text-[1.25rem] text-[#575757] pt-4">
+                View <span className="underline font-[600]">Privacy Policy</span>
+              </p>
             
         </div>
         <div className="img">
@@ -65,10 +68,10 @@ const Travelers = () => {
         heading={
         <>
             What we do?
-            <span className="text-[2.25rem] block italic font-[500] pt-[2.5rem]">
+            <span className="text-[1.5rem] md:text-[2.25rem] block italic font-[500] pt-[2.5rem]">
             We handpick the most amazing fixed departure group trips and list them for you.
             </span>
-            <span className={`${styles.barlow} block text-[1.75rem] text-[#575757] font-[500] pt-[2.5rem] `}>
+            <span className={`${styles.barlow} block text-[1rem] max-md:leading-[1.6] md:text-[1.75rem] text-[#575757] font-[500] pt-[2.5rem] `}>
                 Before listing, we check the quality of every trip and reliability of every trip organizer.
                 Then we list those trips by the categories of experience it offers to the travelers.
                 So that you find the right trip, at the right time, in the right mood.
@@ -77,7 +80,7 @@ const Travelers = () => {
                 } 
         child={
         <>
-           <h2 className="text-[3rem]  italic font-[500] pb-[5rem]">
+           <h2 className="text-[1.5rem] max-md:text-center md:text-[3rem]  italic font-[500] pb-[2.5rem] md:pb-[5rem]">
             <span className={styles.grad_txt + " " + "pl-1"}>
             Ragir  
             </span> is your one place to discover, compare, and join trips that match your traveling mood.
@@ -86,7 +89,7 @@ const Travelers = () => {
                  <Image 
                  src="/prelaunch-page-imgs/adventures.webp" alt="diff types of adventures"
                  width={4000} height={2000} 
-                 className=" w-[95%] mx-auto "
+                 className=" w-full md:w-[95%] mx-auto "
                  />
             </div>
         </>
@@ -96,7 +99,7 @@ const Travelers = () => {
       <Section heading="How It Works" child= {
         
           <div className="flex flex-col items-center justify-center">
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-[5rem] lg:gap-y-[4rem] w-[90%]">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-[5rem] gap-y-6 lg:gap-y-[4rem] w-full md:w-[90%]">
             {/* Step 1 */}
          <Content Heading="Pick Your Moods or Destinations" 
               content= {
@@ -208,26 +211,44 @@ const Travelers = () => {
              </div>
             </>
         }/>
-      {/* Banner */}
-         <div className="banner_section my-[5rem] w-full min-h-[400px] flex max-md:justify-center align-center rounded-[2.5rem] px-10 py-10 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
+
+
+      {/* Banner for desktop*/}
+         <div className="hidden banner_section my-[5rem] w-full min-h-[400px] md:flex max-md:justify-center align-center rounded-[2.5rem] px-10 py-10 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
                   <div className="w-[90%] max-md:mx-auto md:w-[80%] rounded-[1.5rem] border border-white py-6 px-8 h-[calc(100%-4rem)] bg-[rgba(0,0,0,0.3)] backdrop-blur-[5px] ">
                     <h1 className="text-[4rem] font-[700] text-white h-full">
                       Get Notified when we are live!
                     </h1>
-                  <form onSubmit={handleSubmit} className="bg-white flex max-w-[90%] mt-4 border rounded-[100px] p-3 overflow-hidden">
+             <form onSubmit={handleSubmit} className=" bg-white flex max-md:flex-col mt-4 justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:p-3 overflow-hidden">
                 <input
                     ref={emailRef}
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 px-4 py-4 focus:outline-none"
+                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none"
                 />
-                <button className={`${styles.theme_btn_1} group rounded-full px-5 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500`}>
+                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={20}/>
                 </button>
             </form>
-                  </div>
+         </div>
         </div>
+
+        {/* Banner for mobile */}
+
+         <div className="hidden banner_section mt-[1rem] w-full min-h-[450px] mb-[1.5rem] max-md:flex max-md:justify-center align-center rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
+          <div className="w-full max-md:mx-auto md:w-[60%] rounded-[1.5rem] md:rounded-[2rem] border border-white p-6 md:py-6 md:px-8 h-[calc(100%-4rem)] bg-[rgba(0,0,0,0.3)] backdrop-blur-[5px] ">
+            <h1 className={`${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[700] text-white`}>
+              Join the Movement!
+            </h1>
+            <p className="text-[1.25rem] md:text-[1.5rem] text-white py-6 md:py-[2rem]">Get started today and be discovered by millions of eager travelers</p>
+            <button className="bg-white max-md:justify-center max-md:w-full group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500">
+             <span className="group-hover:opacity-0 transition-all duration-300 text-[1.25rem] font-[500]"> Join as Partner</span>  
+              <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-5rem] transition-all duration-500 group-hover:scale-x-150" size={24} />
+            </button>
+          </div>
+        </div>
+
     </main>
  
     {/* Footer  */}

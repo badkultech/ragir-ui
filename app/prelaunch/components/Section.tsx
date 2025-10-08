@@ -7,8 +7,8 @@ import styles from "../prelaunch.module.css"
  */
 const Section = ({ child, heading }: { child: React.JSX.Element, heading: string | React.JSX.Element }) => {
   return (
-    <section className={`${styles.poppins} my-[7.5rem] w-full `}>
-      <h2 className={`${styles.barlow} text-[4.5rem] text-center font-[600] text-[#333333] pb-[5rem] barlow `}>{heading}</h2>
+    <section className={`${styles.poppins} my-[3.5rem] md:my-[7.5rem] w-full `}>
+      <h2 className={`${styles.barlow} text-[3.5rem] md:text-[4.5rem] text-center font-[600] text-[#333333] pb-[2.5rem] md:pb-[5rem] barlow `}>{heading}</h2>
       {child}
     </section>
   );
