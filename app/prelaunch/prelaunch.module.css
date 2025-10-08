@@ -66,9 +66,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  /* large radius to simulate pill shape; avoid invalid 'infinity' usage */
-  border-radius: calc(9999px - 2px);
-  padding-left: 5px;
 }
 
 
