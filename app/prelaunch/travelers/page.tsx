@@ -26,20 +26,26 @@ const Travelers = () => {
    <>
    <Header button = {{
     link: "/prelaunch",
-    text: "For Organizers"
+    text: "Join as Partners"
     
    }}/>
     <main className="px-[1rem] md:px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
         {/* Hero Section */}
      <section className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-[5rem] mt-[1.5rem] md:mt-[5rem]`}>
         <div className="content ">
-            <h1 className={`md:${styles.poppins}  ${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[600] md:font-[700] pb-5  `}>India’s Travel Scene is about to get a Glow Up✨</h1>
-            <p className="text-[1.25rem] md:text-[1.5rem] font-[400] text-[#575757] py-4">
-               At Ragir, we are building the <span className="font-[600] italic">Biggest </span> and <span className="italic font-[600] "> Most diverse hub of fixed departure group trips </span>in India
-            </p>
-            <p className="text-[2rem] md:text-[2.5rem]  font-[500] pt-4">
-                Don’t miss the drop. Get notified when it’s live!
-            </p>
+           <h1 className={`${styles.barlow} text-[2rem] md:text-[3rem] font-[600] md:font-[700] pb-3 leading-tight`}>
+  India’s Travel Scene is About to Get a Glow Up ✨
+</h1>
+
+<p className="text-[1rem] md:text-[1.25rem] font-[400] text-[#575757] py-3 leading-relaxed">
+  At Ragir, we are building the <span className="font-[600] italic">biggest</span> and
+  <span className="italic font-[600]"> most diverse hub of fixed-departure group trips</span> in India.
+</p>
+
+<p className="text-[1.25rem] md:text-[1.75rem] font-[500] pt-2">
+  Don’t miss the drop — get notified when it’s live!
+</p>
+
 
             <form onSubmit={handleSubmit} className="flex max-md:flex-col mt-[2.5rem] md:mt-[4rem] justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:p-3 overflow-hidden">
                 <input
@@ -57,9 +63,11 @@ const Travelers = () => {
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={24}/>
               </button>
+              <Link href="/organizer/privacy-policy" target="_blank" rel="noopener noreferrer">
               <p className="max-md:text-center text-[1.25rem] text-[#575757] pt-4">
                 View <span className="underline font-[600]">Privacy Policy</span>
               </p>
+              </Link>
             
         </div>
         <div className="img">
