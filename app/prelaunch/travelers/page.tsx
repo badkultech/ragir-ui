@@ -46,7 +46,7 @@ const Travelers = () => {
                     ref={emailRef}
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none"
+                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none outline-none"
                 />
                 <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
