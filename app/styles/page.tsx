@@ -1,0 +1,436 @@
+import { GradientIconButton } from '@/components/library/customButtons/GradientIconButton';
+import { AdventureGradient } from '@/components/library/SvgComponents/GradientsOfMoods/adventureGradient';
+import { BeachGradient } from '@/components/library/SvgComponents/GradientsOfMoods/beachGradient';
+import { CampingGradient } from '@/components/library/SvgComponents/GradientsOfMoods/campingGradient';
+import { DesertGradient } from '@/components/library/SvgComponents/GradientsOfMoods/desertGradient';
+import { HeritageGradient } from '@/components/library/SvgComponents/GradientsOfMoods/heritageGradient';
+import { JungleGradient } from '@/components/library/SvgComponents/GradientsOfMoods/jungleGradient';
+import { LearningGradient } from '@/components/library/SvgComponents/GradientsOfMoods/learningGradient';
+import { MotorSportsGradient } from '@/components/library/SvgComponents/GradientsOfMoods/motorSportsGradient';
+import { MountainGradient } from '@/components/library/SvgComponents/GradientsOfMoods/mountainGradient';
+import { PartyGradient } from '@/components/library/SvgComponents/GradientsOfMoods/partyGradient';
+import { SkygazyGradient } from '@/components/library/SvgComponents/GradientsOfMoods/skygazyGradient';
+import { SpiritualGradient } from '@/components/library/SvgComponents/GradientsOfMoods/spiritualGradient';
+import { TrekkingGradient } from '@/components/library/SvgComponents/GradientsOfMoods/trekkingGradient';
+import { WeekendGradient } from '@/components/library/SvgComponents/GradientsOfMoods/weekendGradient';
+import { WellnessGradient } from '@/components/library/SvgComponents/GradientsOfMoods/wellnessGradient';
+import { WomenOnlyGradient } from '@/components/library/SvgComponents/GradientsOfMoods/womenOnlyGradient';
+import { BeachIcon } from '@/components/library/SvgComponents/Icons/beachIcon';
+import { CalenderIcon } from '@/components/library/SvgComponents/Icons/calenderIcon';
+import { CampingIcon } from '@/components/library/SvgComponents/Icons/campingIcon';
+import { CompassIcon } from '@/components/library/SvgComponents/Icons/compassIcon';
+import { DesertIcon } from '@/components/library/SvgComponents/Icons/desertIcon';
+import { DrinksIcon } from '@/components/library/SvgComponents/Icons/drinksIcon';
+import { FastTravelIcon } from '@/components/library/SvgComponents/Icons/fastTravelIcon';
+import { FemaleIcon } from '@/components/library/SvgComponents/Icons/femaleIcon';
+import { ForestIcon } from '@/components/library/SvgComponents/Icons/forestIcon';
+import { GraduationCapIcon } from '@/components/library/SvgComponents/Icons/graduationCapIcon';
+import { HealthIcon } from '@/components/library/SvgComponents/Icons/healthIcon';
+import { HeritageIcon } from '@/components/library/SvgComponents/Icons/heritageIcon';
+import { Hiking1Icon } from '@/components/library/SvgComponents/Icons/hiking1Icon';
+import { HikingIcon } from '@/components/library/SvgComponents/Icons/hikingIcon';
+import { LandMarkIcon } from '@/components/library/SvgComponents/Icons/landmarkIcon';
+import { LearningIcon } from '@/components/library/SvgComponents/Icons/learningIcon';
+import { MotorSportsIcon } from '@/components/library/SvgComponents/Icons/motorSportsIcon';
+import { MountainIcon } from '@/components/library/SvgComponents/Icons/mountainIcon';
+import { NightIcon } from '@/components/library/SvgComponents/Icons/nightIcon';
+import { PartiesIcon } from '@/components/library/SvgComponents/Icons/partiesIcon';
+import { WellnessIcon } from '@/components/library/SvgComponents/Icons/wellnessIcon';
+
+const StyleGuide = () => {
+  return (
+    <div className='p-8'>
+      <h1 className='font-poppins text-h1 font-semibold mb-8'>
+        Component Style Guide
+      </h1>
+      <section className='mb-12'>
+        <h2 className='font-poppins text-h2 font-semibold mb-4'>Typography</h2>
+        <div className='bg-gray-100 p-6 rounded-lg space-y-4'>
+          <p className='font-poppins bg-ragir-gradient'>Poppins H1 | Regular</p>
+          <p className='font-barlow text-h2'>Barlow H2 | Semibold</p>
+          <p className='font-poppins text-base'>Poppins Body | Regular</p>
+        </div>
+      </section>
+      <section className='mb-12'>
+        <h2 className='font-poppins text-h2 font-semibold mb-4'>Colors</h2>
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='bg-text-primary p-4 rounded-lg text-white'>
+            <p>text-primary</p>
+          </div>
+          <div className='bg-section-bg p-4 rounded-lg'>
+            <p>section-bg</p>
+          </div>
+          <div className='bg-gradient-heritage p-4 rounded-lg text-white'>
+            <p>heritage gradient</p>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h2 className='font-poppins text-h2 font-semibold mb-4'>Gradients</h2>
+        <div className='grid grid-cols-2 md:grid-cols-8'>
+          <div>
+            <DesertGradient height='150' width='150' />
+            <span>Desert</span>
+          </div>
+          <div>
+            <MountainGradient height='150' width='150' />
+            <span>Mountain</span>
+          </div>
+          <div>
+            <BeachGradient height='150' width='150' />
+            <span>Beach</span>
+          </div>
+          <div>
+            <JungleGradient height='150' width='150' />
+            <span>Jungle</span>
+          </div>
+          <div>
+            <SpiritualGradient height='150' width='150' />
+            <span>Spiritual</span>
+          </div>
+          <div>
+            <TrekkingGradient height='150' width='150' />
+            <span>Trekking</span>
+          </div>
+          <div>
+            <CampingGradient height='150' width='150' />
+            <span>Camping</span>
+          </div>
+          <div>
+            <WellnessGradient height='150' width='150' />
+            <span>Wellness</span>
+          </div>
+          <div>
+            <LearningGradient height='150' width='150' />
+            <span>Learning</span>
+          </div>
+          <div>
+            <AdventureGradient height='150' width='150' />
+            <span>Adventure</span>
+          </div>
+          <div>
+            <MotorSportsGradient height='150' width='150' />
+            <span>MonorSports</span>
+          </div>
+          <div>
+            <WeekendGradient height='150' width='150' />
+            <span>Weekend</span>
+          </div>
+          <div>
+            <WomenOnlyGradient height='150' width='150' />
+            <span>WomenOnly</span>
+          </div>
+          <div>
+            <HeritageGradient height='150' width='150' />
+            <span>Heritage</span>
+          </div>
+          <div>
+            <SkygazyGradient height='150' width='150' />
+            <span>SkygazyGradient</span>
+          </div>
+          <div>
+            <PartyGradient height='150' width='150' />
+            <span>PartyGradient</span>
+          </div>
+        </div>
+        <div className='font-poppins text-h2 font-semibold mt-4 border-t pt-4'>
+          Icons
+        </div>
+        <div className='mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-300 p-6 rounded-lg'>
+          <div className='flex flex-col items-center gap-2'>
+            <FemaleIcon />
+            <div className='font-poppins text-h3 font-semibold'>FemaleIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <NightIcon />
+            <div className='font-poppins text-h3 font-semibold'>NightIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <CalenderIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              CalenderIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <DesertIcon />
+            <div className='font-poppins text-h3 font-semibold'>DesertIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <DrinksIcon />
+            <div className='font-poppins text-h3 font-semibold'>DrinksIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <FastTravelIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              FastTravelIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <ForestIcon />
+            <div className='font-poppins text-h3 font-semibold'>ForestIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <HealthIcon />
+            <div className='font-poppins text-h3 font-semibold'>HealthIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <HikingIcon />
+            <div className='font-poppins text-h3 font-semibold'>HikingIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <Hiking1Icon />
+            <div className='font-poppins text-h3 font-semibold'>
+              Hiking1Icon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <HeritageIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              HeritageIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <LandMarkIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              LandMarkIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <LearningIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              LearningIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <MountainIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              MountainIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <NightIcon />
+            <div className='font-poppins text-h3 font-semibold'>NightIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <BeachIcon />
+            <div className='font-poppins text-h3 font-semibold'>BeachIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <CompassIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              CompassIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <HealthIcon />
+            <div className='font-poppins text-h3 font-semibold'>HealthIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <ForestIcon />
+            <div className='font-poppins text-h3 font-semibold'>ForestIcon</div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <MotorSportsIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              MotorSportsIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <WellnessIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              WellnessIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <LearningIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              LearningIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <PartiesIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              PartiesIcon
+            </div>
+          </div>
+
+          <div className='flex flex-col items-center gap-2'>
+            <CampingIcon />
+            <div className='font-poppins text-h3 font-semibold'>
+              CampingIcon
+            </div>
+          </div>
+        </div>
+
+        <div className='font-poppins text-h2 font-semibold mt-4 border-t pt-4'>
+          Buttons
+        </div>
+        <div className='mt-8 grid grid-cols-2 md:grid-cols-4 gap-4'>
+          <GradientIconButton
+            label='Desert'
+            Icon={FemaleIcon}
+            Gradient={DesertGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Mountain'
+            Icon={FemaleIcon}
+            Gradient={MountainGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Beach'
+            Icon={FemaleIcon}
+            Gradient={BeachGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Jungle'
+            Icon={FemaleIcon}
+            Gradient={JungleGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Spiritual'
+            Icon={FemaleIcon}
+            Gradient={SpiritualGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Trekking'
+            Icon={FemaleIcon}
+            Gradient={TrekkingGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+          <GradientIconButton
+            label='Camping'
+            Icon={FemaleIcon}
+            Gradient={CampingGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Wellness'
+            Icon={FemaleIcon}
+            Gradient={WellnessGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Learning'
+            Icon={FemaleIcon}
+            Gradient={LearningGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Adventure'
+            Icon={FemaleIcon}
+            Gradient={AdventureGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='MotorSports'
+            Icon={FemaleIcon}
+            Gradient={MotorSportsGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Weekend'
+            Icon={FemaleIcon}
+            Gradient={WeekendGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='WomenOnly'
+            Icon={FemaleIcon}
+            Gradient={WomenOnlyGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+
+          <GradientIconButton
+            label='Heritage'
+            Icon={FemaleIcon}
+            Gradient={HeritageGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+          <GradientIconButton
+            label='Skygazy'
+            Icon={FemaleIcon}
+            Gradient={SkygazyGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+          <GradientIconButton
+            label='Party'
+            Icon={FemaleIcon}
+            Gradient={PartyGradient}
+            onClick={() => {
+              return;
+            }}
+          />
+        </div>
+      </section>
+    </div>
+  );
+};
+export default StyleGuide;
