@@ -92,7 +92,7 @@ export default function JoinAsPartner() {
             <AppHeader showLogo={true} showAvatar={false} />
 
             <main
-                className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] bg-cover bg-center px-4 sm:px-6 lg:px-8 overflow-y-auto"
+                className="mt-2 flex flex-col items-center justify-center min-h-[calc(100vh-120px)] bg-cover bg-center px-4 sm:px-6 lg:px-8 overflow-y-auto"
             >
                 <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6 sm:p-8">
                     <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
