@@ -6,7 +6,6 @@ import { ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Sidebar } from "@/components/superadmin/sidebar";
-import { Header } from "@/components/superadmin/header";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,22 +15,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetNextAdminIdQuery } from "@/lib/services/superadmin/add-admin";
+import {
+  useCreateSuperAdminMutation,
+  useGetNextAdminIdQuery,
+} from "@/lib/services/superadmin/add-admin";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useSelector } from "react-redux";
+import { GradientButton } from "@/components/gradient-button";
+import {
+  CreateSuperAdminRequest,
+} from "@/lib/services/superadmin/add-admin/types";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import LoadingOverlay from "@/components/common/LoadingOverlay";
+import { useRouter } from "next/navigation";
+import { AppHeader } from "@/components/app-header";
 
 export default function AddAdmin() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
     lastName: "",
-    role: "super-admin",
+    role: "SYSTEM_ADMIN",
+    employeeNumber: "",
   });
   const [emailError, setEmailError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
   const { data: data } = useGetNextAdminIdQuery(organizationId);
+  const router = useRouter();
+  const [createSuperAdmin, { isLoading: isLoading }] =
+    useCreateSuperAdminMutation();
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,35 +81,47 @@ export default function AddAdmin() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
     try {
-      console.log("[v0] Submitting admin invitation:", formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert("Admin invitation sent successfully!");
-      // Reset form or redirect
-    } catch (error) {
-      console.error("[v0] Error sending invitation:", error);
-      alert("Failed to send invitation. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      const payload: CreateSuperAdminRequest = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        roles: [formData.role], // or from f
+        employeeNumber: data ?? "",
+      };
+
+      const result = await createSuperAdmin({
+        organizationId: organizationId,
+        payload,
+      }).unwrap(); // throws on error, returns UserDTO on success [4][1]
+      console.log("Admin created successfully:", result);
+      showSuccess("Admin invitation sent successfully!");
+      router.push("/superadmin/admins");
+    } catch (err) {
+      showApiError(err as any);
+      console.error("Failed to create admin:", err);
     }
+    setIsSubmitting(false);
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+     <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Content */}
       <div className="flex-1">
-        <Header title="Add Admin" />
+        <AppHeader
+          title="Add Admins"
+          onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
+        />
 
         {/* Main Content Area */}
         <main className="flex-1 p-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             {/* Back Button and Title */}
             <div className="flex items-center mb-8">
               <Link
-                href="/superadmin"
+                href="/superadmin/admins"
                 className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -213,10 +240,10 @@ export default function AddAdmin() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="super-admin">
+                    <SelectItem value="SYSTEM_ADMIN">
                       Super Admin (Full Platform Control)
                     </SelectItem>
-                    <SelectItem value="admin">
+                    <SelectItem value="ORGANIZATION_ADMIN">
                       Admin (Limited Access)
                     </SelectItem>
                     <SelectItem value="moderator">
@@ -242,19 +269,16 @@ export default function AddAdmin() {
               </div>
 
               {/* Submit Button */}
-              <button
+              <GradientButton
                 type="submit"
                 disabled={isSubmitting || !!emailError}
-                className="w-full py-4 rounded-full font-medium text-white shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
-                }}
               >
-                {isSubmitting
-                  ? "Sending Invitation..."
-                  : "Send Admin Invitation"}
-              </button>
+                <LoadingOverlay
+                  isLoading={isSubmitting}
+                  message="Sending Invitation..."
+                />
+                Send Admin Invitation
+              </GradientButton>
             </form>
           </div>
         </main>

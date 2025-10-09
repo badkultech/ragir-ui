@@ -1,5 +1,5 @@
 // services/api.ts
-import { baseAPI, publicBaseAPI } from '..';
+import { baseAPI } from '..';
 import { ApiResponse } from '../common-types';
 import { ENDPOINTS } from '@/lib/utils';
 import { LoginDTO } from '../otp/types';
@@ -19,7 +19,23 @@ export const adminAPI = baseAPI.injectEndpoints({
       }),
       transformResponse: (response: ApiResponse<LoginDTO>) => response.data,
     }),
+    resendInvite: builder.mutation<void, { email: string }>({
+      query: ({ email }) => ({
+        url: ENDPOINTS.RESEND_INVITE,
+        method: 'POST',
+        body: { email },
+      }),
+      transformResponse: (response: ApiResponse<void>) => response.data,
+    }),
+    ForgotPassword : builder.mutation<void, { email: string }>({
+      query: ({ email }) => ({
+        url: ENDPOINTS.FORGOT_PASSWORD,
+        method: 'POST',
+        body: { email },
+      }),
+      transformResponse: (response: ApiResponse<void>) => response.data,
+    }),
   }),
 });
 
-export const { useSetupPasswordMutation } = adminAPI;
+export const { useSetupPasswordMutation ,useResendInviteMutation, useForgotPasswordMutation } = adminAPI;

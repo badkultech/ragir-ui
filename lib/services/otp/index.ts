@@ -1,6 +1,7 @@
 // services/api.ts
 import { baseAPI, publicBaseAPI } from '..';
 import { ApiResponse } from '../common-types';
+import { TAGS } from '../tags';
 import { OtpResponse, GenerateOtpRequest, ValidateOtpRequest, LoginDTO } from './types';
 import { ENDPOINTS } from '@/lib/utils';
 
@@ -22,6 +23,7 @@ export const otpAPI = publicBaseAPI.injectEndpoints({
         body,
       }),
       transformResponse: (response: ApiResponse<LoginDTO>) => response.data,
+       invalidatesTags: [{ type: TAGS.travelerProfile }],
     }),
   }),
 });

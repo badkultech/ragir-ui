@@ -24,11 +24,11 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(({ id, title, description, action, type = "info", ...props }) => (
+      {toasts.map(({ id, title, description, action, toastType , ...props }) => (
         <Toast
           key={id}
           {...props}
-          className={`border-l-4 p-4 rounded-md shadow-md flex justify-between items-start gap-4 ${toastColors[type]}`}
+          className={`border-l-4 p-4 rounded-md shadow-md flex justify-between items-start gap-4 ${toastColors[toastType ?? "info"]}`}
         >
           <div className="flex flex-col gap-1">
             {title && <ToastTitle className="font-semibold">{title}</ToastTitle>}

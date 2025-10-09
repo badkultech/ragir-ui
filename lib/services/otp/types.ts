@@ -10,6 +10,7 @@ export interface GenerateOtpRequest {
   identifier: string; // email or mobile
   type: "EMAIL" | "MOBILE"; // matches your OTPType enum
   organization: boolean;
+  userPublicId?: string; // optional, required if organization is true
 }
 
 
@@ -18,6 +19,7 @@ export interface ValidateOtpRequest {
   otp: string;
   type: "EMAIL" | "MOBILE"; // matches your OTPType enum
   organization: boolean; // true if it's an organization login
+  userPublicId?: string; // optional, required if organization is true
 }
 
 export interface LoginDTO {

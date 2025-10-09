@@ -1,9 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { TAGS } from './tags';
-import { RootState, store } from '../slices/store';
-import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import type {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from '@reduxjs/toolkit/query';
 import { hideLoader, showLoader } from '../slices/uiSlice';
 import { withFullLoader } from '@/lib/utils/withFullLoader';
+
+// Keep RootState type import separate
+import type { RootState } from '../slices/store';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: 'https://ragir.badkultech.com/ragir/api',
@@ -14,22 +20,33 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
-// Handles 401 token refresh
-export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
+// Fixed: Use api parameter instead of direct store import
+export const baseQueryWithReauth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
-    const refreshResult = await baseQuery({
-      url: '/auth/refresh-token',
-      method: 'POST',
-      body: { refreshToken: (api.getState() as RootState).auth.refreshToken },
-    }, api, extraOptions);
+    const refreshResult = await baseQuery(
+      {
+        url: '/auth/refresh-token',
+        method: 'POST',
+        body: { refreshToken: (api.getState() as RootState).auth.refreshToken },
+      },
+      api,
+      extraOptions,
+    );
 
     if (refreshResult.data) {
       const { accessToken, refreshToken } = (refreshResult.data as any).data;
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
-      api.dispatch({ type: 'auth/setCredentials', payload: refreshResult.data });
+      api.dispatch({
+        type: 'auth/setCredentials',
+        payload: refreshResult.data,
+      });
 
       result = await baseQuery(args, api, extraOptions);
     } else {
@@ -40,20 +57,22 @@ export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, Fetch
   return result;
 };
 
-// Adds optional loader support
+// Fixed: Remove store dispatch, use api parameter
 const baseQueryWithLoader = async (args: any, api: any, extraOptions: any) => {
   const showFullLoader = args?.showFullLoader ?? false;
 
   if (showFullLoader) {
-   return await withFullLoader(
-  new Promise((resolve) => resolve(baseQueryWithReauth(args, api, extraOptions)))
-);
+    return await withFullLoader(
+      new Promise((resolve) =>
+        resolve(baseQueryWithReauth(args, api, extraOptions)),
+      ),
+    );
   } else {
-    if (args?.showLoader) store.dispatch(showLoader());
+    if (args?.showLoader) api.dispatch(showLoader());
     try {
       return await baseQueryWithReauth(args, api, extraOptions);
     } finally {
-      if (args?.showLoader) store.dispatch(hideLoader());
+      if (args?.showLoader) api.dispatch(hideLoader());
     }
   }
 };
@@ -66,7 +85,9 @@ export const baseAPI = createApi({
 });
 
 // Public API (no token)
-const publicBaseQuery = fetchBaseQuery({ baseUrl: 'https://ragir.badkultech.com/ragir/api' });
+const publicBaseQuery = fetchBaseQuery({
+  baseUrl: 'https://ragir.badkultech.com/ragir/api',
+});
 export const publicBaseAPI = createApi({
   reducerPath: 'publicBaseAPI',
   baseQuery: publicBaseQuery,

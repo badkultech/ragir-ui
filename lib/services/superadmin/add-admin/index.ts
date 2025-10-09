@@ -2,6 +2,7 @@ import { ENDPOINTS } from "@/lib/utils";
 import { baseAPI } from "../..";
 import { ApiResponse, PageResponse } from "../../common-types";
 import { TAGS } from "../../tags";
+import { CreateSuperAdminRequest, UserDTO } from "./types";
 
 export const numberSeriesAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -16,7 +17,16 @@ export const numberSeriesAPI = baseAPI.injectEndpoints({
       transformResponse: (response: ApiResponse<string>) => response.data,
       providesTags: [TAGS.admins],
     }),
+    createSuperAdmin: builder.mutation<UserDTO, {payload : CreateSuperAdminRequest ,organizationId : string}>({
+        query : ({organizationId, payload}) => ({
+            url: ENDPOINTS.CREATE_SUPER_ADMIN(organizationId),
+            method: "POST",
+            body: payload,
+        }),
+        transformErrorResponse: (response: ApiResponse<null>) => response.message,
+        invalidatesTags: [TAGS.admins],
+    })
   }),
 });
 
-export const { useGetNextAdminIdQuery } = numberSeriesAPI;
+export const { useGetNextAdminIdQuery, useCreateSuperAdminMutation } = numberSeriesAPI;

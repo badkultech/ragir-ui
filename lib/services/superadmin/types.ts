@@ -18,3 +18,12 @@ export interface Admin {
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
   publicId: string;
 }
+
+export interface TenantDashboardStats {
+  totalAdmins: number;
+  activeAdmins: number;
+  pendingAdmins: number;
+  totalOrganizers: number;
+  activeOrganizations: number;
+  pendingOrganizations: number;
+}

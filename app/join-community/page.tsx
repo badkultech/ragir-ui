@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { AppHeader } from "@/components/app-header"
-import { GradientButton } from "@/components/gradient-button"
-import { ChevronDown } from "lucide-react"
-import LoadingOverlay from "@/components/common/LoadingOverlay"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { AppHeader } from "@/components/app-header";
+import { GradientButton } from "@/components/gradient-button";
+import { ChevronDown } from "lucide-react";
+import LoadingOverlay from "@/components/common/LoadingOverlay";
 
 export default function JoinCommunityPage() {
   const [formData, setFormData] = useState({
@@ -13,28 +13,33 @@ export default function JoinCommunityPage() {
     age: "",
     gender: "",
     agreeToTerms: false,
-  })
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = () => {
-    if (formData.fullName && formData.age && formData.gender && formData.agreeToTerms) {
-      router.push("/profile")
+    if (
+      formData.fullName &&
+      formData.age &&
+      formData.gender &&
+      formData.agreeToTerms
+    ) {
+      router.push("/profile");
     }
-  }
+  };
 
   return (
     <div
       className="min-h-screen bg-gradient-to-br from-orange-200 via-pink-200 to-red-200"
       style={{
-        backgroundImage: "url(/orgRegisterBg.jpg)",
+        backgroundImage: "url(/bg.jpg)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundBlendMode: "overlay",
@@ -46,26 +51,36 @@ export default function JoinCommunityPage() {
         <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl">
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-6">Join Community</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-6">
+                Join Community
+              </h1>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label htmlFor="fullName" className="block text-sm font-semibold text-gray-900 mb-2">
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
                   Full Name
                 </label>
                 <input
                   id="fullName"
                   type="text"
                   value={formData.fullName}
-                  onChange={(e) => handleInputChange("fullName", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("fullName", e.target.value)
+                  }
                   placeholder="Your full name"
                   className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label htmlFor="age" className="block text-sm font-semibold text-gray-900 mb-2">
+                <label
+                  htmlFor="age"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
                   Age
                 </label>
                 <input
@@ -79,14 +94,19 @@ export default function JoinCommunityPage() {
               </div>
 
               <div>
-                <label htmlFor="gender" className="block text-sm font-semibold text-gray-900 mb-2">
+                <label
+                  htmlFor="gender"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
                   Gender
                 </label>
                 <div className="relative">
                   <select
                     id="gender"
                     value={formData.gender}
-                    onChange={(e) => handleInputChange("gender", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("gender", e.target.value)
+                    }
                     className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent appearance-none bg-white"
                   >
                     <option value="">Select Gender</option>
@@ -103,23 +123,30 @@ export default function JoinCommunityPage() {
                   id="terms"
                   type="checkbox"
                   checked={formData.agreeToTerms}
-                  onChange={(e) => handleInputChange("agreeToTerms", e.target.checked)}
+                  onChange={(e) =>
+                    handleInputChange("agreeToTerms", e.target.checked)
+                  }
                   className="mt-1 h-4 w-4 text-orange-500 border-gray-300 rounded focus:ring-orange-400"
                 />
                 <label htmlFor="terms" className="text-sm text-gray-700">
-                  I agree to all the <span className="font-semibold text-gray-900">Terms</span> and{" "}
-                  <span className="font-semibold text-gray-900">Privacy Policy</span>
+                  I agree to all the{" "}
+                  <span className="font-semibold text-gray-900">Terms</span> and{" "}
+                  <span className="font-semibold text-gray-900">
+                    Privacy Policy
+                  </span>
                 </label>
               </div>
-<LoadingOverlay
-                  isLoading={isLoading}
-                  message="Joining Community"
-                />
-              <GradientButton onClick={handleSubmit}>Join Community</GradientButton>
+              <LoadingOverlay
+                isLoading={isLoading}
+                message="Joining Community"
+              />
+              <GradientButton onClick={handleSubmit}>
+                Join Community
+              </GradientButton>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
