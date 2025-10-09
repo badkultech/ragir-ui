@@ -1,4 +1,4 @@
-import { Poppins } from "next/font/google";
+import { Poppins, Barlow } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ReduxProvider } from "@/lib/redux-provider";
@@ -10,8 +10,16 @@ export const metadata = {
   description: "Travel organizer dashboard for managing trips and analytics",
 };
 
+const barlow = Barlow({
+  variable: "--font-barlow",
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
+
 const poppins = Poppins({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
 });
