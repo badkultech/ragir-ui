@@ -52,7 +52,7 @@ export default function EventsPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen ">
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -71,29 +71,29 @@ export default function EventsPage() {
             onAddClick={() => setModalOpen(true)}
           />
           {/* Search */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <Input
               placeholder="Search Library..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full sm:w-80 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
             />
-          </div>
+          </div> */}
 
           {/* Card Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
             {filtered.map((event) => (
               <div
                 key={event.id}
-                className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+                className="bg-white border border-gray-200 rounded-[16px] shadow-sm overflow-hidden flex p-4 gap-y-5 flex-col"
               >
                 {/* Image */}
-                <div className="h-32 bg-gray-100 flex items-center justify-center">
+                <div className="h-32 bg-gray-100 flex items-center justify-center rounded-[12px]">
                   {event.image ? (
                     <img
                       src={event.image}
                       alt={event.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover "
                     />
                   ) : (
                     <span className="text-gray-400 text-sm">No Image</span>
@@ -101,12 +101,14 @@ export default function EventsPage() {
                 </div>
 
                 {/* Content */}
-                <div className="p-4 flex-1 flex flex-col">
+                <div className=" flex-1 flex flex-col">
                   <h3 className="font-semibold text-gray-900">{event.title}</h3>
                   <div className="flex items-center text-gray-600 text-sm mt-1">
                     <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                     {event.location}
                   </div>
+
+                  <div className="flex justify-between marker mt-5">
                   <p className="text-sm text-gray-500 mt-2 line-clamp-2">
                     {event.description}
                   </p>
@@ -123,6 +125,9 @@ export default function EventsPage() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
+                  </div>
+
+                  
                 </div>
               </div>
             ))}

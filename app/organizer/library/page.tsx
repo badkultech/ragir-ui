@@ -17,6 +17,7 @@ import {
 import { GradientButton } from "@/components/gradient-button";
 import { useState } from "react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
+import { LibraryHeader } from "@/components/library/LibraryHeader";
 
 const categories = [
   { label: "Events", href: "/organizer/library/events", icon: Calendar },
@@ -52,8 +53,9 @@ export default function LibraryOverviewPage() {
         <AppHeader title="Library" onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="flex-1 p-6 md:p-8">
-          {/* Header with Add Item */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+         
+          
+          {/* <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
                 Ragir Library
@@ -72,7 +74,16 @@ export default function LibraryOverviewPage() {
               <PlusCircle className="w-4 h-4" />
               Add Item
             </GradientButton>
-          </div>
+          </div> */  }
+
+           {/* Header with Add Item */}
+
+            <LibraryHeader
+                       title="Ragir Library"
+                       buttonLabel="Add item"
+                       onAddClick={() => setModalOpen(true)}
+                       hideBackBtn = {true}
+                     />
 
           {/* Modal */}
           <AddNewItemModal

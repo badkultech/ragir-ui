@@ -145,7 +145,7 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
                 <div className={["flex items-center justify-between rounded-[8px]",
                  active
                         ? "bg-gray-900 text-white shadow-sm"
-                        : "text-gray-700 hover:bg-[#ffffff]",].join(" ")}>
+                        : "text-gray-700 hover:bg-gray-50",].join(" ")}>
                   <Link
                     href={href || "#"}
                     className="group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all"
@@ -176,7 +176,7 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
 
                 {/* Submenu */}
                 {children && open[label] && (
-                  <div className=" bg-white rounded-[8px]">
+                  <div className=" bg-gray-100 rounded-[8px]">
                     <div className="mx-2 py-2 space-y-2">
                     {children.map(({ label, href, icon: ChildIcon, boxedPlus }) => {
                       const childActive = isActive(href);
@@ -187,8 +187,8 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
                           className={[
                             "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all",
                             childActive
-                              ? "bg-gray-100 text-gray-600"
-                              : "text-gray-600 hover:bg-gray-100",
+                              ? "bg-gray-50 text-gray-600"
+                              : "text-gray-600 hover:bg-gray-50",
                           ].join(" ")}
                         >
                           {boxedPlus ? (
