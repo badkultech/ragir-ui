@@ -161,7 +161,7 @@ const Travelers = () => {
               </div>
               {/* Step 4 */}
                <div className=" order-7">
-                <Image src="/prelaunch-page-imgs/travelers-hiw-3.webp" alt="How It Works Image" width={2000} height={1000} className="w-full"/>
+                <Image src="/prelaunch-page-imgs/travelers-hiw-4.webp" alt="How It Works Image" width={2000} height={1000} className="w-full"/>
               </div>
               <Content Heading="Join the Group" 
              content= {<>
