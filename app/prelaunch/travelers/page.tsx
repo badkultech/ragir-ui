@@ -29,7 +29,7 @@ const Travelers = () => {
     text: "Join as Partner"
     
    }}/>
-    <main className="px-[1rem] md:px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
+    <main className="px-[1rem] md:px-[5.5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
         {/* Hero Section */}
      <section className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-[5rem] mt-[1.5rem] md:mt-[5rem]`}>
         <div className="content ">

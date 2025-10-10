@@ -26,7 +26,7 @@ export default function Home() {
     text: "For Travelers"
     
    }}/>
-    <main className="px-[1rem] md:px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
+    <main className="px-[1rem] md:px-[5.5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
       {/* Hero Section */}
       <Hero />
 
