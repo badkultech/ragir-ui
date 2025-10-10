@@ -25,7 +25,7 @@ export default function Header({button}:{ button: { text: string, link: string }
           />
         </Link>
         <Link href={button.link}>
-          <button className={`${styles.theme_btn_1} group rounded-full py-2 px-4  md:px-4 md:py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500`}>
+          <button className={`${styles.theme_btn_1} group rounded-full py-2 px-4  md:px-4 md:py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
             <span className="group-hover:opacity-0 transition-all duration-300">{button.text}</span>
             <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] md:group-hover:translate-x-[-3rem] transition-all duration-500 group-hover:scale-x-150" size={24}/>
           </button>

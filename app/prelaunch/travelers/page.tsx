@@ -26,7 +26,7 @@ const Travelers = () => {
    <>
    <Header button = {{
     link: "/prelaunch",
-    text: "Join as Partners"
+    text: "Join as Partner"
     
    }}/>
     <main className="px-[1rem] md:px-[5rem] relative w-full overflow-hidden max-w-[1500px] mx-auto">
@@ -54,12 +54,12 @@ const Travelers = () => {
                     placeholder="Enter your email"
                     className="flex-1 w-[60%] px-4 py-4 focus:outline-none outline-none"
                 />
-                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500`}>
+                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={20}/>
                 </button>
             </form>
-             <button className={`${styles.theme_btn_1} max-md:flex hidden justify-center mt-4 group rounded-full px-[2rem] py-4 text-[1.25rem] items-center gap-2 w-full transition-all duration-500`}>
+             <button className={`${styles.theme_btn_1} max-md:flex hidden justify-center mt-4 group rounded-full px-[2rem] py-4 text-[1.25rem] items-center gap-2 w-full transition-all duration-500 cursor-pointer`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={24}/>
               </button>
@@ -238,7 +238,7 @@ const Travelers = () => {
                     placeholder="Enter your email"
                     className="flex-1 w-[60%] px-4 py-4 focus:outline-none"
                 />
-                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500`}>
+                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={20}/>
                 </button>
@@ -254,7 +254,7 @@ const Travelers = () => {
               Join the Movement!
             </h1>
             <p className="text-[1.25rem] md:text-[1.5rem] text-white py-6 md:py-[2rem]">Get started today and be discovered by millions of eager travelers</p>
-            <button className="bg-white max-md:justify-center max-md:w-full group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500">
+            <button className="bg-white max-md:justify-center max-md:w-full group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500 cursor-pointer">
              <span className="group-hover:opacity-0 transition-all duration-300 text-[1.25rem] font-[500]"> Join as Partner</span>  
               <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-5rem] transition-all duration-500 group-hover:scale-x-150" size={24} />
             </button>

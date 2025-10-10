@@ -223,7 +223,7 @@ export default function JoinAsPartner() {
             <GradientButton
               type="submit"
               disabled={isLoading}
-              className={`mt-4 w-full rounded-full text-white py-2 font-medium transition ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
+              className={` cursor-pointer mt-4 w-full rounded-full text-white py-2 font-medium transition ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
                 }`}
             >
               {isLoading ? "Submitting..." : "Join as Partner"}

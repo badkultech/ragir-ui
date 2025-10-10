@@ -18,25 +18,25 @@ export default function PrivacyPolicyPage() {
 
         <div className="space-y-8 text-sm md:text-base leading-relaxed text-gray-800">
           <p>
-            <strong>Ragir</strong> (We/Us/Our) is an online platform where users (You)
-            can discover and search fixed departure group trips. We partner with group
-            trip organizers who list their trips, bringing together diverse and
-            exciting travel experiences in one trustworthy place.
+            <strong>Ragir</strong> (We/Us/Our) is an online platform where users (You) can discover and
+            search fixed departure group trips. We partner with group trip organizers who
+            list their trips, bringing together diverse and exciting travel experiences
+            in one trustworthy place.
           </p>
 
           <p>
-            We are currently in the development stage, and while the platform is not
-            yet available for its intended purpose, we invite you to join our early
-            access and updates list. By sharing your email address, you will be among
-            the first to receive updates about our platform.
+            We are currently in the development stage, and while the platform is not yet
+            available for its intended purpose, we invite you to join our early access
+            and updates list. By sharing your email address, you will be among the first
+            to receive updates about our platform.
           </p>
 
           <p>
-            Protecting your privacy is our priority. This Privacy Policy explains how
-            we collect, use, and protect your personal information when you visit our
-            prelaunch page and share your details with us. Please note that this
-            policy applies only to our prelaunch page. It will be updated after launch
-            as our services and data processing evolve.
+            Protecting your privacy is our priority. This Privacy Policy explains how we
+            collect, use, and protect your personal information when you visit our
+            prelaunch page and share your details with us. Please note that this policy
+            applies only to our prelaunch page. It will be updated after launch as our
+            services and data processing evolve.
           </p>
 
           <section>
@@ -111,11 +111,10 @@ export default function PrivacyPolicyPage() {
             <h2 className="font-bold text-lg mb-2">6. Data Retention</h2>
             <p>
               We retain your personal information only for as long as necessary to fulfill
-              the purposes outlined in this Privacy Policy, such as sending you updates,
-              providing early access, or contacting you regarding partnerships. Once the
-              purpose for which the information was collected is fulfilled, or if you
-              request deletion, we will securely delete, unless a longer retention period
-              is required by law.
+              the purposes outlined in this Privacy Policy, such as sending you updates
+              or providing early access. Once the purpose for which the information was
+              collected is fulfilled, or if you request deletion, we will securely delete,
+              unless a longer retention period is required by law.
             </p>
           </section>
 
@@ -125,15 +124,12 @@ export default function PrivacyPolicyPage() {
               Our website and services, including the prelaunch page, are not directed at
               individuals under the age of 18 and individuals residing outside India. If
               you fall within these categories, we kindly ask you not to use our platform
-              at this stage. As we grow, we intend to extend our services beyond India in
-              the future, not presently.
+              at this stage.
             </p>
           </section>
 
           <section>
-            <h2 className="font-bold text-lg mb-2">
-              8. Data Protection Board of India
-            </h2>
+            <h2 className="font-bold text-lg mb-2">8. Data Protection Board of India</h2>
             <p>
               We aim to address all privacy-related concerns promptly. If you feel your
               issue has not been resolved to your satisfaction by us, you may raise it

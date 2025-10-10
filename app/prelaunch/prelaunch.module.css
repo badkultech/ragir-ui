@@ -42,7 +42,7 @@
   transition: 400ms
 }
  .btn::after {
-  content: "Join as Partners";
+  content: "Join as Partner";
   font-size: 1.5rem;
   background: linear-gradient(90deg, #FEA901 0%, #FD6E34 33%, #FE336A 66%,  #FD401A 100%);
   -webkit-background-clip: text;
