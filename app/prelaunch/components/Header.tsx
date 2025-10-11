@@ -13,7 +13,7 @@ import { MoveRight } from 'lucide-react';
  */
 export default function Header({button}:{ button: { text: string, link: string }} ): React.JSX.Element {
   return (
-    <header  className={`${styles.header_bg} p-4 md:py-[1.2rem] md:px-[4rem]`}>
+    <header  className={`${styles.header_bg} p-4 md:py-[1.2rem] md:px-[4rem] sticky top-0  z-50`}>
       <nav className="flex justify-between items-center">
         <Link href="/" className="font-bold">
           <Image
