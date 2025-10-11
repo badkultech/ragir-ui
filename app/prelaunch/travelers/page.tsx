@@ -52,9 +52,9 @@ const Travelers = () => {
                     ref={emailRef}
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none outline-none"
+                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none outline-none text-[1.25rem]"
                 />
-                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
+                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-6 py-[0.8rem] text-[1.25rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={20}/>
                 </button>
@@ -226,19 +226,19 @@ const Travelers = () => {
 
 
       {/* Banner for desktop*/}
-         <div className="hidden banner_section my-[5rem] w-full min-h-[400px] md:flex max-md:justify-center align-center rounded-[2.5rem] px-10 py-10 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
+         <div className="hidden banner_section my-[5rem] w-full min-h-[400px] md:flex max-md:justify-center align-center items-center rounded-[2.5rem] px-10 py-10 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
                   <div className="w-[90%] max-md:mx-auto md:w-[80%] rounded-[1.5rem] border border-white py-6 px-8 h-[calc(100%-4rem)] bg-[rgba(0,0,0,0.3)] backdrop-blur-[5px] ">
                     <h1 className="text-[4rem] font-[700] text-white h-full">
                       Get Notified when we are live!
                     </h1>
-             <form onSubmit={handleSubmit} className=" bg-white flex max-md:flex-col mt-4 justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:p-3 overflow-hidden">
+             <form onSubmit={handleSubmit} className=" bg-white text-[1.25rem] flex max-md:flex-col mt-4 justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:p-3 overflow-hidden">
                 <input
                     ref={emailRef}
                     type="email"
                     placeholder="Enter your email"
                     className="flex-1 w-[60%] px-4 py-4 focus:outline-none"
                 />
-                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-5 py-[0.8rem] text-[1.5rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
+                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-6 py-[0.8rem] text-[1.25rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={20}/>
                 </button>

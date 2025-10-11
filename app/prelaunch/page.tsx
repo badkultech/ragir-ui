@@ -135,7 +135,7 @@ export default function Home() {
 
       {/* When travelers choose Ragir, they choose you! Banner section*/}
       <Section heading={<>When travelers choose <span className={styles.grad_txt}>Ragir</span>, they <br /><span className="grad_txt">choose you!</span></>} child={ 
-        <div className="banner_section mt-[3.5rem] md:mt-[5rem] w-full min-h-[450px] flex max-md:justify-center align-center rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
+        <div className="banner_section mt-[3.5rem] md:mt-[5rem] w-full min-h-[450px] flex max-md:justify-center align-center items-center rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
           <div className="w-full max-md:mx-auto md:w-[60%] rounded-[1.5rem] md:rounded-[2rem] border border-white p-6 md:py-6 md:px-8 h-[calc(100%-4rem)] bg-[rgba(0,0,0,0.3)] backdrop-blur-[5px]">
             <h1 className={`${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[700] text-white`}>
               Join the Movement!
