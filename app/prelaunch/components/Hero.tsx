@@ -86,7 +86,7 @@ export default function Hero(): React.JSX.Element {
 
         <div className="content max-md:text-center order-1 md:order-2">
           <h1
-            className={`${styles.poppins} text-[3.5rem] md:text-[4.5rem] font-[700] pb-5  `}
+            className={`${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[700] pb-5  `}
           >
             What is <span className={styles.grad_txt}> Ragir?</span>
           </h1>
