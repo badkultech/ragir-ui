@@ -82,17 +82,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
+    <div
       lang="en"
       // apply font variables and set the root font-size to 14px (smaller overall scale)
       className={`${barlow.variable} ${poppins.variable} text-[14px]`}
     >
-      <body className="antialiased">
+      <div className="antialiased">
         {/* if you need a wrapper div for project-specific CSS, keep it */}
         <div className="min-h-screen text-base">
           {children}
         </div>
-      </body>
-    </html>
+      </div>
+    </div>
   );
 }

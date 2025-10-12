@@ -17,7 +17,8 @@ import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
 
 const Travelers = () => {
   const emailRef = useRef<HTMLInputElement>(null);
-  const [joinAsPartner, { isLoading, isSuccess, isError }] = useJoinAsPartnerMutation();
+  const [joinAsPartner, { isLoading, isSuccess, isError }] =
+    useJoinAsPartnerMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,19 +27,18 @@ const Travelers = () => {
 
     const payload: PartnerRequest = {
       email: emailRef.current.value,
-      phone: "",          // not required, backend ignores
+      phone: "1234567890", // dummy phone, backend ignores
+      organizerName: "Traveler", // dummy name, backend ignores
+      partnerType: "USER", // not required, backend ignores
     };
 
     try {
       await joinAsPartner(payload).unwrap();
-      alert("🎉 Thanks! You’ll be notified when we go live!");
       emailRef.current.value = "";
     } catch (err) {
       console.error("Error submitting email:", err);
-      alert("Something went wrong. Please try again later.");
     }
   };
-
 
   return (
     <>
@@ -88,10 +88,12 @@ const Travelers = () => {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none"
               />
-              <button
+              <button 
+               type="submit"
                 disabled={isLoading}
-                className={`${styles.theme_btn_1} ${isLoading ? "opacity-70 cursor-not-allowed" : ""
-                  } max-md:hidden group rounded-full px-6 py-[0.9rem] text-[1.1rem] flex items-center gap-2 transition-all duration-500`}
+                className={`${styles.theme_btn_1} ${
+                  isLoading ? "opacity-70 cursor-not-allowed" : ""
+                } max-md:hidden group rounded-full px-6 py-[0.9rem] text-[1.1rem] flex items-center gap-2 transition-all duration-500`}
               >
                 {isLoading ? (
                   <span>Submitting...</span>
@@ -107,20 +109,31 @@ const Travelers = () => {
                   </>
                 )}
               </button>
-
             </form>
 
             {/* Mobile Submit */}
             <button
-              className={`${styles.theme_btn_1} max-md:flex hidden justify-center mt-4 group rounded-full px-[2rem] py-4 text-[1.25rem] items-center gap-2 w-full transition-all duration-500 cursor-pointer`}
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className={`${
+                styles.theme_btn_1
+              } max-md:flex hidden justify-center mt-4 group rounded-full px-[2rem] py-4 text-[1.25rem] items-center gap-2 w-full transition-all duration-500 ${
+                isLoading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              <span className="group-hover:opacity-0 transition-all duration-300">
-                Submit
-              </span>
-              <MoveRight
-                className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150"
-                size={24}
-              />
+              {isLoading ? (
+                <span>Submitting...</span>
+              ) : (
+                <>
+                  <span className="group-hover:opacity-0 transition-all duration-300">
+                    Submit
+                  </span>
+                  <MoveRight
+                    className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150"
+                    size={24}
+                  />
+                </>
+              )}
             </button>
 
             <Link
@@ -129,7 +142,8 @@ const Travelers = () => {
               rel="noopener noreferrer"
             >
               <p className="max-md:text-center text-[1.1rem] text-[#575757] pt-4">
-                View <span className="underline font-[600]">Privacy Policy</span>
+                View{" "}
+                <span className="underline font-[600]">Privacy Policy</span>
               </p>
             </Link>
           </div>
@@ -149,21 +163,21 @@ const Travelers = () => {
           </div>
         </section>
 
-
-
         {/* What we do */}
         <Section
           heading={
             <>
               What we do?
               <span className="text-[1.5rem] md:text-[2rem] block italic font-[500] pt-[1.5rem]">
-                We handpick the most amazing fixed departure group trips and list them for you.
+                We handpick the most amazing fixed departure group trips and
+                list them for you.
               </span>
               <span
                 className={`${styles.barlow} block text-[1.1rem] md:text-[1.5rem] text-[#575757] font-[500] pt-[1rem]`}
               >
-                Before listing, we check the quality of every trip and reliability of every organizer.
-                Then we list them by the categories of experience they offer. So you find the right trip,
+                Before listing, we check the quality of every trip and
+                reliability of every organizer. Then we list them by the
+                categories of experience they offer. So you find the right trip,
                 at the right time, in the right mood.
               </span>
             </>
@@ -171,8 +185,9 @@ const Travelers = () => {
           child={
             <>
               <h2 className="text-[1.35rem] md:text-[2rem] italic font-[500] pb-[2rem] md:pb-[3.5rem] text-center">
-                <span className={`${styles.grad_txt} pr-[5px]`}>Ragir</span> is your one place to discover,
-                compare, and join trips that match your traveling mood.
+                <span className={`${styles.grad_txt} pr-[5px]`}>Ragir</span> is
+                your one place to discover, compare, and join trips that match
+                your traveling mood.
               </h2>
               <AutoScrollCarousel />
             </>
@@ -190,10 +205,13 @@ const Travelers = () => {
                   content={
                     <>
                       <span className="block text-[1.05rem]">
-                        Ragir’s mood-based search lets you pick multiple travel moods at a time so you find trips that truly fit your mood.
+                        Ragir’s mood-based search lets you pick multiple travel
+                        moods at a time so you find trips that truly fit your
+                        mood.
                       </span>
                       <span className="block pt-2 text-[1.05rem]">
-                        Or use our destination-based search, pick where you want to go and when, and discover unique trips heading there.
+                        Or use our destination-based search, pick where you want
+                        to go and when, and discover unique trips heading there.
                       </span>
                     </>
                   }
@@ -218,7 +236,8 @@ const Travelers = () => {
                   content={
                     <>
                       <span className="block text-[1.05rem]">
-                        Browse trips from our trusted partners. Each page shows all the information you need to make an informed choice.
+                        Browse trips from our trusted partners. Each page shows
+                        all the information you need to make an informed choice.
                       </span>
                     </>
                   }
@@ -231,7 +250,8 @@ const Travelers = () => {
                   content={
                     <>
                       <span className="block text-[1.05rem]">
-                        Confused between trips? Use Compare to see which fits you best — even drag and drop details that matter most.
+                        Confused between trips? Use Compare to see which fits
+                        you best — even drag and drop details that matter most.
                       </span>
                     </>
                   }
@@ -262,7 +282,8 @@ const Travelers = () => {
                   content={
                     <>
                       <span className="block text-[1.05rem]">
-                        Tap “Request Invite” to let the organizer know you want to join. Once confirmed, you’ve locked in your journey.
+                        Tap “Request Invite” to let the organizer know you want
+                        to join. Once confirmed, you’ve locked in your journey.
                       </span>
                     </>
                   }
@@ -275,7 +296,8 @@ const Travelers = () => {
                   content={
                     <>
                       <span className="block text-[1.05rem]">
-                        Show up, meet new people, make memories, and explore the world!
+                        Show up, meet new people, make memories, and explore the
+                        world!
                       </span>
                     </>
                   }
@@ -363,8 +385,9 @@ const Travelers = () => {
                         />
                         <button
                           disabled={isLoading}
-                          className={`${styles.theme_btn_1} ${isLoading ? "opacity-70 cursor-not-allowed" : ""
-                            } max-md:hidden group rounded-full px-6 py-[0.9rem] text-[1.1rem] flex items-center gap-2 transition-all duration-500`}
+                          className={`${styles.theme_btn_1} ${
+                            isLoading ? "opacity-70 cursor-not-allowed" : ""
+                          } max-md:hidden group rounded-full px-6 py-[0.9rem] text-[1.1rem] flex items-center gap-2 transition-all duration-500`}
                         >
                           {isLoading ? (
                             <span>Submitting...</span>
@@ -380,12 +403,15 @@ const Travelers = () => {
                             </>
                           )}
                         </button>
-
                       </div>
                     </div>
                   </form>
                   <div className="mt-3 text-sm text-white/90">
-                    <a href="/organizer/privacy-policy" target="_blank" className="hover:underline">
+                    <a
+                      href="/organizer/privacy-policy"
+                      target="_blank"
+                      className="hover:underline"
+                    >
                       View Privacy Policy
                     </a>
                   </div>

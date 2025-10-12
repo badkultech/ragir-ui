@@ -103,6 +103,7 @@ export default function JoinAsPartner() {
         organizerName: name.trim(),
         email: email.trim(),
         phone,
+        "partnerType": "ORGANIZER",
       }).unwrap();
 
       showSuccess("🎉 Successfully registered as a partner!");
