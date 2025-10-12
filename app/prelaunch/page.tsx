@@ -117,7 +117,7 @@ export default function Home() {
       }/> 
 
       {/* Why Travelers Choose Ragir */}
-      <Section heading="Why Travelers Choose Ragir" child={
+      <Section heading={<>Why Travelers Choose <span className={styles.grad_txt}>Ragir</span></>} child={
         <>
         <div className="max-md:p-0 grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-8">
           <Image src="/prelaunch-page-imgs/travellers-ragir.webp" alt="Why Travelers Choose Ragir" width={2000} height={1000} className=" max-md:mx-auto md:w-full"/>

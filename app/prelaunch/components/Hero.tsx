@@ -88,7 +88,7 @@ export default function Hero(): React.JSX.Element {
           <h1
             className={`${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[700] pb-5  `}
           >
-            What is <span className={styles.grad_txt}> Ragir?</span>
+            What is <span className={`${styles.grad_txt} pr-[7px]`}> Ragir?</span>
           </h1>
           <h2 className="text-[1.25rem] md:text-[1.75rem] text-[#333333] font-[600] italic pt-5">
             Ragir is India’s first search and discovery platform that

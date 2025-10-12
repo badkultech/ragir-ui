@@ -92,7 +92,7 @@ const Travelers = () => {
                 } 
         child={
         <>
-           <h2 className="text-[1.5rem] max-md:text-center md:text-[3rem]  italic font-[500] pb-[2.5rem] md:pb-[5rem]">
+           <h2 className="text-[1.5rem] text-center md:text-[3rem]  italic font-[500] pb-[2.5rem] md:pb-[5rem]">
             <span className={styles.grad_txt + " " + "pl-1"}>
             Ragir  
             </span> is your one place to discover, compare, and join trips that match your traveling mood.
@@ -228,7 +228,7 @@ const Travelers = () => {
       {/* Banner for desktop*/}
          <div className="hidden banner_section my-[5rem] w-full min-h-[400px] md:flex max-md:justify-center align-center items-center rounded-[2.5rem] px-10 py-10 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
                   <div className="w-[90%] max-md:mx-auto md:w-[80%] rounded-[1.5rem] border border-white py-6 px-8 h-[calc(100%-4rem)] bg-[rgba(0,0,0,0.3)] backdrop-blur-[5px] ">
-                    <h1 className="text-[4rem] font-[700] text-white h-full">
+                    <h1 className="text-[3.5rem] font-[700] text-white h-full">
                       Get Notified when we are live!
                     </h1>
              <form onSubmit={handleSubmit} className=" bg-white text-[1.25rem] flex max-md:flex-col mt-4 justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:p-3 overflow-hidden">
