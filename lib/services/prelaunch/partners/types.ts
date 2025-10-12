@@ -1,5 +1,5 @@
 export interface PartnerRequest {
-  organizerName: string;
+  organizerName?: string;
   email: string;
   phone: string;
 }

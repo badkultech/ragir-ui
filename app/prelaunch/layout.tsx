@@ -1,14 +1,15 @@
+// app/layout.tsx
 import type { Metadata } from "next";
-import { Poppins, Barlow } from "next/font/google"; 
-import  styles from "./prelaunch.module.css";
-// import "./globals.css";
+import { Poppins, Barlow } from "next/font/google";
+import React from "react";
+import styles from "./prelaunch.module.css";
 
-// Optimized font loading with display swap for better performance
+// Fonts
 const poppins = Poppins({
   variable: "--font-poppins",
   weight: ["400", "500", "600"],
   subsets: ["latin"],
-  display: "swap", // Improves loading performance
+  display: "swap",
 });
 
 const barlow = Barlow({
@@ -16,7 +17,7 @@ const barlow = Barlow({
   weight: ["400", "500", "700"],
   subsets: ["latin"],
   style: ["normal", "italic"],
-  display: "swap", // Improves loading performance
+  display: "swap",
 });
 
 // Comprehensive SEO metadata [AI Generated]
@@ -77,18 +78,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    
-      
-      < div className={`${barlow.variable} ${poppins.variable} antialiased`}
-      >
-        {children}
-
-        </ div>
-        
-    
+    <html
+      lang="en"
+      // apply font variables and set the root font-size to 14px (smaller overall scale)
+      className={`${barlow.variable} ${poppins.variable} text-[14px]`}
+    >
+      <body className="antialiased">
+        {/* if you need a wrapper div for project-specific CSS, keep it */}
+        <div className="min-h-screen text-base">
+          {children}
+        </div>
+      </body>
+    </html>
   );
 }

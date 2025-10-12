@@ -99,7 +99,7 @@ export default function Home() {
       </>} child= {
         <>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 italic">
           <Feature img="/prelaunch-page-imgs/mar-group.png" 
           title="Enables you to list your group trips on a platform dedicated to fixed departure group trips."
            description="So that your every seat is booked on time" />
