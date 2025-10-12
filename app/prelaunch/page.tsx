@@ -95,22 +95,22 @@ export default function Home() {
 
       {/* More About Ragir */}
       <Section heading={<>More About <span className={styles.grad_txt}>Ragir</span>
-      <p className="text-[1.5rem] md:text-[2rem] barlow font-[550] italic text-center text-[#575757] mt-6"> Ragir is the only one in India! That...</p>
+      <p className="text-[1.5rem] md:text-[2rem] barlow font-[550] italic text-center text-[#575757] mt-2"> Ragir is the only one in India! That...</p>
       </>} child= {
         <>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
           <Feature img="/prelaunch-page-imgs/mar-group.png" 
-          title="enables you to list your group trips on a platform dedicated to fixed departure group trips."
+          title="Enables you to list your group trips on a platform dedicated to fixed departure group trips."
            description="So that your every seat is booked on time" />
           <Feature img="/prelaunch-page-imgs/mar-travel.png" 
-          title="enables travelers to search and filter group trips based on the experience parted during the trip." 
+          title="Enables travelers to search and filter group trips based on the experience parted during the trip." 
           description="Because it’s not just about the destination, it’s the memories we make there" />
           <Feature img="/prelaunch-page-imgs/mar-insights.png" 
-          title="provides you access to data and insights of traveler behavior and market trends."
+          title="Provides you access to data and insights of traveler behavior and market trends."
            description="So that you know what travelers’ actually want" />
           <Feature img="/prelaunch-page-imgs/mar-trust.png" 
-          title="puts your brand identity at the forefront."
+          title="Puts your brand identity at the forefront."
            description="Because travelers are not just looking for trips, they are looking for brands they can trust" />
         </div>
         </>
@@ -135,12 +135,12 @@ export default function Home() {
 
       {/* When travelers choose Ragir, they choose you! Banner section*/}
       <Section heading={<>When travelers choose <span className={styles.grad_txt}>Ragir</span>, they <br /><span className="grad_txt">choose you!</span></>} child={ 
-        <div className="banner_section mt-[3.5rem] md:mt-[5rem] w-full min-h-[450px] flex max-md:justify-center align-center items-center rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
+        <div className="banner_section md:mt-[1.5rem] w-full min-h-[450px] flex max-md:justify-center align-center items-center rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
           <div className="w-full max-md:mx-auto md:w-[60%] rounded-[1.5rem] md:rounded-[2rem] border border-white p-6 md:py-6 md:px-8 h-[calc(100%-4rem)] bg-[rgba(0,0,0,0.3)] backdrop-blur-[5px]">
-            <h1 className={`${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[700] text-white`}>
+            <h1 className={`${styles.barlow} text-[3.5rem] md:text-[4rem] font-[700] text-white`}>
               Join the Movement!
             </h1>
-            <p className="text-[1.25rem] md:text-[1.5rem] text-white py-6 md:py-[2rem]">Get started today and be discovered by millions of eager travelers</p>
+            <p className="text-[1.25rem] md:text-[1.5rem] text-white py-6 md:py-[1.75rem]">Get started today and be discovered by millions of eager travelers</p>
            
             <Link href="/organizer/join-as-partner" >
             <button className="bg-white max-md:justify-center max-md:w-full group rounded-full px-6 py-[0.8rem] text-[1rem] flex items-center gap-2 transition-all duration-500 cursor-pointer">

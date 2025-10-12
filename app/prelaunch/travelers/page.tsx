@@ -11,6 +11,7 @@ import Content from "../components/how_it_works/Content";
 import styles from "../prelaunch.module.css"
 import {MoveRight} from "lucide-react";
 import WhyRagirCard from "../components/WhyRagirCard";
+import AutoScrollCarousel from "../components/AutoplayCarousel";
 
 
 const Travelers = () => {
@@ -33,28 +34,28 @@ const Travelers = () => {
         {/* Hero Section */}
      <section className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-[5rem] mt-[1.5rem] md:mt-[5rem]`}>
         <div className="content ">
-           <h1 className={`${styles.barlow} text-[2rem] md:text-[3rem] font-[600] md:font-[700] pb-3 leading-tight`}>
-  India’s Travel Scene is About to Get a Glow Up ✨
+           <h1 className={`${styles.barlow} text-[2rem] md:text-[3.5rem] font-[600] md:font-[700] pb-3 leading-tight`}>
+  India’s Travel Scene is About to Get  a Glow Up✨
 </h1>
 
-<p className="text-[1rem] md:text-[1.25rem] font-[400] text-[#575757] py-3 leading-relaxed">
+<p className="text-[1rem] md:text-[1.35rem] font-[400] text-[#575757] py-4 leading-relaxed">
   At Ragir, we are building the <span className="font-[600] italic">biggest</span> and
   <span className="italic font-[600]"> most diverse hub of fixed-departure group trips</span> in India.
 </p>
 
-<p className="text-[1.25rem] md:text-[1.75rem] font-[500] pt-2">
-  Don’t miss the drop — get notified when it’s live!
+<p className="text-[1.25rem] md:text-[1.75rem] font-[500] pt-10">
+  Don’t miss the drop — <br /> get notified when it’s live!
 </p>
 
 
-            <form onSubmit={handleSubmit} className="flex max-md:flex-col mt-[2.5rem] md:mt-[4rem] justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:p-3 overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex max-md:flex-col mt-[2.5rem] md:mt-[1.5rem] justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 md:py-[6px] md:p-3 overflow-hidden">
                 <input
                     ref={emailRef}
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none outline-none text-[1.25rem]"
+                    className="flex-1 w-[60%] px-4 py-4 focus:outline-none outline-none text-[1.05rem]"
                 />
-                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-6 py-[0.8rem] text-[1.25rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
+                <button className={`${styles.theme_btn_1} max-md:hidden group rounded-full px-6 py-[0.8rem] text-[1.05rem] flex items-center gap-2 transition-all duration-500 cursor-pointer`}>
                     <span className="group-hover:opacity-0 transition-all duration-300"> Submit</span>
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={20}/>
                 </button>
@@ -64,7 +65,7 @@ const Travelers = () => {
                     <MoveRight className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150" size={24}/>
               </button>
               <Link href="/organizer/privacy-policy" target="_blank" rel="noopener noreferrer">
-              <p className="max-md:text-center text-[1.25rem] text-[#575757] pt-4">
+              <p className="max-md:text-center text-[1.05rem] text-[#575757] pt-4">
                 View <span className="underline font-[600]">Privacy Policy</span>
               </p>
               </Link>
@@ -83,7 +84,7 @@ const Travelers = () => {
             <span className="text-[1.5rem] md:text-[2.25rem] block italic font-[500] pt-[2.5rem]">
             We handpick the most amazing fixed departure group trips and list them for you.
             </span>
-            <span className={`${styles.barlow} block text-[1rem] max-md:leading-[1.6] md:text-[1.75rem] text-[#575757] font-[500] pt-[2.5rem] `}>
+            <span className={`${styles.barlow} block text-[1rem] max-md:leading-[1.6] md:text-[1.75rem] text-[#575757] font-[500] pt-[1.5rem] `}>
                 Before listing, we check the quality of every trip and reliability of every trip organizer.
                 Then we list those trips by the categories of experience it offers to the travelers.
                 So that you find the right trip, at the right time, in the right mood.
@@ -92,17 +93,19 @@ const Travelers = () => {
                 } 
         child={
         <>
-           <h2 className="text-[1.5rem] text-center md:text-[3rem]  italic font-[500] pb-[2.5rem] md:pb-[5rem]">
-            <span className={styles.grad_txt + " " + "pl-1"}>
+           <h2 className="text-[1.5rem] text-center md:text-[2.5rem]  italic font-[500] pb-[2.5rem] md:pb-[5rem]">
+            <span className={`${styles.grad_txt} pr-[5px]`}>
             Ragir  
             </span> is your one place to discover, compare, and join trips that match your traveling mood.
             </h2> 
             <div>
-                 <Image 
+                 {/* <Image 
                  src="/prelaunch-page-imgs/adventures.webp" alt="diff types of adventures"
                  width={4000} height={2000} 
                  className=" w-full md:w-[95%] mx-auto "
-                 />
+                 /> */}
+             < AutoScrollCarousel />
+
             </div>
         </>
     }/>

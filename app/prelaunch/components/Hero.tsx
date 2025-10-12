@@ -7,38 +7,38 @@ export default function Hero(): React.JSX.Element {
       {/* Main Hero Section */}
       <section className="hero_section w-full md:w-[57.5%] flex justify-between flex-col md:flex-row items-center lg:overflow-hidden pb-[5rem]">
         <div
-          className={`${styles.barlow} content mt-2 md:mt-6 max-md:text-center`}
+          className={`${styles.barlow} content mt-2 md:mt-[3rem] max-md:text-center`}
         >
-          <h1 className="text-[1.75rem] md:text-[2.25rem] font-[500] leading-tight">
+          <h1 className="text-[1.75rem] md:text-[2.5rem] font-[500] leading-tight">
             Are you a{" "}
-            <span className="font-[600] italic text-[2.25rem] md:text-[3rem] text-[#111]">
+            <span className="font-[600] italic text-[2.25rem] md:text-[3.5rem] text-[#111]">
               Trip Organizer
             </span>
           </h1>
-          <h1 className="text-[1.75rem] md:text-[2.25rem] font-[500] leading-tight">
+          <h1 className="text-[1.75rem] md:text-[2.5rem] font-[500] leading-tight">
             or a{" "}
-            <span className="font-[600] italic text-[2.25rem] md:text-[3rem] text-[#111]">
+            <span className="font-[600] italic text-[2.25rem] md:text-[3.5rem] text-[#111]">
               Trip Leader
             </span>
           </h1>
-          <h1 className="text-[1.75rem] md:text-[2.25rem] font-[500] leading-tight mb-4 mt-6">
+          <h1 className="text-[1.85rem] md:text-[2rem] font-[500] leading-tight mb-4 mt-10">
             that organizes fixed departure group trips?
           </h1>
 
           <div
             className={`${styles.poppins} md:w-[180%] text-[#575757] max-lg:mt-[5rem] lg:w-full z-1`}
           >
-            <h2 className="text-[1.5rem] md:text-[2rem] font-[500] py-4">
+            <h2 className="text-[1.5rem] md:text-[1.85rem] font-[500] pb-4">
               We’ve got an offer you’ll love 🧡
             </h2>
-            <p className="text-[1rem] md:text-[1.25rem] font-[400]  pt-4">
+            <p className="text-[1rem] md:text-[1.3rem] font-[400]">
               At Ragir, we are launching a platform that{" "}
               <span className="font-[600] italic sub-txt tracking-[0.15%]">
                 (exclusively)
               </span>{" "}
               lists fixed departure group trips.
             </p>
-            <p className="text-[1rem] md:text-[1.25rem] font-[400]  py-5">
+            <p className="text-[1rem] md:text-[1.3rem] font-[400] pt-3 pb-5">
               Whether you run treks, expeditions, weekend getaways, creative
               workshops, wellness retreats, cultural tours, or adventure camps,{" "}
               <span className="font-[600] italic sub-txt tracking-[0.15%]">
@@ -47,7 +47,7 @@ export default function Hero(): React.JSX.Element {
               </span>
               <br />
             </p>
-            <h2 className="text-[1.75rem] md:text-[2.5rem] font-[500]  poppins pt-2">
+            <h2 className="text-[1.75rem] md:text-[1.85rem] font-[500]  poppins pt-1">
               Become one of our first partners and get lifetime perks of being
               our Day 1s
             </h2>
@@ -55,7 +55,7 @@ export default function Hero(): React.JSX.Element {
               <Link href="/organizer/join-as-partner" className="max-md:w-full">
                 {/* Intentionaly left empty, content set by css for that gradeint text*/}
                 <button
-                  className={`${styles.btn} text-[1rem] md:text-[1.5rem] rounded-full font-[500] max-md:flex-1 w-full px-6 py-3 mt-8 poppins`}
+                  className={`${styles.btn} text-[1rem] md:text-[1.5rem] rounded-full font-[500] max-md:flex-1 w-full px-6 py-3 mt-4 poppins`}
                 ></button>
               </Link>
             </div>
@@ -67,7 +67,7 @@ export default function Hero(): React.JSX.Element {
             alt="Hero Image in which a looking for destination"
             width={4000}
             height={2000}
-            className=" z-[-1] md:absolute w-[95%]  md:w-[55%] lg:w-[45%] top-40 right-0"
+            className=" z-[-1] md:absolute w-[95%]  md:w-[55%] lg:w-[45%] top-25 right-0"
           />
         </div>
       </section>
@@ -86,11 +86,11 @@ export default function Hero(): React.JSX.Element {
 
         <div className="content max-md:text-center order-1 md:order-2">
           <h1
-            className={`${styles.barlow} text-[3.5rem] md:text-[4.5rem] font-[700] pb-5  `}
+            className={`${styles.barlow} text-[3.5rem] md:text-[3.85rem] font-[700] pb-5  `}
           >
             What is <span className={`${styles.grad_txt} pr-[7px]`}> Ragir?</span>
           </h1>
-          <h2 className="text-[1.25rem] md:text-[1.75rem] text-[#333333] font-[600] italic pt-5">
+          <h2 className="text-[1.25rem] md:text-[1.5rem] text-[#333333] font-[600] italic pt-5">
             Ragir is India’s first search and discovery platform that
             exclusively lists fixed departure group trips.
           </h2>
