@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Poppins, Barlow } from "next/font/google";
 import React from "react";
 import styles from "./prelaunch.module.css";
+import { Toaster } from "sonner";
 
 // Fonts
 const poppins = Poppins({
@@ -82,17 +83,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div
+    <html
       lang="en"
       // apply font variables and set the root font-size to 14px (smaller overall scale)
-      className={`${barlow.variable} ${poppins.variable} text-[14px]`}
+      className={`${barlow.variable} ${poppins.variable} text-[15px]`}
     >
-      <div className="antialiased">
+      <body className="antialiased">
         {/* if you need a wrapper div for project-specific CSS, keep it */}
         <div className="min-h-screen text-base">
           {children}
+           <Toaster richColors position="top-center" />
         </div>
-      </div>
-    </div>
+      </body>
+    </html>
   );
 }

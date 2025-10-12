@@ -14,30 +14,46 @@ import AutoScrollCarousel from "../components/AutoplayCarousel";
 import SmartAnimateHIW from "../components/SmartAnimateHIW";
 import { PartnerRequest } from "@/lib/services/prelaunch/partners/types";
 import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
+import { showError, showSuccess } from "@/lib/utils/toastHelpers";
 
 const Travelers = () => {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const [joinAsPartner, { isLoading, isSuccess, isError }] =
-    useJoinAsPartnerMutation();
+  // ✅ separate refs for hero & banner forms
+  const heroEmailRef = useRef<HTMLInputElement>(null);
+  const bannerEmailRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [joinAsPartner, { isLoading }] = useJoinAsPartnerMutation();
 
-    if (!emailRef.current?.value) return;
-
+  // ✅ shared logic for submitting any email
+  const handleEmailSubmit = async (email: string) => {
+    if (!email) return;
     const payload: PartnerRequest = {
-      email: emailRef.current.value,
-      phone: "1234567890", // dummy phone, backend ignores
-      organizerName: "Traveler", // dummy name, backend ignores
-      partnerType: "USER", // not required, backend ignores
+      email,
+      phone: "1234567890", // dummy data
+      organizerName: "Traveler",
+      partnerType: "USER",
     };
-
     try {
       await joinAsPartner(payload).unwrap();
-      emailRef.current.value = "";
+      showSuccess("🎉 Thanks! You’ll be notified when we go live!");
     } catch (err) {
       console.error("Error submitting email:", err);
+      showError("Something went wrong. Please try again later.");
     }
+  };
+
+  // ✅ handlers for both forms
+  const handleHeroSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = heroEmailRef.current?.value.trim() || "";
+    await handleEmailSubmit(email);
+    if (heroEmailRef.current) heroEmailRef.current.value = "";
+  };
+
+  const handleBannerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = bannerEmailRef.current?.value.trim() || "";
+    await handleEmailSubmit(email);
+    if (bannerEmailRef.current) bannerEmailRef.current.value = "";
   };
 
   return (
@@ -49,18 +65,12 @@ const Travelers = () => {
         }}
       />
 
-      {/* Slightly larger base font-size */}
       <main className="text-[18px] leading-relaxed px-[1.25rem] md:px-[4.5rem] relative w-full overflow-hidden max-w-[1400px] mx-auto">
-        {/* Hero Section */}
-        {/* Hero Section */}
-        <section
-          className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-10 mt-6 md:mt-10`}
-        >
-          {/* Left Content */}
+
+        {/* ✅ HERO SECTION */}
+        <section className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-10 mt-6 md:mt-10`}>
           <div className="content pt-6 md:pt-12">
-            <h1
-              className={`${styles.barlow} text-[2.125rem] md:text-[3rem] font-[700] pb-3 leading-tight`}
-            >
+            <h1 className={`${styles.barlow} text-[2.125rem] md:text-[3rem] font-[700] pb-3 leading-tight`}>
               India’s Travel Scene is About to Get a Glow Up✨
             </h1>
 
@@ -78,22 +88,24 @@ const Travelers = () => {
               Don’t miss the drop — <br /> get notified when it’s live!
             </p>
 
+            {/* ✅ single responsive form */}
             <form
-              onSubmit={handleSubmit}
-              className="flex max-md:flex-col mt-6 md:mt-5 justify-between w-full md:max-w-[90%] border rounded-[100px] p-4 overflow-hidden"
+              onSubmit={handleHeroSubmit}
+              className="flex flex-col md:flex-row mt-6 md:mt-5 justify-between w-full md:max-w-[90%] border rounded-[100px] p-3 md:p-4 overflow-hidden"
             >
               <input
-                ref={emailRef}
+                ref={heroEmailRef}
                 type="email"
+                required
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none"
+                className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none rounded-full"
               />
-              <button 
-               type="submit"
+
+              <button
+                type="submit"
                 disabled={isLoading}
-                className={`${styles.theme_btn_1} ${
-                  isLoading ? "opacity-70 cursor-not-allowed" : ""
-                } max-md:hidden group rounded-full px-6 py-[0.9rem] text-[1.1rem] flex items-center gap-2 transition-all duration-500`}
+                className={`${styles.theme_btn_1} group rounded-full mt-3 md:mt-0 px-5 py-[0.8rem] text-[1.1rem] flex items-center justify-center gap-2 transition-all duration-500 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
               >
                 {isLoading ? (
                   <span>Submitting...</span>
@@ -111,44 +123,14 @@ const Travelers = () => {
               </button>
             </form>
 
-            {/* Mobile Submit */}
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className={`${
-                styles.theme_btn_1
-              } max-md:flex hidden justify-center mt-4 group rounded-full px-[2rem] py-4 text-[1.25rem] items-center gap-2 w-full transition-all duration-500 ${
-                isLoading ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {isLoading ? (
-                <span>Submitting...</span>
-              ) : (
-                <>
-                  <span className="group-hover:opacity-0 transition-all duration-300">
-                    Submit
-                  </span>
-                  <MoveRight
-                    className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150"
-                    size={24}
-                  />
-                </>
-              )}
-            </button>
-
-            <Link
-              href="/organizer/privacy-policy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link href="/organizer/privacy-policy" target="_blank" rel="noopener noreferrer">
               <p className="max-md:text-center text-[1.1rem] text-[#575757] pt-4">
-                View{" "}
-                <span className="underline font-[600]">Privacy Policy</span>
+                View <span className="underline font-[600]">Privacy Policy</span>
               </p>
             </Link>
           </div>
 
-          {/* Right Image */}
+          {/* Image */}
           <div className="img flex items-center justify-center">
             <div className="w-full lg:w-[80%] mx-auto overflow-hidden rounded-xl">
               <Image
@@ -361,7 +343,7 @@ const Travelers = () => {
           }
         />
 
-        {/* Banner Section */}
+        {/* ✅ BANNER SECTION (separate emailRef) */}
         <div className="rounded-2xl banner_section my-10 w-full bg-[url('/prelaunch-page-imgs/banner.jpg')] bg-cover bg-center">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6 md:px-8 py-10">
             <div className="rounded-2xl border border-white/20 bg-[rgba(0,0,0,0.35)] backdrop-blur-sm p-6 md:p-10">
@@ -371,41 +353,38 @@ const Travelers = () => {
                     Get Notified when we are live!
                   </h1>
                 </div>
+
                 <div className="md:col-span-5">
-                  <form onSubmit={handleSubmit} className="w-full">
+                  <form onSubmit={handleBannerSubmit} className="w-full">
                     <div className="flex items-center gap-3 w-full justify-center">
                       <div className="rounded-full bg-white p-1 flex items-center gap-2 shadow-md w-full">
                         <input
-                          ref={emailRef}
+                          ref={bannerEmailRef}
                           type="email"
-                          name="email"
                           required
                           placeholder="Enter your email"
                           className="flex-1 bg-transparent placeholder-gray-400 text-base md:text-lg px-4 py-3 rounded-full outline-none"
                         />
                         <button
+                          type="submit"
                           disabled={isLoading}
-                          className={`${styles.theme_btn_1} ${
-                            isLoading ? "opacity-70 cursor-not-allowed" : ""
-                          } max-md:hidden group rounded-full px-6 py-[0.9rem] text-[1.1rem] flex items-center gap-2 transition-all duration-500`}
+                          className={`${styles.theme_btn_1} inline-flex items-center gap-2 rounded-full px-5 py-3 text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+                            }`}
                         >
                           {isLoading ? (
-                            <span>Submitting...</span>
+                            "Submitting..."
                           ) : (
                             <>
-                              <span className="group-hover:opacity-0 transition-all duration-300">
-                                Submit
-                              </span>
-                              <MoveRight
-                                className="inline-block group-hover:block group-hover:translate-x-[-2rem] transition-all duration-500 group-hover:scale-x-150"
-                                size={22}
-                              />
+                              <span className="hidden md:inline">Submit</span>
+                              <span className="inline md:hidden">Go</span>
+                              <MoveRight size={20} />
                             </>
                           )}
                         </button>
                       </div>
                     </div>
                   </form>
+
                   <div className="mt-3 text-sm text-white/90">
                     <a
                       href="/organizer/privacy-policy"
