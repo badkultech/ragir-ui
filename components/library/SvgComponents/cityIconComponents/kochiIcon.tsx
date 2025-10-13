@@ -15,7 +15,7 @@ export const KochiIcon = ({
     // viewBox='0 0 99 99'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_7871)'>
+    <g clipPath='url(#clip0_1918_7871)'>
       <mask
         id='mask0_1918_7871'
         maskUnits='userSpaceOnUse'

@@ -15,7 +15,7 @@ export const ChennaiIcon = ({
     viewBox='0 0 99 99'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_8542)'>
+    <g clipPath='url(#clip0_1918_8542)'>
       <rect
         width='97.7932'
         height='97.7932'

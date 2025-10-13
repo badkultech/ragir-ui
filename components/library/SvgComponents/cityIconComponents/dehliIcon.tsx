@@ -15,7 +15,7 @@ export const DehliIcon = ({
     // viewBox='0 0 99 99'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_1727)'>
+    <g clipPath='url(#clip0_1918_1727)'>
       <rect
         width='97.7932'
         height='97.7932'

@@ -15,7 +15,7 @@ export const JalandarIcon = ({
     // viewBox='0 0 98 99'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_1118)'>
+    <g clipPath='url(#clip0_1918_1118)'>
       <rect
         width='97.7932'
         height='97.7932'

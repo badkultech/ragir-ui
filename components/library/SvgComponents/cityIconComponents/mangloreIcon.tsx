@@ -15,7 +15,7 @@ export const MangloreIcon = ({
     // viewBox='0 0 99 98'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_10014)'>
+    <g clipPath='url(#clip0_1918_10014)'>
       <rect
         width='97.7932'
         height='97.7932'

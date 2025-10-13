@@ -15,7 +15,7 @@ export const NagpurIcon = ({
     // viewBox='0 0 98 98'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_8272)'>
+    <g clipPath='url(#clip0_1918_8272)'>
       <rect
         width='97.7932'
         height='97.7932'

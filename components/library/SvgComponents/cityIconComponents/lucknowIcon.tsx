@@ -15,7 +15,7 @@ export const LucknowIcon = ({
     viewBox='0 0 99 98'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_6627)'>
+    <g clipPath='url(#clip0_1918_6627)'>
       <rect
         width='97.7932'
         height='97.7932'

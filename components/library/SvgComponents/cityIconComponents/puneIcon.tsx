@@ -15,7 +15,7 @@ export const PuneIcon = ({
     // viewBox='0 0 99 99'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_10736)'>
+    <g clipPath='url(#clip0_1918_10736)'>
       <rect
         width='97.7932'
         height='97.7932'

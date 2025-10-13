@@ -15,7 +15,7 @@ export const VadodaraIcon = ({
     viewBox='0 0 99 98'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_2465)'>
+    <g clipPath='url(#clip0_1918_2465)'>
       <rect
         width='97.7932'
         height='97.7932'

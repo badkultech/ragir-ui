@@ -15,7 +15,7 @@ export const HyderabadIcon = ({
     // viewBox='0 0 99 99'
     fill='none'
   >
-    <g clip-path='url(#clip0_1918_7663)'>
+    <g clipPath='url(#clip0_1918_7663)'>
       <rect
         width='97.7932'
         height='97.7932'
