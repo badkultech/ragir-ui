@@ -11,10 +11,14 @@ import styles from "../prelaunch.module.css";
 import { MoveRight } from "lucide-react";
 import WhyRagirCard from "../components/WhyRagirCard";
 import AutoScrollCarousel from "../components/AutoplayCarousel";
-import SmartAnimateHIW from "../components/SmartAnimateHIW";
 import { PartnerRequest } from "@/lib/services/prelaunch/partners/types";
 import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
 import { showError, showSuccess } from "@/lib/utils/toastHelpers";
+import PickYourMood from "../components/PickYourMood";
+import JoinTheGroup from "../components/JoinTheGroup"; 
+import ExploreTheWorld from "../components/ExploreTheWorld";
+import CompareOptions from "../components/CompareOptions";
+import ExploreItineraries from "../components/ExploreItineraries";
 
 const Travelers = () => {
   // ✅ separate refs for hero & banner forms
@@ -91,7 +95,8 @@ const Travelers = () => {
             {/* ✅ single responsive form */}
             <form
               onSubmit={handleHeroSubmit}
-              className="flex flex-col md:flex-row mt-6 md:mt-5 justify-between w-full md:max-w-[90%] border rounded-[100px] p-3 md:p-4 overflow-hidden"
+             className="flex flex-col md:flex-row mt-6 md:mt-5 justify-between w-full md:max-w-[90%] border-0 md:border rounded-none md:rounded-[100px] p-0 md:p-4 overflow-hidden"
+
             >
               <input
                 ref={heroEmailRef}
@@ -201,18 +206,12 @@ const Travelers = () => {
                   optional="order-2 sm:order-1"
                 />
                 <div className="order-1 sm:order-2">
-                  <SmartAnimateHIW />
+                  <PickYourMood />
+                </div>
+                <div className="order-1 sm:order-2">
+                  <ExploreItineraries />
                 </div>
 
-                <div className="order-3">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-2.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
-                </div>
                 <Content
                   Heading="Explore Itineraries"
                   content={
@@ -241,23 +240,15 @@ const Travelers = () => {
                   optional="max-sm:order-6 order-5"
                 />
                 <div className="max-sm:order-5 order-6">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-3.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
+                 <div className="order-1 sm:order-2">
+                  <CompareOptions/>
+                </div>
                 </div>
 
                 <div className="order-7">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-4.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
+                 <div className="order-7 sm:order-2">
+                  <JoinTheGroup  />
+                </div>
                 </div>
                 <Content
                   Heading="Join the Group"
@@ -287,13 +278,7 @@ const Travelers = () => {
                   optional="order-9 max-sm:order-10"
                 />
                 <div className="order-10 max-sm:order-9">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-5.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
+                  <ExploreTheWorld  />
                 </div>
               </div>
             </div>
@@ -376,7 +361,7 @@ const Travelers = () => {
                           ) : (
                             <>
                               <span className="hidden md:inline">Submit</span>
-                              <span className="inline md:hidden">Go</span>
+                              {/* <span className="inline md:hidden">Go</span> */}
                               <MoveRight size={20} />
                             </>
                           )}

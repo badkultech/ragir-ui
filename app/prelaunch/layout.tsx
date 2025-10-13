@@ -86,7 +86,7 @@ export default function RootLayout({
     <html
       lang="en"
       // apply font variables and set the root font-size to 14px (smaller overall scale)
-      className={`${barlow.variable} ${poppins.variable} text-[15px]`}
+      className={`${barlow.variable} ${poppins.variable} text-[13px]`}
     >
       <body className="antialiased">
         {/* if you need a wrapper div for project-specific CSS, keep it */}

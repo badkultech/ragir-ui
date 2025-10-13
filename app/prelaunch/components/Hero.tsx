@@ -6,10 +6,10 @@ export default function Hero(): React.JSX.Element {
   return (
     <>
       {/* Main Hero Section */}
-      <section className="hero_section w-full flex flex-col md:flex-row justify-between items-center relative overflow-hidden pb-[3rem] md:pb-[5rem]">
+      <section className="hero_section w-full flex flex-col md:flex-row justify-between items-center relative overflow-hidden pb-[2rem] md:pb-[4rem]">
         {/* LEFT CONTENT */}
         <div
-          className={`${styles.barlow} content mt-2 md:mt-[3rem] max-md:text-center md:w-[55%]`}
+          className={`${styles.barlow} content mt-1 md:mt-[3rem] max-md:text-center md:w-[55%]`}
         >
           <h1 className="text-[1.75rem] md:text-[2.5rem] font-[500] leading-tight">
             Are you a{" "}
@@ -19,18 +19,18 @@ export default function Hero(): React.JSX.Element {
           </h1>
           <h1 className="text-[1.75rem] md:text-[2.5rem] font-[500] leading-tight">
             or a{" "}
-            <span className="font-[600] italic text-[2.25rem] md:text-[3.5rem] text-[#111]">
+            <span className="font-[600] italic text-[2.25rem] md:text-[2.5rem] text-[#111]">
               Trip Leader
             </span>
           </h1>
-          <h1 className="text-[1.85rem] md:text-[2rem] font-[500] leading-tight mb-4 mt-10">
+          <h1 className="text-[1.85rem] md:text-[2rem] font-[500] leading-tight mb-2 mt-4">
             that organizes fixed departure group trips?
           </h1>
 
           <div
             className={`${styles.poppins} text-[#575757] max-lg:mt-[5rem] lg:w-full z-1`}
           >
-            <h2 className="text-[1.5rem] md:text-[1.85rem] font-[500] pb-4">
+            <h2 className="text-[1.5rem] md:text-[1.85rem] font-[500] pb-2">
               We’ve got an offer you’ll love 🧡
             </h2>
             <p className="text-[1rem] md:text-[1.3rem] font-[400]">
@@ -40,7 +40,7 @@ export default function Hero(): React.JSX.Element {
               </span>{" "}
               lists fixed departure group trips.
             </p>
-            <p className="text-[1rem] md:text-[1.3rem] font-[400] pt-3 pb-5">
+            <p className="text-[1rem] md:text-[1.3rem] font-[400] pt-3 pb-3">
               Whether you run treks, expeditions, weekend getaways, creative
               workshops, wellness retreats, cultural tours, or adventure camps,{" "}
               <span className="font-[600] italic sub-txt tracking-[0.15%]">
@@ -49,7 +49,7 @@ export default function Hero(): React.JSX.Element {
               </span>
               <br />
             </p>
-            <h2 className="text-[1.75rem] md:text-[1.85rem] font-[500] pt-1">
+            <h2 className="text-[1.75rem] md:text-[1.85rem] font-[500]">
               Become one of our first partners and get lifetime perks of being
               our Day 1s
             </h2>

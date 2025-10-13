@@ -5,17 +5,11 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const frames = [
-  "/prelaunch-frames/frame1.png",
-  "/prelaunch-frames/frame2.png",
-  "/prelaunch-frames/frame3.png",
-  "/prelaunch-frames/frame4.png",
-  "/prelaunch-frames/frame5.png",
-  "/prelaunch-frames/frame6.png",
-  "/prelaunch-frames/frame7.png",
-  "/prelaunch-frames/frame8.png",
+  "/join_the_group/frame1.png",
+  "/join_the_group/frame2.png",
 ];
 
-export default function SmartAnimateHIW() {
+export default function JoinTheGroup() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -50,19 +44,6 @@ export default function SmartAnimateHIW() {
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {/* small dot indicators */}
-      {/* <div className="flex justify-center gap-2 mt-4">
-        {frames.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className={`h-2 w-2 rounded-full transition-all ${
-              i === index ? "bg-pink-500 w-4" : "bg-gray-300"
-            }`}
-          />
-        ))}
-      </div> */}
     </div>
   );
 }
