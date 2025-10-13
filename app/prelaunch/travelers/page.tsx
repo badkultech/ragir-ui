@@ -16,7 +16,6 @@ import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
 import { showError, showSuccess } from "@/lib/utils/toastHelpers";
 import PickYourMood from "../components/PickYourMood";
 import JoinTheGroup from "../components/JoinTheGroup";
-import ExploreTheWorld from "../components/ExploreTheWorld";
 import CompareOptions from "../components/CompareOptions";
 import ExploreItineraries from "../components/ExploreItineraries";
 
@@ -70,11 +69,14 @@ const Travelers = () => {
       />
 
       <main className="text-[18px] leading-relaxed px-[1.25rem] md:px-[4.5rem] relative w-full overflow-hidden max-w-[1400px] mx-auto">
-
         {/* ✅ HERO SECTION */}
-        <section className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-10 mt-6 md:mt-10`}>
+        <section
+          className={`${styles.poppins} intro_section w-full grid grid-cols-1 lg:grid-cols-2 gap-10 mt-6 md:mt-10`}
+        >
           <div className="content pt-6 md:pt-12">
-            <h1 className={`${styles.barlow} text-[2.125rem] md:text-[3rem] font-[700] pb-3 leading-tight`}>
+            <h1
+              className={`${styles.barlow} text-[2.125rem] md:text-[3rem] font-[700] pb-3 leading-tight`}
+            >
               India’s Travel Scene is About to Get a Glow Up✨
             </h1>
 
@@ -96,7 +98,6 @@ const Travelers = () => {
             <form
               onSubmit={handleHeroSubmit}
               className="flex flex-col md:flex-row mt-6 md:mt-5 justify-between w-full md:max-w-[90%] border-0 md:border rounded-none md:rounded-[100px] p-0 md:p-4 overflow-hidden"
-
             >
               <input
                 ref={heroEmailRef}
@@ -106,12 +107,14 @@ const Travelers = () => {
                 className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none rounded-full border-gray-300 focus:border-gray-500 bg-white border-0"
               />
 
-
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`${styles.theme_btn_1} group rounded-full mt-3 md:mt-0 px-5 py-[0.8rem] text-[1.1rem] flex items-center justify-center gap-2 transition-all duration-500 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
+                className={`${
+                  styles.theme_btn_1
+                } group rounded-full mt-3 md:mt-0 px-5 py-[0.8rem] text-[1.1rem] flex items-center justify-center gap-2 transition-all duration-500 ${
+                  isLoading ? "opacity-70 cursor-not-allowed" : ""
+                }`}
               >
                 {isLoading ? (
                   <span>Submitting...</span>
@@ -129,9 +132,14 @@ const Travelers = () => {
               </button>
             </form>
 
-            <Link href="/organizer/privacy-policy" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="/organizer/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <p className="max-md:text-center text-[1.1rem] text-[#575757] pt-4">
-                View <span className="underline font-[600]">Privacy Policy</span>
+                View{" "}
+                <span className="underline font-[600]">Privacy Policy</span>
               </p>
             </Link>
           </div>
@@ -209,7 +217,7 @@ const Travelers = () => {
                 <div className="order-1 sm:order-2">
                   <PickYourMood />
                 </div>
-                <div className="order-3" >
+                <div className="order-3">
                   <ExploreItineraries />
                 </div>
 
@@ -279,7 +287,13 @@ const Travelers = () => {
                   optional="order-9 max-sm:order-10"
                 />
                 <div className="order-10 max-sm:order-9">
-                  <ExploreTheWorld />
+                  <Image
+                    src="/prelaunch-page-imgs/travelers-hiw-5.webp"
+                    alt="How It Works Image"
+                    width={2000}
+                    height={1000}
+                    className="w-full"
+                  />
                 </div>
               </div>
             </div>
@@ -344,7 +358,6 @@ const Travelers = () => {
                   <form onSubmit={handleBannerSubmit} className="w-full">
                     <div className="flex items-center justify-center w-full px-2">
                       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 w-full max-w-[600px] md:p-1 bg-transparent md:bg-white md:rounded-full shadow-none md:shadow-md">
-
                         <input
                           ref={bannerEmailRef}
                           type="email"
@@ -356,8 +369,11 @@ const Travelers = () => {
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className={`${styles.theme_btn_1} flex items-center justify-center gap-1 sm:gap-2 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
-                            }`}
+                          className={`${
+                            styles.theme_btn_1
+                          } flex items-center justify-center gap-1 sm:gap-2 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg font-medium transition-all duration-300 ${
+                            isLoading ? "opacity-70 cursor-not-allowed" : ""
+                          }`}
                         >
                           {isLoading ? (
                             "Submitting..."
