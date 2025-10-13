@@ -103,7 +103,7 @@ const Travelers = () => {
                 type="email"
                 required
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none rounded-full border border-gray-300 focus:border-gray-500 bg-white"
+                className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none rounded-full border-gray-300 focus:border-gray-500 bg-white border-0"
               />
 
 
@@ -350,7 +350,7 @@ const Travelers = () => {
                           type="email"
                           required
                           placeholder="Enter your email"
-                          className="flex-1 bg-white md:bg-transparent placeholder-gray-400 text-sm sm:text-base md:text-lg px-4 py-3 rounded-full outline-none border border-gray-300 md:border-none"
+                          className="flex-1 bg-white md:bg-transparent placeholder-gray-400 text-sm sm:text-base md:text-lg px-4 py-3 rounded-full outline-none border-0 border-gray-300 md:border-none"
                         />
 
                         <button
