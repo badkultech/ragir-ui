@@ -342,31 +342,33 @@ const Travelers = () => {
                 <div className="md:col-span-5">
                   <form onSubmit={handleBannerSubmit} className="w-full">
                     <div className="flex items-center justify-center w-full px-2">
-                      <div className="rounded-full md:rounded-full bg-white md:bg-white p-1 flex flex-col md:flex-row items-center gap-2 shadow-md w-full md:p-1">
+                      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 w-full max-w-[600px] md:p-1 bg-transparent md:bg-white md:rounded-full shadow-none md:shadow-md">
+
                         <input
                           ref={bannerEmailRef}
                           type="email"
                           required
                           placeholder="Enter your email"
-                          className="flex-1 bg-white md:bg-transparent placeholder-gray-400 text-base md:text-lg px-4 py-3 rounded-md md:rounded-full outline-none border border-gray-300 md:border-none"
+                          className="flex-1 bg-white md:bg-transparent placeholder-gray-400 text-sm sm:text-base md:text-lg px-4 py-3 rounded-md md:rounded-full outline-none border border-gray-300 md:border-none"
                         />
+
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className={`${styles.theme_btn_1} inline-flex items-center justify-center gap-2 rounded-md md:rounded-full px-5 py-3 text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+                          className={`${styles.theme_btn_1} flex items-center justify-center gap-1 sm:gap-2 rounded-md md:rounded-full px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
                             }`}
                         >
                           {isLoading ? (
                             "Submitting..."
                           ) : (
                             <>
-                              <span className="hidden md:inline">Submit</span>
-                              <MoveRight size={20} />
+                              <span className="md:inline">Submit</span>
+                              <MoveRight size={18} className="shrink-0" />
                             </>
                           )}
                         </button>
-                      </div>
 
+                      </div>
                     </div>
 
                   </form>
