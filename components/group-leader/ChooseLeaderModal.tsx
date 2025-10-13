@@ -1,71 +1,112 @@
-"use client";
-import { useState } from "react";
+"use client"
+
+import { useMemo, useState } from "react"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
+import { ScrollArea } from "../ui/scroll-area"
+import { Search } from "lucide-react"
+
+type Leader = {
+  id: number
+  name: string
+  bio: string
+  img: string
+}
+
+type ChooseLeaderModalProps = {
+  open: boolean
+  onClose: () => void
+  onSelect?: (leader: Leader) => void
+}
 
 // Mock leader data for demo
-const dummyLeaders = [
+const dummyLeaders: Leader[] = [
   { id: 1, name: "John Does", bio: "Adventure awaits beyond comfort zones", img: "/avatar1.png" },
   { id: 2, name: "John Does", bio: "Adventure awaits beyond comfort zones", img: "/avatar1.png" },
   { id: 3, name: "John Does", bio: "Adventure awaits beyond comfort zones", img: "/avatar1.png" },
   { id: 4, name: "John Does", bio: "Adventure awaits beyond comfort zones", img: "/avatar1.png" },
   { id: 5, name: "John Does", bio: "Adventure awaits beyond comfort zones", img: "/avatar1.png" },
-];
+]
 
-export  function ChooseLeaderModal({ open, onClose }) {
-  const [selectedId, setSelectedId] = useState(null);
-  const [search, setSearch] = useState("");
-  if (!open) return null;
+export function ChooseLeaderModal({ open, onClose, onSelect }: ChooseLeaderModalProps) {
+  const [search, setSearch] = useState("")
+  const [selectedId, setSelectedId] = useState<number | null>(null)
 
-  const filteredLeaders = dummyLeaders.filter(l =>
-    l.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredLeaders = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return dummyLeaders
+    return dummyLeaders.filter((l) => l.name.toLowerCase().includes(q))
+  }, [search])
+
+  function handleSelect() {
+    if (!selectedId) return
+    const leader = dummyLeaders.find((l) => l.id === selectedId)
+    if (leader) {
+      onSelect?.(leader)
+    }
+    onClose()
+  }
 
   return (
-    <div className="fixed z-50 inset-0 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl w-[430px] max-h-[90vh] overflow-y-auto shadow-xl p-6 relative">
-        {/* Close */}
-        <button onClick={onClose} className="absolute right-4 top-4 text-xl text-gray-400 hover:text-black font-bold">×</button>
-        <h2 className="font-semibold text-lg mb-4">Add Leader</h2>
-        <div className="mb-5">
-          <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 mb-3">
-            <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="bg-transparent outline-none w-full"
-              placeholder="Search"
-            />
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="sm:max-w-[430px] p-0">
+        <DialogHeader className="px-6 pt-6">
+          <DialogTitle>Add Leader</DialogTitle>
+        </DialogHeader>
+
+        <div className="px-6 py-4">
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search" className="pl-9" />
           </div>
-          <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto">
-            {filteredLeaders.map(l => (
-              <button
-                type="button"
-                key={l.id}
-                onClick={() => setSelectedId(l.id)}
-                className={`flex items-center gap-3 rounded-xl p-3 text-left
-                  border ${selectedId === l.id ? "border-orange-400 bg-orange-50" : "border-transparent hover:border-gray-300"} transition`}
-              >
-                <img src={l.img} alt="avatar" className="w-11 h-11 rounded-full object-cover" />
-                <div>
-                  <div className="font-medium">{l.name}</div>
-                  <div className="text-gray-400 text-[15px]">"{l.bio}"</div>
-                </div>
-              </button>
-            ))}
-            {filteredLeaders.length === 0 && (
-              <div className="text-center py-8 text-gray-400">No leaders found</div>
-            )}
-          </div>
+
+          {/* List */}
+          <ScrollArea className="h-[300px] pr-3">
+            <div className="flex flex-col gap-2">
+              {filteredLeaders.map((l) => {
+                const active = selectedId === l.id
+                return (
+                  <button
+                    type="button"
+                    key={l.id}
+                    onClick={() => setSelectedId(l.id)}
+                    className={`flex items-center gap-3 rounded-xl border p-3 text-left transition
+                      ${active ? "border-primary/80 bg-primary/5" : "border-transparent hover:border-muted/70"}`}
+                    aria-pressed={active}
+                    aria-label={`Select ${l.name}`}
+                  >
+                    <img
+                      src={l.img || "/placeholder.svg"}
+                      alt={`${l.name} avatar`}
+                      className="h-11 w-11 rounded-full object-cover"
+                    />
+                    <div>
+                      <div className="font-medium text-foreground">{l.name}</div>
+                      <div className="text-sm text-muted-foreground">“{l.bio}”</div>
+                    </div>
+                  </button>
+                )
+              })}
+
+              {filteredLeaders.length === 0 && (
+                <div className="py-8 text-center text-muted-foreground">No leaders found</div>
+              )}
+            </div>
+          </ScrollArea>
         </div>
-        <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-6 py-2 bg-gray-50 border rounded-full text-gray-600 font-medium">Cancel</button>
-          <button
-            className="px-6 py-2 rounded-full font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500"
-            disabled={!selectedId}
-          >
+
+        <DialogFooter className="px-6 pb-6">
+          <Button variant="outline" onClick={onClose} className="rounded-full bg-transparent">
+            Cancel
+          </Button>
+          <Button onClick={handleSelect} disabled={!selectedId} className="rounded-full">
             Select
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }
+  
