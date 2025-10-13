@@ -3,6 +3,24 @@ import Heading1 from '@/components/library/customButtons/Heading1';
 import Heading2 from '@/components/library/customButtons/Heading2';
 import SubHeading from '@/components/library/customButtons/SubHeading';
 import Text from '@/components/library/customButtons/Text';
+import { BangloreIcon } from '@/components/library/SvgComponents/cityIconComponents/bangloreIcon';
+import { ChennaiIcon } from '@/components/library/SvgComponents/cityIconComponents/chennaiIcon';
+import { CoimbatoreIcon } from '@/components/library/SvgComponents/cityIconComponents/coimbatoreIcon';
+import { DehliIcon } from '@/components/library/SvgComponents/cityIconComponents/dehliIcon';
+import { DehradunIcon } from '@/components/library/SvgComponents/cityIconComponents/dehradunIcon';
+import { GoaIcon } from '@/components/library/SvgComponents/cityIconComponents/goaIcon';
+import { HyderabadIcon } from '@/components/library/SvgComponents/cityIconComponents/hyderabadIcon';
+import { JalandarIcon } from '@/components/library/SvgComponents/cityIconComponents/jalandarIcon';
+import { KochiIcon } from '@/components/library/SvgComponents/cityIconComponents/kochiIcon';
+import { KolkataIcon } from '@/components/library/SvgComponents/cityIconComponents/kolkataIcon';
+import { LucknowIcon } from '@/components/library/SvgComponents/cityIconComponents/lucknowIcon';
+import { MangloreIcon } from '@/components/library/SvgComponents/cityIconComponents/mangloreIcon';
+import { MumbaiIcon } from '@/components/library/SvgComponents/cityIconComponents/mumbaiIcon';
+import { MysoreIcon } from '@/components/library/SvgComponents/cityIconComponents/mysoreIcon';
+import { NagpurIcon } from '@/components/library/SvgComponents/cityIconComponents/nagpurIcon';
+import { PondicherryIcon } from '@/components/library/SvgComponents/cityIconComponents/pondicherryIcon';
+import { PuneIcon } from '@/components/library/SvgComponents/cityIconComponents/puneIcon';
+import { VadodaraIcon } from '@/components/library/SvgComponents/cityIconComponents/vadodaraIcon';
 import { AdventureGradient } from '@/components/library/SvgComponents/GradientsOfMoods/adventureGradient';
 import { BeachGradient } from '@/components/library/SvgComponents/GradientsOfMoods/beachGradient';
 import { CampingGradient } from '@/components/library/SvgComponents/GradientsOfMoods/campingGradient';
@@ -451,6 +469,126 @@ const StyleGuide = () => {
               return;
             }}
           />
+        </div>
+      </section>
+
+      <section className='mt-12 border-t pt-4 grid gap-4 border-gray-400'>
+        <h2 className='font-poppins text-h2 font-semibold mb-4'>CityIcons</h2>
+        <div className='grid grid-cols-10 gap-4'>
+          <div className='mb-4 flex flex-col items-center'>
+            <MumbaiIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Mumbai
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <PuneIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Pune
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <DehliIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Dehli
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <BangloreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Banglore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <GoaIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Goa
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <KolkataIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Kolkata
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <ChennaiIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Chennai
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <HyderabadIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Hyderabad
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <KochiIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Kochi
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <DehradunIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Dehradun
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <NagpurIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Nagpur
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <MangloreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Manglore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <JalandarIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Pondicherry
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <LucknowIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Lucknow
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <VadodaraIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Vadodara
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <CoimbatoreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Coimbatore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <KolkataIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Kolkata
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <MysoreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Mysore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <PondicherryIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Pondicherry
+            </label>
+          </div>
         </div>
       </section>
     </div>
