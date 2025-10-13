@@ -205,7 +205,7 @@ const Travelers = () => {
                   direction="left"
                   optional="order-2 sm:order-1"
                 />
-                <div className="order-1 sm:order-2">
+                <div className="order-3 sm:order-3">
                   <PickYourMood />
                 </div>
                 <div className="order-1 sm:order-2">
