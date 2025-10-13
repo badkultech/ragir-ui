@@ -9,7 +9,7 @@ export function TripStepperHeader({ activeStep = 1 }) {
   ];
 
   return (
-    <div className="flex items-center w-full justify-center py-6 pl-11 bg-white">
+    <div className="flex items-center w-full justify-center py-3 pl-11 bg-white">
       {steps.map((step, idx) => {
         const stepNumber = idx + 1;
         const isCompleted = stepNumber < activeStep;
@@ -35,7 +35,7 @@ export function TripStepperHeader({ activeStep = 1 }) {
                   isActive
                     ? "text-black"
                     : isCompleted
-                    ? "text-orange-600"
+                    ? "text-black"
                     : "text-gray-400"
                 }`}
               >

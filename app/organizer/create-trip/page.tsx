@@ -45,7 +45,7 @@ export default function CreateTripPage() {
         <AppHeader title="Organizers" />
         
         <TripStepperHeader activeStep={1} />
-        <div className="p-8 bg-gray-50 min-h-screen">
+        <div className="p-8 bg-white min-h-screen">
 
           <div className="max-w-4xl mx-auto bg-white shadow rounded-2xl p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">
@@ -169,8 +169,9 @@ export default function CreateTripPage() {
               ></Textarea>
             </div>
 
+                  </div>
             {/* Bottom Buttons */}
-            <div className="rounded-xl border border-gray-200 p-6 bg-white mb-8">
+            <div className="rounded-2xl border border-gray-200 p-6 bg-white mb-8 mt-4 ">
               <div className="flex items-center justify-between mb-1">
                 <span className="font-semibold text-xl">Group Leaders</span>
                 <div className="flex gap-3">
@@ -187,7 +188,7 @@ export default function CreateTripPage() {
               <p className="text-gray-400 text-base">Select from existing leaders or add new</p>
             </div>
 
-            <div className="flex items-center gap-4 mt-10 justify-end">
+            <div className="flex items-center gap-4 mt-10 justify-end-safe">
               <Button
                 className="px-8 py-2 rounded-full border border-gray-300 text-gray-500 font-medium bg-white hover:bg-gray-50 transition"
               >
@@ -203,11 +204,9 @@ export default function CreateTripPage() {
               </Button>
             </div>
 
-          </div>
         </div>
          <AddLeaderModal open={leaderModalOpen} onClose={() => setLeaderModalOpen(false)} />
           <ChooseLeaderModal open={chooseModalOpen} onClose={() => setChooseModalOpen(false)} />
-      {/* <ItineraryPage open={itineraryOpen} onClose={() => setItineraryOpen(false)} /> */}
       </div>
     </div>
   );
