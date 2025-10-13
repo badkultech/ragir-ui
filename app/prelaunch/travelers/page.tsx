@@ -15,7 +15,7 @@ import { PartnerRequest } from "@/lib/services/prelaunch/partners/types";
 import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
 import { showError, showSuccess } from "@/lib/utils/toastHelpers";
 import PickYourMood from "../components/PickYourMood";
-import JoinTheGroup from "../components/JoinTheGroup"; 
+import JoinTheGroup from "../components/JoinTheGroup";
 import ExploreTheWorld from "../components/ExploreTheWorld";
 import CompareOptions from "../components/CompareOptions";
 import ExploreItineraries from "../components/ExploreItineraries";
@@ -95,7 +95,7 @@ const Travelers = () => {
             {/* ✅ single responsive form */}
             <form
               onSubmit={handleHeroSubmit}
-             className="flex flex-col md:flex-row mt-6 md:mt-5 justify-between w-full md:max-w-[90%] border-0 md:border rounded-none md:rounded-[100px] p-0 md:p-4 overflow-hidden"
+              className="flex flex-col md:flex-row mt-6 md:mt-5 justify-between w-full md:max-w-[90%] border-0 md:border rounded-none md:rounded-[100px] p-0 md:p-4 overflow-hidden"
 
             >
               <input
@@ -240,15 +240,15 @@ const Travelers = () => {
                   optional="max-sm:order-6 order-5"
                 />
                 <div className="max-sm:order-5 order-6">
-                 <div className="order-1 sm:order-2">
-                  <CompareOptions/>
-                </div>
+                  <div className="order-1 sm:order-2">
+                    <CompareOptions />
+                  </div>
                 </div>
 
                 <div className="order-7">
-                 <div className="order-7 sm:order-2">
-                  <JoinTheGroup  />
-                </div>
+                  <div className="order-7 sm:order-2">
+                    <JoinTheGroup />
+                  </div>
                 </div>
                 <Content
                   Heading="Join the Group"
@@ -278,7 +278,7 @@ const Travelers = () => {
                   optional="order-9 max-sm:order-10"
                 />
                 <div className="order-10 max-sm:order-9">
-                  <ExploreTheWorld  />
+                  <ExploreTheWorld />
                 </div>
               </div>
             </div>
@@ -341,33 +341,36 @@ const Travelers = () => {
 
                 <div className="md:col-span-5">
                   <form onSubmit={handleBannerSubmit} className="w-full">
-                    <div className="flex items-center gap-3 w-full justify-center">
-                      <div className="rounded-full bg-white p-1 flex items-center gap-2 shadow-md w-full">
+                    <div className="flex items-center justify-center w-full px-2">
+                      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 w-full max-w-[600px] md:p-1 bg-transparent md:bg-white md:rounded-full shadow-none md:shadow-md">
+
                         <input
                           ref={bannerEmailRef}
                           type="email"
                           required
                           placeholder="Enter your email"
-                          className="flex-1 bg-transparent placeholder-gray-400 text-base md:text-lg px-4 py-3 rounded-full outline-none"
+                          className="flex-1 bg-white md:bg-transparent placeholder-gray-400 text-sm sm:text-base md:text-lg px-4 py-3 rounded-md md:rounded-full outline-none border border-gray-300 md:border-none"
                         />
+
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className={`${styles.theme_btn_1} inline-flex items-center gap-2 rounded-full px-5 py-3 text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+                          className={`${styles.theme_btn_1} flex items-center justify-center gap-1 sm:gap-2 rounded-md md:rounded-full px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
                             }`}
                         >
                           {isLoading ? (
                             "Submitting..."
                           ) : (
                             <>
-                              <span className="hidden md:inline">Submit</span>
-                              {/* <span className="inline md:hidden">Go</span> */}
-                              <MoveRight size={20} />
+                              <span className="md:inline">Submit</span>
+                              <MoveRight size={18} className="shrink-0" />
                             </>
                           )}
                         </button>
+
                       </div>
                     </div>
+
                   </form>
 
                   <div className="mt-3 text-sm text-white/90">
