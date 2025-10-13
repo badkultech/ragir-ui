@@ -4,30 +4,39 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-const frames = [
-  "/prelaunch-frames/frame1.png",
-  "/prelaunch-frames/frame2.png",
-  "/prelaunch-frames/frame3.png",
-  "/prelaunch-frames/frame4.png",
-  "/prelaunch-frames/frame5.png",
-  "/prelaunch-frames/frame6.png",
-  "/prelaunch-frames/frame7.png",
-  "/prelaunch-frames/frame8.png",
-];
+interface SmartAnimateProps {
+  folder: string;          // e.g. "prelaunch-frames"
+  frameCount: number;      // number of images
+  interval?: number;       // default: 4000ms
+  aspectRatio?: string;    // e.g. "16/9", "4/3", etc.
+  className?: string;      // extra styling
+}
 
-export default function SmartAnimateHIW() {
+export default function SmartAnimate({
+  folder,
+  frameCount,
+  interval = 4000,
+  aspectRatio = "16/9",
+  className = "",
+}: SmartAnimateProps) {
   const [index, setIndex] = useState(0);
 
+  // Generate paths dynamically
+  const frames = Array.from({ length: frameCount }, (_, i) => 
+    `/${folder}/frame${i + 1}.png`
+  );
+
+  // Auto-play animation
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % frames.length);
-    }, 5000); // adjust speed (ms)
-    return () => clearInterval(interval);
-  }, []);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [frames.length, interval]);
 
   return (
-    <div className="relative w-full h-auto rounded-2xl overflow-hidden">
-      <div className="relative w-full aspect-[16/9] md:aspect-[4/3] overflow-hidden rounded-2xl">
+    <div className={`relative w-full h-auto rounded-2xl overflow-hidden ${className}`}>
+      <div className={`relative w-full aspect-[${aspectRatio}] overflow-hidden rounded-2xl`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={frames[index]}
@@ -36,13 +45,13 @@ export default function SmartAnimateHIW() {
             exit={{ opacity: 0, scale: 1.02, y: -10 }}
             transition={{
               duration: 1.1,
-              ease: [0.65, 0, 0.35, 1], // smooth figma-like ease
+              ease: [0.65, 0, 0.35, 1],
             }}
             className="absolute inset-0"
           >
             <Image
               src={frames[index]}
-              alt={`Smart Animate frame ${index + 1}`}
+              alt={`Frame ${index + 1}`}
               fill
               className="object-contain"
               priority
@@ -50,19 +59,6 @@ export default function SmartAnimateHIW() {
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {/* small dot indicators */}
-      {/* <div className="flex justify-center gap-2 mt-4">
-        {frames.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className={`h-2 w-2 rounded-full transition-all ${
-              i === index ? "bg-pink-500 w-4" : "bg-gray-300"
-            }`}
-          />
-        ))}
-      </div> */}
     </div>
   );
 }

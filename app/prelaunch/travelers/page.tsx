@@ -11,10 +11,10 @@ import styles from "../prelaunch.module.css";
 import { MoveRight } from "lucide-react";
 import WhyRagirCard from "../components/WhyRagirCard";
 import AutoScrollCarousel from "../components/AutoplayCarousel";
-import SmartAnimateHIW from "../components/SmartAnimateHIW";
 import { PartnerRequest } from "@/lib/services/prelaunch/partners/types";
 import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
 import { showError, showSuccess } from "@/lib/utils/toastHelpers";
+import SmartAnimate from "../components/SmartAnimateHIW";
 
 const Travelers = () => {
   // ✅ separate refs for hero & banner forms
@@ -201,18 +201,12 @@ const Travelers = () => {
                   optional="order-2 sm:order-1"
                 />
                 <div className="order-1 sm:order-2">
-                  <SmartAnimateHIW />
+                  <SmartAnimate folder="prelaunch-frames" frameCount={8} />
+                </div>
+                <div className="order-1 sm:order-2">
+                  <SmartAnimate folder="explore_itineraries" frameCount={3} />
                 </div>
 
-                <div className="order-3">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-2.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
-                </div>
                 <Content
                   Heading="Explore Itineraries"
                   content={
@@ -241,23 +235,15 @@ const Travelers = () => {
                   optional="max-sm:order-6 order-5"
                 />
                 <div className="max-sm:order-5 order-6">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-3.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
+                 <div className="order-1 sm:order-2">
+                  <SmartAnimate folder="compare_options" frameCount={4} />
+                </div>
                 </div>
 
                 <div className="order-7">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-4.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
+                 <div className="order-7 sm:order-2">
+                  <SmartAnimate folder="join_the_group" frameCount={2} />
+                </div>
                 </div>
                 <Content
                   Heading="Join the Group"
@@ -287,13 +273,7 @@ const Travelers = () => {
                   optional="order-9 max-sm:order-10"
                 />
                 <div className="order-10 max-sm:order-9">
-                  <Image
-                    src="/prelaunch-page-imgs/travelers-hiw-5.webp"
-                    alt="How It Works Image"
-                    width={2000}
-                    height={1000}
-                    className="w-full"
-                  />
+                  <SmartAnimate folder="explore_the_world" frameCount={2} />
                 </div>
               </div>
             </div>
