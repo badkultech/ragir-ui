@@ -103,8 +103,9 @@ const Travelers = () => {
                 type="email"
                 required
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none rounded-full"
+                className="flex-1 px-4 py-3 text-[1.15rem] focus:outline-none rounded-full border border-gray-300 focus:border-gray-500 bg-white"
               />
+
 
               <button
                 type="submit"
@@ -205,10 +206,10 @@ const Travelers = () => {
                   direction="left"
                   optional="order-2 sm:order-1"
                 />
-                <div className="order-3 sm:order-3">
+                <div className="order-1 sm:order-2">
                   <PickYourMood />
                 </div>
-                <div className="order-1 sm:order-2">
+                <div className="order-3" >
                   <ExploreItineraries />
                 </div>
 
@@ -349,13 +350,13 @@ const Travelers = () => {
                           type="email"
                           required
                           placeholder="Enter your email"
-                          className="flex-1 bg-white md:bg-transparent placeholder-gray-400 text-sm sm:text-base md:text-lg px-4 py-3 rounded-md md:rounded-full outline-none border border-gray-300 md:border-none"
+                          className="flex-1 bg-white md:bg-transparent placeholder-gray-400 text-sm sm:text-base md:text-lg px-4 py-3 rounded-full outline-none border border-gray-300 md:border-none"
                         />
 
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className={`${styles.theme_btn_1} flex items-center justify-center gap-1 sm:gap-2 rounded-md md:rounded-full px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+                          className={`${styles.theme_btn_1} flex items-center justify-center gap-1 sm:gap-2 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg font-medium transition-all duration-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
                             }`}
                         >
                           {isLoading ? (
@@ -367,10 +368,8 @@ const Travelers = () => {
                             </>
                           )}
                         </button>
-
                       </div>
                     </div>
-
                   </form>
 
                   <div className="mt-3 text-sm text-white/90">
