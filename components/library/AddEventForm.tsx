@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import MDEditor from "@uiw/react-md-editor";
 
 type AddEventFormProps = {
   mode?: "library" | "trip";
@@ -19,7 +20,7 @@ export function AddEventForm({
   onSave,
 }: AddEventFormProps) {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState<string>("");
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [packing, setPacking] = useState("");
@@ -33,7 +34,7 @@ export function AddEventForm({
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
     setLocation(item.location || "");
-    setDescription(item.description || "");
+    setDescription(String(item.description || ""));
   };
 
   const handleSubmit = (replace = false) => {
@@ -44,7 +45,7 @@ export function AddEventForm({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)"}}>
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -58,7 +59,9 @@ export function AddEventForm({
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          className="block text-[0.95rem] font-medium mb-1"
+        >
           Title *
         </label>
         <Input
@@ -67,62 +70,83 @@ export function AddEventForm({
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-[0.95rem] font-medium mb-1">
           Description *
         </label>
-        <Textarea
+        {/* <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter here"
           rows={5}
           maxLength={800}
+        /> */}
+        <MDEditor
+          height={100}
+          value={description}
+          onChange={(val?: string) => setDescription(val ?? "")}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+
+        <p className="text-xs text-right text-orange-500 mt-1">
           {description.length}/800 Words
         </p>
       </div>
 
       {/* Location + Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+   <label className="block text-[0.95rem] font-[] font-medium mb-1">
+          Location
+        </label>
         <Input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Location"
         />
+        </div>
+      <div>
+           <label className="block text-[0.95rem] font-[] font-medium mb-1">
+          Time
+        </label>
         <Input
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-        />
+          />
+      </div>
       </div>
 
       {/* Packing Suggestions */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-1">
           Packing Suggestions
         </label>
-        <Textarea
+        {/* <Textarea
           value={packing}
           onChange={(e) => setPacking(e.target.value)}
           placeholder="Enter here"
           rows={5}
           maxLength={800}
+        /> */}
+         <MDEditor
+          height={100}
+          value={packing}
+          onChange={(val?: string) => setPacking(val ?? "")}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {packing.length}/800 Words
         </p>
       </div>
 
       {/* Image Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Images (Max 6)
         </label>
         <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition">
