@@ -40,8 +40,8 @@ export default function ItineraryPage() {
       {/* Stepper (responsive) */}
       <TripStepperHeader activeStep={2} />
       {/* Main Card */}
-      <div className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow p-4 sm:p-8 mb-6">
-       
+      <div className="max-w-4xl w-full mx-auto bg-white rounded-2xl border p-4 sm:p-8 mb-6">
+      <b> Itinerary</b>
        <FileUploadCard/>
 
         {/* Days render */}

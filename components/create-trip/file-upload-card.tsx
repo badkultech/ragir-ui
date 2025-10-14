@@ -15,9 +15,9 @@ export function FileUploadCard({
   const [name, setName] = useState<string | null>(null)
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="rounded-xl  bg-card  p-4">
       <Label className="mb-2 block text-sm">{label}</Label>
-      <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border p-6">
+      <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-gray-50 p-6">
         <img src="/itinerary.jpg" alt="" className="h-14 w-14" />
         <div className="text-sm text-muted-foreground">{name ? `Selected: ${name}` : "No file selected"}</div>
         <div className="flex gap-3">

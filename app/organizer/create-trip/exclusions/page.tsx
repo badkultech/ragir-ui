@@ -68,7 +68,7 @@ export default function ExclusionsPage() {
       <WizardFooter
         onPrev={() => router.push("/organizer/create-trip/Itinerary")}
         onDraft={() => console.log("[v0] Draft exclusions:", selected)}
-        onNext={() => router.push("/organizer/create-trip")} // replace with next step when ready
+        onNext={() => router.push("/organizer/create-trip/faqs")} 
         prevLabel="‹ Previous"
       />
     </OrganizerShell>
