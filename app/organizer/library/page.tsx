@@ -13,6 +13,10 @@ import {
   Activity,
   Users,
   HelpCircle,
+  Car,
+  Home,
+  ForkKnife,
+  User2,
 } from "lucide-react";
 import { GradientButton } from "@/components/gradient-button";
 import { useState } from "react";
@@ -20,10 +24,10 @@ import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 
 const categories = [
-  { label: "Events", href: "/organizer/library/events", icon: Calendar },
-  { label: "Stays", href: "/organizer/library/stays", icon: Hotel },
-  { label: "Transit", href: "/organizer/library/transits", icon: Bus },
-  { label: "Meals", href: "/organizer/library/meals", icon: Utensils },
+  { label: "Day Description", href: "/organizer/library/events", icon: Calendar },
+  { label: "Transit", href: "/organizer/library/transits", icon: Car },
+  { label: "Stays", href: "/organizer/library/stays", icon: Home },
+  { label: "Meals", href: "/organizer/library/meals", icon: ForkKnife },
   {
     label: "Activities",
     href: "/organizer/library/activities",
@@ -32,7 +36,7 @@ const categories = [
   {
     label: "Trip Leaders",
     href: "/organizer/library/trip-leaders",
-    icon: Users,
+    icon: User2,
   },
   { label: "FAQs", href: "/organizer/library/faqs", icon: HelpCircle },
 ];
