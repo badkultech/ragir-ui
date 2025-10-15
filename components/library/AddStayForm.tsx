@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import MDEditor from "@uiw/react-md-editor";
+import RichTextEditor from "../editor/RichTextEditor";
 
 type AddStayFormProps = {
   mode?: "library" | "trip";
@@ -130,14 +131,13 @@ export function AddStayForm({ mode = "library", onCancel, onSave }: AddStayFormP
           Description
         </label>
         
-           <MDEditor
-          height={100}
+           <RichTextEditor
           value={description}
-          onChange={(val?: string) => setPacking(val ?? "")}
+          onChange={setPacking}
+          placeholder="Enter here"
+          maxLength={800}
         />
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {description.length}/800 Words
-        </p>
+       
       </div>
 
       {/* Packing Suggestions */}
@@ -145,16 +145,13 @@ export function AddStayForm({ mode = "library", onCancel, onSave }: AddStayFormP
         <label className="block text-[0.95rem] font-medium mb-1">
           Packing Suggestions
         </label>
-        <Textarea
+        <RichTextEditor
           value={packing}
-          onChange={(e) => setPacking(e.target.value)}
+          onChange={setPacking}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {packing.length}/800 Words
-        </p>
+
       </div>
 
       {/* Image Upload */}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import MDEditor from "@uiw/react-md-editor";
+import RichTextEditor from "../editor/RichTextEditor";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
@@ -75,7 +76,7 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
       </div>
@@ -147,14 +148,11 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Description
         </label>
-         <MDEditor
-          height={100}
+         <RichTextEditor
+         placeholder="enter text"
           value={description}
-          onChange={(val?: string) => setDescription(val ?? "")}
+          onChange={setDescription}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {description.length}/800 Words
-        </p>
       </div>
 
       {/* Packing Suggestions */}
@@ -162,11 +160,10 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Packing Suggestions
         </label>
-        <Textarea
+        <RichTextEditor
           value={packing}
-          onChange={(e) => setPacking(e.target.value)}
+          onChange={setPacking}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
         <p className="text-xs text-right text-gray-400 mt-1">

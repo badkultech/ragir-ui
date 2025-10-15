@@ -136,7 +136,7 @@ export default function ActivitiesPage() {
       <AddNewItemModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        initialStep="faq" // 👈 opens AddStayForm directly
+        initialStep="activity" // 👈 opens AddStayForm directly
       />
     </div>
   );

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import MDEditor from "@uiw/react-md-editor";
+import RichTextEditor from "../editor/RichTextEditor";
 
 type AddEventFormProps = {
   mode?: "library" | "trip";
@@ -89,15 +90,12 @@ export function AddEventForm({
           rows={5}
           maxLength={800}
         /> */}
-        <MDEditor
-          height={100}
+        <RichTextEditor
           value={description}
-          onChange={(val?: string) => setDescription(val ?? "")}
+          onChange={setDescription}
+          maxLength={800}
         />
 
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {description.length}/800 Words
-        </p>
       </div>
 
       {/* Location + Time */}
@@ -136,14 +134,12 @@ export function AddEventForm({
           rows={5}
           maxLength={800}
         /> */}
-         <MDEditor
-          height={100}
+         <RichTextEditor
           value={packing}
-          onChange={(val?: string) => setPacking(val ?? "")}
+          onChange={setPacking}
+          placeholder="Enter here"
+          maxLength={800}
         />
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {packing.length}/800 Words
-        </p>
       </div>
 
       {/* Image Upload */}

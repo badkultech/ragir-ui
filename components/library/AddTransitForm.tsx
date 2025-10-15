@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import MDEditor from "@uiw/react-md-editor";
+import RichTextEditor from "../editor/RichTextEditor";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
@@ -196,34 +197,28 @@ export function AddTransitForm({
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Description
         </label>
-       <MDEditor
-          height={100}
+       <RichTextEditor
           value={description}
-          onChange={(val?: string) => setDescription(val ?? "")}
+          onChange={setDescription}
+          maxLength={800}
         />
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {description.length}/800 Words
-        </p>
+      
       </div>
 
       {/* Packing Suggestions */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Packing Suggestions
         </label>
-        <Textarea
+        <RichTextEditor
           value={packing}
-          onChange={(e) => setPacking(e.target.value)}
+          onChange={setPacking}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {packing.length}/800 Words
-        </p>
       </div>
 
       {/* Image Upload */}
