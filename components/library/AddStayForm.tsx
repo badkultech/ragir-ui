@@ -6,8 +6,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import MDEditor from "@uiw/react-md-editor";
 
-export function AddStayForm({ mode = "library", onCancel, onSave }) {
+type AddStayFormProps = {
+  mode?: "library" | "trip";
+  onCancel: () => void;
+  onSave: (data: any, replace?: boolean) => void;
+};
+
+export function AddStayForm({ mode = "library", onCancel, onSave }: AddStayFormProps) {
   const [title, setTitle] = useState("");
   const [sharingType, setSharingType] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -45,8 +52,10 @@ export function AddStayForm({ mode = "library", onCancel, onSave }) {
     setDescription(item.description || "");
   };
 
+  const isTripMode = mode === "trip";
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)"}}>
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -60,7 +69,7 @@ export function AddStayForm({ mode = "library", onCancel, onSave }) {
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-1">
           Title *
         </label>
         <Input
@@ -69,7 +78,7 @@ export function AddStayForm({ mode = "library", onCancel, onSave }) {
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
       </div>
@@ -79,9 +88,9 @@ export function AddStayForm({ mode = "library", onCancel, onSave }) {
         <select
           value={sharingType}
           onChange={(e) => setSharingType(e.target.value)}
-          className="w-full border rounded-lg p-2 text-sm text-gray-700"
+          className="w-full border rounded-lg p-2 text-sm text-gray-500"
         >
-          <option value="">Type of Sharing</option>
+          <option value="" className="hover:bg-gray-900">Type of Sharing</option>
           <option value="single">Single Occupancy</option>
           <option value="double">Double Occupancy</option>
           <option value="triple">Triple Occupancy</option>
@@ -103,32 +112,37 @@ export function AddStayForm({ mode = "library", onCancel, onSave }) {
           <Input type="time" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
         </div>
       </div>
+      <div>
+      <label className="block text-[0.95rem] font-medium mb-1">
+          Location *
+        </label>
       <Input
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         placeholder="Location"
       />
+      </div>
+      
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-1">
           Description
         </label>
-        <Textarea
+        
+           <MDEditor
+          height={100}
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter here"
-          rows={5}
-          maxLength={800}
+          onChange={(val?: string) => setPacking(val ?? "")}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {description.length}/800 Words
         </p>
       </div>
 
       {/* Packing Suggestions */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-1">
           Packing Suggestions
         </label>
         <Textarea
@@ -138,7 +152,7 @@ export function AddStayForm({ mode = "library", onCancel, onSave }) {
           rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {packing.length}/800 Words
         </p>
       </div>
@@ -167,14 +181,25 @@ export function AddStayForm({ mode = "library", onCancel, onSave }) {
         )}
       </div>
 
+         { isTripMode &&  <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+        <Input type="checkbox" value="" className=" w-[22px]" />
+          <label className="block text-[0.95rem] font-medium">
+          Save in Library
+        </label>
+          </div>
+          
+        <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
+        </div>  }
+
       {/* Footer */}
-      <div className="flex justify-end items-center gap-4 mt-6">
+      <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" className="rounded-full px-6" onClick={onCancel}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
           Save
         </Button>
