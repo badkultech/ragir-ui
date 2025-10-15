@@ -18,13 +18,78 @@ import { Sidebar } from "@/components/organizer/sidebar"
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader"
 import { OrganizerShell } from "@/components/layouts/organizer-shell"
 
-// If you already have a WizardFooter component, you can replace the footer below with it.
+
+type PricingMode = "simple" | "dynamic";
+
+type Row = {
+  particular: string;
+  values: string[];
+};
+
 
 export default function PricingPage() {
     const router = useRouter()
     const [pricingMode, setPricingMode] = useState<"simple" | "dynamic">("simple")
     const [gst, setGst] = useState<GstValue>("excludes")
     const [credit, setCredit] = useState({ card: true, emi: false })
+    const [mode, setMode] = useState<PricingMode>("simple");
+
+    const [price, setPrice] = useState("");
+
+     // Dynamic Pricing
+  const [columns, setColumns] = useState<string[]>([
+    "Single Occupancy",
+    "Double Occupancy",
+  ]);
+
+  const [rows, setRows] = useState<Row[]>([
+    { particular: "Price Particular", values: ["600", "900"] },
+    { particular: "Price Particular", values: ["800", "1100"] },
+  ]);
+
+
+   // Dynamic Pricing Handlers
+  const addRow = () => {
+    setRows([
+      ...rows,
+      {
+        particular: "Price Particular",
+        values: Array(columns.length).fill(""),
+      },
+    ]);
+  };
+
+  const removeRow = (rowIdx: number) => {
+    setRows(rows.filter((_, idx) => idx !== rowIdx));
+  };
+
+  const addColumn = () => {
+    setColumns([...columns, `Occupancy ${columns.length + 1}`]);
+    setRows(rows.map((row) => ({ ...row, values: [...row.values, ""] })));
+  };
+
+  const removeColumn = (colIdx: number) => {
+    setColumns(columns.filter((_, idx) => idx !== colIdx));
+    setRows(
+      rows.map((row) => ({
+        ...row,
+        values: row.values.filter((_, idx) => idx !== colIdx),
+      }))
+    );
+  };
+
+  const handleRowChange = (rowIdx: number, value: string) => {
+    const updated = [...rows];
+    updated[rowIdx].particular = value;
+    setRows(updated);
+  };
+
+  const handleCellChange = (rowIdx: number, colIdx: number, value: string) => {
+    const updated = [...rows];
+    updated[rowIdx].values[colIdx] = value;
+    setRows(updated);
+  };
+
 
     return (
 
@@ -44,58 +109,147 @@ export default function PricingPage() {
                                     <CardContent className="space-y-6">
                                         {/* Pricing mode */}
                                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 ">
-                                            <button
-                                                type="button"
-                                                onClick={() => setPricingMode("simple")}
-                                                className={`flex flex-col items-center justify-center w-full h-22 rounded-xl border transition
-                                                      ${pricingMode === "simple"
-                                                        ? "border-orange-300 bg-orange-50"
-                                                        : "border-gray-200 bg-white"}
-                                                      `}
+                                            <Button
+                                                variant={mode === "simple" ? "default" : "outline"}
+                                                className={`flex-1 ${mode === "simple" ? "bg-orange-50 text-white" : ""
+                                                    }`}
+                                                onClick={() => setMode("simple")}
                                             >
                                                 {/* Custom radio */}
                                                 <span
                                                     className={`mt-2 mb-2 flex items-center justify-center w-4 h-4 rounded-full border transition
-                                                         ${pricingMode === "simple"
+                                                         ${mode === "simple"
                                                             ? "border-orange-300 bg-white"
                                                             : "border-gray-200 bg-white"}`}
                                                 >
-                                                    {pricingMode === "simple" && (
+                                                    {mode === "simple" && (
                                                         <span className="inline-block w-3 h-3 rounded-full bg-orange-600" />
                                                     )}
                                                 </span>
                                                 <span className="text-lg font-medium text-black mt-2">Simple Pricing</span>
-                                            </button>
+                                            </Button>
                                             {/* Dynamic Pricing Card */}
-                                            <button
-                                                type="button"
-                                                onClick={() => setPricingMode("dynamic")}
-                                                className={`flex flex-col items-center justify-center w-full h-22 rounded-xl border transition
-                                                       ${pricingMode === "dynamic"
-                                                        ? "border-orange-400 bg-orange-50"
-                                                        : "border-gray-200 bg-white"}
-                                                           `}
+                                            <Button
+                                                variant={mode === "dynamic" ? "default" : "outline"}
+                                                className={`flex-1 ${mode === "dynamic" ? "bg-orange-50 text-white" : ""
+                                                    }`}
+                                                onClick={() => setMode("dynamic")}
                                             >
                                                 {/* Custom radio */}
                                                 <span
                                                     className={`mt-2 mb-2 flex items-center justify-center w-4 h-4 rounded-full border transition
-                                                         ${pricingMode === "dynamic"
+                                                         ${mode === "dynamic"
                                                             ? "border-orange-400 bg-white"
                                                             : "border-gray-200 bg-white"}`}
                                                 >
-                                                    {pricingMode === "dynamic" && (
+                                                    {mode === "dynamic" && (
                                                         <span className="inline-block w-3 h-3 rounded-full bg-[#FF4B2B]  " />
                                                     )}
                                                 </span>
                                                 <span className="text-lg font-medium text-black mt-2">Dynamic Pricing</span>
-                                            </button>
+                                            </Button>
                                         </div>
 
-                                        {/* Price */}
-                                        <div className="space-y-2">
-                                            <Label htmlFor="price">Price *</Label>
-                                            <Input id="price" placeholder="Enter price" inputMode="decimal" />
-                                        </div>
+                                        {/* Simple Pricing */}
+                                        {mode === "simple" && (
+                                            <div className="mb-6">
+                                                <label className="block font-medium mb-2">Price *</label>
+                                                <Input
+                                                    placeholder="Enter price"
+                                                    value={price}
+                                                    onChange={(e) => setPrice(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Dynamic Pricing */}
+                                        {mode === "dynamic" && (
+                                            <div className="mb-6 overflow-x-auto">
+                                                <table className="w-full border-collapse rounded-lg overflow-hidden">
+                                                    <thead>
+                                                        <tr className="bg-orange-100 text-orange-700">
+                                                            <th className="border p-3 text-left font-semibold">
+                                                                Price Particular
+                                                            </th>
+                                                            {columns.map((col, colIdx) => (
+                                                                <th
+                                                                    key={colIdx}
+                                                                    className="border p-3 text-center font-semibold"
+                                                                >
+                                                                    <div className="flex items-center justify-between">
+                                                                        {col}
+                                                                        <button
+                                                                            className="text-red-500 text-xs ml-2"
+                                                                            onClick={() => removeColumn(colIdx)}
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    </div>
+                                                                </th>
+                                                            ))}
+                                                            <th className="border p-3 text-center font-semibold">
+                                                                Actions
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {rows.map((row, rowIdx) => (
+                                                            <tr key={rowIdx} className="hover:bg-orange-50">
+                                                                {/* Row Header */}
+                                                                <td className="border p-3 font-medium bg-orange-50 text-orange-700">
+                                                                    <Input
+                                                                        className="bg-white"
+                                                                        placeholder="Enter Particular"
+                                                                        value={row.particular}
+                                                                        onChange={(e) =>
+                                                                            handleRowChange(rowIdx, e.target.value)
+                                                                        }
+                                                                    />
+                                                                </td>
+                                                                {/* Row Values */}
+                                                                {columns.map((_, colIdx) => (
+                                                                    <td key={colIdx} className="border p-2 text-center">
+                                                                        <Input
+                                                                            className="text-center"
+                                                                            placeholder="Price"
+                                                                            value={row.values[colIdx] || ""}
+                                                                            onChange={(e) =>
+                                                                                handleCellChange(
+                                                                                    rowIdx,
+                                                                                    colIdx,
+                                                                                    e.target.value
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                ))}
+                                                                {/* Actions */}
+                                                                <td className="border p-2 text-center">
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        onClick={() => removeRow(rowIdx)}
+                                                                    >
+                                                                        Remove
+                                                                    </Button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+
+                                                {/* Add Row / Column */}
+                                                <div className="flex space-x-4 mt-4">
+                                                    <Button variant="outline" onClick={addRow}>
+                                                        + Add Particular
+                                                    </Button>
+                                                    <Button variant="outline" onClick={addColumn}>
+                                                        + Add Occupancy Type
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+
 
                                         {/* Add ons */}
                                         <AddOnsFieldset />

@@ -19,7 +19,7 @@ export function Sidebar({ showLogo = true }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-72 min-h-screen bg-gray-50 border-r border-gray-200 flex flex-col shadow-sm">
+    <aside className=" min-h-screen bg-gray-50 border-r border-gray-200 flex flex-col shadow-sm">
       {/* Logo Section */}
       {showLogo && (
         <div className="p-6 border-b border-gray-100">
