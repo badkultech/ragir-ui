@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2 } from "lucide-react";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { AppHeader } from "@/components/app-header";
+import { ConfirmConversionModal } from "@/components/organizer/ConfirmConversionModal";
 
 interface Lead {
   id: string;
@@ -60,6 +61,14 @@ const mockLeads: Lead[] = [
 export default function LeadsPage() {
   const [leads, setLeads] = useState(mockLeads);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleConfirmConversion = () => {
+    if (selectedLead) {
+      markAsConverted(selectedLead);
+    }
+  };
 
   const markAsConverted = (id: string) => {
     setLeads((prev) =>
@@ -74,7 +83,8 @@ export default function LeadsPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB]">
+    <div className="flex min-h-screen bg-[#F9FAFB] overflow-x-hidden">
+
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -124,25 +134,116 @@ export default function LeadsPage() {
             </div>
           </div>
 
-          {/* Search + Filter */}
+          {/* 🔍 Search + Filters Section */}
           <div className="flex flex-wrap gap-3 mb-6 items-center">
-            <div className="flex-1 relative">
+            {/* Search Input */}
+            <div className="flex-1 min-w-[180px] sm:min-w-[220px]">
               <Input
                 placeholder="Search"
-                className="w-full rounded-md bg-white shadow-sm border-gray-200 focus-visible:ring-0 focus:border-gray-300"
+                className="
+        w-full
+        rounded-md
+        bg-white
+        border border-gray-200
+        shadow-sm
+        focus-visible:ring-0
+        focus:border-gray-300
+        h-9 sm:h-10
+        text-sm
+      "
               />
             </div>
-            <select className="border border-gray-200 rounded-md bg-white px-3 py-2 text-sm shadow-sm">
-              <option>All Status</option>
-              <option>Open</option>
-              <option>Converted</option>
-            </select>
-            <select className="border border-gray-200 rounded-md bg-white px-3 py-2 text-sm shadow-sm">
-              <option>Sort By</option>
-              <option>Newest</option>
-              <option>Oldest</option>
-            </select>
+
+            {/* Status Filter */}
+            <div className="relative">
+              <select
+                className="
+        appearance-none
+        border border-gray-200
+        rounded-md
+        bg-white
+        px-3 sm:px-4
+        pr-8
+        py-1.5 sm:py-2
+        h-9 sm:h-10
+        text-xs sm:text-sm
+        text-gray-700
+        shadow-sm
+        focus:outline-none
+        focus:ring-1
+        focus:ring-gray-300
+        hover:border-gray-300
+        cursor-pointer
+      "
+              >
+                <option>All Status</option>
+                <option>Open</option>
+                <option>Converted</option>
+              </select>
+
+              {/* Chevron Icon */}
+              <svg
+                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+
+            {/* Sort Filter */}
+            <div className="relative">
+              <select
+                className="
+        appearance-none
+        border border-gray-200
+        rounded-md
+        bg-white
+        px-3 sm:px-4
+        pr-8
+        py-1.5 sm:py-2
+        h-9 sm:h-10
+        text-xs sm:text-sm
+        text-gray-700
+        shadow-sm
+        focus:outline-none
+        focus:ring-1
+        focus:ring-gray-300
+        hover:border-gray-300
+        cursor-pointer
+      "
+              >
+                <option>Sort By</option>
+                <option>Newest to Oldest</option>
+                <option>Oldest to Newest</option>
+              </select>
+
+              {/* Chevron Icon */}
+              <svg
+                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
           </div>
+
+
 
           {/* Lead Cards */}
           <div className="space-y-4">
@@ -204,21 +305,19 @@ export default function LeadsPage() {
                 </div>
 
                 {/* Second Row (Buttons) */}
-                <div className="flex flex-wrap gap-3 mt-4">
+                <div className="flex flex-wrap gap-3 mt-4 justify-end">
                   {lead.status === "open" && (
                     <Button
-                      onClick={() => markAsConverted(lead.id)}
+                      onClick={() => {
+                        setSelectedLead(lead.id);
+                        setShowModal(true);
+                      }}
                       className="bg-orange-500 hover:bg-orange-600 text-white rounded-md flex-1 sm:flex-none"
                     >
                       Mark as Converted
                     </Button>
+
                   )}
-                  <Button
-                    variant="outline"
-                    className="rounded-md flex-1 sm:flex-none"
-                  >
-                    Contact Lead
-                  </Button>
                   <button
                     onClick={() => deleteLead(lead.id)}
                     className="border border-red-300 p-2 rounded-md hover:bg-red-50"
@@ -230,6 +329,11 @@ export default function LeadsPage() {
             ))}
           </div>
         </div>
+        <ConfirmConversionModal
+          open={showModal}
+          onClose={() => setShowModal(false)}
+          onConfirm={handleConfirmConversion}
+        />
       </div>
     </div>
   );
