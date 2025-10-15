@@ -44,17 +44,17 @@ export function LibraryHeader({
       {/* Add Button */}
       <Button
         onClick={onAddClick}
-        className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white"
+        className="flex items-center gap-2 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-tl hover:cursor-pointer text-white"
       >
         <Plus className="w-4 h-4" />
         {buttonLabel}
       </Button>
     </div>
     {/* Search Bar */}
-    <div className="relative mb-[2.5rem]">
+    <div className="relative mb-[2.5rem] w-[400px]">
     <Search className="absolute z-10 top-2.5 left-2" color="#757575" size={20}/>
     <input 
-    className="flex items-center justify-between bg-[#f7f7f7] border border-gray-200 rounded-[12px] px-10 py-2 outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+    className="flex items-center justify-between w-full bg-[#f7f7f7] border border-gray-200 rounded-[12px] px-10 py-2 outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
     placeholder=" Search your library..."
     >
     </input>

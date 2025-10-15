@@ -114,7 +114,7 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
       )}
 
       <aside
-        className={`bg-[#F3F3F3] fixed md:static top-0 left-0 z-50 min-h-screen w-[18.2%] max-w-[320px] border-r border-gray-200 flex flex-col transform transition-transform duration-300
+        className={`bg-[#F3F3F3] fixed md:static top-0 left-0 z-50 min-h-screen md:w-[18.2%] max-w-[320px] border-r border-gray-200 flex flex-col transform transition-transform duration-300
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         {/* Mobile close button */}

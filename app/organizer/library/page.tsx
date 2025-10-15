@@ -56,7 +56,7 @@ export default function LibraryOverviewPage() {
       <div className="flex-1 flex flex-col">
         <AppHeader title="Library" onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 p-6 md:p-8 lg:w-[1200px] lg:mx-auto">
          
           
           {/* <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -105,7 +105,7 @@ export default function LibraryOverviewPage() {
           </div> */}
 
           {/* Categories Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6  gap-x-2 justify-items-center">
             {categories.map(({ label, href, icon: Icon }) => (
               <Link
                 key={label}
