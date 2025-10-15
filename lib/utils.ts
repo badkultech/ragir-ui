@@ -64,6 +64,7 @@ export const ENDPOINTS = {
     id: number
   ) =>
     `/org/${organizationId}/user/${userId}/user-notifications-status/${id}/seen`,
+  ORGANIZATION_PROFILE: (organizationId: string) => `/org/${organizationId}/profile`,
 } as const;
 
 // utils/roles.ts (or wherever you keep these)
