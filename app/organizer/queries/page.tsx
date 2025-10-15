@@ -38,7 +38,7 @@ export default function QueriesPage() {
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
                   Ladakh Adventure – Complete Leh Circuit with Nubra Valley
                 </h2>
-                <Link href="/queries/all">
+                <Link href="/organizer/queries/all">
                   <Button className="bg-[#F97316] hover:bg-[#ea6d14] text-white px-6 rounded-lg">
                     View All Queries
                   </Button>
