@@ -45,7 +45,7 @@ export default function ActivitiesPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
