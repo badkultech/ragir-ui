@@ -109,4 +109,3 @@ export function ChooseLeaderModal({ open, onClose, onSelect }: ChooseLeaderModal
     </Dialog>
   )
 }
-  

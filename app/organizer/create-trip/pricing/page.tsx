@@ -29,7 +29,6 @@ type Row = {
 
 export default function PricingPage() {
     const router = useRouter()
-    const [pricingMode, setPricingMode] = useState<"simple" | "dynamic">("simple")
     const [gst, setGst] = useState<GstValue>("excludes")
     const [credit, setCredit] = useState({ card: true, emi: false })
     const [mode, setMode] = useState<PricingMode>("simple");
@@ -324,8 +323,8 @@ export default function PricingPage() {
                         {/* Footer actions (inline, mobile-friendly) */}
                         <WizardFooter
                             onPrev={() => router.push("/organizer/create-trip/faqs")}
-                            onDraft={() => console.log("[v0] Draft exclusions:")}
-                            onNext={() => router.push("/organizer/create-trip/")}
+                            onDraft={() => console.log(" Draft exclusions:")}
+                            onNext={() => router.push("/organizer/create-trip/review")}
                             prevLabel="‹ Previous"
                         />
                     </main>
