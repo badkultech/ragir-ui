@@ -82,17 +82,20 @@ export default function OrganizerProfileEditPage() {
       formData.append('testimonials', testimonials);
 
       if (logoFile) {
-        formData.append('displayPicture', logoFile);
+        formData.append('displayPicture.file', logoFile);
       }
       if (bannerFile) {
-        formData.append('bannerImage', bannerFile);
+        formData.append('bannerImage.file', bannerFile);
       }
       if (testimonialScreenshotFile) {
-        formData.append('testimonialScreenshot', testimonialScreenshotFile);
+        formData.append(
+          'testimonialScreenshot.file',
+          testimonialScreenshotFile,
+        );
       }
 
       certifications.forEach((file, index) => {
-        formData.append(`certifications[${index}]`, file);
+        formData.append(`certifications[${index}].file`, file);
       });
       const response = await updatedOrgProfile({
         organizationId: organizationId,
@@ -106,7 +109,12 @@ export default function OrganizerProfileEditPage() {
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
-      <OrganizerSidebar />
+      <OrganizerSidebar
+        isOpen={false}
+        onClose={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+      />
 
       <div className='flex-1 flex flex-col'>
         <AppHeader title='Organizer Profile' />
