@@ -1,4 +1,26 @@
 import { GradientIconButton } from '@/components/library/customButtons/GradientIconButton';
+import Heading1 from '@/components/library/customButtons/Heading1';
+import Heading2 from '@/components/library/customButtons/Heading2';
+import SubHeading from '@/components/library/customButtons/SubHeading';
+import Text from '@/components/library/customButtons/Text';
+import { BangloreIcon } from '@/components/library/SvgComponents/cityIconComponents/bangloreIcon';
+import { ChennaiIcon } from '@/components/library/SvgComponents/cityIconComponents/chennaiIcon';
+import { CoimbatoreIcon } from '@/components/library/SvgComponents/cityIconComponents/coimbatoreIcon';
+import { DehliIcon } from '@/components/library/SvgComponents/cityIconComponents/dehliIcon';
+import { DehradunIcon } from '@/components/library/SvgComponents/cityIconComponents/dehradunIcon';
+import { GoaIcon } from '@/components/library/SvgComponents/cityIconComponents/goaIcon';
+import { HyderabadIcon } from '@/components/library/SvgComponents/cityIconComponents/hyderabadIcon';
+import { JalandarIcon } from '@/components/library/SvgComponents/cityIconComponents/jalandarIcon';
+import { KochiIcon } from '@/components/library/SvgComponents/cityIconComponents/kochiIcon';
+import { KolkataIcon } from '@/components/library/SvgComponents/cityIconComponents/kolkataIcon';
+import { LucknowIcon } from '@/components/library/SvgComponents/cityIconComponents/lucknowIcon';
+import { MangloreIcon } from '@/components/library/SvgComponents/cityIconComponents/mangloreIcon';
+import { MumbaiIcon } from '@/components/library/SvgComponents/cityIconComponents/mumbaiIcon';
+import { MysoreIcon } from '@/components/library/SvgComponents/cityIconComponents/mysoreIcon';
+import { NagpurIcon } from '@/components/library/SvgComponents/cityIconComponents/nagpurIcon';
+import { PondicherryIcon } from '@/components/library/SvgComponents/cityIconComponents/pondicherryIcon';
+import { PuneIcon } from '@/components/library/SvgComponents/cityIconComponents/puneIcon';
+import { VadodaraIcon } from '@/components/library/SvgComponents/cityIconComponents/vadodaraIcon';
 import { AdventureGradient } from '@/components/library/SvgComponents/GradientsOfMoods/adventureGradient';
 import { BeachGradient } from '@/components/library/SvgComponents/GradientsOfMoods/beachGradient';
 import { CampingGradient } from '@/components/library/SvgComponents/GradientsOfMoods/campingGradient';
@@ -45,10 +67,29 @@ const StyleGuide = () => {
       </h1>
       <section className='mb-12'>
         <h2 className='font-poppins text-h2 font-semibold mb-4'>Typography</h2>
-        <div className='bg-gray-100 p-6 rounded-lg space-y-4'>
-          <p className='font-poppins bg-ragir-gradient'>Poppins H1 | Regular</p>
-          <p className='font-barlow text-h2'>Barlow H2 | Semibold</p>
-          <p className='font-poppins text-base'>Poppins Body | Regular</p>
+        <div className='space-y-10 p-10'>
+          <div className='flex justify-between'>
+            <Heading1 fontFamily='poppins'>Poppins H1 | Reg</Heading1>
+            <Heading1 fontFamily='barlow'>Barlow H1 | Semibold</Heading1>
+          </div>
+          <div className='flex justify-between'>
+            <Heading2 fontFamily='poppins'>Poppins H2 | Reg</Heading2>
+            <Heading2 fontFamily='barlow' style={{ fontStyle: 'italic' }}>
+              Barlow Italics H2 | Semibold
+            </Heading2>
+          </div>
+          <div className='flex justify-between'>
+            <SubHeading fontFamily='poppins'>
+              Poppins | Regular | Line height: 140%
+            </SubHeading>
+            <SubHeading fontFamily='barlow'>
+              Barlow | Medium | Line height: 160%
+            </SubHeading>
+          </div>
+          <div className='flex justify-between'>
+            <Text fontFamily='poppins'>Poppins H3 | Regular</Text>
+            <Text fontFamily='barlow'>Barlow H3 | Regular </Text>
+          </div>
         </div>
       </section>
       <section className='mb-12'>
@@ -290,7 +331,7 @@ const StyleGuide = () => {
         <div className='mt-8 grid grid-cols-2 md:grid-cols-4 gap-4'>
           <GradientIconButton
             label='Desert'
-            Icon={FemaleIcon}
+            Icon={DesertIcon}
             Gradient={DesertGradient}
             onClick={() => {
               return;
@@ -299,7 +340,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Mountain'
-            Icon={FemaleIcon}
+            Icon={MountainIcon}
             Gradient={MountainGradient}
             onClick={() => {
               return;
@@ -308,7 +349,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Beach'
-            Icon={FemaleIcon}
+            Icon={BeachIcon}
             Gradient={BeachGradient}
             onClick={() => {
               return;
@@ -317,7 +358,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Jungle'
-            Icon={FemaleIcon}
+            Icon={ForestIcon}
             Gradient={JungleGradient}
             onClick={() => {
               return;
@@ -335,7 +376,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Trekking'
-            Icon={FemaleIcon}
+            Icon={Hiking1Icon}
             Gradient={TrekkingGradient}
             onClick={() => {
               return;
@@ -343,7 +384,7 @@ const StyleGuide = () => {
           />
           <GradientIconButton
             label='Camping'
-            Icon={FemaleIcon}
+            Icon={CampingIcon}
             Gradient={CampingGradient}
             onClick={() => {
               return;
@@ -352,7 +393,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Wellness'
-            Icon={FemaleIcon}
+            Icon={WellnessIcon}
             Gradient={WellnessGradient}
             onClick={() => {
               return;
@@ -361,7 +402,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Learning'
-            Icon={FemaleIcon}
+            Icon={LearningIcon}
             Gradient={LearningGradient}
             onClick={() => {
               return;
@@ -370,7 +411,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Adventure'
-            Icon={FemaleIcon}
+            Icon={CompassIcon}
             Gradient={AdventureGradient}
             onClick={() => {
               return;
@@ -379,7 +420,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='MotorSports'
-            Icon={FemaleIcon}
+            Icon={MotorSportsIcon}
             Gradient={MotorSportsGradient}
             onClick={() => {
               return;
@@ -388,7 +429,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Weekend'
-            Icon={FemaleIcon}
+            Icon={CalenderIcon}
             Gradient={WeekendGradient}
             onClick={() => {
               return;
@@ -406,7 +447,7 @@ const StyleGuide = () => {
 
           <GradientIconButton
             label='Heritage'
-            Icon={FemaleIcon}
+            Icon={HeritageIcon}
             Gradient={HeritageGradient}
             onClick={() => {
               return;
@@ -414,7 +455,7 @@ const StyleGuide = () => {
           />
           <GradientIconButton
             label='Skygazy'
-            Icon={FemaleIcon}
+            Icon={NightIcon}
             Gradient={SkygazyGradient}
             onClick={() => {
               return;
@@ -422,12 +463,132 @@ const StyleGuide = () => {
           />
           <GradientIconButton
             label='Party'
-            Icon={FemaleIcon}
+            Icon={PartiesIcon}
             Gradient={PartyGradient}
             onClick={() => {
               return;
             }}
           />
+        </div>
+      </section>
+
+      <section className='mt-12 border-t pt-4 grid gap-4 border-gray-400'>
+        <h2 className='font-poppins text-h2 font-semibold mb-4'>CityIcons</h2>
+        <div className='grid grid-cols-10 gap-4'>
+          <div className='mb-4 flex flex-col items-center'>
+            <MumbaiIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Mumbai
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <PuneIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Pune
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <DehliIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Dehli
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <BangloreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Banglore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <GoaIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Goa
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <KolkataIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Kolkata
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <ChennaiIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Chennai
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <HyderabadIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Hyderabad
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <KochiIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Kochi
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <DehradunIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Dehradun
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <NagpurIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Nagpur
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <MangloreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Manglore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <JalandarIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Pondicherry
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <LucknowIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Lucknow
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <VadodaraIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Vadodara
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <CoimbatoreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Coimbatore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <KolkataIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Kolkata
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <MysoreIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Mysore
+            </label>
+          </div>
+          <div className='mb-4 flex flex-col items-center'>
+            <PondicherryIcon />
+            <label className='font-poppins text-h3 font-semibold mt-2'>
+              Pondicherry
+            </label>
+          </div>
         </div>
       </section>
     </div>
