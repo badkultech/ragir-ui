@@ -6,12 +6,43 @@ import { AppHeader } from "@/components/app-header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { AddLeaderModal } from "@/components/group-leader/AddLeaderModal";
 import { ChooseLeaderModal } from "@/components/group-leader/ChooseLeaderModal";
 import { useRouter } from "next/navigation";
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader";
 import MDEditor from "@uiw/react-md-editor";
+import { GradientIconButton } from "@/components/library/customButtons/GradientIconButton";
+import { ForestIcon } from "@/components/library/SvgComponents/Icons/forestIcon";
+import { JungleGradient } from "@/components/library/SvgComponents/GradientsOfMoods/jungleGradient";
+import { MountainIcon } from "@/components/library/SvgComponents/Icons/mountainIcon";
+import { MountainGradient } from "@/components/library/SvgComponents/GradientsOfMoods/mountainGradient";
+import { NightIcon } from "@/components/library/SvgComponents/Icons/nightIcon";
+import { SkygazyGradient } from "@/components/library/SvgComponents/GradientsOfMoods/skygazyGradient";
+import { BeachIcon } from "@/components/library/SvgComponents/Icons/beachIcon";
+import { BeachGradient } from "@/components/library/SvgComponents/GradientsOfMoods/beachGradient";
+import { DesertIcon } from "@/components/library/SvgComponents/Icons/desertIcon";
+import { DesertGradient } from "@/components/library/SvgComponents/GradientsOfMoods/desertGradient";
+import { WellnessIcon } from "@/components/library/SvgComponents/Icons/wellnessIcon";
+import { WellnessGradient } from "@/components/library/SvgComponents/GradientsOfMoods/wellnessGradient";
+import { HeritageIcon } from "@/components/library/SvgComponents/Icons/heritageIcon";
+import { HeritageGradient } from "@/components/library/SvgComponents/GradientsOfMoods/heritageGradient";
+import { CompassIcon } from "@/components/library/SvgComponents/Icons/compassIcon";
+import { AdventureGradient } from "@/components/library/SvgComponents/GradientsOfMoods/adventureGradient";
+import { Hiking1Icon } from "@/components/library/SvgComponents/Icons/hiking1Icon";
+import { TrekkingGradient } from "@/components/library/SvgComponents/GradientsOfMoods/trekkingGradient";
+import { MotorSportsIcon } from "@/components/library/SvgComponents/Icons/motorSportsIcon";
+import { MotorSportsGradient } from "@/components/library/SvgComponents/GradientsOfMoods/motorSportsGradient";
+import { CalenderIcon } from "@/components/library/SvgComponents/Icons/calenderIcon";
+import { WeekendGradient } from "@/components/library/SvgComponents/GradientsOfMoods/weekendGradient";
+import { FemaleIcon } from "@/components/library/SvgComponents/Icons/femaleIcon";
+import { WomenOnlyGradient } from "@/components/library/SvgComponents/GradientsOfMoods/womenOnlyGradient";
+import { PartiesIcon } from "@/components/library/SvgComponents/Icons/partiesIcon";
+import { PartyGradient } from "@/components/library/SvgComponents/GradientsOfMoods/partyGradient";
+import { LearningIcon } from "@/components/library/SvgComponents/Icons/learningIcon";
+import { LearningGradient } from "@/components/library/SvgComponents/GradientsOfMoods/learningGradient";
+import { CampingIcon } from "@/components/library/SvgComponents/Icons/campingIcon";
+import { CampingGradient } from "@/components/library/SvgComponents/GradientsOfMoods/campingGradient";
+import { SpiritualGradient } from "@/components/library/SvgComponents/GradientsOfMoods/spiritualGradient";
 
 
 
@@ -24,22 +55,22 @@ export default function CreateTripPage() {
   const router = useRouter();
 
   const tags = [
-    { id: "mountain", label: "Mountain", icon: "🏔️" },
-    { id: "skygaze", label: "Skygaze", icon: "👁️" },
-    { id: "beach", label: "Beach", icon: "🏖️" },
-    { id: "desert", label: "Desert", icon: "🏜️" },
-    { id: "jungle", label: "Jungle", icon: "🌲" },
-    { id: "wellness", label: "Wellness", icon: "🌸" },
-    { id: "heritage", label: "Heritage", icon: "🏛️" },
-    { id: "adventure", label: "Adventure", icon: "🧭" },
-    { id: "trekking", label: "Trekking", icon: "🥾" },
-    { id: "motorsports", label: "Motorsports", icon: "🏎️" },
-    { id: "weekends", label: "Weekends", icon: "📅" },
-    { id: "women-only", label: "Women-Only", icon: "👥" },
-    { id: "parties", label: "Parties", icon: "🎉" },
-    { id: "learning", label: "Learning", icon: "🎓" },
-    { id: "camping", label: "Camping", icon: "⛺" },
-    { id: "spiritual", label: "Spiritual", icon: "🕉️" },
+    { id: "mountain", label: "Mountain", icon: MountainIcon, gradient: MountainGradient },
+    { id: "skygaze", label: "Skygaze", icon: NightIcon, gradient: SkygazyGradient },
+    { id: "beach", label: "Beach", icon: BeachIcon, gradient: BeachGradient },
+    { id: "desert", label: "Desert", icon: DesertIcon, gradient: DesertGradient },
+    { id: "jungle", label: "Jungle", icon: ForestIcon, gradient: JungleGradient },
+    { id: "wellness", label: "Wellness", icon: WellnessIcon, gradient: WellnessGradient },
+    { id: "heritage", label: "Heritage", icon: HeritageIcon, gradient: HeritageGradient },
+    { id: "adventure", label: "Adventure", icon: CompassIcon, gradient: AdventureGradient },
+    { id: "trekking", label: "Trekking", icon: Hiking1Icon, gradient: TrekkingGradient },
+    { id: "motorsports", label: "Motorsports", icon: MotorSportsIcon, gradient: MotorSportsGradient },
+    { id: "weekends", label: "Weekends", icon: CalenderIcon, gradient: WeekendGradient },
+    { id: "women-only", label: "Women-Only", icon: FemaleIcon, gradient: WomenOnlyGradient },
+    { id: "parties", label: "Parties", icon: PartiesIcon, gradient: PartyGradient },
+    { id: "learning", label: "Learning", icon: LearningIcon, gradient: LearningGradient },
+    { id: "camping", label: "Camping", icon: CampingIcon, gradient: CampingGradient },
+    { id: "spiritual", label: "Spiritual", icon: FemaleIcon, gradient: SpiritualGradient },
   ];
 
   const [cityTags, setCityTags] = useState<string[]>([
@@ -320,18 +351,19 @@ export default function CreateTripPage() {
               <Label className="block text-gray-600 mb-3 font-medium">
                 Mood Tags
               </Label>
-              <div className="flex flex-wrap gap-2">
-                {tags.map(tag => (
-                  <button
+              <div className="flex flex-wrap gap-3">
+                {tags.map((tag) => (
+                  <GradientIconButton
                     key={tag.id}
-                    onClick={() => toggleTag(tag.id)}
-                    className={`${selectedTags.includes(tag.id) ? "bg-orange-500 text-white" : "bg-gray-100"} flex items-center gap-2 px-4 py-1.5 rounded-full`}
-                  >
-                    {tag.icon} {tag.label}
-                  </button>
+                    label={tag.label}
+                    Icon={tag.icon}
+                    Gradient={tag.gradient}
+                    selected={selectedTags.includes(tag.id)} // ✅ highlight selected
+                    onClick={() => toggleTag(tag.id)} // ✅ toggle on click
+                  />
                 ))}
-
               </div>
+
             </div>
 
             {/* Locations */}
@@ -406,7 +438,7 @@ export default function CreateTripPage() {
               <span className="font-semibold text-xl">Group Leaders</span>
               <div className="flex gap-3">
                 <Button onClick={() => setLeaderModalOpen(true)}
-                  className="border border-orange-500 text-orange-500 px-5 py-2 rounded-md font-medium hover:bg-orange-50 transition-all flex items-center gap-2">
+                  className="border border-orange-500 bg-white text-orange-500 px-5 py-2 rounded-md font-medium hover:bg-orange-50 transition-all flex items-center gap-2">
                   <span className="text-lg leading-none">+</span> Add Leader
                 </Button>
                 <Button onClick={() => setChooseModalOpen(true)}

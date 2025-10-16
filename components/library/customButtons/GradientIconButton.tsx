@@ -1,11 +1,13 @@
-import React from 'react';
+import React from "react";
 
 interface GradientButtonIconProps {
   style?: React.CSSProperties;
   label: string;
-  Icon: React.ElementType; // React component for the icon (e.g., FemaleIcon)
-  Gradient: React.ElementType; // React component for the gradient background (e.g., WomenOnlyGradient)
+  Icon: React.ElementType;
+  Gradient: React.ElementType;
   onClick?: () => void;
+  className?: string;
+  selected?: boolean; 
 }
 
 export const GradientIconButton = ({
@@ -14,36 +16,29 @@ export const GradientIconButton = ({
   Icon,
   Gradient,
   onClick,
+  className = "",
+  selected = false,
 }: GradientButtonIconProps) => {
   return (
     <button
       style={style}
-      // onClick={onClick}
-      className='
-        relative
-        w-[220px]
-        h-[60px]
-        rounded-[100px]
-        border-4
-        overflow-hidden
-        text-white
-        font-semibold
-        z-0
-        flex
-        items-center
-        justify-center
-        gap-2
-        px-4
-      '
+      onClick={onClick}
+      className={`relative w-[170px] h-[45px] rounded-[100px] overflow-hidden font-semibold flex items-center justify-center gap-2 px-4 transition-all duration-300
+        ${selected
+          ? "border-[3px]  bg-gradient-to-r from-white to-white text-orange-500 border-orange-300"
+          : "border-[3px] border-gray-200 bg-white text-gray-700 hover:border-orange-300"}
+        ${className}`}
     >
-      {/* SVG Gradient Background */}
-      <div className='absolute inset-0 z-0 pointer-events-none'>
-        <Gradient width='100%' height='100%' />
-      </div>
+      {/* Gradient Overlay when selected */}
+      {selected && (
+        <div className="absolute inset-0 opacity-0">
+          <Gradient width="100%" height="100%" />
+        </div>
+      )}
 
       {/* Icon and Label */}
-      <div className='relative z-10 flex items-center gap-2'>
-        <Icon fill='white' />
+      <div className="relative z-10 flex items-center gap-2">
+        <Icon fill={selected ? "orange" : "black"} />
         <span>{label}</span>
       </div>
     </button>
