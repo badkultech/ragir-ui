@@ -5,7 +5,19 @@ import { ApiResponse } from '../common-types';
 
 export const organizerAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
-    organizerProfile: builder.mutation<
+    getOrganizerProfile: builder.query<
+      PartnerResponse,
+      { organizationId: string }
+    >({
+      query: ({ organizationId }) => ({
+        url: `${ENDPOINTS.ORGANIZATION_PROFILE(organizationId)}`,
+        method: 'GET',
+        // DON'T manually set Content-Type — browser will handle it with boundary
+      }),
+      transformResponse: (response: ApiResponse<PartnerResponse>) =>
+        response.data,
+    }),
+    updateOrganizerProfile: builder.mutation<
       PartnerResponse,
       { organizationId: string; data: FormData }
     >({
@@ -21,4 +33,8 @@ export const organizerAPI = baseAPI.injectEndpoints({
   }),
 });
 
-export const { useOrganizerProfileMutation } = organizerAPI;
+export const {
+  useUpdateOrganizerProfileMutation,
+  useGetOrganizerProfileQuery,
+  useLazyGetOrganizerProfileQuery,
+} = organizerAPI;

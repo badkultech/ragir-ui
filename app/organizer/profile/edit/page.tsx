@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppHeader } from '@/components/app-header';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useOrganizerProfileMutation } from '@/lib/services/organizer';
+import {
+  useLazyGetOrganizerProfileQuery,
+  useUpdateOrganizerProfileMutation,
+} from '@/lib/services/organizer';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
 
@@ -31,7 +34,43 @@ export default function OrganizerProfileEditPage() {
 
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
-  const [updatedOrgProfile, { isLoading }] = useOrganizerProfileMutation();
+  const [updatedOrgProfile, { isLoading }] =
+    useUpdateOrganizerProfileMutation();
+  const [getOrgProfile, { isLoading: profileLoading }] =
+    useLazyGetOrganizerProfileQuery();
+
+  useEffect(() => {
+    if (organizationId) {
+      getOrgProfile({ organizationId }).then((res) => {
+        console.log('Fetched profile:', res);
+        if (res.data) {
+          const data = res.data as any;
+          setOrganizerName(data.organizerName || '');
+          setTagline(data.tagline || '');
+          setDescription(data.description || '');
+          setWebsiteUrl(data.websiteUrl || '');
+          setInstagramHandle(data.instagramHandle || '');
+          setYoutubeChannel(data.youtubeChannel || '');
+          setGoogleBusiness(data.googleBusiness || '');
+          setTestimonials(data.testimonials || '');
+          setLogoPreview(data.displayPicture?.url || null);
+          setBannerPreview(data.bannerImage?.url || null);
+          setTestimonialScreenshotFile(
+            data.testimonialScreenshot?.file || null,
+          );
+          if (data.certifications) {
+            const certFiles = data.certifications
+              .filter((cert: any) => cert.file)
+              .map((cert: any) => {
+                // Create a dummy File object for display purposes
+                return new File([], cert.file);
+              });
+            setCertifications(certFiles);
+          }
+        }
+      });
+    }
+  }, [organizationId]);
 
   // Placeholder error function
   const showApiError = (msg: string) => alert(msg);
@@ -166,31 +205,30 @@ export default function OrganizerProfileEditPage() {
             <div>
               <label className='block text-sm mb-1'>Cover Image / Banner</label>
               <div className='border border-dashed rounded-lg p-6 text-center'>
-                {bannerPreview ? (
+                {bannerPreview && (
                   <img
                     src={bannerPreview}
                     alt='Banner'
-                    className='w-full h-40 object-cover rounded-lg'
+                    className='w-full h-40 object-cover rounded-lg mb-4'
                   />
-                ) : (
-                  <>
-                    <div className='relative inline-block'>
-                      <Button variant='outline'>Upload Banner Image</Button>
-                      <input
-                        id='banner-upload'
-                        type='file'
-                        accept='image/*'
-                        className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
-                        onChange={(e) =>
-                          handleFileChange(e, setBannerFile, setBannerPreview)
-                        }
-                      />
-                    </div>
-                    <p className='text-xs text-gray-400 mt-1'>
-                      1920px x 480px recommended
-                    </p>
-                  </>
                 )}
+                <>
+                  <div className='relative inline-block'>
+                    <Button variant='outline'>Upload Banner Image</Button>
+                    <input
+                      id='banner-upload'
+                      type='file'
+                      accept='image/*'
+                      className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
+                      onChange={(e) =>
+                        handleFileChange(e, setBannerFile, setBannerPreview)
+                      }
+                    />
+                  </div>
+                  <p className='text-xs text-gray-400 mt-1'>
+                    1920px x 480px recommended
+                  </p>
+                </>
               </div>
             </div>
           </section>
