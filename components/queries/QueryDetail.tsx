@@ -75,7 +75,7 @@ export default function QueryDetail({ query, onBack, onReport }: any) {
         </div>
 
         {/* Chat container */}
-        <div className="h-[420px] overflow-y-auto pr-2 pb-4 border-t border-b border-gray-100">
+        <div className="h-[250px] overflow-y-auto pr-2 pb-4 border-t border-b border-gray-100">
           <div className="flex flex-col gap-5 mt-5">
             {chat.map((msg, index) => (
               <div
