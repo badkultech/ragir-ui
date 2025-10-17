@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 
-export function AddStayForm({ mode = "library", onCancel, onSave }) {
+type AddStayFormProps = {
+  mode?: string;
+  onCancel: () => void;
+  onSave: (data: any) => void;
+};
+
+export function AddStayForm({ mode = "library", onCancel, onSave }:AddStayFormProps) {
   const [title, setTitle] = useState("");
   const [sharingType, setSharingType] = useState("");
   const [checkIn, setCheckIn] = useState("");
