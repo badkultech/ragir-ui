@@ -9,6 +9,14 @@ import { Trash2 } from "lucide-react";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { ConfirmConversionModal } from "@/components/organizer/ConfirmConversionModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Link from "next/link";
 
 interface Lead {
   id: string;
@@ -84,7 +92,6 @@ export default function LeadsPage() {
 
   return (
     <div className="flex min-h-screen bg-[#F9FAFB] overflow-x-hidden">
-
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -101,8 +108,11 @@ export default function LeadsPage() {
             <h1 className="text-xl font-semibold text-gray-800">
               Ladakh Adventure – Complete Leh Circuit with Nubra Valley
             </h1>
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-md px-5 py-2">
-              View All Leads
+            <Button
+              asChild
+              className="bg-orange-500 hover:bg-orange-600 text-white rounded-md px-5 py-2"
+            >
+              <Link href="/organizer/leads/all-leads">View All Leads</Link>
             </Button>
           </div>
 
@@ -133,117 +143,41 @@ export default function LeadsPage() {
               </p>
             </div>
           </div>
-
-          {/* 🔍 Search + Filters Section */}
+          {/* Filters Section */}
           <div className="flex flex-wrap gap-3 mb-6 items-center">
             {/* Search Input */}
             <div className="flex-1 min-w-[180px] sm:min-w-[220px]">
               <Input
                 placeholder="Search"
-                className="
-        w-full
-        rounded-md
-        bg-white
-        border border-gray-200
-        shadow-sm
-        focus-visible:ring-0
-        focus:border-gray-300
-        h-9 sm:h-10
-        text-sm
-      "
+                className="w-full rounded-full border border-gray-200 bg-white h-9 sm:h-10 text-sm px-4 shadow-sm focus-visible:ring-1 focus-visible:ring-gray-300"
               />
             </div>
 
             {/* Status Filter */}
-            <div className="relative">
-              <select
-                className="
-        appearance-none
-        border border-gray-200
-        rounded-md
-        bg-white
-        px-3 sm:px-4
-        pr-8
-        py-1.5 sm:py-2
-        h-9 sm:h-10
-        text-xs sm:text-sm
-        text-gray-700
-        shadow-sm
-        focus:outline-none
-        focus:ring-1
-        focus:ring-gray-300
-        hover:border-gray-300
-        cursor-pointer
-      "
-              >
-                <option>All Status</option>
-                <option>Open</option>
-                <option>Converted</option>
-              </select>
-
-              {/* Chevron Icon */}
-              <svg
-                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
+            <Select>
+              <SelectTrigger className="w-[160px] rounded-full border border-gray-200 h-9 sm:h-10 text-sm bg-white shadow-sm">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border border-gray-200 bg-white shadow-lg">
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+                <SelectItem value="converted">Converted</SelectItem>
+                <SelectItem value="nudged">Nudged Again</SelectItem>
+              </SelectContent>
+            </Select>
 
             {/* Sort Filter */}
-            <div className="relative">
-              <select
-                className="
-        appearance-none
-        border border-gray-200
-        rounded-md
-        bg-white
-        px-3 sm:px-4
-        pr-8
-        py-1.5 sm:py-2
-        h-9 sm:h-10
-        text-xs sm:text-sm
-        text-gray-700
-        shadow-sm
-        focus:outline-none
-        focus:ring-1
-        focus:ring-gray-300
-        hover:border-gray-300
-        cursor-pointer
-      "
-              >
-                <option>Sort By</option>
-                <option>Newest to Oldest</option>
-                <option>Oldest to Newest</option>
-              </select>
-
-              {/* Chevron Icon */}
-              <svg
-                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
+            <Select>
+              <SelectTrigger className="w-[160px] rounded-full border border-gray-200 h-9 sm:h-10 text-sm bg-white shadow-sm">
+                <SelectValue placeholder="Sort By" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border border-gray-200 bg-white shadow-lg">
+                <SelectItem value="newest">Newest to Oldest</SelectItem>
+                <SelectItem value="oldest">Oldest to Newest</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-
 
           {/* Lead Cards */}
           <div className="space-y-4">
@@ -316,7 +250,6 @@ export default function LeadsPage() {
                     >
                       Mark as Converted
                     </Button>
-
                   )}
                   <button
                     onClick={() => deleteLead(lead.id)}
