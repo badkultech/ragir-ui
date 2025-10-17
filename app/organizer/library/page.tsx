@@ -113,7 +113,7 @@ export default function LibraryOverviewPage() {
                 className="flex flex-col justify-center items-center 
                  w-full max-w-[200px] md:max-w-[320px] lg:max-w-[300px] 
                  h-[160px] md:h-[170px] 
-                 p-4 gap-6
+                 px-4 py-0  gap-4
                  bg-[rgba(255,128,76,0.06)] border border-[#FF804C] rounded-xl
                  transition hover:shadow-md hover:border-[#ff662a]"
               >

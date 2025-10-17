@@ -22,7 +22,7 @@ export function LibraryHeader({
   onAddClick,
 }: LibraryHeaderProps) {
   return (
-    <div className="flex flex-col gap-[2.5rem]">
+    <div className="flex flex-col gap-[1.5rem]">
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       {/* Back + Title/Description */}
       <div className="flex items-start gap-4">
