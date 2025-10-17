@@ -1,22 +1,26 @@
-import React from "react";
+import React from 'react';
 
 interface GradientButtonIconProps {
   style?: React.CSSProperties;
   label: string;
+  labelColor?: string;
   Icon: React.ElementType;
-  Gradient: React.ElementType;
+  iconColor?: string;
+  Gradient?: React.ElementType | null;
   onClick?: () => void;
   className?: string;
-  selected?: boolean; 
+  selected?: boolean;
 }
 
 export const GradientIconButton = ({
   style,
   label,
   Icon,
+  iconColor,
+  labelColor,
   Gradient,
   onClick,
-  className = "",
+  className = '',
   selected = false,
 }: GradientButtonIconProps) => {
   return (
@@ -24,22 +28,24 @@ export const GradientIconButton = ({
       style={style}
       onClick={onClick}
       className={`relative w-[170px] h-[45px] rounded-[100px] overflow-hidden font-semibold flex items-center justify-center gap-2 px-4 transition-all duration-300
-        ${selected
-          ? "border-[3px]  bg-gradient-to-r from-white to-white text-orange-500 border-orange-300"
-          : "border-[3px] border-gray-200 bg-white text-gray-700 hover:border-orange-300"}
+        ${
+          selected
+            ? `border-[3px]  bg-gradient-to-r from-white to-white text-${iconColor}-500 border-orange-300`
+            : `border-[3px] border-gray-200 bg-white text-${iconColor}-700`
+        }
         ${className}`}
     >
       {/* Gradient Overlay when selected */}
-      {selected && (
-        <div className="absolute inset-0 opacity-0">
-          <Gradient width="100%" height="100%" />
+      {Gradient && selected && (
+        <div className='absolute inset-0'>
+          <Gradient width='100%' height='100%' />
         </div>
       )}
 
       {/* Icon and Label */}
-      <div className="relative z-10 flex items-center gap-2">
-        <Icon fill={selected ? "orange" : "black"} />
-        <span>{label}</span>
+      <div className='relative z-10 flex items-center gap-2'>
+        <Icon fill={iconColor} />
+        <span className={`color-${labelColor}`}>{label}</span>
       </div>
     </button>
   );

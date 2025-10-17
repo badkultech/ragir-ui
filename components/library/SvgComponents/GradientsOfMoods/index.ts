@@ -1,0 +1,32 @@
+// export {
+//   LearningGradient,
+//   JungleGradient,
+//   MountainGradient,
+//   SkygazyGradient,
+//   BeachGradient,
+//   DesertGradient,
+//   WellnessGradient,
+//   HeritageGradient,
+//   AdventureGradient,
+//   TrekkingGradient,
+//   MotorSportsGradient,
+//   WeekendGradient,
+//   WomenOnlyGradient,
+//   PartyGradient,
+//   GradientIconButton,
+// };
+
+export { LearningGradient } from './learningGradient';
+export { JungleGradient } from './jungleGradient';
+export { MountainGradient } from './mountainGradient';
+export { SkygazyGradient } from './skygazyGradient';
+export { BeachGradient } from './beachGradient';
+export { DesertGradient } from './desertGradient';
+export { WellnessGradient } from './wellnessGradient';
+export { HeritageGradient } from './heritageGradient';
+export { AdventureGradient } from './adventureGradient';
+export { TrekkingGradient } from './trekkingGradient';
+export { MotorSportsGradient } from './motorSportsGradient';
+export { WeekendGradient } from './weekendGradient';
+export { WomenOnlyGradient } from './womenOnlyGradient';
+export { PartyGradient } from './partyGradient';
