@@ -1,20 +1,3 @@
-// export {
-//   LearningGradient,
-//   JungleGradient,
-//   MountainGradient,
-//   SkygazyGradient,
-//   BeachGradient,
-//   DesertGradient,
-//   WellnessGradient,
-//   HeritageGradient,
-//   AdventureGradient,
-//   TrekkingGradient,
-//   MotorSportsGradient,
-//   WeekendGradient,
-//   WomenOnlyGradient,
-//   PartyGradient,
-//   GradientIconButton,
-// };
 
 export { LearningGradient } from './learningGradient';
 export { JungleGradient } from './jungleGradient';
