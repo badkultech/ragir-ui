@@ -241,7 +241,7 @@ export default function CreateTripPage() {
               <Label className='block text-gray-600 mb-2 font-medium'>
                 Trip Title
               </Label>
-              <div className='ralative'>
+              <div className='relative'>
                 <Input
                   type='text'
                   placeholder='Enter trip title'
@@ -252,7 +252,7 @@ export default function CreateTripPage() {
                   }
                   className='w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500'
                 />
-                <span className='absolute right-20 top-85 -translate-y-1/2 text-sm text-orange-500'>
+                <span className='absolute right-4 top-1/2 -translate-y-1/2 text-sm text-orange-500'>
                   {formData.tripTitle.length}/80 Characters
                 </span>
               </div>
@@ -442,7 +442,7 @@ export default function CreateTripPage() {
                       selectedTags.includes(tag.id) ? 'Orange' : 'black'
                     }
                     labelColor={
-                      selectedTags.includes(tag.id) ? 'Orange' : 'white'
+                      selectedTags.includes(tag.id) ? 'Orange' : 'black'
                     }
                   />
                 ))}
