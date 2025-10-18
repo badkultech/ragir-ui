@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import { useSaveGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
+import { selectAuthState } from "@/lib/slices/auth";
+import { useSelector } from "react-redux";
+
 
 type AddTripLeaderFormProps = {
   mode?: "library" | "trip";
@@ -25,6 +29,9 @@ export function AddTripLeaderForm({
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [saveGroupLeader, { isLoading }] = useSaveGroupLeaderMutation();
+  const { userData } = useSelector(selectAuthState);
+  const orgId = userData?.organizationPublicId;
 
   const handleLibrarySelect = (item: any) => {
     setName(item.title || "");
@@ -40,9 +47,44 @@ export function AddTripLeaderForm({
     }
   };
 
-  const handleSubmit = () => {
-    onSave({ name, tagline, bio, profileImage, mode });
+  const handleSubmit = async () => {
+    if (!orgId) {
+      console.error("Missing org ID");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name.trim());
+      formData.append("bio", bio.trim());
+      formData.append("tagline", tagline.trim());
+      formData.append("addToLibrary", String(mode === "library"));
+
+      if (profileImage) {
+        formData.append("documents[0].file", profileImage, profileImage.name);
+        formData.append("documents[0].name", profileImage.name);
+        formData.append("documents[0].type", "IMAGE");
+      }
+
+      // 🧩 Debug check
+      for (const [key, value] of formData.entries()) {
+        console.log("➡️", key, value);
+      }
+
+      const response = await saveGroupLeader({
+        organizationId: orgId,
+        data: formData,
+      }).unwrap();
+
+      onSave(response);
+    } catch (err) {
+      console.error("❌ Failed to save trip leader:", err);
+    }
   };
+
+
+
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -137,10 +179,12 @@ export function AddTripLeaderForm({
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          disabled={isLoading || !name.trim() || !bio.trim()}
+          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white disabled:opacity-60"
         >
-          Save
+          {isLoading ? "Saving..." : "Save"}
         </Button>
+
       </div>
     </div>
   );

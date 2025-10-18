@@ -27,6 +27,13 @@ export const ENDPOINTS = {
 
   PARTNER: "/public/join_as_partner",
 
+   // ======= Group Leader Library =======
+  GET_ALL_GROUP_LEADERS: (organizationId: string) =>
+    `/org/${organizationId}/library/leader`,
+
+  SAVE_GROUP_LEADER: (organizationId: string) => `/org/${organizationId}/library/leader`,
+
+
   // super admin dashboard
   GET_ALL_ADMINS: (organizationId: string) =>
     `/org/${organizationId}/admin/admins`,
