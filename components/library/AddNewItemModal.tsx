@@ -62,7 +62,7 @@ const categories: CategoryItem[] = [
 function StepHeader({ title }: { title: string }) {
   return (
     <DialogHeader>
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle >{title}</DialogTitle>
     </DialogHeader>
   );
 }
@@ -115,7 +115,7 @@ export function AddNewItemModal({
         }
       }}
     >
-      <DialogContent className="w-full max-w-3xl rounded-2xl overflow-hidden">
+      <DialogContent className="w-full sm:max-w-xl rounded-2xl overflow-hidden">
         {/* inner scroll container keeps outer border radius intact */}
         <div className="max-h-[90vh] overflow-y-auto">
           {step === "select" && (
@@ -242,7 +242,7 @@ export function AddNewItemModal({
 
           {step === "event" && (
             <>
-              <StepHeader title="Add Event" />
+              <StepHeader title="Day Description" />
               <AddEventForm
                 mode="library"
                 onCancel={handleBack}

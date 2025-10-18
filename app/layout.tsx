@@ -29,7 +29,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body className="font-poppins antialiased">
+      <body className="font-poppins antialiased ">
         <ReduxProvider>
           <HydratedAuth>
             {children}

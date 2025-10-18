@@ -13,16 +13,21 @@ import {
   Activity,
   Users,
   HelpCircle,
+  Car,
+  Home,
+  ForkKnife,
+  User2,
 } from "lucide-react";
 import { GradientButton } from "@/components/gradient-button";
 import { useState } from "react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
+import { LibraryHeader } from "@/components/library/LibraryHeader";
 
 const categories = [
-  { label: "Events", href: "/organizer/library/events", icon: Calendar },
-  { label: "Stays", href: "/organizer/library/stays", icon: Hotel },
-  { label: "Transit", href: "/organizer/library/transits", icon: Bus },
-  { label: "Meals", href: "/organizer/library/meals", icon: Utensils },
+  { label: "Day Description", href: "/organizer/library/events", icon: Calendar },
+  { label: "Transit", href: "/organizer/library/transits", icon: Car },
+  { label: "Stays", href: "/organizer/library/stays", icon: Home },
+  { label: "Meals", href: "/organizer/library/meals", icon: ForkKnife },
   {
     label: "Activities",
     href: "/organizer/library/activities",
@@ -31,7 +36,7 @@ const categories = [
   {
     label: "Trip Leaders",
     href: "/organizer/library/trip-leaders",
-    icon: Users,
+    icon: User2,
   },
   { label: "FAQs", href: "/organizer/library/faqs", icon: HelpCircle },
 ];
@@ -40,7 +45,7 @@ export default function LibraryOverviewPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen">
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -51,9 +56,10 @@ export default function LibraryOverviewPage() {
       <div className="flex-1 flex flex-col">
         <AppHeader title="Library" onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 p-6 md:p-8">
-          {/* Header with Add Item */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <main className="flex-1 p-6 md:p-8 lg:w-[1200px] lg:mx-auto">
+         
+          
+          {/* <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
                 Ragir Library
@@ -72,7 +78,16 @@ export default function LibraryOverviewPage() {
               <PlusCircle className="w-4 h-4" />
               Add Item
             </GradientButton>
-          </div>
+          </div> */  }
+
+           {/* Header with Add Item */}
+
+            <LibraryHeader
+                       title="Ragir Library"
+                       buttonLabel="Add item"
+                       onAddClick={() => setModalOpen(true)}
+                       hideBackBtn = {true}
+                     />
 
           {/* Modal */}
           <AddNewItemModal
@@ -90,7 +105,7 @@ export default function LibraryOverviewPage() {
           </div> */}
 
           {/* Categories Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6  gap-x-2 justify-items-center">
             {categories.map(({ label, href, icon: Icon }) => (
               <Link
                 key={label}
@@ -98,7 +113,7 @@ export default function LibraryOverviewPage() {
                 className="flex flex-col justify-center items-center 
                  w-full max-w-[200px] md:max-w-[320px] lg:max-w-[300px] 
                  h-[160px] md:h-[170px] 
-                 p-4 gap-6
+                 px-4 py-0  gap-4
                  bg-[rgba(255,128,76,0.06)] border border-[#FF804C] rounded-xl
                  transition hover:shadow-md hover:border-[#ff662a]"
               >
