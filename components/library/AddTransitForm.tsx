@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import MDEditor from "@uiw/react-md-editor";
+import RichTextEditor from "../editor/RichTextEditor";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
@@ -76,8 +78,10 @@ export function AddTransitForm({
     });
   };
 
+  const isTripMode = mode==="trip";
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" style={{fontFamily: "var(--font-poppins)"}}>
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -91,7 +95,7 @@ export function AddTransitForm({
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium  mb-1">
           Title *
         </label>
         <Input
@@ -100,14 +104,14 @@ export function AddTransitForm({
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
       </div>
 
       {/* Transit Route */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-1">
           Transit Route *
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -127,6 +131,7 @@ export function AddTransitForm({
             type="time"
             value={departure}
             onChange={(e) => setDeparture(e.target.value)}
+            className=" "
           />
           <Input
             type="time"
@@ -138,7 +143,7 @@ export function AddTransitForm({
 
       {/* Vehicle */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Vehicle *
         </label>
         <div className="flex flex-wrap gap-2">
@@ -167,11 +172,11 @@ export function AddTransitForm({
 
       {/* Arrangement */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Arrangement *
         </label>
-        <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-6">
+          <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
               checked={arrangement === "organizer"}
@@ -179,7 +184,7 @@ export function AddTransitForm({
             />
             Arranged by the organizer
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
               checked={arrangement === "traveler"}
@@ -192,36 +197,28 @@ export function AddTransitForm({
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Description
         </label>
-        <Textarea
+       <RichTextEditor
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter here"
-          rows={5}
+          onChange={setDescription}
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {description.length}/800 Words
-        </p>
+      
       </div>
 
       {/* Packing Suggestions */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Packing Suggestions
         </label>
-        <Textarea
+        <RichTextEditor
           value={packing}
-          onChange={(e) => setPacking(e.target.value)}
+          onChange={setPacking}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {packing.length}/800 Words
-        </p>
       </div>
 
       {/* Image Upload */}
@@ -242,20 +239,31 @@ export function AddTransitForm({
           />
         </label>
         {images.length > 0 && (
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-orange-500 mt-2">
             {images.length} file(s) selected
           </p>
         )}
       </div>
 
+      { isTripMode &&  <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+        <Input type="checkbox" value="" className=" w-[22px]" />
+          <label className="block text-[0.95rem] font-medium">
+          Save in Library
+        </label>
+          </div>
+          
+        <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
+        </div>  }
+
       {/* Footer */}
-      <div className="flex justify-end items-center gap-4 mt-6">
+      <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
           Save
         </Button>

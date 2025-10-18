@@ -30,9 +30,9 @@ export function DefaultNotificationDropdown() {
         <Button
           variant="ghost"
           size="sm"
-          className="relative rounded-full h-10 w-10 flex items-center justify-center bg-blue-100 hover:bg-blue-200 transition"
+          className="relative rounded-full h-10 w-10 flex items-center justify-center bg-gray-200 hover:bg-gray-100 transition"
         >
-          <Bell className="h-6 w-6 text-blue-600" />
+          <Bell className=" text-gray-800" size={28} />
           <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-500 text-white"></Badge>
         </Button>
       </DropdownMenuTrigger>

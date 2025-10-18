@@ -3,20 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Grid3X3,
+ LayoutGrid,
   Plus,
-  User,
+  CircleUser,
+  MapPinned,
+  Images,
   ChevronDown,
-  ChevronRight,
+  ChevronUp,
   X,
   BookOpen,
   Calendar,
   Hotel,
-  Bus,
-  Utensils,
-  Activity,
+  Car,
+  UtensilsCrossed,
+  PersonStanding,
   Users,
   HelpCircle,
+   Award
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -29,19 +32,19 @@ type NavItem = {
 };
 
 const nav: NavItem[] = [
-  { label: "Dashboard", href: "/organizer", icon: Grid3X3 },
-  {
-    label: "Admins",
-    href: "/organizer/admins",
-    icon: User,
-    children: [
-      { label: "Add Admin", href: "/organizer/add-admin", icon: Plus },
-    ],
-  },
+  { label: "Dashboard", href: "/organizer", icon: LayoutGrid },
+  // {
+  //   label: "Organizer Profile",
+  //   href: "/organizer/admins",
+  //   icon: CircleUser,
+  //   children: [
+  //     { label: "Add Admin", href: "/organizer/add-admin", icon: Plus },
+  //   ],
+  // },
   {
     label: "Organizers",
     href: "/organizer/organizer",
-    icon: User,
+    icon: CircleUser,
     children: [
       {
         label: "Add Organizer",
@@ -51,17 +54,21 @@ const nav: NavItem[] = [
       },
     ],
   },
+  { label: "Trip",
+    href: "/organizer/create-trip",
+    icon: MapPinned
+  },
   {
     label: "Library",
     href: "/organizer/library",
-    icon: BookOpen,
+    icon: Images,
     children: [
-      { label: "Events", href: "/organizer/library/events", icon: Calendar },
+      { label: "Day Description", href: "/organizer/library/events", icon: Calendar },
       { label: "Stays", href: "/organizer/library/stays", icon: Hotel },
-      { label: "Transit", href: "/organizer/library/transits", icon: Bus },
-      { label: "Meals", href: "/organizer/library/meals", icon: Utensils },
-      { label: "Activities", href: "/organizer/library/activities", icon: Activity },
-      { label: "Trip Leaders", href: "/organizer/library/trip-leaders", icon: Users },
+      { label: "Transit", href: "/organizer/library/transits", icon: Car },
+      { label: "Meals", href: "/organizer/library/meals", icon: UtensilsCrossed },
+      { label: "Activities", href: "/organizer/library/activities", icon: PersonStanding },
+      { label: "Trip Leaders", href: "/organizer/library/trip-leaders", icon: Award },
       { label: "FAQs", href: "/organizer/library/faqs", icon: HelpCircle },
     ],
   },
@@ -75,7 +82,7 @@ type OrganizerSidebarProps = {
 
 export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: OrganizerSidebarProps) {
   const pathname = usePathname();
-  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [open, setOpen] = useState<Record<string, boolean>>({["Library"]: true});
 
   const isActive = (href?: string) =>
     href
@@ -107,7 +114,7 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
       )}
 
       <aside
-        className={`fixed md:static top-0 left-0 z-50 h-full w-72 bg-white border-r border-gray-200 flex flex-col transform transition-transform duration-300
+        className={`bg-[#F3F3F3] fixed md:static top-0 left-0 z-50 min-h-screen md:w-[18.2%] max-w-[320px] border-r border-gray-200 flex flex-col transform transition-transform duration-300
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         {/* Mobile close button */}
@@ -129,21 +136,19 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
         )}
 
         {/* Navigation */}
-        <nav className="p-4 space-y-3 overflow-y-auto">
+        <nav className="p-3 space-y-3 overflow-y-auto">
           {nav.map(({ label, href, icon: Icon, boxedPlus, children }) => {
             const active = isActive(href);
 
             return (
               <div key={label}>
-                <div className="flex items-center justify-between">
+                <div className={["flex items-center justify-between rounded-[8px]",
+                 active
+                        ? "bg-gray-900 text-white shadow-sm"
+                        : "text-gray-700 hover:bg-gray-50",].join(" ")}>
                   <Link
                     href={href || "#"}
-                    className={[
-                      "group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all",
-                      active
-                        ? "bg-gray-900 text-white shadow-sm"
-                        : "text-gray-700 hover:bg-gray-100",
-                    ].join(" ")}
+                    className="group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all"
                   >
                     <Icon
                       className={[
@@ -153,17 +158,17 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
                           : "text-gray-700 group-hover:text-gray-900",
                       ].join(" ")}
                     />
-                    <span className="font-medium">{label}</span>
+                    <span className="font-medium text-[1rem]">{label}</span>
                   </Link>
                   {children && (
                     <button
                       onClick={() => toggle(label)}
-                      className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-200 transition-colors"
+                      className="flex items-center justify-center w-6 h-6 rounded-full transition-colors pr-1"
                     >
                       {open[label] ? (
-                        <ChevronDown className="w-5 h-5 text-gray-700" />
+                        <ChevronDown className={["w-5 h-5 ", active ? "text-white" : "text-gray-700" ].join(" ")} />
                       ) : (
-                        <ChevronRight className="w-5 h-5 text-gray-700" />
+                        <ChevronUp className={["w-5 h-5 ", active ? "text-white" : "text-gray-700" ].join(" ")} />
                       )}
                     </button>
                   )}
@@ -171,7 +176,8 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
 
                 {/* Submenu */}
                 {children && open[label] && (
-                  <div className="ml-6 mt-1 space-y-2">
+                  <div className=" bg-gray-100 rounded-[8px]">
+                    <div className="mx-2 py-2 space-y-2">
                     {children.map(({ label, href, icon: ChildIcon, boxedPlus }) => {
                       const childActive = isActive(href);
                       return (
@@ -181,8 +187,8 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
                           className={[
                             "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all",
                             childActive
-                              ? "bg-gray-900 text-white"
-                              : "text-gray-600 hover:bg-gray-100",
+                              ? "bg-gray-50 text-gray-600"
+                              : "text-gray-600 hover:bg-gray-50",
                           ].join(" ")}
                         >
                           {boxedPlus ? (
@@ -204,15 +210,17 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
                       );
                     })}
                   </div>
+                  </div> 
+                  
                 )}
               </div>
             );
           })}
         </nav>
 
-        <div className="mt-auto p-4">
+        {/* <div className="mt-auto p-4">
           <div className="text-xs text-gray-400">Organizer Admin</div>
-        </div>
+        </div> */}
       </aside>
     </>
   );

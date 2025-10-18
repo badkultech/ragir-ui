@@ -49,7 +49,7 @@ export default function TripLeadersPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       <OrganizerSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -65,14 +65,14 @@ export default function TripLeadersPage() {
           />
 
           {/* Search */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <Input
               placeholder="Search Library.."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full sm:w-80 rounded-full border-gray-200 bg-gray-50 text-sm"
             />
-          </div>
+          </div> */}
 
           {/* List */}
           <div className="flex flex-col gap-3">

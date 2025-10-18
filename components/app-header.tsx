@@ -63,7 +63,7 @@ export function AppHeader({
   }
 
   return (
-    <header className="w-full bg-white border-b border-gray-200 shadow-sm flex items-center justify-between px-4 md:px-6 py-3">
+    <header className="w-full bg-white border-b border-gray-200  flex items-center justify-between px-4 md:px-6 py-3">
       <div className="flex items-center gap-4 flex-1">
         {/* Hamburger (mobile only) */}
         {onMenuClick && (
