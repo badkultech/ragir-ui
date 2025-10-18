@@ -30,10 +30,10 @@ import { AddFAQForm } from '@/components/library/AddFAQForm';
 import {
   useCreateOrganizerDayDescriptionMutation,
   useUpdateOrganizerDayDescriptionMutation,
-} from '@/lib/services/organizer/library';
+} from '@/lib/services/organizer/library/day-description';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
-import { Document } from '@/lib/services/organizer/library/types';
+import { Document } from '@/lib/services/organizer/library/day-description/types';
 import { update } from 'lodash';
 
 /* ===== types ===== */

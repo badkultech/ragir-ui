@@ -1,13 +1,9 @@
+import { baseAPI } from '@/lib/services';
 import { ENDPOINTS } from '@/lib/utils';
-import {
-  DayDescription,
-  DayDescriptionByIdResponse,
-  DayDescriptionsResponse,
-} from './types';
-import { baseAPI } from '../..';
-import { ApiResponse } from '../../common-types';
 import { da } from 'date-fns/locale';
-import { TAGS } from '../../tags';
+import { DayDescription, DayDescriptionByIdResponse } from './types';
+import { ApiResponse } from '@/lib/services/common-types';
+import { TAGS } from '@/lib/services/tags';
 
 export const organizerAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
