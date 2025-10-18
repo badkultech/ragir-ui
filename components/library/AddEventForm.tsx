@@ -92,6 +92,8 @@ export function AddEventForm({
     );
   };
 
+  const isTripMode = mode === "trip";
+
   return (
     <div className='flex flex-col gap-6'>
       {/* Top-right button */}
@@ -107,7 +109,9 @@ export function AddEventForm({
 
       {/* Title */}
       <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
+        <label
+          className="block text-[0.95rem] font-medium mb-1"
+        >
           Title *
         </label>
         <Input
@@ -126,11 +130,16 @@ export function AddEventForm({
         <label className='block text-sm font-medium text-gray-700 mb-1'>
           Description *
         </label>
-        <Textarea
+        {/* <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder='Enter here'
           rows={5}
+          maxLength={800}
+        /> */}
+        <RichTextEditor
+          value={description}
+          onChange={setDescription}
           maxLength={800}
         />
         <p className='text-xs text-right text-gray-400 mt-1'>
@@ -145,11 +154,17 @@ export function AddEventForm({
           onChange={(e) => setLocation(e.target.value)}
           placeholder='Location'
         />
+        </div>
+      <div>
+           <label className="block text-[0.95rem] font-[] font-medium mb-1">
+          Time
+        </label>
         <Input
           type='time'
           value={time}
           onChange={(e) => setTime(e.target.value)}
-        />
+          />
+      </div>
       </div>
 
       {/* Packing Suggestions */}
@@ -157,11 +172,17 @@ export function AddEventForm({
         <label className='block text-sm font-medium text-gray-700 mb-1'>
           Packing Suggestions
         </label>
-        <Textarea
+        {/* <Textarea
           value={packing}
           onChange={(e) => setPacking(e.target.value)}
           placeholder='Enter here'
           rows={5}
+          maxLength={800}
+        /> */}
+         <RichTextEditor
+          value={packing}
+          onChange={setPacking}
+          placeholder="Enter here"
           maxLength={800}
         />
         <p className='text-xs text-right text-gray-400 mt-1'>
@@ -224,7 +245,18 @@ export function AddEventForm({
               ))}
           </div>
         )}
-      </div>
+      </div >
+
+        { isTripMode &&  <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+        <Input type="checkbox" value="" className=" w-[22px]" />
+          <label className="block text-[0.95rem] font-medium">
+          Save in Library
+        </label>
+          </div>
+          
+        <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
+        </div>  }
 
       {/* Footer */}
       <div className='flex justify-end items-center gap-4 mt-6'>
