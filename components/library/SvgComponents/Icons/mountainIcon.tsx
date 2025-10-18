@@ -17,9 +17,9 @@ export const MountainIcon = ({
     <path
       d='M7 1L11 9L16 4L21 19H1L7 1Z'
       stroke={fill}
-      stroke-width='1.6'
-      stroke-linecap='round'
-      stroke-linejoin='round'
+      strokeWidth='1.6'
+      strokeLinecap='round'
+      strokeLinejoin='round'
     />
   </svg>
 );

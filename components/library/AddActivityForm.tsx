@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import RichTextEditor from "@/components/editor/RichTextEditor";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -38,8 +39,10 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
     onSave({ title, moodTags, priceType, location, time, description, packing, images, mode });
   };
 
+  const isTripMode = mode === "trip";
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -53,26 +56,25 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">{title.length}/70 Characters</p>
+        <p className="text-xs text-right text-orange-500 mt-1">{title.length}/70 Characters</p>
       </div>
 
       {/* Mood Tags */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Mood Tags *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Mood Tags *</label>
         <select
-          multiple
           value={moodTags}
           onChange={(e) => setMoodTags(Array.from(e.target.selectedOptions, o => o.value))}
           className="w-full border rounded-lg p-2 text-sm text-gray-700"
         >
-          <option value="adventure">Adventure</option>
+          <option value="adventure" className="">Adventure</option>
           <option value="relaxing">Relaxing</option>
           <option value="cultural">Cultural</option>
           <option value="family">Family</option>
@@ -81,9 +83,9 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
 
       {/* Price Type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Price Charge *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Price Charge *</label>
         <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
               checked={priceType === "included"}
@@ -91,7 +93,7 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
             />
             Included
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-[0.95rem]">
             <input
               type="radio"
               checked={priceType === "chargeable"}
@@ -104,42 +106,53 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
 
       {/* Location + Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
+        <div>
+           <label className="block text-[0.95rem] font-medium mb-2">Location</label>
+           <Input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Location"
         />
+        </div>
+        
+        <div>
+         <label className="block text-[0.95rem] font-medium mb-2">Time</label>
         <Input
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-        />
+          />
+      </div>
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <Textarea
+        <label className="block text-[0.95rem] font-medium  mb-1">Description</label>
+        {/* <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter here"
           rows={5}
           maxLength={800}
+        /> */}
+
+        <RichTextEditor
+        value={description}
+          onChange={setDescription}
+          placeholder="Enter here"
+          maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">{description.length}/800 Words</p>
       </div>
 
       {/* Packing Suggestions */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
-        <Textarea
-          value={packing}
-          onChange={(e) => setPacking(e.target.value)}
+        <RichTextEditor
+        value={packing}
+          onChange={setPacking}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">{packing.length}/800 Words</p>
       </div>
 
       {/* Image Upload */}
@@ -162,12 +175,23 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
         )}
       </div>
 
+      { isTripMode &&  <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+        <Input type="checkbox" value="" className=" w-[22px]" />
+          <label className="block text-[0.95rem] font-medium">
+          Save in Library
+        </label>
+          </div>
+          
+        <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
+        </div>  }
+
       {/* Footer */}
-      <div className="flex justify-end items-center gap-4 mt-6">
+      <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
           Save
         </Button>

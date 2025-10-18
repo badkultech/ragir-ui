@@ -70,7 +70,7 @@ const categories: CategoryItem[] = [
 function StepHeader({ title }: { title: string }) {
   return (
     <DialogHeader>
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle >{title}</DialogTitle>
     </DialogHeader>
   );
 }

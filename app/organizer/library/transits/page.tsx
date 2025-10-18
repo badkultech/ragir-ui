@@ -43,7 +43,7 @@ export default function TransitPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -63,14 +63,14 @@ export default function TransitPage() {
           />
 
           {/* Search */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <Input
               placeholder="Search Library..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full sm:w-80 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
             />
-          </div>
+          </div> */}
 
           {/* Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
