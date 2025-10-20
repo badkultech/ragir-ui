@@ -10,4 +10,5 @@ export const TAGS = {
   otp: 'otp',
   notifications: 'notifications',
   travelerProfile: 'travelerProfile',
+  tripLibraryGroupLeader: 'TripLibraryGroupLeader',
 } as const;
