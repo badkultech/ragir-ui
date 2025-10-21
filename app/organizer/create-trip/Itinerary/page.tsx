@@ -32,16 +32,21 @@ export default function ItineraryPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 ">
         <AppHeader title="Create New Trip" />
 
-        <div className="bg-white min-h-screen w-full flex flex-col">
+       
           {/* Stepper (responsive) */}
           <TripStepperHeader activeStep={2} />
 
           {/* Main Card */}
-          <div className="max-w-4xl w-full mx-auto bg-white rounded-2xl border p-4 sm:p-8 mb-6 overflow-hidden">
-            <b>Itinerary</b>
+        <div className='p-8 bg-white min-h-screen '>
+
+          <div className='max-w-auto mx-auto bg-white shadow rounded-2xl p-8'>
+
+            <h2 className='text-2xl font-semibold text-gray-800 mb-6'>
+              Itinerary 
+            </h2>
             <FileUploadCard />
             
 
@@ -133,6 +138,6 @@ export default function ItineraryPage() {
           </div>
         </div>
       </div>
-    </div>
+   </div>
   );
 }
