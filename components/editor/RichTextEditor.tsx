@@ -261,7 +261,7 @@ export default function RichTextEditor({
         <div className="h-4 w-px bg-gray-200 mx-1" />
 
         {/* Heading buttons with active highlight */}
-        <ToolbarButton
+        {/* <ToolbarButton
           active={activeHeading === "h1"}
           onClick={() => applyBlockFormat("h1")}
           icon={<span className="text-xs font-bold">H1</span>}
@@ -275,7 +275,7 @@ export default function RichTextEditor({
           active={activeHeading === "h3"}
           onClick={() => applyBlockFormat("h3")}
           icon={<span className="text-xs font-bold">H3</span>}
-        />
+        /> */}
 
         <div className="h-4 w-px bg-gray-200 mx-1" />
 
