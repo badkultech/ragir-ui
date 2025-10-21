@@ -1,6 +1,7 @@
 import React from 'react';
 
 interface GradientButtonIconProps {
+  style?: React.CSSProperties;
   label: string;
   Icon: React.ElementType; // React component for the icon (e.g., FemaleIcon)
   Gradient: React.ElementType; // React component for the gradient background (e.g., WomenOnlyGradient)
@@ -8,6 +9,7 @@ interface GradientButtonIconProps {
 }
 
 export const GradientIconButton = ({
+  style,
   label,
   Icon,
   Gradient,
@@ -15,6 +17,7 @@ export const GradientIconButton = ({
 }: GradientButtonIconProps) => {
   return (
     <button
+      style={style}
       // onClick={onClick}
       className='
         relative

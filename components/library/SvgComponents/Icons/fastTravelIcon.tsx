@@ -26,44 +26,44 @@ export const FastTravelIcon = ({
       <path
         d='M7 1H1'
         stroke='white'
-        stroke-width='1.2'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeWidth='1.2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
       <path
         d='M7 5H1'
         stroke='white'
-        stroke-width='1.2'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeWidth='1.2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
       <path
         d='M7 9H1'
         stroke='white'
-        stroke-width='1.2'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeWidth='1.2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
       <path
         d='M7 13H1'
         stroke='white'
-        stroke-width='1.2'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeWidth='1.2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
       <path
         d='M17 7C17 3.69 13.5 0.75 8.75 0.75C8.25 0.75 7 3.5 7 7C7 10.5 8.25 13.25 8.75 13.25C13.5 13.25 17 10.31 17 7Z'
         stroke='black'
-        stroke-width='1.2'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeWidth='1.2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
       <path
         d='M17 7C17 3.69 13.5 0.75 8.75 0.75C8.25 0.75 7 3.5 7 7C7 10.5 8.25 13.25 8.75 13.25C13.5 13.25 17 10.31 17 7Z'
         stroke='white'
-        stroke-width='1.2'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeWidth='1.2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
     </mask>
     <g mask='url(#mask0_96_327)'>

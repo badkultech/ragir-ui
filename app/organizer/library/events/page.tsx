@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { AppHeader } from '@/components/app-header';
+import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   PlusCircle,
   MapPin,
@@ -12,47 +12,67 @@ import {
   Eye,
   Trash2,
   ArrowLeft,
-} from "lucide-react";
-import { AddNewItemModal } from "@/components/library/AddNewItemModal";
-import { LibraryHeader } from "@/components/library/LibraryHeader";
-import Link from "next/link";
+} from 'lucide-react';
+import { AddNewItemModal } from '@/components/library/AddNewItemModal';
+import { LibraryHeader } from '@/components/library/LibraryHeader';
+import Link from 'next/link';
+import {
+  useCreateOrganizerDayDescriptionMutation,
+  useDeleteOrganizerDayDescriptionMutation,
+  useGetOrganizerDayDescriptionQuery,
+} from '@/lib/services/organizer/library/day-description';
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '@/lib/slices/auth';
 
 const mockEvents = [
   {
     id: 1,
-    title: "Rajasthan Folk Festival",
-    location: "Jodhpur, Rajasthan",
+    title: 'Rajasthan Folk Festival',
+    location: 'Jodhpur, Rajasthan',
     description:
-      "Traditional music and dance performances with local artisans and cultural workshops",
+      'Traditional music and dance performances with local artisans and cultural workshops',
     image: null,
   },
   {
     id: 2,
-    title: "Goa Carnival",
-    location: "Goa",
-    description: "Colorful parades, music, dance, and festive celebrations",
+    title: 'Goa Carnival',
+    location: 'Goa',
+    description: 'Colorful parades, music, dance, and festive celebrations',
     image: null,
   },
   {
     id: 3,
-    title: "Diwali Festival",
-    location: "Jaipur, Rajasthan",
-    description: "Festival of lights with cultural shows and fireworks",
+    title: 'Diwali Festival',
+    location: 'Jaipur, Rajasthan',
+    description: 'Festival of lights with cultural shows and fireworks',
     image: null,
   },
 ];
 
 export default function EventsPage() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [updateId, setUpdateId] = useState<number | null>(null);
+
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  const { data: dayDescriptions } = useGetOrganizerDayDescriptionQuery({
+    organizationId,
+  });
+  const [deleteOrganizerDayDescription] =
+    useDeleteOrganizerDayDescriptionMutation();
+  console.log(organizationId, dayDescriptions);
 
   const filtered = mockEvents.filter((event) =>
-    event.title.toLowerCase().includes(search.toLowerCase())
+    event.title.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <div className="flex min-h-screen ">
+
+    <div className='flex min-h-screen bg-gray-50'>
+
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -60,70 +80,86 @@ export default function EventsPage() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <AppHeader title="Events" />
+      <div className='flex-1 flex flex-col'>
+        <AppHeader title='Events' />
 
-        <main className="flex-1 p-6 md:p-8">
+        <main className='flex-1 p-6 md:p-8'>
           {/* Header */}
           <LibraryHeader
-            title="Ragir Library"
-            buttonLabel="Add Event"
-            onAddClick={() => setModalOpen(true)}
+            title='Ragir Library'
+            buttonLabel='Add Event'
+            onAddClick={() => {
+              setUpdateId(null);
+              setModalOpen(true);
+            }}
           />
           {/* Search */}
           {/* <div className="mb-6">
             <Input
-              placeholder="Search Library..."
+              placeholder='Search Library...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-80 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
+              className='w-full sm:w-80 border-orange-300 focus:border-orange-500 focus:ring-orange-500'
             />
           </div> */}
 
           {/* Card Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 ">
-            {filtered.map((event) => (
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {dayDescriptions?.map((dayDescription) => (
               <div
-                key={event.id}
-                className="bg-white border border-gray-200 rounded-[16px] shadow-sm overflow-hidden flex p-4 gap-y-5 flex-col"
+                key={dayDescription.id}
+                className='bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col'
               >
                 {/* Image */}
-                <div className="h-32 bg-gray-100 flex items-center justify-center rounded-[12px]">
-                  {event.image ? (
+                <div className='h-32 bg-gray-100 flex items-center justify-center'>
+                  {dayDescription.documents ? (
                     <img
-                      src={event.image}
-                      alt={event.title}
-                      className="w-full h-full object-cover "
+                      src={dayDescription.documents[0].url}
+                      alt={dayDescription.name}
+                      className='w-full h-full object-cover'
                     />
                   ) : (
-                    <span className="text-gray-400 text-sm">No Image</span>
+                    <span className='text-gray-400 text-sm'>No Image</span>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className=" flex-1 flex flex-col">
-                  <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                  <div className="flex items-center text-gray-600 text-sm mt-1">
-                    <MapPin className="w-4 h-4 mr-1 text-gray-500" />
-                    {event.location}
+                <div className='p-4 flex-1 flex flex-col'>
+                  <h3 className='font-semibold text-gray-900'>
+                    {dayDescription.name}
+                  </h3>
+                  <div className='flex items-center text-gray-600 text-sm mt-1'>
+                    <MapPin className='w-4 h-4 mr-1 text-gray-500' />
+                    {dayDescription.location}
                   </div>
-
-                  <div className="flex justify-between marker mt-5">
-                  <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                    {event.description}
+                  <p className='text-sm text-gray-500 mt-2 line-clamp-2'>
+                    {dayDescription.description}
                   </p>
 
                   {/* Actions */}
-                  <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                   
-                    <button className="hover:text-orange-500">
-                      <Pencil className="w-4 h-4" />
+                  <div className='mt-4 flex justify-end gap-3 text-gray-500'>
+                    <button className='hover:text-orange-500'>
+                      <Eye className='w-4 h-4' />
                     </button>
-                     <button className="hover:text-orange-500">
-                      <Eye className="w-4 h-4" />
+                    <button
+                      className='hover:text-orange-500'
+                      onClick={() => {
+                        setUpdateId(dayDescription.id);
+                        setModalOpen(true);
+                      }}
+                    >
+                      <Pencil className='w-4 h-4' />
                     </button>
-                    <button className="hover:text-red-500">
-                      <Trash2 className="w-4 h-4" />
+                    <button
+                      className='hover:text-red-500'
+                      onClick={() => {
+                        deleteOrganizerDayDescription({
+                          dayDescriptionId: dayDescription.id,
+                          organizationId,
+                        }).unwrap();
+                      }}
+                    >
+                      <Trash2 className='w-4 h-4' />
                     </button>
                   </div>
                   </div>
@@ -134,7 +170,7 @@ export default function EventsPage() {
             ))}
 
             {filtered.length === 0 && (
-              <div className="col-span-full text-center text-gray-500 py-10">
+              <div className='col-span-full text-center text-gray-500 py-10'>
                 No events found.
               </div>
             )}
@@ -145,8 +181,9 @@ export default function EventsPage() {
       {/* Add New Item Modal */}
       <AddNewItemModal
         open={modalOpen}
+        updateId={updateId}
         onClose={() => setModalOpen(false)}
-        initialStep="event" // 👈 opens AddStayForm directly
+        initialStep='event' // 👈 opens AddStayForm directly
       />
     </div>
   );
