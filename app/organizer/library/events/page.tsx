@@ -115,11 +115,12 @@ export default function EventsPage() {
 
                   {/* Actions */}
                   <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                    <button className="hover:text-orange-500">
-                      <Eye className="w-4 h-4" />
-                    </button>
+                   
                     <button className="hover:text-orange-500">
                       <Pencil className="w-4 h-4" />
+                    </button>
+                     <button className="hover:text-orange-500">
+                      <Eye className="w-4 h-4" />
                     </button>
                     <button className="hover:text-red-500">
                       <Trash2 className="w-4 h-4" />
