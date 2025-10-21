@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { OrganizerShell } from "@/components/layouts/organizer-shell"
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader"
 import { SectionCard } from "@/components/create-trip/section-card"
 import { PillCheckboxGroup } from "@/components/create-trip/pill-checkbox-group"
@@ -11,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Sidebar } from "@/components/organizer/sidebar"
+import { AppHeader } from "@/components/app-header"
 
 const DEFAULT_OPTIONS = [
   "Personal Expenses",
@@ -37,12 +37,12 @@ export default function ExclusionsPage() {
     if (!selected.includes(trimmed)) setSelected((prev) => [...prev, trimmed])
     setCustom("")
   }
-
+ 
   return (
     <div className="flex min-h-screen bg-gray-50">      
               <Sidebar />
          <div className="flex-1 w-full min-h-screen flex flex-col">
-    <OrganizerShell title="Create New Trip">
+    <AppHeader title="Create New Trip"/>
       <TripStepperHeader activeStep={3} />
       
       <SectionCard title="Exclusions" >
@@ -71,7 +71,7 @@ export default function ExclusionsPage() {
         onNext={() => router.push("/organizer/create-trip/faqs")} 
         prevLabel="‹ Previous"
       />
-    </OrganizerShell>
+   
     </div>
     </div>
   )

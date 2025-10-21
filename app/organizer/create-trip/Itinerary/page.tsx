@@ -30,19 +30,19 @@ export default function ItineraryPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
       <Sidebar />
-      <div className="flex-1 ">
+      <div className="flex-1 w-full min-h-screen flex flex-col ">
         <AppHeader title="Create New Trip" />
 
        
-          {/* Stepper (responsive) */}
+          {/* Stepper (responsive) */}  
           <TripStepperHeader activeStep={2} />
 
           {/* Main Card */}
-        <div className='p-8 bg-white min-h-screen '>
+        <div className='p-8 bg-white  '>
+          <div className='max-w-full mx-auto bg-white shadow rounded-2xl p-8 overflow-x-hidden'>
 
-          <div className='max-w-auto mx-auto bg-white shadow rounded-2xl p-8'>
 
             <h2 className='text-2xl font-semibold text-gray-800 mb-6'>
               Itinerary 

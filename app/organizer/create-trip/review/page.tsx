@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { OrganizerShell } from "@/components/layouts/organizer-shell"
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader"
 import { SectionCard } from "@/components/create-trip/section-card"
 import { TripSummaryCard } from "@/components/create-trip/trip-summary-card"
 import { WizardFooter } from "@/components/create-trip/wizard-footer"
 import { Sidebar } from "@/components/organizer/sidebar"
+import { AppHeader } from "@/components/app-header"
 
 interface ReviewPageState {
   tripName: string
@@ -58,7 +58,7 @@ export default function ReviewPage() {
                 <Sidebar />
 
                  <div className="flex-1 h-auto  ">
-    <OrganizerShell title="Create New Trip">
+    <AppHeader title="Create New Trip"/>
       <TripStepperHeader activeStep={6} />
 
       <SectionCard title="Review & Submit">
@@ -85,7 +85,6 @@ export default function ReviewPage() {
         onDraft={handleDraft}
         onNext={handleSubmit}
       />
-    </OrganizerShell>
     </div>
     </div>
   )

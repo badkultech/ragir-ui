@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { OrganizerShell } from "@/components/layouts/organizer-shell"
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader"
 import { SectionCard } from "@/components/create-trip/section-card"
 import { Button } from "@/components/ui/button"
@@ -12,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { WizardFooter } from "@/components/create-trip/wizard-footer"
 import { Sidebar } from "@/components/organizer/sidebar"
 import MDEditor from "@uiw/react-md-editor"
+import { AppHeader } from "@/components/app-header"
 
 interface FAQ {
   id: string
@@ -70,7 +70,7 @@ export default function FAQsPage() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 h-auto  ">
-        <OrganizerShell title="Create New Trip">
+        <AppHeader title="Create New Trip" />
           <TripStepperHeader activeStep={4} />
 
           <SectionCard title="Trip Preparation & FAQs">
@@ -154,7 +154,7 @@ export default function FAQsPage() {
             prevLabel="<Previous"
             nextLabel="Save & Next"
           />
-        </OrganizerShell>
+        
       </div>
     </div>
   )

@@ -11,12 +11,11 @@ import { GstStatusToggle, type GstValue } from "@/components/create-trip/gst-sta
 import { CreditOptions } from "@/components/create-trip/credit-options"
 import { PricingSummary } from "@/components/create-trip/pricing-summary"
 import { Calendar } from "lucide-react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { WizardFooter } from "@/components/create-trip/wizard-footer"
 import { Sidebar } from "@/components/organizer/sidebar"
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader"
-import { OrganizerShell } from "@/components/layouts/organizer-shell"
+import { AppHeader } from "@/components/app-header"
 
 
 type PricingMode = "simple" | "dynamic";
@@ -95,7 +94,7 @@ export default function PricingPage() {
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />
             <div className="flex-1 h-auto  ">
-                <OrganizerShell title="Create New Trip">
+                <AppHeader title="Create New Trip"/>
                     <TripStepperHeader activeStep={5} />
                     <main className="mx-auto w-full max-w-6xl px-4 py-6">
                         {/* Header/Stepper is assumed to be present in your layout; omit here to avoid coupling */}
@@ -328,7 +327,7 @@ export default function PricingPage() {
                             prevLabel="‹ Previous"
                         />
                     </main>
-                </OrganizerShell>
+                
             </div>
         </div>
     )
