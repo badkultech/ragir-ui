@@ -96,7 +96,7 @@ export function AddEventForm({
   const isTripMode = mode === "trip";
 
   return (
-    <div className='flex flex-col gap-6'>
+    <div className='flex flex-col gap-6' style={{ fontFamily: "var(--font-poppins)" }}>
       {/* Top-right button */}
       <div className='flex justify-end'>
         <Button
@@ -150,11 +150,17 @@ export function AddEventForm({
 
       {/* Location + Time */}
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-        <Input
+        <div>
+           <label className='block text-sm font-medium text-gray-700 mb-1'>
+          Location *
+        </label>
+         <Input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder='Location'
         />
+        </div>
+       
         </div>
       <div>
            <label className="block text-[0.95rem] font-[] font-medium mb-1">
