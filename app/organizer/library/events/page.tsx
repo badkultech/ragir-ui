@@ -129,8 +129,8 @@ export default function EventsPage() {
 
                 {/* Content */}
                 <div className='p-4 flex-1 flex flex-col'>
-                  <h3 className='font-semibold text-gray-900'>
-                    {dayDescription.name}
+                  <h3 className='font-bold text-gray-900'>
+                   <strong> {dayDescription.name}</strong>
                   </h3>
                   <div className='flex items-center text-gray-600 text-sm mt-1'>
                     <MapPin className='w-4 h-4 mr-1 text-gray-500' />

@@ -145,11 +145,15 @@ export function LibrarySelectModal({
               <button
                 key={item.id}
                 onClick={() => setSelected(item.id)}
-                className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
-                  selected === item.id
+                onDoubleClick={() => {
+                  setSelected(item.id);
+                  onSelect(item);
+                  onClose();
+                }}
+                className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${selected === item.id
                     ? "border-orange-500 shadow"
                     : "border-gray-200 hover:border-orange-400"
-                }`}
+                  }`}
               >
                 <div className="font-medium text-gray-900">{item.title}</div>
                 {item.location && (
@@ -163,6 +167,7 @@ export function LibrarySelectModal({
               </button>
             ))}
 
+
             {items.length === 0 && (
               <p className="text-sm text-gray-500">No items found</p>
             )}
@@ -173,11 +178,10 @@ export function LibrarySelectModal({
             <button
               key={item.id}
               onClick={() => setSelected(item.id)}
-              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
-                selected === item.id
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${selected === item.id
                   ? "border-orange-500 shadow"
                   : "border-gray-200 hover:border-orange-400"
-              }`}
+                }`}
             >
               <img
                 src={item.image || "/default-avatar.png"}
