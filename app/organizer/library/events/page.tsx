@@ -136,9 +136,10 @@ export default function EventsPage() {
                     <MapPin className='w-4 h-4 mr-1 text-gray-500' />
                     {dayDescription.location}
                   </div>
-                  <p className='text-sm text-gray-500 mt-2 line-clamp-2'>
-                    {dayDescription.description}
-                  </p>
+                  <p
+                    className="text-sm text-gray-500 mt-2 line-clamp-2"
+                    dangerouslySetInnerHTML={{ __html: dayDescription.description || "" }}
+                  ></p>
 
                   {/* Actions */}
                   <div className='mt-4 flex justify-end gap-3 text-gray-500'>
