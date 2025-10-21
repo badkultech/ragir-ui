@@ -14,6 +14,7 @@ import {
   DayDescriptionByIdResponse,
   Document,
 } from '@/lib/services/organizer/library/day-description/types';
+import RichTextEditor from '../editor/RichTextEditor';
 
 type AddEventFormProps = {
   mode?: 'library' | 'trip';
@@ -164,7 +165,6 @@ export function AddEventForm({
           value={time}
           onChange={(e) => setTime(e.target.value)}
           />
-      </div>
       </div>
 
       {/* Packing Suggestions */}
