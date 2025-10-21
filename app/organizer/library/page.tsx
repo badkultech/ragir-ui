@@ -56,7 +56,7 @@ export default function LibraryOverviewPage() {
       <div className="flex-1 flex flex-col">
         <AppHeader title="Library" onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 p-6 md:p-8 lg:w-[1200px] lg:mx-auto">
+        <main className="flex-1 p-6 md:p-8 lg:max-w-[1400px] w-full lg:mx-auto">
          
           
           {/* <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">

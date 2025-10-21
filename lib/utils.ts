@@ -77,6 +77,8 @@ export const ENDPOINTS = {
     LIBRARY: {
       DAY_DESCRIPTION: (organizationId: string) =>
         `/org/${organizationId}/library/day-description`,
+      FAQ: (organizationId: string) =>
+        `/org/${organizationId}/library/faqs`
     },
   },
 } as const;

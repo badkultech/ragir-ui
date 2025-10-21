@@ -2,6 +2,7 @@ import { userAgent } from "next/server";
 
 export const TAGS = {
   dayDescriptions:'dayDescriptions',
+  faq: 'faqs',
   users: 'users',
   admins: 'admins',
   organizations: 'organizations',
