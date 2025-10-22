@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,13 @@ type AddTransitFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  initialData?: any; // ✅ NEW
 };
+
 
 const VEHICLES = [
   "Traveler Van",
-  "Car",
+  "CAR",
   "Motorbike",
   "Cruise",
   "Airplane",
@@ -29,6 +31,7 @@ export function AddTransitForm({
   mode = "library",
   onCancel,
   onSave,
+  initialData,
 }: AddTransitFormProps) {
   const [title, setTitle] = useState("");
   const [from, setFrom] = useState("");
@@ -44,6 +47,26 @@ export function AddTransitForm({
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+
+  useEffect(() => {
+  if (!initialData) return;
+
+  console.log("🚀 Prefilling transit form with:", initialData);
+
+  setTitle(initialData.name || "");
+  setFrom(initialData.fromLocation || "");
+  setTo(initialData.toLocation || "");
+  setDeparture(initialData.startTime || "");
+  setArrival(initialData.endTime || "");
+  setDescription(initialData.description || "");
+  setPacking(initialData.packagingSuggestion || "");
+
+  // Handle vehicle and arrangement
+  setVehicle(initialData.vehicleType ? [initialData.vehicleType] : []);
+  setArrangement(
+    initialData.arrangedBy?.toLowerCase() === "traveler" ? "traveler" : "organizer"
+  );
+}, [initialData]);
 
   const toggleVehicle = (v: string) => {
     setVehicle((prev) =>
