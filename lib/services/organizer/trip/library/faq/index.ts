@@ -20,7 +20,7 @@ export const faqAPI = baseAPI.injectEndpoints({
 
       transformResponse: (response: LibraryApiResponse<FaqResponse>) =>
               response.data,
-            invalidatesTags: [TAGS.faq],
+            invalidatesTags: [TAGS.faqs],
         }),
          getOrganizerFaqs: builder.query<
                Array<FaqResponse>,
@@ -32,7 +32,7 @@ export const faqAPI = baseAPI.injectEndpoints({
                }),
                transformResponse: (response: LibraryApiResponse<Array<FaqResponse>>) =>
                  response.data,
-               providesTags: [TAGS.faq],
+               providesTags: [TAGS.faqs],
              }),
            getOrganizerFaqById: builder.query<
               FaqResponse,
@@ -49,7 +49,7 @@ export const faqAPI = baseAPI.injectEndpoints({
             }),
             updateOrganizerFaq: builder.mutation<
               FaqResponse,
-              { organizationId: string; faqId: string; data: FormData }
+              { organizationId: string; faqId: number; data: FormData }
             >({
               query: ({ organizationId, faqId, data }) => ({
                 url: `${ENDPOINTS.ORGANIZER.LIBRARY.FAQ(
@@ -61,7 +61,7 @@ export const faqAPI = baseAPI.injectEndpoints({
               }),
               transformResponse: (response: LibraryApiResponse<FaqResponse>) =>
                 response.data,
-              invalidatesTags: [TAGS.faq],
+              invalidatesTags: [TAGS.faqs],
             }),
             deleteOrganizerFaq: builder.mutation<
               FaqResponse,
@@ -76,7 +76,7 @@ export const faqAPI = baseAPI.injectEndpoints({
               }),
               transformResponse: (response: LibraryApiResponse<FaqResponse>) =>
                 response.data,
-              invalidatesTags: [TAGS.faq],
+              invalidatesTags: [TAGS.faqs],
             }),     
   }),
 

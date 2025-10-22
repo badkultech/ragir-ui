@@ -20,7 +20,7 @@ import {
   useCreateOrganizerDayDescriptionMutation,
   useDeleteOrganizerDayDescriptionMutation,
   useGetOrganizerDayDescriptionQuery,
-} from '@/lib/services/organizer/library/day-description';
+} from '@/lib/services/organizer/trip/library/day-description';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
 import { ViewDayDescriptionModal } from '@/components/library/ViewDayDescriptionModal';

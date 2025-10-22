@@ -78,7 +78,9 @@ export const ENDPOINTS = {
       DAY_DESCRIPTION: (organizationId: string) =>
         `/org/${organizationId}/library/day-description`,
       FAQ: (organizationId: string) =>
-        `/org/${organizationId}/library/faqs`
+        `/org/${organizationId}/library/faqs`,
+      TRANSIT:(organizationId: string) =>
+        `/org/${organizationId}/library/transit`,
     },
   },
 } as const;

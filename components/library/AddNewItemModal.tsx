@@ -30,11 +30,12 @@ import { AddFAQForm } from '@/components/library/AddFAQForm';
 import {
   useCreateOrganizerDayDescriptionMutation,
   useUpdateOrganizerDayDescriptionMutation,
-} from '@/lib/services/organizer/library/day-description';
+} from '@/lib/services/organizer/trip/library/day-description';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
-import { Document } from '@/lib/services/organizer/library/day-description/types';
+import { Document } from '@/lib/services/organizer/trip/library/day-description/types';
 import { update } from 'lodash';
+import { useCreateOrganizerTransitMutation, useUpdateOrganizerTransitMutation } from '@/lib/services/organizer/trip/library/transits';
 
 /* ===== types ===== */
 type Step =
@@ -81,6 +82,8 @@ type AddNewItemModalProps = {
   onClose: () => void;
   updateId?: number | null;
   initialStep?: Step;
+  initialData?: any;      // 👈 FAQ data to prefill
+  isEditMode?: boolean;
 };
 
 export function AddNewItemModal({
@@ -101,16 +104,22 @@ export function AddNewItemModal({
   const [updateOrganizerDayDescription] =
     useUpdateOrganizerDayDescriptionMutation();
 
+  const [createOrganizerTransit] = useCreateOrganizerTransitMutation();
+  const [updateOrganizerTransit] = useUpdateOrganizerTransitMutation();
+
+
   const handleNext = () => {
     if (selected) setStep(selected.step);
   };
 
   React.useEffect(() => {
-    if (open) {
-      setStep(initialStep);
-      setSelected(null);
-    }
+    if (!open) return;
+
+    // Always open directly to the initial step (Add or Edit)
+    setStep(initialStep);
+    setSelected(null);
   }, [open, initialStep]);
+
 
   const handleSaveEvent = (data: any, replace?: boolean) => {
     const formData = new FormData();
@@ -189,11 +198,10 @@ export function AddNewItemModal({
                       onClick={() =>
                         setSelected({ label, icon: Icon, step: stepKey })
                       }
-                      className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${
-                        selected?.label === label
-                          ? 'border-orange-500 shadow-md'
-                          : 'border-gray-200 hover:border-orange-400'
-                      }`}
+                      className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${selected?.label === label
+                        ? 'border-orange-500 shadow-md'
+                        : 'border-gray-200 hover:border-orange-400'
+                        }`}
                     >
                       <Icon className='h-6 w-6 text-gray-600 mb-2' />
                       <span className='text-sm font-medium text-gray-700'>
@@ -212,11 +220,10 @@ export function AddNewItemModal({
                       step: 'faq',
                     })
                   }
-                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${
-                    selected?.label === 'FAQs'
-                      ? 'border-orange-500 shadow-md'
-                      : 'border-gray-200 hover:border-orange-400'
-                  }`}
+                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${selected?.label === 'FAQs'
+                    ? 'border-orange-500 shadow-md'
+                    : 'border-gray-200 hover:border-orange-400'
+                    }`}
                 >
                   <HelpCircle className='h-6 w-6 text-gray-600 mb-2' />
                   <span className='text-sm font-medium text-gray-700'>
@@ -244,7 +251,7 @@ export function AddNewItemModal({
 
           {step === 'stay' && (
             <>
-              <StepHeader title='Add Stay' />
+              <StepHeader title={updateId ? 'Edit Stay' : 'Add Stay'} />
               <AddStayForm
                 mode='library'
                 onCancel={handleBack}
@@ -258,7 +265,7 @@ export function AddNewItemModal({
 
           {step === 'meal' && (
             <>
-              <StepHeader title='Add Meal' />
+              <StepHeader title={updateId ? 'Edit Meal' : 'Add Meal'} />
               <AddMealForm
                 mode='library'
                 onCancel={handleBack}
@@ -272,7 +279,7 @@ export function AddNewItemModal({
 
           {step === 'activity' && (
             <>
-              <StepHeader title='Add Activity' />
+              <StepHeader title={updateId ? 'Edit Activity' : 'Add Activity'} />
               <AddActivityForm
                 mode='library'
                 onCancel={handleBack}
@@ -286,7 +293,7 @@ export function AddNewItemModal({
 
           {step === 'trip-leader' && (
             <>
-              <StepHeader title='Add Trip Leader' />
+              <StepHeader title={updateId ? 'Edit Trip Leader' : 'Add Trip Leader'} />
               <AddTripLeaderForm
                 mode='library'
                 onCancel={handleBack}
@@ -300,7 +307,7 @@ export function AddNewItemModal({
 
           {step === 'event' && (
             <>
-              <StepHeader title='Add Event' />
+              <StepHeader title={updateId ? 'Edit Day Description' : 'Add Day Description'} />
               <AddEventForm
                 updateId={updateId}
                 mode='library'
@@ -310,33 +317,70 @@ export function AddNewItemModal({
             </>
           )}
 
-          {step === 'transit' && (
+          {step === "transit" && (
             <>
-              <StepHeader title='Add Transit' />
+              <StepHeader title={updateId ? "Edit Transit" : "Add Transit"} />
               <AddTransitForm
-                mode='library'
+                mode="library"
+                initialData={initialData} // ✅ pass this
                 onCancel={handleBack}
                 onSave={(data: any) => {
-                  console.log('Transit saved:', data);
+                  const formData = new FormData();
+                  formData.append("fromLocation", data.from);
+                  formData.append("toLocation", data.to);
+                  formData.append("startTime", data.departure);
+                  formData.append("endTime", data.arrival);
+                  formData.append("vehicleType", Array.isArray(data.vehicle) ? data.vehicle[0] : data.vehicle);
+                  formData.append("arrangedBy", data.arrangement.toUpperCase());
+                  formData.append("description", data.description || "");
+                  formData.append("packagingSuggestion", data.packing || "");
+                  formData.append("name", data.title || "");
+                  formData.append("addToLibrary", "false");
+
+                  if (data.images?.length) {
+                    data.images.forEach((file: File, index: number) =>
+                      formData.append(`documents[${index}].file`, file)
+                    );
+                  }
+
+                  if (updateId) {
+                    updateOrganizerTransit({
+                      organizationId,
+                      transitId: updateId,
+                      data: formData,
+                    })
+                      .unwrap()
+                      .then(() => onClose());
+                  } else {
+                    createOrganizerTransit({
+                      organizationId,
+                      data: formData,
+                    })
+                      .unwrap()
+                      .then(() => onClose());
+                  }
+                }}
+              />
+            </>
+          )}
+
+
+
+          {step === "faq" && (
+            <>
+              <StepHeader title={updateId ? "Edit FAQ" : "Add FAQ"} />
+              <AddFAQForm
+                updateId={updateId} // 👈 now forwarded correctly
+                mode="library"
+                onCancel={handleBack}
+                onSave={(data: any) => {
+                  console.log(updateId ? "FAQ updated:" : "FAQ saved:", data);
                   onClose();
                 }}
               />
             </>
           )}
 
-          {step === 'faq' && (
-            <>
-              <StepHeader title='Add FAQ' />
-              <AddFAQForm
-                mode='library'
-                onCancel={handleBack}
-                onSave={(data: any) => {
-                  console.log('FAQ saved:', data);
-                  onClose();
-                }}
-              />
-            </>
-          )}
         </div>
       </DialogContent>
     </Dialog>
