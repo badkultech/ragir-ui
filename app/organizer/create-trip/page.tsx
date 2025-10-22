@@ -464,17 +464,23 @@ export default function CreateTripPage() {
                     onKeyPress={(e) => e.key === 'Enter' && addCityTag()}
                     className='flex-1'
                   />
+
                 </div>
+
                 {cityTags.length > 0 && (
                   <div className='flex flex-wrap gap-2'>
                     {cityTags.map((tag) => (
                       <span
                         key={tag}
-                        className='inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-sm'
+                        onClick={() => setCityInput(tag)} // ✅ click to move tag text back to input
+                        className='inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-sm cursor-pointer hover:bg-blue-100 transition'
                       >
                         {tag}
                         <button
-                          onClick={() => removeCityTag(tag)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // ❗ stop click bubbling (so delete doesn’t trigger input fill)
+                            removeCityTag(tag);
+                          }}
                           className='ml-1 text-blue-500 hover:text-blue-700'
                         >
                           ×
@@ -486,23 +492,24 @@ export default function CreateTripPage() {
               </div>
             </div>
 
+
             {/* Highlights */}
             <div className='mb-8'>
               <Label className='block text-gray-600 mb-2 font-medium'>
                 Trip Highlights
               </Label>
               <div className='border border-gray-200 rounded-2xl'>
-                
-                  <RichTextEditor
-                    value={formData.tripHighlights}
-                    onChange={(val) =>
-                      handleInputChange('tripHighlights', val ?? '')
-                    }
-                     // Can be 'edit', 'live', or 'preview'
-                   
-                  />
-                  
-                
+
+                <RichTextEditor
+                  value={formData.tripHighlights}
+                  onChange={(val) =>
+                    handleInputChange('tripHighlights', val ?? '')
+                  }
+                // Can be 'edit', 'live', or 'preview'
+
+                />
+
+
               </div>
             </div>
           </div>
