@@ -8,30 +8,26 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Pencil, Trash2, HelpCircle } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { useGetOrganizerFaqByIdQuery, useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/faq";
 
-const mockFAQs = [
-  {
-    id: 1,
-    question: "What is included in the trip package?",
-    answer:
-      "Our packages typically include accommodation, meals as specified, transportation, guided tours, and entry fees to attractions. Flight tickets are usually separate unless mentioned otherwise.",
-    tags: ["Trekking"],
-  },
-  {
-    id: 2,
-    question: "Is travel insurance provided?",
-    answer: "Yes, all packages include basic travel insurance coverage.",
-    tags: ["Safety"],
-  },
-];
+
 
 export default function FAQsPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const filtered = mockFAQs.filter((f) =>
-    f.question.toLowerCase().includes(search.toLowerCase())
+
+  const { data: faqs = [], isLoading, refetch } =
+    useGetOrganizerFaqsQuery(organizationId);
+
+
+  const filtered = faqs.filter((f) =>
+    f.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -74,16 +70,17 @@ export default function FAQsPage() {
                 {/* Content */}
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">
-                    {faq.question}
+                    {faq.name}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                     {faq.answer}
                   </p>
-                  {faq.tags && (
+                  { /* {faq.groupName && (
                     <div className="mt-2 text-xs text-gray-400">
-                      {faq.tags.join(", ")}
+                      {faq.groupName.join(", ")}
                     </div>
-                  )}
+                  )} */}
+
                 </div>
 
                 {/* Actions */}
