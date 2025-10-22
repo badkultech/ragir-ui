@@ -23,6 +23,7 @@ import {
 } from '@/lib/services/organizer/library/day-description';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
+import { ViewDayDescriptionModal } from '@/components/library/ViewDayDescriptionModal';
 
 const mockEvents = [
   {
@@ -58,6 +59,9 @@ export default function EventsPage() {
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<any>(null);
+
   const { data: dayDescriptions } = useGetOrganizerDayDescriptionQuery({
     organizationId,
   });
@@ -83,7 +87,7 @@ export default function EventsPage() {
       <div className='flex-1 flex flex-col'>
         <AppHeader title='Events' />
 
-        <main className='flex-1 p-6 md:p-8'>
+        <main className='flex-1 p-6 md:p-4'>
           {/* Header */}
           <LibraryHeader
             title='Ragir Library'
@@ -125,22 +129,30 @@ export default function EventsPage() {
 
                 {/* Content */}
                 <div className='p-4 flex-1 flex flex-col'>
-                  <h3 className='font-semibold text-gray-900'>
-                    {dayDescription.name}
+                  <h3 className='font-bold text-gray-900'>
+                   <strong> {dayDescription.name}</strong>
                   </h3>
                   <div className='flex items-center text-gray-600 text-sm mt-1'>
                     <MapPin className='w-4 h-4 mr-1 text-gray-500' />
                     {dayDescription.location}
                   </div>
-                  <p className='text-sm text-gray-500 mt-2 line-clamp-2'>
-                    {dayDescription.description}
-                  </p>
+                  <p
+                    className="text-sm text-gray-500 mt-2 line-clamp-2"
+                    dangerouslySetInnerHTML={{ __html: dayDescription.description || "" }}
+                  ></p>
 
                   {/* Actions */}
                   <div className='mt-4 flex justify-end gap-3 text-gray-500'>
-                    <button className='hover:text-orange-500'>
-                      <Eye className='w-4 h-4' />
+                    <button
+                      className="hover:text-orange-500"
+                      onClick={() => {
+                        setSelectedDay(dayDescription);
+                        setViewModalOpen(true);
+                      }}
+                    >
+                      <Eye className="w-4 h-4" />
                     </button>
+
                     <button
                       className='hover:text-orange-500'
                       onClick={() => {
@@ -184,6 +196,12 @@ export default function EventsPage() {
         onClose={() => setModalOpen(false)}
         initialStep='event' // 👈 opens AddStayForm directly
       />
+      <ViewDayDescriptionModal
+        open={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        data={selectedDay}
+      />
+
     </div>
   );
 }

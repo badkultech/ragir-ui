@@ -36,7 +36,10 @@ export function LibraryHeader({
           </div>
          
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800 mb-2">{title}</h1>
+    <h1 className="text-[1.4rem] font-bold text-gray-800">
+  <strong>{title}</strong>
+</h1>
+
           <p className="text-sm text-gray-500">{description}</p>
         </div>
       </div>
