@@ -52,18 +52,31 @@ export function FileUploadCard({
   };
 
   return (
-    <div className="rounded-xl bg-card p-4">
+    <div className="relative w-full max-w-full mb-4 overflow-hidden">
       <Label className="mb-2 block text-sm">{label}</Label>
+
       <div
-        className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-gray-50 p-6 cursor-pointer"
+        className="flex flex-col items-center justify-center gap-3 
+                 rounded-lg border border-dashed border-gray-300 
+                 bg-gray-50 p-6 cursor-pointer 
+                 w-full max-w-full overflow-hidden box-border"
         onClick={handleDropAreaClick}
       >
-        <img src="/itinerary.jpg" alt="" className="h-14 w-14" />
-        <div className="text-sm text-muted-foreground">
+        <img
+          src="/itinerary.jpg"
+          alt=""
+          className="h-14 w-14 object-contain flex-shrink-0"
+        />
+
+        <div className="text-sm text-gray-600 text-center break-words max-w-full px-2">
           {file ? `Selected: ${file.name}` : "No file selected"}
         </div>
-        {error && <div className="text-red-500 text-xs">{error}</div>}
-        <div className="flex gap-3">
+
+        {error && (
+          <div className="text-red-500 text-xs text-center">{error}</div>
+        )}
+
+        <div className="flex gap-3 flex-wrap justify-center max-w-full">
           <Input
             ref={inputRef}
             type="file"
@@ -73,18 +86,32 @@ export function FileUploadCard({
             aria-label={label}
           />
           {!file ? (
-            <Button variant="outline" className="rounded-full">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-full"
+              onClick={(e) => e.stopPropagation()}
+            >
               Choose File
             </Button>
           ) : (
-            <Button variant="outline" onClick={clearFile} className="rounded-full">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                clearFile();
+              }}
+              className="rounded-full"
+            >
               Clear
             </Button>
           )}
         </div>
-        <p className="text-center text-gray-500 mt-4">
-                  Or create itinerary below
-                </p>
+
+        <p className="text-center text-gray-500 text-sm mt-2">
+          Or create itinerary below
+        </p>
       </div>
     </div>
   );
