@@ -3,14 +3,13 @@
 import { useState } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { PlusCircle, Pencil, Trash2, HelpCircle } from "lucide-react";
+import { Pencil, Trash2, HelpCircle } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { useGetOrganizerFaqByIdQuery, useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/faq";
+import { useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/faq";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 
 
@@ -22,8 +21,10 @@ export default function FAQsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
-  const { data: faqs = [], isLoading, refetch } =
-    useGetOrganizerFaqsQuery(organizationId);
+ const { data: faqs = [], isLoading, refetch } =
+  useGetOrganizerFaqsQuery(
+    organizationId ? { organizationId } : skipToken
+  );
 
 
   const filtered = faqs.filter((f) =>
