@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Upload, X } from 'lucide-react';
 import { LibrarySelectModal } from '@/components/library/LibrarySelectModal';
-import { update } from 'lodash';
 import { useLazyGetOrganizerDayDescriptionByIdQuery } from '@/lib/services/organizer/library/day-description';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
@@ -21,6 +20,7 @@ type AddEventFormProps = {
   updateId?: number | null;
   onCancel: () => void;
   onSave: (data: any, replace?: boolean) => void;
+  header?: string;
 };
 
 export function AddEventForm({
@@ -28,6 +28,7 @@ export function AddEventForm({
   onCancel,
   updateId,
   onSave,
+  header,
 }: AddEventFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -96,7 +97,15 @@ export function AddEventForm({
   const isTripMode = mode === "trip";
 
   return (
+
     <div className='flex flex-col gap-6'>
+      <div className="flex items-center justify-between w-full">
+      {header && (
+        <div className="text-lg  font-semibold text-gray-800  pb-2">
+          {header}
+        </div>
+      )}
+
       {/* Top-right button */}
       <div className='flex justify-end'>
         <Button
@@ -106,6 +115,7 @@ export function AddEventForm({
         >
           Choose from Library
         </Button>
+      </div>
       </div>
 
       {/* Title */}
@@ -155,16 +165,16 @@ export function AddEventForm({
           onChange={(e) => setLocation(e.target.value)}
           placeholder='Location'
         />
-        </div>
+      </div>
       <div>
-           <label className="block text-[0.95rem] font-[] font-medium mb-1">
+        <label className="block text-[0.95rem] font-[] font-medium mb-1">
           Time
         </label>
         <Input
           type='time'
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          />
+        />
       </div>
 
       {/* Packing Suggestions */}
@@ -179,7 +189,7 @@ export function AddEventForm({
           rows={5}
           maxLength={800}
         /> */}
-         <RichTextEditor
+        <RichTextEditor
           value={packing}
           onChange={setPacking}
           placeholder="Enter here"
@@ -247,16 +257,16 @@ export function AddEventForm({
         )}
       </div >
 
-        { isTripMode &&  <div className="flex flex-col items-end gap-2">
-          <div className="flex justify-end items-center gap-2">
-        <Input type="checkbox" value="" className=" w-[22px]" />
+      {isTripMode && <div className="flex flex-col items-end gap-2">
+        <div className="flex justify-end items-center gap-2">
+          <Input type="checkbox" value="" className=" w-[22px]" />
           <label className="block text-[0.95rem] font-medium">
-          Save in Library
-        </label>
-          </div>
-          
+            Save in Library
+          </label>
+        </div>
+
         <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-        </div>  }
+      </div>}
 
       {/* Footer */}
       <div className='flex justify-end items-center gap-4 mt-6'>

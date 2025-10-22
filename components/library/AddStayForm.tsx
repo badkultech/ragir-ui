@@ -11,9 +11,10 @@ type AddStayFormProps = {
   mode?: string;
   onCancel: () => void;
   onSave: (data: any) => void;
+  header?:string;
 };
 
-export function AddStayForm({ mode = "library", onCancel, onSave }:AddStayFormProps) {
+export function AddStayForm({ mode = "library", onCancel, onSave,header }:AddStayFormProps) {
   const [title, setTitle] = useState("");
   const [sharingType, setSharingType] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -53,6 +54,12 @@ export function AddStayForm({ mode = "library", onCancel, onSave }:AddStayFormPr
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between w-full">
+      {header && (
+        <div className="text-lg  font-semibold text-gray-800  pb-2">
+          {header}
+        </div>
+      )}
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -62,6 +69,7 @@ export function AddStayForm({ mode = "library", onCancel, onSave }:AddStayFormPr
         >
           Choose from Library
         </Button>
+      </div>
       </div>
 
       {/* Title */}

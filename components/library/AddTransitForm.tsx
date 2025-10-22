@@ -13,6 +13,7 @@ type AddTransitFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  header?:string;
 };
 
 const VEHICLES = [
@@ -29,6 +30,7 @@ export function AddTransitForm({
   mode = "library",
   onCancel,
   onSave,
+  header,
 }: AddTransitFormProps) {
   const [title, setTitle] = useState("");
   const [from, setFrom] = useState("");
@@ -82,6 +84,12 @@ export function AddTransitForm({
 
   return (
     <div className="flex flex-col gap-6" style={{fontFamily: "var(--font-poppins)"}}>
+      <div className="flex items-center justify-between w-full">
+      {header && (
+        <div className="text-lg  font-semibold text-gray-800  pb-2">
+          {header}
+        </div>
+      )}
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -91,6 +99,7 @@ export function AddTransitForm({
         >
           Choose from Library
         </Button>
+      </div>
       </div>
 
       {/* Title */}

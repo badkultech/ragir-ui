@@ -221,6 +221,7 @@ export function DetailsOptions() {
       {showDayDescription && (
         <ModalWrapper onClose={() => setShowDayDescription(false)}>
           <AddEventForm
+          header="Add Day Description"
             onCancel={() => setShowDayDescription(false)}
             onSave={(data) => {
               handleSave("event", data);
@@ -233,6 +234,7 @@ export function DetailsOptions() {
       {showTransit && (
         <ModalWrapper onClose={() => setShowTransit(false)}>
           <AddTransitForm
+          header="Add Transit"
             onCancel={() => setShowTransit(false)}
             onSave={(data) => {
               handleSave("transit", data);
@@ -245,6 +247,7 @@ export function DetailsOptions() {
       {showStay && (
         <ModalWrapper onClose={() => setShowStay(false)}>
           <AddStayForm
+          header="Add Stay"
             onCancel={() => setShowStay(false)}
             onSave={(data) => {
               handleSave("stay", data);
@@ -257,6 +260,7 @@ export function DetailsOptions() {
       {showMeal && (
         <ModalWrapper onClose={() => setShowMeal(false)}>
           <AddMealForm
+          header="Add Meal"
             onCancel={() => setShowMeal(false)}
             onSave={(data) => {
               handleSave("meal", data);
@@ -269,6 +273,7 @@ export function DetailsOptions() {
       {showActivity && (
         <ModalWrapper onClose={() => setShowActivity(false)}>
           <AddActivityForm
+          header="Add Activity"
             onCancel={() => setShowActivity(false)}
             onSave={(data) => {
               handleSave("activity", data);

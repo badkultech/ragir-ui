@@ -12,9 +12,10 @@ type AddActivityFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  header?:string;
 };
 
-export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActivityFormProps) {
+export function AddActivityForm({ mode = "library", onCancel, onSave, header }: AddActivityFormProps) {
   const [title, setTitle] = useState("");
   const [moodTags, setMoodTags] = useState<string[]>([]);
   const [priceType, setPriceType] = useState<"included" | "chargeable">("included");
@@ -43,6 +44,12 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
 
   return (
     <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+       <div className="flex items-center justify-between w-full">
+      {header && (
+        <div className="text-lg  font-semibold text-gray-800  pb-2">
+          {header}
+        </div>
+      )}
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -52,6 +59,7 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
         >
           Choose from Library
         </Button>
+      </div>
       </div>
 
       {/* Title */}

@@ -13,9 +13,10 @@ type AddMealFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  header?:string;
 };
 
-export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormProps) {
+export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddMealFormProps) {
   const [title, setTitle] = useState("");
   const [mealType, setMealType] = useState("");
   const [mealTime, setMealTime] = useState("");
@@ -54,6 +55,12 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
 
   return (
     <div className="flex flex-col gap-6" style={{fontFamily: "var(--font-poppins)"  }}>
+      <div className="flex items-center justify-between w-full">
+      {header && (
+        <div className="text-lg  font-semibold text-gray-800  pb-2">
+          {header}
+        </div>
+      )}
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -63,6 +70,7 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
         >
           Choose from Library
         </Button>
+      </div>
       </div>
 
       {/* Title */}
