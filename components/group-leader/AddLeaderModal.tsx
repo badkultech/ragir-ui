@@ -7,6 +7,7 @@ import { Button } from "../ui/button"
 import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
+import RichTextEditor from "../editor/RichTextEditor"
 
 export function AddLeaderModal({
   open,
@@ -100,14 +101,12 @@ export function AddLeaderModal({
 
         <div className="mb-4">
           <Label className="text-sm font-medium block mb-2">Bio</Label>
-          <Textarea
-            className="w-full border rounded-md px-4 py-2 min-h-[80px] focus:ring-2 focus:ring-orange-400 outline-none"
-            maxLength={500}
-            placeholder="Enter here"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-          />
-          <div className="text-xs text-gray-400 text-right mt-1">{bio.length}/500 Characters</div>
+          <RichTextEditor
+                    value={bio}
+                    onChange={setBio}
+                    placeholder="Enter here"
+                  />
+          
         </div>
 
         <div className="flex justify-end gap-3">

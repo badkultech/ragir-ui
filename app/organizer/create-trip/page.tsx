@@ -10,7 +10,6 @@ import { AddLeaderModal } from '@/components/group-leader/AddLeaderModal';
 import { ChooseLeaderModal } from '@/components/group-leader/ChooseLeaderModal';
 import { useRouter } from 'next/navigation';
 import { TripStepperHeader } from '@/components/create-trip/tripStepperHeader';
-import MDEditor from '@uiw/react-md-editor';
 import {
   LearningGradient,
   JungleGradient,
@@ -47,6 +46,7 @@ import {
 import { CampingGradient } from '@/components/library/SvgComponents/GradientsOfMoods/campingGradient';
 import { SpiritualGradient } from '@/components/library/SvgComponents/GradientsOfMoods/spiritualGradient';
 import { GradientIconButton } from '@/components/library/customButtons/GradientIconButton';
+import RichTextEditor from '@/components/editor/RichTextEditor';
 
 export default function CreateTripPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -491,25 +491,18 @@ export default function CreateTripPage() {
               <Label className='block text-gray-600 mb-2 font-medium'>
                 Trip Highlights
               </Label>
-              <div className='border border-gray-200 rounded-lg'>
-                <div className='relative'>
-                  <MDEditor
+              <div className='border border-gray-200 rounded-2xl'>
+                
+                  <RichTextEditor
                     value={formData.tripHighlights}
                     onChange={(val) =>
                       handleInputChange('tripHighlights', val ?? '')
                     }
-                    preview='edit' // Can be 'edit', 'live', or 'preview'
-                    hideToolbar={false}
+                     // Can be 'edit', 'live', or 'preview'
+                   
                   />
-                  <span className='absolute bottom-3 right-3 text-sm text-orange-500'>
-                    {
-                      formData.tripHighlights
-                        .split(' ')
-                        .filter((word) => word.length > 0).length
-                    }
-                    /500 Words
-                  </span>
-                </div>
+                  
+                
               </div>
             </div>
           </div>

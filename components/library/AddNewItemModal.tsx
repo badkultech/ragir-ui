@@ -83,7 +83,7 @@ type AddNewItemModalProps = {
   initialStep?: Step;
 };
 
-export function AddNewItemModal({
+export function   AddNewItemModal({
   open,
   onClose,
   updateId,
