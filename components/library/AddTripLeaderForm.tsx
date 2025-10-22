@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import { useSaveGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
+import { selectAuthState } from "@/lib/slices/auth";
+import { useSelector } from "react-redux";
+import RichTextEditor from "../editor/RichTextEditor";
+
 
 type AddTripLeaderFormProps = {
   mode?: "library" | "trip";
@@ -25,6 +30,9 @@ export function AddTripLeaderForm({
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [saveGroupLeader, { isLoading }] = useSaveGroupLeaderMutation();
+  const { userData } = useSelector(selectAuthState);
+  const orgId = userData?.organizationPublicId;
 
   const handleLibrarySelect = (item: any) => {
     setName(item.title || "");
@@ -40,12 +48,47 @@ export function AddTripLeaderForm({
     }
   };
 
-  const handleSubmit = () => {
-    onSave({ name, tagline, bio, profileImage, mode });
+  const handleSubmit = async () => {
+    if (!orgId) {
+      console.error("Missing org ID");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name.trim());
+      formData.append("bio", bio.trim());
+      formData.append("tagline", tagline.trim());
+      formData.append("addToLibrary", String(mode === "library"));
+
+      if (profileImage) {
+        formData.append("documents[0].file", profileImage, profileImage.name);
+        formData.append("documents[0].name", profileImage.name);
+        formData.append("documents[0].type", "IMAGE");
+      }
+
+      // 🧩 Debug check
+      for (const [key, value] of formData.entries()) {
+        console.log("➡️", key, value);
+      }
+
+      const response = await saveGroupLeader({
+        organizationId: orgId,
+        data: formData,
+      }).unwrap();
+
+      onSave(response);
+    } catch (err) {
+      console.error("❌ Failed to save trip leader:", err);
+    }
   };
 
+
+
+
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
       {/* Profile Image Upload */}
       {/* Top-right button */}
       <div className="flex justify-end">
@@ -73,7 +116,7 @@ export function AddTripLeaderForm({
         )}
         <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50">
           <Upload className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-700">Update Profile Image</span>
+          <span className="text-[0.95rem]">Update Profile Image</span>
           <input
             type="file"
             accept="image/png,image/jpeg"
@@ -86,7 +129,7 @@ export function AddTripLeaderForm({
 
       {/* Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Name *
         </label>
         <Input
@@ -98,7 +141,7 @@ export function AddTripLeaderForm({
 
       {/* Tagline */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium  mb-2">
           Tagline
         </label>
         <Input
@@ -110,19 +153,23 @@ export function AddTripLeaderForm({
 
       {/* Bio */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Bio *
         </label>
-        <Textarea
+        {/* <Textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           placeholder="Enter here"
           rows={5}
           maxLength={500}
-        />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {bio.length}/500 Characters
-        </p>
+        /> */}
+      <RichTextEditor
+        value={bio}
+          onChange={ setBio}
+          placeholder="Enter here"
+          maxLength={500}
+      />
+
       </div>
       <LibrarySelectModal
         open={libraryOpen}
@@ -132,15 +179,17 @@ export function AddTripLeaderForm({
       />
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
-        <Button variant="outline" onClick={onCancel}>
+        <Button variant="outline" className="rounded-full" onClick={onCancel}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          disabled={isLoading || !name.trim() || !bio.trim()}
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
-          Save
+          {isLoading ? "Saving..." : "Save"}
         </Button>
+
       </div>
     </div>
   );

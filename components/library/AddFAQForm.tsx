@@ -31,7 +31,7 @@ export function AddFAQForm({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" style={{fontFamily: "var(--font-poppins)"  }}>
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -45,7 +45,7 @@ export function AddFAQForm({
 
       {/* Question */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Question *
         </label>
         <Input
@@ -54,14 +54,14 @@ export function AddFAQForm({
           placeholder="Enter question"
           maxLength={200}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {question.length}/200 Characters
         </p>
       </div>
 
       {/* Answer */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Answer *
         </label>
         <Textarea
@@ -71,7 +71,7 @@ export function AddFAQForm({
           rows={5}
           maxLength={1000}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {answer.length}/1000 Characters
         </p>
       </div>
@@ -83,7 +83,7 @@ export function AddFAQForm({
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
           Save
         </Button>
