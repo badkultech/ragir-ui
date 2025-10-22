@@ -6,7 +6,7 @@ export function WizardFooter({
   onPrev,
   onDraft,
   onNext,
-  prevLabel = "Previous",
+  prevLabel = "← Previous",   
   nextLabel = "Save & Next",
 }: {
   onPrev?: () => void

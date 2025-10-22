@@ -151,8 +151,6 @@ export default function FAQsPage() {
               console.log("Draft saved (placeholder)")
             }}
             onNext={() => router.push("/organizer/create-trip/pricing")}
-            prevLabel="<Previous"
-            nextLabel="Save & Next"
           />
         
       </div>

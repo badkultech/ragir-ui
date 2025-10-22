@@ -133,7 +133,6 @@ export default function ItineraryPage() {
               onPrev={() => router.push("/organizer/create-trip")}
               onDraft={() => console.log(" Draft itinerary saved")}
               onNext={() => router.push("/organizer/create-trip/exclusions")}
-              prevLabel="‹ Previous"
             />
           </div>
         </div>

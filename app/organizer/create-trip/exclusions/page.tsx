@@ -44,6 +44,7 @@ export default function ExclusionsPage() {
          <div className="flex-1 w-full min-h-screen flex flex-col">
     <AppHeader title="Create New Trip"/>
       <TripStepperHeader activeStep={3} />
+        <div className='p-8 bg-white min-h-screen '>
       
       <SectionCard title="Exclusions" >
         <div className="space-y-6">
@@ -57,7 +58,9 @@ export default function ExclusionsPage() {
                 value={custom}
                 onChange={(e) => setCustom(e.target.value)}
               />
-              <Button type="button" variant="outline" className="rounded-full bg-transparent" onClick={addCustom}>
+              <Button type="button" variant="outline" 
+              className="px-8 py-2 rounded-full font-medium text-orange-500 border-orange-400 hover:bg-orange-50 transition flex items-center gap-2"
+               onClick={addCustom}>
                 + Add
               </Button>
             </div>
@@ -69,9 +72,9 @@ export default function ExclusionsPage() {
         onPrev={() => router.push("/organizer/create-trip/Itinerary")}
         onDraft={() => console.log("Draft exclusions:", selected)}
         onNext={() => router.push("/organizer/create-trip/faqs")} 
-        prevLabel="‹ Previous"
       />
    
+    </div>
     </div>
     </div>
   )

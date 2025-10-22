@@ -324,7 +324,6 @@ export default function PricingPage() {
                             onPrev={() => router.push("/organizer/create-trip/faqs")}
                             onDraft={() => console.log(" Draft exclusions:")}
                             onNext={() => router.push("/organizer/create-trip/review")}
-                            prevLabel="‹ Previous"
                         />
                     </main>
                 
