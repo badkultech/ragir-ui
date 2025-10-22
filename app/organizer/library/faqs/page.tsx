@@ -10,22 +10,21 @@ import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetOrganizerFaqByIdQuery, useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/faq";
 
 
 
 export default function FAQsPage() {
   const [modalOpen, setModalOpen] = useState(false);
-    const { userData } = useSelector(selectAuthState);
-    const organizationId = userData?.organizationPublicId;
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  
-    const { data: faqs = [], isLoading, refetch } =
-      useGetOrganizerFaqsQuery(organizationId);
-  
+
+  const { data: faqs = [], isLoading, refetch } =
+    useGetOrganizerFaqsQuery(organizationId);
+
 
   const filtered = faqs.filter((f) =>
     f.name.toLowerCase().includes(search.toLowerCase())
@@ -80,7 +79,7 @@ export default function FAQsPage() {
                     <div className="mt-2 text-xs text-gray-400">
                       {faq.groupName.join(", ")}
                     </div>
-                  )} */} 
+                  )} */}
 
                 </div>
 
