@@ -16,6 +16,7 @@ import {
   Document,
 } from '@/lib/services/organizer/trip/library/day-description/types';
 import RichTextEditor from '../editor/RichTextEditor';
+import { ChooseFromLibraryButton } from './ChooseFromLibraryButton';
 
 type AddEventFormProps = {
   mode?: 'library' | 'trip';
@@ -108,19 +109,11 @@ export function AddEventForm({
           </div>
         )}
       </div>
-
-      <div className='flex flex-col gap-6' style={{ fontFamily: "var(--font-poppins)" }}>
-        {/* Top-right button */}
-        <div className='flex justify-end'>
-          <Button
-            variant='outline'
-            className='text-orange-500 border-orange-500 hover:bg-orange-50'
-            onClick={() => setLibraryOpen(true)}
-          >
-            Choose from Library
-          </Button>
-        </div>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
 
       {/* Title */}
       <div>
@@ -173,7 +166,6 @@ export function AddEventForm({
             onChange={(e) => setLocation(e.target.value)}
             placeholder='Location'
           />
-
         </div>
 
       </div>

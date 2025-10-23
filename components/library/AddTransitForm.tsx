@@ -8,12 +8,13 @@ import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import MDEditor from "@uiw/react-md-editor";
 import RichTextEditor from "../editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
-  header?:string;
+  header?: string;
   initialData?: any; // ✅ NEW
 };
 
@@ -51,24 +52,24 @@ export function AddTransitForm({
   const [libraryOpen, setLibraryOpen] = useState(false);
 
   useEffect(() => {
-  if (!initialData) return;
+    if (!initialData) return;
 
-  console.log("🚀 Prefilling transit form with:", initialData);
+    console.log("🚀 Prefilling transit form with:", initialData);
 
-  setTitle(initialData.name || "");
-  setFrom(initialData.fromLocation || "");
-  setTo(initialData.toLocation || "");
-  setDeparture(initialData.startTime || "");
-  setArrival(initialData.endTime || "");
-  setDescription(initialData.description || "");
-  setPacking(initialData.packagingSuggestion || "");
+    setTitle(initialData.name || "");
+    setFrom(initialData.fromLocation || "");
+    setTo(initialData.toLocation || "");
+    setDeparture(initialData.startTime || "");
+    setArrival(initialData.endTime || "");
+    setDescription(initialData.description || "");
+    setPacking(initialData.packagingSuggestion || "");
 
-  // Handle vehicle and arrangement
-  setVehicle(initialData.vehicleType ? [initialData.vehicleType] : []);
-  setArrangement(
-    initialData.arrangedBy?.toLowerCase() === "traveler" ? "traveler" : "organizer"
-  );
-}, [initialData]);
+    // Handle vehicle and arrangement
+    setVehicle(initialData.vehicleType ? [initialData.vehicleType] : []);
+    setArrangement(
+      initialData.arrangedBy?.toLowerCase() === "traveler" ? "traveler" : "organizer"
+    );
+  }, [initialData]);
 
   const toggleVehicle = (v: string) => {
     setVehicle((prev) =>
@@ -103,27 +104,24 @@ export function AddTransitForm({
     });
   };
 
-  const isTripMode = mode==="trip";
+  const isTripMode = mode === "trip";
 
   return (
-    <div className="flex flex-col gap-6" style={{fontFamily: "var(--font-poppins)"}}>
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
       <div className="flex items-center justify-between w-full">
-      {header && (
-        <div className="text-lg  font-semibold text-gray-800  pb-2">
-          {header}
-        </div>
-      )}
+        {header && (
+          <div className="text-lg  font-semibold text-gray-800  pb-2">
+            {header}
+          </div>
+        )}
+      </div>
+
       {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
-      </div>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
 
       {/* Title */}
       <div>
@@ -184,11 +182,10 @@ export function AddTransitForm({
               type="button"
               key={v}
               onClick={() => toggleVehicle(v)}
-              className={`px-4 py-2 rounded-lg border text-sm ${
-                vehicle.includes(v)
-                  ? "bg-orange-500 text-white border-orange-500"
-                  : "border-gray-300 hover:border-orange-400"
-              }`}
+              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v)
+                ? "bg-orange-500 text-white border-orange-500"
+                : "border-gray-300 hover:border-orange-400"
+                }`}
             >
               {v}
             </button>
@@ -232,12 +229,12 @@ export function AddTransitForm({
         <label className="block text-[0.95rem] font-medium mb-2">
           Description
         </label>
-       <RichTextEditor
+        <RichTextEditor
           value={description}
           onChange={setDescription}
           maxLength={800}
         />
-      
+
       </div>
 
       {/* Packing Suggestions */}
@@ -277,16 +274,16 @@ export function AddTransitForm({
         )}
       </div>
 
-      { isTripMode &&  <div className="flex flex-col items-end gap-2">
-          <div className="flex justify-end items-center gap-2">
-        <Input type="checkbox" value="" className=" w-[22px]" />
+      {isTripMode && <div className="flex flex-col items-end gap-2">
+        <div className="flex justify-end items-center gap-2">
+          <Input type="checkbox" value="" className=" w-[22px]" />
           <label className="block text-[0.95rem] font-medium">
-          Save in Library
-        </label>
-          </div>
-          
+            Save in Library
+          </label>
+        </div>
+
         <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-        </div>  }
+      </div>}
 
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">

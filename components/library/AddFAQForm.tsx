@@ -13,6 +13,7 @@ import {
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 type AddFAQFormProps = {
   mode?: "library" | "trip";
@@ -92,22 +93,19 @@ export function AddFAQForm({
       </div>
     );
   }
-
+  const isTripMode = mode === "trip";
   return (
     <div
       className="flex flex-col gap-6"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
       {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
+
 
       {/* Question */}
       <div>
@@ -155,8 +153,8 @@ export function AddFAQForm({
           {creating || updating
             ? "Saving..."
             : updateId
-            ? "Update"
-            : "Save"}
+              ? "Update"
+              : "Save"}
         </Button>
       </div>
 

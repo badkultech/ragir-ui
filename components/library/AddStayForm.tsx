@@ -6,15 +6,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import MDEditor from "@uiw/react-md-editor";
+import RichTextEditor from "../editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 type AddStayFormProps = {
   mode?: string;
   onCancel: () => void;
   onSave: (data: any) => void;
-  header?:string;
+  header?: string;
 };
 
-export function AddStayForm({ mode = "library", onCancel, onSave,header }:AddStayFormProps) {
+export function AddStayForm({ mode = "library", onCancel, onSave, header }: AddStayFormProps) {
   const [title, setTitle] = useState("");
   const [sharingType, setSharingType] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -51,26 +54,24 @@ export function AddStayForm({ mode = "library", onCancel, onSave,header }:AddSta
     setLocation(item.location || "");
     setDescription(item.description || "");
   };
-
+  const isTripMode = mode === "trip";
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between w-full">
-      {header && (
-        <div className="text-lg  font-semibold text-gray-800  pb-2">
-          {header}
-        </div>
-      )}
+        {header && (
+          <div className="text-lg  font-semibold text-gray-800  pb-2">
+            {header}
+          </div>
+        )}
+
+      </div>
       {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)} // 🟠 open modal
-        >
-          Choose from Library
-        </Button>
-      </div>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
+
 
       {/* Title */}
       <div>

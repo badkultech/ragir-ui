@@ -8,12 +8,13 @@ import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import MDEditor from "@uiw/react-md-editor";
 import RichTextEditor from "../editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
-  header?:string;
+  header?: string;
 };
 
 export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddMealFormProps) {
@@ -54,24 +55,21 @@ export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddM
   const isTripMode = mode === 'trip';
 
   return (
-    <div className="flex flex-col gap-6" style={{fontFamily: "var(--font-poppins)"  }}>
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
       <div className="flex items-center justify-between w-full">
-      {header && (
-        <div className="text-lg  font-semibold text-gray-800  pb-2">
-          {header}
-        </div>
-      )}
+        {header && (
+          <div className="text-lg  font-semibold text-gray-800  pb-2">
+            {header}
+          </div>
+        )}
+      </div>
       {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
-      </div>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
+
 
       {/* Title */}
       <div>
@@ -106,14 +104,14 @@ export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddM
             <option value="snack">Snack</option>
             <option value="dinner">Dinner</option>
           </select>
-    <label className="flex items-center gap-2 my-4">
-          <input
-            type="radio"
-            checked={included === "included"}
-            onChange={() => setIncluded("included")}
-          />
-          Included
-        </label>
+          <label className="flex items-center gap-2 my-4">
+            <input
+              type="radio"
+              checked={included === "included"}
+              onChange={() => setIncluded("included")}
+            />
+            Included
+          </label>
         </div>
         <div>
           <label className="block text-[0.95rem] font-medium  mb-2">
@@ -125,15 +123,15 @@ export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddM
             onChange={(e) => setMealTime(e.target.value)}
           />
 
-           <label className="flex items-center gap-2 my-4">
-          <input
-            type="radio"
-            checked={included === "chargeable"}
-            onChange={() => setIncluded("chargeable")
-            }
-          />
-          Chargeable
-        </label>
+          <label className="flex items-center gap-2 my-4">
+            <input
+              type="radio"
+              checked={included === "chargeable"}
+              onChange={() => setIncluded("chargeable")
+              }
+            />
+            Chargeable
+          </label>
         </div>
       </div>
 
@@ -142,22 +140,22 @@ export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddM
       {/* Location */}
       <div>
 
-      <label className="block text-[0.95rem] font-medium mb-1">
+        <label className="block text-[0.95rem] font-medium mb-1">
           Location
         </label>
-      <Input
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
+        <Input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
         />
-        </div>
+      </div>
 
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Description
         </label>
-         <RichTextEditor
-         placeholder="enter text"
+        <RichTextEditor
+          placeholder="enter text"
           value={description}
           onChange={setDescription}
         />
@@ -203,16 +201,16 @@ export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddM
         )}
       </div>
 
-         { isTripMode &&  <div className="flex flex-col items-end gap-2">
-          <div className="flex justify-end items-center gap-2">
-        <Input type="checkbox" value="" className=" w-[22px]" />
+      {isTripMode && <div className="flex flex-col items-end gap-2">
+        <div className="flex justify-end items-center gap-2">
+          <Input type="checkbox" value="" className=" w-[22px]" />
           <label className="block text-[0.95rem] font-medium">
-          Save in Library
-        </label>
-          </div>
-          
+            Save in Library
+          </label>
+        </div>
+
         <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-        </div>  }
+      </div>}
 
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
