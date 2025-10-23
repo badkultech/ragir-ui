@@ -1,3 +1,4 @@
+"use client";
 import { GradientIconButton } from '@/components/library/customButtons/GradientIconButton';
 import Heading1 from '@/components/library/customButtons/Heading1';
 import Heading2 from '@/components/library/customButtons/Heading2';
