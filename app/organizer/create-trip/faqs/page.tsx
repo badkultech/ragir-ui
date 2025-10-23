@@ -10,7 +10,6 @@ import { RichTextarea } from "@/components/create-trip/rich-textarea"
 import { Input } from "@/components/ui/input"
 import { WizardFooter } from "@/components/create-trip/wizard-footer"
 import { Sidebar } from "@/components/organizer/sidebar"
-import MDEditor from "@uiw/react-md-editor"
 import { AppHeader } from "@/components/app-header"
 
 interface FAQ {
@@ -82,19 +81,12 @@ export default function FAQsPage() {
                     <AccordionContent className="pt-2 pb-4">
                       <div className="border border-gray-200 rounded-lg p-2 relative">
 
-                        <MDEditor
+                        <RichTextarea
                           value={faq.answer}
                           onChange={(val) => updateAnswer(faq.id, val)}
 
 
                         />
-                        <div className="absolute bottom-3 right-3 text-sm text-orange-500">
-                          {faq.answer
-                            ? faq.answer.split(/\s+/).filter((word) => word.length > 0).length
-                            : 0}
-                          /500 Words
-                        </div>
-
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -109,17 +101,12 @@ export default function FAQsPage() {
                   className="mb-3"
                 />
                 <div className="border border-gray-200 rounded-lg p-2 relative">
-                  <MDEditor
+                  <RichTextarea
                     value={newAnswer}
                     onChange={(val) => setNewAnswer(val ?? "")}
                   />
 
-                  <div className="absolute bottom-3 right-3 text-sm text-orange-500">
-                    {newAnswer
-                      ? newAnswer.split(" ").filter((word) => word.length > 0).length
-                      : 0}
-                    /500 Words
-                  </div>
+                  
                 </div>
 
 
@@ -129,7 +116,7 @@ export default function FAQsPage() {
               <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                 <Button
                   variant="outline"
-                  className="rounded-full bg-transparent"
+                  className="px-8 py-2 rounded-md font-medium text-orange-500 border-orange-400 hover:bg-orange-50 transition flex items-center gap-2"
                   onClick={() => {
                     const q = newQuestion.trim()
                     if (!q) return
@@ -140,7 +127,9 @@ export default function FAQsPage() {
                 >
                   + Add Question
                 </Button>
-                <Button className="rounded-full">Choose from Library</Button>
+                <Button className="px-8 py-2 rounded-md font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 transition flex items-center gap-2"
+
+                >Choose from Library</Button>
               </div>
             </div>
           </SectionCard>
