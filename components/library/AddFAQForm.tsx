@@ -58,7 +58,7 @@ export function AddFAQForm({
 
   const handleLibrarySelect = (item: any) => {
     setQuestion(item.title || "");
-    setAnswer(item.description || "");
+    setAnswer(item.answer || "");
   };
 
   const handleSubmit = async () => {

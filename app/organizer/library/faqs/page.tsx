@@ -42,9 +42,10 @@ export default function FAQsPage() {
   const handleDelete = async () => {
     if (!selectedFaq) return;
     try {
+      debugger
       await deleteFaq({
         organizationId,
-        id: selectedFaq.id,
+        faqId: selectedFaq.id,
       }).unwrap();
       setConfirmOpen(false);
       setSelectedFaq(null);
@@ -97,7 +98,7 @@ export default function FAQsPage() {
 
                   {/* Content */}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{faq.name}</h3>
+                    <h3 className="font-semibold text-gray-900"><strong>{faq.name}</strong></h3>
                     <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                       {faq.answer}
                     </p>
