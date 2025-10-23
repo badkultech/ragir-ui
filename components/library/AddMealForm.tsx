@@ -172,9 +172,6 @@ export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddM
           placeholder="Enter here"
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {packing.length}/800 Words
-        </p>
       </div>
 
       {/* Image Upload */}

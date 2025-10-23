@@ -129,16 +129,11 @@ export function AddStayForm({ mode = "library", onCancel, onSave, header }: AddS
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Description
         </label>
-        <Textarea
+        <RichTextEditor
+          placeholder="enter text"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter here"
-          rows={5}
-          maxLength={800}
+          onChange={setDescription}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {description.length}/800 Words
-        </p>
       </div>
 
       {/* Packing Suggestions */}
@@ -146,16 +141,12 @@ export function AddStayForm({ mode = "library", onCancel, onSave, header }: AddS
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Packing Suggestions
         </label>
-        <Textarea
+        <RichTextEditor
           value={packing}
-          onChange={(e) => setPacking(e.target.value)}
+          onChange={setPacking}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {packing.length}/800 Words
-        </p>
       </div>
 
       {/* Image Upload */}
