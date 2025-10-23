@@ -43,48 +43,70 @@ export default function LibraryOverviewPage() {
       <div className="flex-1 flex flex-col">
         <AppHeader title="Library" onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 p-4 sm:p-6 md:p-6 lg:p-6 flex flex-col items-center">
-          <div className="w-full max-w-[1100px]">
-            {/* Header */}
-            <LibraryHeader
-              title="Ragir Library"
-              buttonLabel="Add item"
-              onAddClick={() => setModalOpen(true)}
-              hideBackBtn={true}
-            />
+        <main className="flex-1 p-6 md:p-8 lg:max-w-[1400px] w-full lg:mx-auto">
 
-            {/* Modal */}
-            <AddNewItemModal
-              open={modalOpen}
-              onClose={() => setModalOpen(false)}
-            />
 
-            {/* Categories Grid */}
-            <div
-              className="
+          {/* <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                Ragir Library
+              </h1>
+              <p className="text-sm text-gray-500">
+                Manage your travel content and organize into custom collections
+              </p>
+            </div>
+            <GradientButton
+              className="flex items-center justify-center gap-2 
+             w-auto 
+             px-5 py-2 
+             bg-orange-500 hover:bg-orange-600 text-white"
+              onClick={() => setModalOpen(true)}
+            >
+              <PlusCircle className="w-4 h-4" />
+              Add Item
+            </GradientButton>
+          </div> */  }
+
+          {/* Header with Add Item */}
+
+          <LibraryHeader
+            title="Ragir Library"
+            buttonLabel="Add item"
+            onAddClick={() => setModalOpen(true)}
+            hideBackBtn={true}
+          />
+
+          {/* Modal */}
+          <AddNewItemModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+          />
+
+          {/* Categories Grid */}
+          <div
+            className="
                 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 
                 gap-4 sm:gap-5 md:gap-6 
                 mt-6 sm:mt-1 justify-items-center
               "
-            >
-              {categories.map(({ label, href, icon: Icon }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  className="flex flex-col justify-center items-center 
+          >
+            {categories.map(({ label, href, icon: Icon }) => (
+              <Link
+                key={label}
+                href={href}
+                className="flex flex-col justify-center items-center 
                      w-full max-w-[180px] sm:max-w-[200px] md:max-w-[220px] 
                      h-[120px] sm:h-[130px] md:h-[140px] 
                      px-2 py-2 gap-3
                      bg-[rgba(255,128,76,0.06)] border border-[#FF804C] rounded-lg
                      transition hover:shadow-md hover:border-[#ff662a]"
-                >
-                  <Icon className="h-8 w-8 text-[#FF804C]" />
-                  <span className="text-sm sm:text-base font-medium text-gray-900 text-center">
-                    {label}
-                  </span>
-                </Link>
-              ))}
-            </div>
+              >
+                <Icon className="h-8 w-8 text-[#FF804C]" />
+                <span className="text-sm sm:text-base font-medium text-gray-900 text-center">
+                  {label}
+                </span>
+              </Link>
+            ))}
           </div>
         </main>
       </div>

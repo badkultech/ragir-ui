@@ -1,37 +1,103 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import {
+  useCreateOrganizerFaqMutation,
+  useUpdateOrganizerFaqMutation,
+  useGetOrganizerFaqByIdQuery,
+} from "@/lib/services/organizer/trip/library/faq";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 type AddFAQFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  updateId?: number | null; // 👈 added for edit mode
 };
 
 export function AddFAQForm({
   mode = "library",
   onCancel,
   onSave,
+  updateId,
 }: AddFAQFormProps) {
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
 
+  // Mutations
+  const [createFaq, { isLoading: creating }] = useCreateOrganizerFaqMutation();
+  const [updateFaq, { isLoading: updating }] = useUpdateOrganizerFaqMutation();
+
+  // 👇 Fetch FAQ by ID if editing
+  const {
+    data: existingFaq,
+    isLoading: loadingFaq,
+  } = useGetOrganizerFaqByIdQuery(
+    updateId && organizationId
+      ? { organizationId, faqId: updateId }
+      : skipToken
+  );
+
+  // 👇 Prefill when data arrives
+  useEffect(() => {
+    if (existingFaq) {
+      setQuestion(existingFaq.name || "");
+      setAnswer(existingFaq.answer || "");
+    }
+  }, [existingFaq]);
+
   const handleLibrarySelect = (item: any) => {
     setQuestion(item.title || "");
-    setAnswer(item.description || "");
+    setAnswer(item.answer || "");
   };
 
-  const handleSubmit = () => {
-    onSave({ question, answer, mode });
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append("name", question);
+    formData.append("answer", answer);
+
+    try {
+      if (updateId) {
+        await updateFaq({
+          organizationId,
+          faqId: updateId,
+          data: formData,
+        }).unwrap();
+      } else {
+        await createFaq({
+          organizationId,
+          data: formData,
+        }).unwrap();
+      }
+      onSave({ question, answer });
+    } catch (err) {
+      console.error("Error saving FAQ:", err);
+    }
   };
+
+  if (loadingFaq) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Loading FAQ details...
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-6" style={{fontFamily: "var(--font-poppins)"  }}>
+    <div
+      className="flex flex-col gap-6"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
       {/* Top-right button */}
       <div className="flex justify-end">
         <Button
@@ -83,9 +149,14 @@ export function AddFAQForm({
         </Button>
         <Button
           onClick={handleSubmit}
+          disabled={creating || updating}
           className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
-          Save
+          {creating || updating
+            ? "Saving..."
+            : updateId
+            ? "Update"
+            : "Save"}
         </Button>
       </div>
 

@@ -6,13 +6,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Upload, X } from 'lucide-react';
 import { LibrarySelectModal } from '@/components/library/LibrarySelectModal';
-import { useLazyGetOrganizerDayDescriptionByIdQuery } from '@/lib/services/organizer/library/day-description';
+import { update } from 'lodash';
+import { useLazyGetOrganizerDayDescriptionByIdQuery } from '@/lib/services/organizer/trip/library/day-description';
+
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
 import {
   DayDescriptionByIdResponse,
   Document,
-} from '@/lib/services/organizer/library/day-description/types';
+} from '@/lib/services/organizer/trip/library/day-description/types';
 import RichTextEditor from '../editor/RichTextEditor';
 
 type AddEventFormProps = {
@@ -100,22 +102,24 @@ export function AddEventForm({
 
     <div className='flex flex-col gap-6'>
       <div className="flex items-center justify-between w-full">
-      {header && (
-        <div className="text-lg  font-semibold text-gray-800  pb-2">
-          {header}
-        </div>
-      )}
-
-      {/* Top-right button */}
-      <div className='flex justify-end'>
-        <Button
-          variant='outline'
-          className='text-orange-500 border-orange-500 hover:bg-orange-50'
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
+        {header && (
+          <div className="text-lg  font-semibold text-gray-800  pb-2">
+            {header}
+          </div>
+        )}
       </div>
+
+      <div className='flex flex-col gap-6' style={{ fontFamily: "var(--font-poppins)" }}>
+        {/* Top-right button */}
+        <div className='flex justify-end'>
+          <Button
+            variant='outline'
+            className='text-orange-500 border-orange-500 hover:bg-orange-50'
+            onClick={() => setLibraryOpen(true)}
+          >
+            Choose from Library
+          </Button>
+        </div>
       </div>
 
       {/* Title */}
@@ -160,11 +164,18 @@ export function AddEventForm({
 
       {/* Location + Time */}
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-        <Input
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder='Location'
-        />
+        <div>
+          <label className='block text-sm font-medium text-gray-700 mb-1'>
+            Location *
+          </label>
+          <Input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder='Location'
+          />
+
+        </div>
+
       </div>
       <div>
         <label className="block text-[0.95rem] font-[] font-medium mb-1">
