@@ -276,7 +276,6 @@ export default function PricingPage() {
                                                     <span className="text-sm text-muted-foreground">Valid until</span>
                                                     <div className="relative w-full">
                                                         <Input type="date" className="pr-9" />
-                                                        <Calendar className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                                     </div>
                                                 </div>
                                                 <div />

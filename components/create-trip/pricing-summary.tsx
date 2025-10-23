@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function PricingSummary() {
   return (
-    <Card className="h-screen bg-gray-50">
+    <Card className="h-full bg-gray-50">
       <CardHeader>
         <CardTitle className="text-base ">Pricing Summary</CardTitle>
       </CardHeader>

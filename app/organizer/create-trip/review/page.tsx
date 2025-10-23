@@ -78,8 +78,6 @@ export default function ReviewPage() {
       </SectionCard>
 
       <WizardFooter
-        prevLabel="Previous"
-        
         nextLabel="Submit"
         onPrev={handlePrevious}
         onDraft={handleDraft}
