@@ -16,7 +16,7 @@ type AddActivityFormProps = {
   header?: string;
 };
 
-export function AddActivityForm({ mode = "library", onCancel, onSave, header }: AddActivityFormProps) {
+export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: AddActivityFormProps) {
   const [title, setTitle] = useState("");
   const [moodTags, setMoodTags] = useState<string[]>([]);
   const [priceType, setPriceType] = useState<"included" | "chargeable">("included");

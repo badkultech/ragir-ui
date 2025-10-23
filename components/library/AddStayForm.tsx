@@ -17,7 +17,7 @@ type AddStayFormProps = {
   header?: string;
 };
 
-export function AddStayForm({ mode = "library", onCancel, onSave, header }: AddStayFormProps) {
+export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStayFormProps) {
   const [title, setTitle] = useState("");
   const [sharingType, setSharingType] = useState("");
   const [checkIn, setCheckIn] = useState("");

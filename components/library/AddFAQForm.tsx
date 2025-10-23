@@ -23,7 +23,7 @@ type AddFAQFormProps = {
 };
 
 export function AddFAQForm({
-  mode = "library",
+  mode = "trip",
   onCancel,
   onSave,
   updateId,

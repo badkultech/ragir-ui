@@ -17,7 +17,7 @@ type AddMealFormProps = {
   header?: string;
 };
 
-export function AddMealForm({ mode = "library", onCancel, onSave, header }: AddMealFormProps) {
+export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMealFormProps) {
   const [title, setTitle] = useState("");
   const [mealType, setMealType] = useState("");
   const [mealTime, setMealTime] = useState("");

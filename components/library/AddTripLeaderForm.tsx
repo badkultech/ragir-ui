@@ -20,7 +20,7 @@ type AddTripLeaderFormProps = {
 };
 
 export function AddTripLeaderForm({
-  mode = "library",
+  mode = "trip",
   onCancel,
   onSave,
 }: AddTripLeaderFormProps) {

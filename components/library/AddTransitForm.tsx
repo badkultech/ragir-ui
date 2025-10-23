@@ -30,7 +30,7 @@ const VEHICLES = [
 ];
 
 export function AddTransitForm({
-  mode = "library",
+  mode = "trip",
   onCancel,
   onSave,
   header,

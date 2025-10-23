@@ -27,7 +27,7 @@ type AddEventFormProps = {
 };
 
 export function AddEventForm({
-  mode = 'library',
+  mode = 'trip',
   onCancel,
   updateId,
   onSave,
