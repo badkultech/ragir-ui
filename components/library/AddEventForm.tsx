@@ -15,6 +15,7 @@ import {
   Document,
 } from '@/lib/services/organizer/trip/library/day-description/types';
 import RichTextEditor from '../editor/RichTextEditor';
+import { ChooseFromLibraryButton } from './ChooseFromLibraryButton';
 
 type AddEventFormProps = {
   mode?: 'library' | 'trip';
@@ -97,16 +98,11 @@ export function AddEventForm({
 
   return (
     <div className='flex flex-col gap-6' style={{ fontFamily: "var(--font-poppins)" }}>
-      {/* Top-right button */}
-      <div className='flex justify-end'>
-        <Button
-          variant='outline'
-          className='text-orange-500 border-orange-500 hover:bg-orange-50'
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
 
       {/* Title */}
       <div>
@@ -151,26 +147,26 @@ export function AddEventForm({
       {/* Location + Time */}
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
         <div>
-           <label className='block text-sm font-medium text-gray-700 mb-1'>
-          Location *
-        </label>
-         <Input
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder='Location'
-        />
+          <label className='block text-sm font-medium text-gray-700 mb-1'>
+            Location *
+          </label>
+          <Input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder='Location'
+          />
         </div>
-       
-        </div>
+
+      </div>
       <div>
-           <label className="block text-[0.95rem] font-[] font-medium mb-1">
+        <label className="block text-[0.95rem] font-[] font-medium mb-1">
           Time
         </label>
         <Input
           type='time'
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          />
+        />
       </div>
 
       {/* Packing Suggestions */}
@@ -185,7 +181,7 @@ export function AddEventForm({
           rows={5}
           maxLength={800}
         /> */}
-         <RichTextEditor
+        <RichTextEditor
           value={packing}
           onChange={setPacking}
           placeholder="Enter here"
@@ -253,16 +249,16 @@ export function AddEventForm({
         )}
       </div >
 
-        { isTripMode &&  <div className="flex flex-col items-end gap-2">
-          <div className="flex justify-end items-center gap-2">
-        <Input type="checkbox" value="" className=" w-[22px]" />
+      {isTripMode && <div className="flex flex-col items-end gap-2">
+        <div className="flex justify-end items-center gap-2">
+          <Input type="checkbox" value="" className=" w-[22px]" />
           <label className="block text-[0.95rem] font-medium">
-          Save in Library
-        </label>
-          </div>
-          
+            Save in Library
+          </label>
+        </div>
+
         <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-        </div>  }
+      </div>}
 
       {/* Footer */}
       <div className='flex justify-end items-center gap-4 mt-6'>

@@ -8,6 +8,7 @@ import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import MDEditor from "@uiw/react-md-editor";
 import RichTextEditor from "../editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 type AddStayFormProps = {
   mode?: "library" | "trip";
@@ -56,17 +57,13 @@ export function AddStayForm({ mode = "library", onCancel, onSave }: AddStayFormP
   const isTripMode = mode === "trip";
 
   return (
-    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)"}}>
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
       {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)} // 🟠 open modal
-        >
-          Choose from Library
-        </Button>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
 
       {/* Title */}
       <div>
@@ -114,30 +111,30 @@ export function AddStayForm({ mode = "library", onCancel, onSave }: AddStayFormP
         </div>
       </div>
       <div>
-      <label className="block text-[0.95rem] font-medium mb-1">
+        <label className="block text-[0.95rem] font-medium mb-1">
           Location *
         </label>
-      <Input
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        placeholder="Location"
-      />
+        <Input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Location"
+        />
       </div>
-      
+
 
       {/* Description */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-1">
           Description
         </label>
-        
-           <RichTextEditor
+
+        <RichTextEditor
           value={description}
           onChange={setPacking}
           placeholder="Enter here"
           maxLength={800}
         />
-       
+
       </div>
 
       {/* Packing Suggestions */}
@@ -178,16 +175,16 @@ export function AddStayForm({ mode = "library", onCancel, onSave }: AddStayFormP
         )}
       </div>
 
-         { isTripMode &&  <div className="flex flex-col items-end gap-2">
-          <div className="flex justify-end items-center gap-2">
-        <Input type="checkbox" value="" className=" w-[22px]" />
+      {isTripMode && <div className="flex flex-col items-end gap-2">
+        <div className="flex justify-end items-center gap-2">
+          <Input type="checkbox" value="" className=" w-[22px]" />
           <label className="block text-[0.95rem] font-medium">
-          Save in Library
-        </label>
-          </div>
-          
+            Save in Library
+          </label>
+        </div>
+
         <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-        </div>  }
+      </div>}
 
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">

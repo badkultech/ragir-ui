@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "@/components/editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -44,15 +45,12 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
   return (
     <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
       {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
-      </div>
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
+
 
       {/* Title */}
       <div>
@@ -107,22 +105,22 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
       {/* Location + Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-           <label className="block text-[0.95rem] font-medium mb-2">Location</label>
-           <Input
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Location"
-        />
-        </div>
-        
-        <div>
-         <label className="block text-[0.95rem] font-medium mb-2">Time</label>
-        <Input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
+          <label className="block text-[0.95rem] font-medium mb-2">Location</label>
+          <Input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Location"
           />
-      </div>
+        </div>
+
+        <div>
+          <label className="block text-[0.95rem] font-medium mb-2">Time</label>
+          <Input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* Description */}
@@ -137,7 +135,7 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
         /> */}
 
         <RichTextEditor
-        value={description}
+          value={description}
           onChange={setDescription}
           placeholder="Enter here"
           maxLength={800}
@@ -148,7 +146,7 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
         <RichTextEditor
-        value={packing}
+          value={packing}
           onChange={setPacking}
           placeholder="Enter here"
           maxLength={800}
@@ -175,16 +173,16 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
         )}
       </div>
 
-      { isTripMode &&  <div className="flex flex-col items-end gap-2">
-          <div className="flex justify-end items-center gap-2">
-        <Input type="checkbox" value="" className=" w-[22px]" />
+      {isTripMode && <div className="flex flex-col items-end gap-2">
+        <div className="flex justify-end items-center gap-2">
+          <Input type="checkbox" value="" className=" w-[22px]" />
           <label className="block text-[0.95rem] font-medium">
-          Save in Library
-        </label>
-          </div>
-          
+            Save in Library
+          </label>
+        </div>
+
         <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-        </div>  }
+      </div>}
 
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
