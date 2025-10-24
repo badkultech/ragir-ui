@@ -47,6 +47,9 @@ import { CampingGradient } from '@/components/library/SvgComponents/GradientsOfM
 import { SpiritualGradient } from '@/components/library/SvgComponents/GradientsOfMoods/spiritualGradient';
 import { GradientIconButton } from '@/components/library/customButtons/GradientIconButton';
 import RichTextEditor from '@/components/editor/RichTextEditor';
+import { AddTripLeaderForm } from '@/components/library/AddTripLeaderForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { LibrarySelectModal } from '@/components/library/LibrarySelectModal';
 
 export default function CreateTripPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -562,14 +565,41 @@ export default function CreateTripPage() {
             </Button>
           </div>
         </div>
-        <AddLeaderModal
-          open={leaderModalOpen}
-          onClose={() => setLeaderModalOpen(false)}
-        />
-        <ChooseLeaderModal
+        {/* ✅ Add Leader Modal */}
+        <Dialog open={leaderModalOpen} onOpenChange={setLeaderModalOpen}>
+          <DialogContent
+            className="max-w-3xl w-full h-[90vh] p-0 overflow-hidden flex flex-col rounded-2xl"
+          >
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold px-6 pt-6">
+                Add New Group Leader
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
+              <AddTripLeaderForm
+                onCancel={() => setLeaderModalOpen(false)}
+                onSave={(leaderData) => {
+                  console.log("✅ Leader Saved:", leaderData);
+                  setLeaderModalOpen(false);
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* ✅ Choose Leader Modal */}
+        <LibrarySelectModal
           open={chooseModalOpen}
           onClose={() => setChooseModalOpen(false)}
+        category="trip-leaders"
+        onSelect={(item) => {
+    console.log("✅ Selected Leader from Library:", item);
+    // TODO: You can save this selected leader in state if needed
+    setChooseModalOpen(false);
+  }}
         />
+
       </div>
     </div>
   );

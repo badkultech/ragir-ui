@@ -17,12 +17,14 @@ type AddTripLeaderFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  open?:boolean;
 };
 
 export function AddTripLeaderForm({
   mode = "trip",
   onCancel,
   onSave,
+  open,
 }: AddTripLeaderFormProps) {
   const [name, setName] = useState("");
   const [tagline, setTagline] = useState("");
