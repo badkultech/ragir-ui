@@ -1,16 +1,17 @@
-import { userAgent } from "next/server";
+import { userAgent } from 'next/server';
 
 export const TAGS = {
-  dayDescriptions:'dayDescriptions',
+  dayDescriptions: 'dayDescriptions',
   faqs: 'faqs',
-  transits:'transits',
+  transits: 'transits',
   users: 'users',
   admins: 'admins',
   organizations: 'organizations',
   orgs: 'org',
-  user : 'user',
+  user: 'user',
   otp: 'otp',
   notifications: 'notifications',
   travelerProfile: 'travelerProfile',
   tripLibraryGroupLeader: 'TripLibraryGroupLeader',
+  organizerProfile: 'organizerProfile',
 } as const;

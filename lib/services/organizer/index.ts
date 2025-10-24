@@ -2,6 +2,7 @@ import { ENDPOINTS } from '@/lib/utils';
 import { baseAPI } from '..';
 import { PartnerResponse } from './types';
 import { ApiResponse } from '../common-types';
+import { TAGS } from '../tags';
 
 export const organizerAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -16,6 +17,7 @@ export const organizerAPI = baseAPI.injectEndpoints({
       }),
       transformResponse: (response: ApiResponse<PartnerResponse>) =>
         response.data,
+      providesTags: [TAGS.organizerProfile],
     }),
     updateOrganizerProfile: builder.mutation<
       PartnerResponse,
@@ -29,6 +31,7 @@ export const organizerAPI = baseAPI.injectEndpoints({
       }),
       transformResponse: (response: ApiResponse<PartnerResponse>) =>
         response.data,
+      invalidatesTags: [TAGS.organizerProfile],
     }),
   }),
 });
