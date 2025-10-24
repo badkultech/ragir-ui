@@ -545,7 +545,12 @@ export default function CreateTripPage() {
               Save as Draft
             </Button>
             <Button
-              onClick={() => router.push('/organizer/create-trip/Itinerary')}
+             
+              onClick={() =>
+  router.push(
+    `/organizer/create-trip/Itinerary?startDate=${formData.startDate}&endDate=${formData.endDate}`
+  )
+}
               className='px-8 py-2 rounded-full font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 transition flex items-center gap-2'
             >
               Save & Next
