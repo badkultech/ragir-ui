@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { FileUploadCard } from "@/components/create-trip/file-upload-card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 
 export default function ItineraryPage() {
   const router = useRouter();
@@ -21,40 +22,45 @@ export default function ItineraryPage() {
 
   const [showDetails, setShowDetails] = useState([false, false, false]);
   const [startingPoint, setStartingPoint] = useState("Mumbai");
-    const [startDate, setStartDate] = useState("20/09/2025");
-    const [endPoint, setEndPoint] = useState("Goa");
+  const [startDate, setStartDate] = useState("20/09/2025");
+  const [endPoint, setEndPoint] = useState("Goa");
   const [endDate, setEndDate] = useState("20/09/2025");
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const handleAddDetails = (idx: number) => {
-    setShowDetails((prev) => prev.map((shown, i) => (i === idx ? true : shown)));
+    setShowDetails((prev) =>
+      prev.map((shown, i) => (i === idx ? true : shown))
+    );
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
-      <Sidebar />
+      {/* Sidebar */}
+      <OrganizerSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
       <div className="flex-1 w-full min-h-screen flex flex-col ">
         <AppHeader title="Create New Trip" />
 
-       
-          {/* Stepper (responsive) */}  
-          <TripStepperHeader activeStep={2} />
+        {/* Stepper (responsive) */}
+        <TripStepperHeader activeStep={2} />
 
-          {/* Main Card */}
-        <div className='p-8 bg-white  '>
-          <div className='max-w-full mx-auto bg-white shadow rounded-2xl p-8 overflow-x-hidden'>
-
-
-            <h2 className='text-2xl font-semibold text-gray-800 mb-6'>
-              Itinerary 
+        {/* Main Card */}
+        <div className="p-8 bg-white  ">
+          <div className="max-w-full mx-auto bg-white shadow rounded-2xl p-8 overflow-x-hidden">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+              Itinerary
             </h2>
             <FileUploadCard />
-            
 
             {/* Days render */}
             {days.map((d, dayIdx) => (
               <div key={d.day} className="mb-4">
                 <div className="rounded-lg bg-orange-50 px-4 py-2 font-semibold text-orange-700 mb-2 text-[15px]">
-                  Day {d.day} <span className="text-gray-400 font-normal ml-2">{d.date}</span>
+                  Day {d.day}{" "}
+                  <span className="text-gray-400 font-normal ml-2">
+                    {d.date}
+                  </span>
                 </div>
 
                 {/* Only show Start Point + Time input for the first day */}
@@ -67,20 +73,18 @@ export default function ItineraryPage() {
                       <Input
                         type="text"
                         value={startingPoint}
-                    onChange={(e) => setStartingPoint(e.target.value)}
-                    placeholder="Enter starting location"
+                        onChange={(e) => setStartingPoint(e.target.value)}
+                        placeholder="Enter starting location"
                         className="w-full border px-3 py-2 rounded outline-none text-sm"
-                        
                       />
                     </div>
                     <div className="flex items-center flex-1 gap-2">
                       <Input
                         type="datetime-local"
                         value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      placeholder="Select date"
+                        onChange={(e) => setStartDate(e.target.value)}
+                        placeholder="Select date"
                         className="w-full border px-3 py-2 mt-6 rounded outline-none text-sm"
-                        
                       />
                     </div>
                   </div>
@@ -100,28 +104,27 @@ export default function ItineraryPage() {
               </div>
             ))}
 
-
             {/* End Point (last) */}
             <div className="bg-gray-50 rounded-lg px-4 py-3 mb-4 flex flex-col sm:flex-row gap-2 max-w-full">
               <div className="flex-1 min-w-0">
-                <label className="text-sm block mb-1 font-medium">End Point *</label>
+                <label className="text-sm block mb-1 font-medium">
+                  End Point *
+                </label>
                 <input
                   type="text"
                   value={endPoint}
-                    onChange={(e) => setEndPoint(e.target.value)}
-                    placeholder="Enter ending location"
+                  onChange={(e) => setEndPoint(e.target.value)}
+                  placeholder="Enter ending location"
                   className="w-full max-w-full border px-3 py-2 rounded outline-none text-sm"
-                  
                 />
               </div>
               <div className="flex items-center flex-1 gap-2 min-w-0">
                 <input
                   type="datetime-local"
                   value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      placeholder="Select date"
+                  onChange={(e) => setEndDate(e.target.value)}
+                  placeholder="Select date"
                   className="w-full max-w-full border px-3 py-2 mt-6 rounded outline-none text-sm"
-                  
                 />
               </div>
             </div>
@@ -137,6 +140,6 @@ export default function ItineraryPage() {
           </div>
         </div>
       </div>
-   </div>
+    </div>
   );
 }
