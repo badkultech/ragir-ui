@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FileUploadCard } from "@/components/create-trip/file-upload-card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { CustomDateTimePicker } from "@/components/ui/date-time-picker";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 
 // Type for each day
@@ -19,23 +20,48 @@ interface Day {
 
 export default function ItineraryPage() {
   const searchParams = useSearchParams();
-  const startDateParam = searchParams.get("startDate") || "2025-09-20T09:00";
-  const totalDaysParam = parseInt(searchParams.get("totalDays") || "5", 10);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
+
+  const startDateParam = searchParams.get("startDate") || new Date().toISOString();
+const endDateParam = searchParams.get("endDate") || new Date().toISOString();
+const totalDaysParam = parseInt(searchParams.get("totalDays") || "1", 10);
+
+  // Normalize startDate from query param
+  const normalizeDate = (value: string) => {
+    if (!value) return "2025-09-20T09:00";
+    // Try ISO format
+    let d = new Date(value);
+    if (!isNaN(d.getTime())) return value;
+
+    // Try DD/MM/YYYY format
+    const parts = value.split("/");
+    if (parts.length === 3) {
+      const iso = `${parts[2]}-${parts[1]}-${parts[0]}T09:00`; // default 9 AM
+      d = new Date(iso);
+      if (!isNaN(d.getTime())) return iso;
+    }
+
+    // fallback
+    return "2025-09-20T09:00";
+  };
+
+  const startDateParamRaw = searchParams.get("startDate") || "2025-09-20T09:00";
+
   const [startDate, setStartDate] = useState(startDateParam);
-  const [endDate, setEndDate] = useState("");
+const [endDate, setEndDate] = useState(endDateParam);
   const [days, setDays] = useState<Day[]>([]);
   const [showDetails, setShowDetails] = useState<boolean[]>([]);
   const [startingPoint, setStartingPoint] = useState("Mumbai");
   const [endPoint, setEndPoint] = useState("Goa");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Generate days dynamically
+  // Generate days dynamically & auto calculate endDate
   useEffect(() => {
     if (!startDate) return;
     const start = new Date(startDate);
     if (isNaN(start.getTime())) return;
 
+    // Generate days
     const generatedDays: Day[] = [];
     for (let i = 0; i < totalDaysParam; i++) {
       const date = new Date(start);
@@ -48,23 +74,21 @@ export default function ItineraryPage() {
       });
       generatedDays.push({ day: i + 1, date: formatted });
     }
-
     setDays(generatedDays);
     setShowDetails(Array(generatedDays.length).fill(false));
 
-    // Update end date automatically
+    // Calculate endDate
     const lastDate = new Date(start);
     lastDate.setDate(start.getDate() + totalDaysParam - 1);
-    setEndDate(lastDate.toISOString().slice(0, 16)); // YYYY-MM-DDTHH:MM
+    setEndDate(lastDate.toISOString().slice(0, 16)); // YYYY-MM-DDTHH:mm
   }, [startDate, totalDaysParam]);
 
-  // Fix handleAddDetails typing
   const handleAddDetails = (idx: number) => {
     setShowDetails((prev) => prev.map((val, i) => (i === idx ? true : val)));
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
+   <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -76,9 +100,7 @@ export default function ItineraryPage() {
 
         <div className="p-8 bg-white">
           <div className="max-w-full mx-auto bg-white shadow rounded-2xl p-8 overflow-x-hidden">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Itinerary
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">Itinerary</h2>
 
             <FileUploadCard />
 
@@ -103,17 +125,18 @@ export default function ItineraryPage() {
                         value={startingPoint}
                         onChange={(e) => setStartingPoint(e.target.value)}
                         placeholder="Enter starting location"
-                        className="w-full border px-3 py-2 rounded outline-none text-sm"
+                        className="w-full border px-3 py-2 rounded-lg outline-none text-sm"
                       />
                     </div>
-                    <div className="flex items-center flex-1 gap-2">
-                      <Input
-                        type="datetime-local"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full border px-3 py-2 mt-6 rounded outline-none text-sm"
-                      />
-                    </div>
+
+                    <CustomDateTimePicker
+                      value={startDate}
+                      onChange={setStartDate}
+                      placeholder="Select start date & time"
+                     className="mt-3 self-end w-full"
+
+
+                    />
                   </div>
                 )}
 
@@ -130,12 +153,10 @@ export default function ItineraryPage() {
               </div>
             ))}
 
-            {/* End point */}
+            {/* End point & endDate */}
             <div className="bg-gray-50 rounded-lg px-4 py-3 mb-4 flex flex-col sm:flex-row gap-2 max-w-full">
               <div className="flex-1 min-w-0">
-                <label className="text-sm block mb-1 font-medium">
-                  End Point *
-                </label>
+                <label className="text-sm block mb-1 font-medium">End Point *</label>
                 <Input
                   type="text"
                   value={endPoint}
@@ -144,14 +165,15 @@ export default function ItineraryPage() {
                   className="w-full max-w-full"
                 />
               </div>
-              <div className="flex items-center flex-1 gap-2 min-w-0">
-                <Input
-                  type="datetime-local"
+             
+                <CustomDateTimePicker
                   value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full max-w-full mt-6"
+                  onChange={setEndDate}
+                  placeholder="Select end date & time"
+                  className="mt-3 self-end w-full"
+
                 />
-              </div>
+              
             </div>
           </div>
 
