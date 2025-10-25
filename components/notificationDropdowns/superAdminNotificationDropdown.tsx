@@ -9,11 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Bell } from "lucide-react";
-
 import { useRouter } from "next/navigation";
 import { getDashboardPath } from "@/lib/utils";
-import { useGetUserNotificationsQuery, useMarkNotificationAsSeenMutation } from "@/lib/services/superadmin/notification";
-
+import {
+  useGetUserNotificationsQuery,
+  useMarkNotificationAsSeenMutation,
+} from "@/lib/services/superadmin/notification";
 
 interface NotificationDropdownProps {
   organizationId: string;
@@ -34,7 +35,14 @@ export function SuperAdminNotificationDropdown({
     isLoading,
     isError,
     refetch,
-  } = useGetUserNotificationsQuery({ organizationId, userId });
+  } = useGetUserNotificationsQuery(
+    { organizationId, userId },
+    {
+      refetchOnMountOrArgChange: false,
+      refetchOnFocus: false,
+      refetchOnReconnect: false,
+    }
+  );
 
   const [markAsSeen] = useMarkNotificationAsSeenMutation();
 
@@ -46,9 +54,23 @@ export function SuperAdminNotificationDropdown({
     }
   };
 
-  const handleViewAll = () => {
+  const handleMarkAllAsRead = async () => {
+    try {
+      const unread = data.notifications.filter((n) => !n.isSeen);
+      await Promise.all(
+        unread.map((n) =>
+          markAsSeen({ organizationId, userId, id: n.id }).unwrap()
+        )
+      );
+      refetch();
+    } catch (e) {
+      console.error("Failed to mark all as read", e);
+    }
+  };
+
+  const handleShowMore = () => {
     setMenuOpen(false);
-    let path = getDashboardPath(role);
+    const path = getDashboardPath(role);
     router.push(`${path}/notifications`);
   };
 
@@ -64,10 +86,10 @@ export function SuperAdminNotificationDropdown({
         <Button
           variant="ghost"
           size="sm"
-          className="relative rounded-full h-10 w-10 flex items-center justify-center bg-blue-100 hover:bg-blue-200 transition"
+          className="relative rounded-full h-10 w-10 flex items-center justify-center bg-orange-50 hover:bg-orange-100 transition"
           onClick={() => refetch()}
         >
-          <Bell className="h-6 w-6 text-blue-600" />
+          <Bell className="h-5 w-5 text-orange-600" />
           {!isLoading && data.unreadCount > 0 && (
             <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-500 text-white">
               {data.unreadCount}
@@ -78,16 +100,19 @@ export function SuperAdminNotificationDropdown({
 
       <DropdownMenuContent
         align="end"
-        className="w-96 max-h-[28rem] overflow-y-auto rounded-2xl shadow-lg p-0"
+        className="w-96 max-h-[28rem] overflow-y-auto rounded-2xl shadow-xl bg-white p-0"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-          <h3 className="font-semibold text-lg text-gray-800">Notifications</h3>
-          {!isLoading && data.unreadCount > 0 && (
-            <span className="text-xs text-blue-600 font-medium">
-              {data.unreadCount} new
-            </span>
-          )}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+          <h3 className="font-semibold text-base text-gray-900">
+            Notifications
+          </h3>
+          <button
+            onClick={handleMarkAllAsRead}
+            className="text-sm font-medium text-orange-500 hover:text-orange-600 flex items-center gap-1"
+          >
+            ✓ Mark all as read
+          </button>
         </div>
 
         {/* Content */}
@@ -100,54 +125,70 @@ export function SuperAdminNotificationDropdown({
 
           {isError && (
             <div className="p-4 text-sm text-red-500 text-center">
-              Failed to load notifications
+              {/* Failed to load notifications */}
             </div>
           )}
 
-          {data.notifications.length
-            ? data.notifications.map((n) => (
-                <div
-                  key={n.id}
-                  onClick={() => handleMarkAsSeen(n.id)}
-                  className={`px-4 py-3 transition hover:bg-gray-50 cursor-pointer ${
-                    n.isSeen ? "bg-white" : "bg-blue-50"
-                  }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium text-gray-900">{n.title}</p>
-                      <p className="text-sm text-gray-600 mt-0.5">
-                        {n.message}
-                      </p>
+          {data.notifications.length > 0 ? (
+            data.notifications.map((n) => (
+              <div
+                key={n.id}
+                onClick={() => handleMarkAsSeen(n.id)}
+                className="px-5 py-3 cursor-pointer hover:bg-gray-50 transition"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="bg-gray-100 rounded-full p-2">
+                      <Bell className="w-4 h-4 text-gray-600" />
                     </div>
-                    {!n.isSeen && (
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></span>
+                  </div>
+
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">
+                      {n.title || "New booking received"}
+                    </p>
+                    <p className="text-sm text-gray-600 mt-0.5 leading-snug">
+                      {n.message ||
+                        `Sarah Patel booked "Rajasthan Folk Festival"`}
+                    </p>
+                    {n.sentAt && (
+                      <p className="text-xs text-gray-400 mt-2">
+                        {new Date(n.sentAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}{" "}
+                        •{" "}
+                        {new Date(n.sentAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
                     )}
                   </div>
-                  {n.sentAt && (
-                    <p className="text-xs text-gray-400 mt-2">
-                      {new Date(n.sentAt).toLocaleString()}
-                    </p>
-                  )}
                 </div>
-              ))
-            : !isLoading && (
-                <div className="p-6 text-center text-sm text-gray-500">
-                  🎉 You’re all caught up!
-                  <p className="mt-1">No new notifications</p>
-                </div>
-              )}
+              </div>
+            ))
+          ) : (
+            !isLoading && (
+              <div className="p-6 text-center text-sm text-gray-500">
+                🎉 You’re all caught up!
+                <p className="mt-1">No new notifications</p>
+              </div>
+            )
+          )}
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 border-t border-gray-200 text-center">
-          <button
-            className="text-sm font-medium text-blue-600 hover:underline"
-            onClick={handleViewAll}
-          >
-            View all notifications
-          </button>
-        </div>
+        {data.notifications.length > 0 && (
+          <div className="px-4 py-3 border-t border-gray-100 text-center">
+            <button
+              className="text-sm font-medium text-orange-500 hover:text-orange-600 transition"
+              onClick={handleShowMore}
+            >
+              Show More
+            </button>
+          </div>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

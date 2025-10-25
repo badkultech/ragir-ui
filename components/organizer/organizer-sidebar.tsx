@@ -9,7 +9,7 @@ import {
   MapPinned,
   Images,
   ChevronDown,
-  ChevronUp,
+  ChevronRight,
   X,
   BookOpen,
   Calendar,
@@ -28,12 +28,14 @@ import {
   House,
   UserRoundCog,
   MessageCircleQuestion,
+  LogOut,
 } from "lucide-react";
 import {
   LibraryIcon,
   TripIcon,
 } from "@/components/library/SvgComponents/Icons";
 import { useState, useEffect } from "react";
+import { LogoutModal } from "./LogoutModal";
 
 type NavItem = {
   label: string;
@@ -44,7 +46,7 @@ type NavItem = {
 };
 
 const nav: NavItem[] = [
-  { label: "Dashboard", href: "/organizer", icon: LayoutGrid },
+  { label: "Dashboard", href: "/organizer/dashboard", icon: LayoutGrid },
   {
     label: "Organizer Profile",
     href: "/organizer/profile",
@@ -83,8 +85,8 @@ const nav: NavItem[] = [
   },
   { label: "Team Members", href: "/organizer/team", icon: UserRoundPlus },
   { label: "Support Center", href: "/organizer/support", icon: Headphones },
-  { label: "Billing", href: "/organizer/support", icon: CreditCard },
-  { label: "Settings", href: "/organizer/support", icon: Settings },
+  { label: "Billing", href: "/organizer/billing", icon: CreditCard },
+  { label: "Settings", href: "/organizer/settings", icon: Settings },
 ];
 
 type OrganizerSidebarProps = {
@@ -93,15 +95,16 @@ type OrganizerSidebarProps = {
   onClose: () => void;
 };
 
+
+
 export function OrganizerSidebar({
   showLogo = true,
   isOpen,
   onClose,
 }: OrganizerSidebarProps) {
   const pathname = usePathname();
-  const [open, setOpen] = useState<Record<string, boolean>>({
-    ["Library"]: true,
-  });
+  const [open, setOpen] = useState<Record<string, boolean>>({ ["Library"]: false });
+  const [showLogoutModal, setShowLogoutModal] = useState(false); // ✅ modal state
 
   const isActive = (href?: string) =>
     href
@@ -120,6 +123,16 @@ export function OrganizerSidebar({
 
   const toggle = (label: string) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const handleLogout = () => {
+    setShowLogoutModal(false);
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    // Optionally redirect
+    window.location.href = "/superadmin/login";
+    // Add your logout logic here
+    console.log("User logged out");
   };
 
   return (
@@ -196,7 +209,7 @@ export function OrganizerSidebar({
                           ].join(" ")}
                         />
                       ) : (
-                        <ChevronUp
+                        <ChevronRight
                           className={[
                             "w-5 h-5 ",
                             active ? "text-white" : "text-gray-700",
@@ -252,10 +265,22 @@ export function OrganizerSidebar({
           })}
         </nav>
 
-        {/* <div className="mt-auto p-4">
-          <div className="text-xs text-gray-400">Organizer Admin</div>
-        </div> */}
+        <div className="mt-auto p-6">
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="flex items-center gap-2 text-red-600 font-medium hover:text-red-700 transition cursor-pointer"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Log Out</span>
+          </button>
+        </div>
       </aside>
+      {/* Logout Modal */}
+      <LogoutModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 }
