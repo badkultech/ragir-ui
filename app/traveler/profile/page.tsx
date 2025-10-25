@@ -27,6 +27,7 @@ import {
   useUpdateTravelerProfileFormMutation,
 } from "@/lib/services/user";
 import { useRouter } from "next/navigation";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 
 type MoodsState = {
   mountain: boolean;
@@ -45,7 +46,7 @@ export default function TravelerProfile() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const onPickAvatar = () => fileRef.current?.click();
 
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,7 +193,11 @@ export default function TravelerProfile() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+     {/* Sidebar */}
+                <OrganizerSidebar
+                  isOpen={sidebarOpen}
+                  onClose={() => setSidebarOpen(false)}
+                />
 
       <div className="flex-1">
         <AppHeader showAvatar={true} title="Traveler Profile" />

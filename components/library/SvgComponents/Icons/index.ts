@@ -19,5 +19,8 @@ export { MountainIcon } from './mountainIcon';
 export { NightIcon } from './nightIcon';
 export { PartiesIcon } from './partiesIcon';
 export { WellnessIcon } from './wellnessIcon';
+export { TripIcon } from '../organizer/sidebar/icon/TripSidebarIcon';
+export { LibraryIcon } from '../organizer/sidebar/icon/LibrarySidebarIcon';
+
 
 // NOTE: prefer named imports: `import { BeachIcon } from "@/components/library/SvgComponents/Icons"`

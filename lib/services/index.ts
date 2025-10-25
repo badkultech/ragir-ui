@@ -1,3 +1,4 @@
+// lib/services/index.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { TAGS } from './tags';
 import type {
@@ -12,7 +13,8 @@ import { withFullLoader } from '@/lib/utils/withFullLoader';
 import type { RootState } from '../slices/store';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://ragir.badkultech.com/ragir/api',
+  // baseUrl: 'https://ragir.badkultech.com/ragir/api',
+  baseUrl: 'http://localhost:8085/ragir/api',
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.accessToken;
     if (token) headers.set('Authorization', `Bearer ${token}`);
@@ -86,7 +88,8 @@ export const baseAPI = createApi({
 
 // Public API (no token)
 const publicBaseQuery = fetchBaseQuery({
-  baseUrl: 'https://ragir.badkultech.com/ragir/api',
+  // baseUrl: 'https://ragir.badkultech.com/ragir/api',
+    baseUrl: 'http://localhost:8085/ragir/api',
 });
 export const publicBaseAPI = createApi({
   reducerPath: 'publicBaseAPI',

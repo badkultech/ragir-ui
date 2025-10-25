@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
- LayoutGrid,
+  LayoutGrid,
   Plus,
   CircleUser,
   MapPinned,
@@ -19,70 +19,89 @@ import {
   PersonStanding,
   Users,
   HelpCircle,
-   Award
+  Award,
+  UserRoundPlus,
+  Headphones,
+  Settings,
+  Briefcase,
+  CreditCard,
+  House,
+  UserRoundCog,
+  MessageCircleQuestion,
 } from "lucide-react";
+import {
+  LibraryIcon,
+  TripIcon,
+} from "@/components/library/SvgComponents/Icons";
 import { useState, useEffect } from "react";
 
 type NavItem = {
   label: string;
   href?: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon: React.ComponentType<any>;
   boxedPlus?: boolean;
   children?: NavItem[];
 };
 
 const nav: NavItem[] = [
   { label: "Dashboard", href: "/organizer", icon: LayoutGrid },
-  // {
-  //   label: "Organizer Profile",
-  //   href: "/organizer/admins",
-  //   icon: CircleUser,
-  //   children: [
-  //     { label: "Add Admin", href: "/organizer/add-admin", icon: Plus },
-  //   ],
-  // },
   {
-    label: "Organizers",
-    href: "/organizer/organizer",
+    label: "Organizer Profile",
+    href: "/organizer/profile",
     icon: CircleUser,
-    children: [
-      {
-        label: "Add Organizer",
-        href: "/organizer/add-organizer",
-        icon: Plus,
-        boxedPlus: true,
-      },
-    ],
   },
-  { label: "Trip",
-    href: "/organizer/create-trip",
-    icon: MapPinned
-  },
+  { label: "Trip", href: "/organizer/create-trip", icon: TripIcon },
   {
     label: "Library",
     href: "/organizer/library",
-    icon: Images,
+    icon: LibraryIcon,
     children: [
-      { label: "Day Description", href: "/organizer/library/events", icon: Calendar },
-      { label: "Stays", href: "/organizer/library/stays", icon: Hotel },
+      {
+        label: "Day Description",
+        href: "/organizer/library/events",
+        icon: Calendar,
+      },
+      { label: "Stays", href: "/organizer/library/stays", icon: House },
       { label: "Transit", href: "/organizer/library/transits", icon: Car },
-      { label: "Meals", href: "/organizer/library/meals", icon: UtensilsCrossed },
-      { label: "Activities", href: "/organizer/library/activities", icon: PersonStanding },
-      { label: "Trip Leaders", href: "/organizer/library/trip-leaders", icon: Award },
-      { label: "FAQs", href: "/organizer/library/faqs", icon: HelpCircle },
+      {
+        label: "Meals",
+        href: "/organizer/library/meals",
+        icon: UtensilsCrossed,
+      },
+      {
+        label: "Activities",
+        href: "/organizer/library/activities",
+        icon: PersonStanding,
+      },
+      {
+        label: "Trip Leaders",
+        href: "/organizer/library/trip-leaders",
+        icon: UserRoundCog,
+      },
+      { label: "FAQs", href: "/organizer/library/faqs", icon: MessageCircleQuestion },
     ],
   },
+  { label: "Team Members", href: "/organizer/team", icon: UserRoundPlus },
+  { label: "Support Center", href: "/organizer/support", icon: Headphones },
+  { label: "Billing", href: "/organizer/support", icon: CreditCard },
+  { label: "Settings", href: "/organizer/support", icon: Settings },
 ];
 
 type OrganizerSidebarProps = {
   showLogo?: boolean;
-  isOpen: boolean;   // for mobile
+  isOpen: boolean; // for mobile
   onClose: () => void;
 };
 
-export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: OrganizerSidebarProps) {
+export function OrganizerSidebar({
+  showLogo = true,
+  isOpen,
+  onClose,
+}: OrganizerSidebarProps) {
   const pathname = usePathname();
-  const [open, setOpen] = useState<Record<string, boolean>>({["Library"]: true});
+  const [open, setOpen] = useState<Record<string, boolean>>({
+    ["Library"]: true,
+  });
 
   const isActive = (href?: string) =>
     href
@@ -142,10 +161,14 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
 
             return (
               <div key={label}>
-                <div className={["flex items-center justify-between rounded-[8px]",
-                 active
-                        ? "bg-gray-900 text-white shadow-sm"
-                        : "text-gray-700 hover:bg-gray-50",].join(" ")}>
+                <div
+                  className={[
+                    "flex items-center justify-between rounded-[8px]",
+                    active
+                      ? "bg-gray-900 text-white shadow-sm"
+                      : "text-gray-700 hover:bg-gray-50",
+                  ].join(" ")}
+                >
                   <Link
                     href={href || "#"}
                     className="group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all"
@@ -166,9 +189,19 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
                       className="flex items-center justify-center w-6 h-6 rounded-full transition-colors pr-1"
                     >
                       {open[label] ? (
-                        <ChevronDown className={["w-5 h-5 ", active ? "text-white" : "text-gray-700" ].join(" ")} />
+                        <ChevronDown
+                          className={[
+                            "w-5 h-5 ",
+                            active ? "text-white" : "text-gray-700",
+                          ].join(" ")}
+                        />
                       ) : (
-                        <ChevronUp className={["w-5 h-5 ", active ? "text-white" : "text-gray-700" ].join(" ")} />
+                        <ChevronUp
+                          className={[
+                            "w-5 h-5 ",
+                            active ? "text-white" : "text-gray-700",
+                          ].join(" ")}
+                        />
                       )}
                     </button>
                   )}
@@ -178,40 +211,41 @@ export function OrganizerSidebar({ showLogo = true, isOpen, onClose }: Organizer
                 {children && open[label] && (
                   <div className=" bg-gray-100 rounded-[8px]">
                     <div className="mx-2 py-2 space-y-2">
-                    {children.map(({ label, href, icon: ChildIcon, boxedPlus }) => {
-                      const childActive = isActive(href);
-                      return (
-                        <Link
-                          key={href}
-                          href={href || "#"}
-                          className={[
-                            "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all",
-                            childActive
-                              ? "bg-gray-50 text-gray-600"
-                              : "text-gray-600 hover:bg-gray-50",
-                          ].join(" ")}
-                        >
-                          {boxedPlus ? (
-                            <span
+                      {children.map(
+                        ({ label, href, icon: ChildIcon, boxedPlus }) => {
+                          const childActive = isActive(href);
+                          return (
+                            <Link
+                              key={href}
+                              href={href || "#"}
                               className={[
-                                "inline-flex h-5 w-5 items-center justify-center rounded border text-xs font-semibold",
+                                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all",
                                 childActive
-                                  ? "bg-white/10 border-white/20 text-white"
-                                  : "border-gray-300 text-gray-600 group-hover:border-gray-400",
+                                  ? "bg-gray-50 text-gray-600"
+                                  : "text-gray-600 hover:bg-gray-50",
                               ].join(" ")}
                             >
-                              <Plus className="h-3.5 w-3.5" />
-                            </span>
-                          ) : (
-                            <ChildIcon className="w-4 h-4" />
-                          )}
-                          <span>{label}</span>
-                        </Link>
-                      );
-                    })}
+                              {boxedPlus ? (
+                                <span
+                                  className={[
+                                    "inline-flex h-5 w-5 items-center justify-center rounded border text-xs font-semibold",
+                                    childActive
+                                      ? "bg-white/10 border-white/20 text-white"
+                                      : "border-gray-300 text-gray-600 group-hover:border-gray-400",
+                                  ].join(" ")}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </span>
+                              ) : (
+                                <ChildIcon className="w-4 h-4" />
+                              )}
+                              <span>{label}</span>
+                            </Link>
+                          );
+                        }
+                      )}
+                    </div>
                   </div>
-                  </div> 
-                  
                 )}
               </div>
             );
