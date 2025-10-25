@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Sidebar } from '@/components/organizer/sidebar';
+
 import { AppHeader } from '@/components/app-header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -50,10 +50,11 @@ import RichTextEditor from '@/components/editor/RichTextEditor';
 import { AddTripLeaderForm } from '@/components/library/AddTripLeaderForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LibrarySelectModal } from '@/components/library/LibrarySelectModal';
+import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 
 export default function CreateTripPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [leaderModalOpen, setLeaderModalOpen] = useState(false);
   const [chooseModalOpen, setChooseModalOpen] = useState(false);
   const router = useRouter();
@@ -228,7 +229,11 @@ export default function CreateTripPage() {
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
-      <Sidebar />
+      {/* Sidebar */}
+      <OrganizerSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
       <div className='flex-1'>
         <AppHeader title='Organizers' />
 

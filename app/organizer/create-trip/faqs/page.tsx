@@ -9,8 +9,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { RichTextarea } from "@/components/create-trip/rich-textarea"
 import { Input } from "@/components/ui/input"
 import { WizardFooter } from "@/components/create-trip/wizard-footer"
-import { Sidebar } from "@/components/organizer/sidebar"
 import { AppHeader } from "@/components/app-header"
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar"
 
 interface FAQ {
   id: string
@@ -46,7 +46,7 @@ export default function FAQsPage() {
   const [faqs, setFaqs] = useState<FAQ[]>(DEFAULT_FAQS)
   const [newQuestion, setNewQuestion] = useState("")
   const [newAnswer, setNewAnswer] = useState("")
-
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const handleAddFaq = () => {
     if (!newQuestion.trim()) return; // optional: prevent empty question
     setFaqs((prev) => [
@@ -67,7 +67,11 @@ export default function FAQsPage() {
   return (
 
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+       {/* Sidebar */}
+            <OrganizerSidebar
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+            />
       <div className="flex-1 h-auto  ">
         <AppHeader title="Create New Trip" />
           <TripStepperHeader activeStep={4} />
