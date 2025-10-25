@@ -315,7 +315,7 @@ export default function CreateTripPage() {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-5'>
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Minimum Group Size <span className='text-red-500'>*</span>
+                  Minimum Group Size <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input
@@ -342,7 +342,7 @@ export default function CreateTripPage() {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Group Size <span className='text-red-500'>*</span>
+                  Maximum Group Size <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input
@@ -373,7 +373,7 @@ export default function CreateTripPage() {
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
                   Minimum Age (18yrs or above){' '}
-                  <span className='text-red-500'>*</span>
+                  <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input
@@ -400,7 +400,7 @@ export default function CreateTripPage() {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Age <span className='text-red-500'>*</span>
+                  Maximum Age <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input

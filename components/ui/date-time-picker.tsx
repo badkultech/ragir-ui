@@ -7,7 +7,7 @@ interface CustomDateTimePickerProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  className?: string; // ✅ className prop
+  className?: string;
 }
 
 export function CustomDateTimePicker({
@@ -31,7 +31,6 @@ export function CustomDateTimePicker({
       {/* Visible input */}
       <Input
         type="text"
-       
         value={
           value
             ? new Date(value).toLocaleString("en-GB", {
@@ -45,8 +44,9 @@ export function CustomDateTimePicker({
             : ""
         }
         placeholder={placeholder}
-        
-        className={`w-full pr-10 cursor-pointer `}
+        className="w-full pr-10 cursor-pointer"
+        readOnly // ✅ prevents typing, removes warning
+        onChange={() => {}} // ✅ stops React warning
       />
 
       {/* Calendar icon */}
@@ -56,7 +56,7 @@ export function CustomDateTimePicker({
         onClick={handleOpenPicker}
       />
 
-      {/* Hidden native input */}
+      {/* Hidden input (actual datetime-local picker) */}
       <input
         type="datetime-local"
         ref={hiddenInputRef}
