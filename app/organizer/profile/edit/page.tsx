@@ -5,12 +5,16 @@ import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useUpdateOrganizerProfileMutation } from '@/lib/services/organizer';
+import {
+  useLazyGetOrganizerProfileQuery,
+  useUpdateOrganizerProfileMutation,
+} from '@/lib/services/organizer';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
 import { Trash2, X } from 'lucide-react';
 import {
   Document,
+  EMPTY_DOCUMENT,
   useDocumentsManager,
 } from '@/hooks/useDocumentsManager';
 import {
@@ -21,6 +25,7 @@ import {
   setTestimonialScreenshotFile,
 } from '../../-organizer-slice';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function OrganizerProfileEditPage() {
   const dispatch = useDispatch();
@@ -29,6 +34,11 @@ export default function OrganizerProfileEditPage() {
   const state = useSelector(organizerState);
 
   const { logoFile, bannerFile, testimonialScreenshotFile, profile } = state;
+  // Keep actual File objects in local component state (Files are non-serializable)
+  const [logoUploadFile, setLogoUploadFile] = useState<File | null>(null);
+  const [bannerUploadFile, setBannerUploadFile] = useState<File | null>(null);
+  const [testimonialUploadFile, setTestimonialUploadFile] =
+    useState<File | null>(null);
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
@@ -43,13 +53,37 @@ export default function OrganizerProfileEditPage() {
     setDocuments: setCertificationsDocuments,
   } = useDocumentsManager();
 
-  const {
-    documents: screenShootDocuments,
-    error: screenShootError,
-    handleAddFiles: handleScreenShootAddFiles,
-    handleMarkForDeletion: handleScreenShootMarkForDeletion,
-    setDocuments: setScreenShootDocuments,
-  } = useDocumentsManager();
+  const [getOrgProfile, { isLoading: profileLoading }] =
+    useLazyGetOrganizerProfileQuery();
+
+  useEffect(() => {
+    if (organizationId) {
+      getOrgProfile({ organizationId }).then((res) => {
+        if (res.data) {
+          const data = res.data as any;
+          dispatch(
+            setProfile({
+              organizerName: data.organizerName || '',
+              tagline: data.tagline || '',
+              description: data.description || '',
+              websiteUrl: data.websiteUrl || '',
+              instagramHandle: data.instagramHandle || '',
+              youtubeChannel: data.youtubeChannel || '',
+              googleBusiness: data.googleBusiness || '',
+              testimonials: data.testimonials || '',
+            }),
+          );
+          dispatch(setLogoFile(data.displayPicture || EMPTY_DOCUMENT));
+          dispatch(setBannerFile(data.bannerImage || EMPTY_DOCUMENT));
+          dispatch(setTestimonialScreenshotFile(data.testimonialScreenshot));
+
+          if (data.certifications) {
+            setCertificationsDocuments(data.certifications);
+          }
+        }
+      });
+    }
+  }, [organizationId]);
 
   // Placeholder error function
   const showApiError = (msg: string) => alert(msg);
@@ -66,128 +100,65 @@ export default function OrganizerProfileEditPage() {
     return true;
   };
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setter: any,
-    document: Document,
-  ) => {
-    const file = e.target.files?.[0];
-    if (file && validateImageFile(file)) {
-      dispatch(
-        setter({
-          ...document,
-          type: file.type,
-          url: URL.createObjectURL(file),
-          file: file,
-          markedForDeletion: document.id ? true : false,
-        }),
-      );
-    }
-  };
-
   const handleSaveProfile = async () => {
     try {
       const formData = new FormData();
-      const {
-        organizerName,
-        tagline,
-        description,
-        websiteUrl,
-        instagramHandle,
-        youtubeChannel,
-        googleBusiness,
-        testimonials,
-      } = profile;
 
-      formData.append('organizerName', organizerName);
-      formData.append('tagline', tagline);
-      formData.append('description', description);
-      formData.append('websiteUrl', websiteUrl);
-      formData.append('instagramHandle', instagramHandle);
-      formData.append('youtubeChannel', youtubeChannel);
-      formData.append('googleBusiness', googleBusiness);
-      formData.append('testimonials', testimonials);
+      // 🧱 1️⃣ Append simple string fields dynamically
+      const textFields: Record<string, any> = {
+        organizerName: profile.organizerName,
+        tagline: profile.tagline,
+        description: profile.description,
+        websiteUrl: profile.websiteUrl,
+        instagramHandle: profile.instagramHandle,
+        youtubeChannel: profile.youtubeChannel,
+        googleBusiness: profile.googleBusiness,
+        testimonials: profile.testimonials,
+      };
 
-      if (logoFile.file) {
-        formData.append('displayPicture.file', String(logoFile.file));
-      }
-      if (logoFile.markedForDeletion) {
-        formData.append(
-          'displayPicture.markedForDeletion',
-          String(logoFile.markedForDeletion),
-        );
-        if (logoFile.id) {
-          formData.append('displayPicture.id', String(logoFile.id));
-        }
-      }
-
-      if (bannerFile.file) {
-        formData.append('bannerImage.file', String(bannerFile.file));
-      }
-      if (bannerFile.markedForDeletion) {
-        formData.append(
-          'bannerImage.markedForDeletion',
-          String(bannerFile.markedForDeletion),
-        );
-        if (bannerFile.id) {
-          formData.append('bannerImage.id', String(bannerFile.id));
-        }
-      }
-
-      if (testimonialScreenshotFile.file) {
-        formData.append(
-          'testimonialScreenshot.file',
-          String(testimonialScreenshotFile.file),
-        );
-      }
-      if (testimonialScreenshotFile.markedForDeletion) {
-        formData.append(
-          'testimonialScreenshot.markedForDeletion',
-          String(testimonialScreenshotFile.markedForDeletion),
-        );
-        if (testimonialScreenshotFile.id) {
-          formData.append(
-            'testimonialScreenshot.id',
-            String(testimonialScreenshotFile.id),
-          );
-        }
-      }
-
-      certificationsDocuments.forEach((certification: Document, index) => {
-        if (certification.file) {
-          formData.append(`certifications[${index}].file`, certification.file);
-        }
-        if (certification.id != null) {
-          formData.append(
-            `certifications[${index}].id`,
-            String(certification.id),
-          );
-        }
-        if (typeof certification.markedForDeletion !== 'undefined') {
-          formData.append(
-            `certifications[${index}].markedForDeletion`,
-            String(certification.markedForDeletion),
-          );
-        }
-        if (certification.type != null) {
-          formData.append(
-            `certifications[${index}].type`,
-            String(certification.type),
-          );
-        }
+      Object.entries(textFields).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) formData.append(key, value);
       });
+
+      // 🖼️ 2️⃣ Helper to append file-related data
+      const appendFileData = (
+        keyPrefix: string,
+
+        uploadFile?: File | null,
+      ) => {
+        // Append actual file
+        if (uploadFile) formData.append(`${keyPrefix}.file`, uploadFile);
+      };
+
+      // 🧩 3️⃣ Append file-related data using helper
+      appendFileData('displayPicture', logoUploadFile);
+      appendFileData('bannerImage', bannerUploadFile);
+      appendFileData('testimonialScreenshot', testimonialUploadFile);
+
+      // 📜 4️⃣ Append certifications
+      certificationsDocuments.forEach((doc, index) => {
+        if (!doc) return;
+
+        const baseKey = `certifications[${index}]`;
+
+        if (doc.file) formData.append(`${baseKey}.file`, doc.file);
+        if (doc.id !== null) formData.append(`${baseKey}.id`, String(doc.id));
+        if (typeof doc.markedForDeletion !== 'undefined')
+          formData.append(
+            `${baseKey}.markedForDeletion`,
+            String(doc.markedForDeletion),
+          );
+        if (doc.type) formData.append(`${baseKey}.type`, doc.type);
+      });
+
+      // 🚀 5️⃣ API call
       const response = await updatedOrgProfile({
-        organizationId: organizationId,
+        organizationId,
         data: formData,
-      })
-        .unwrap()
-        .then((res) => {
-          console.log(res, 'response');
-          if (res) {
-            router.back();
-          }
-        });
+      }).unwrap();
+
       console.log('Profile updated successfully:', response);
+      if (response) router.back();
     } catch (error) {
       console.error('Failed to update profile:', error);
     }
@@ -197,8 +168,12 @@ export default function OrganizerProfileEditPage() {
     if (e.target.files) handleCertificationsAddFiles(e.target.files);
   };
 
-  console.log('certificationsDocuments:', certificationsDocuments);
-
+  if (profileLoading)
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-white'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-4 border-orange-500 border-solid'></div>
+      </div>
+    );
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <OrganizerSidebar
@@ -234,16 +209,29 @@ export default function OrganizerProfileEditPage() {
                       type='file'
                       accept='image/*'
                       className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
-                      onChange={(e) =>
-                        handleFileChange(e, setLogoFile, logoFile)
-                      }
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && validateImageFile(file)) {
+                          // store raw File locally, and only store metadata in Redux
+                          setLogoUploadFile(file);
+                          dispatch(
+                            setLogoFile({
+                              ...logoFile,
+                              type: file.type,
+                              url: URL.createObjectURL(file),
+                              file: null,
+                              markedForDeletion: true,
+                            } as Document),
+                          );
+                        }
+                      }}
                     />
                   </div>
                   {logoFile.url && (
                     <Button
                       variant='outline'
                       className='hover:text-red-500'
-                      onClick={() =>
+                      onClick={() => {
                         dispatch(
                           setLogoFile({
                             ...logoFile,
@@ -251,8 +239,8 @@ export default function OrganizerProfileEditPage() {
                             url: '',
                             file: null,
                           }),
-                        )
-                      }
+                        );
+                      }}
                     >
                       <Trash2 />
                     </Button>
@@ -269,14 +257,14 @@ export default function OrganizerProfileEditPage() {
               <label className='block text-sm mb-1'>Organizer Name</label>
               <Input
                 value={profile?.organizerName}
-                onChange={(e) =>
+                onChange={(e) => {
                   dispatch(
                     setProfile({
                       ...profile,
                       organizerName: e.target.value,
                     }),
-                  )
-                }
+                  );
+                }}
                 placeholder='Enter here'
               />
             </div>
@@ -301,16 +289,28 @@ export default function OrganizerProfileEditPage() {
                         type='file'
                         accept='image/*'
                         className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
-                        onChange={(e) =>
-                          handleFileChange(e, setBannerFile, bannerFile)
-                        }
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && validateImageFile(file)) {
+                            setBannerUploadFile(file);
+                            dispatch(
+                              setBannerFile({
+                                ...bannerFile,
+                                type: file.type,
+                                url: URL.createObjectURL(file),
+                                file: null,
+                                markedForDeletion: true,
+                              } as Document),
+                            );
+                          }
+                        }}
                       />
                     </div>
                     {bannerFile.url && (
                       <Button
                         variant='outline'
                         className='hover:text-red-500'
-                        onClick={() =>
+                        onClick={() => {
                           dispatch(
                             setBannerFile({
                               ...bannerFile,
@@ -318,8 +318,8 @@ export default function OrganizerProfileEditPage() {
                               url: '',
                               file: null,
                             }),
-                          )
-                        }
+                          );
+                        }}
                       >
                         <Trash2 />
                       </Button>
@@ -442,7 +442,7 @@ export default function OrganizerProfileEditPage() {
             </div>
 
             <div className='border border-dashed rounded-lg p-6 text-center'>
-              {testimonialScreenshotFile.url && (
+              {testimonialScreenshotFile?.url && (
                 <img
                   src={testimonialScreenshotFile.url}
                   alt='Banner'
@@ -457,16 +457,24 @@ export default function OrganizerProfileEditPage() {
                     type='file'
                     accept='image/*'
                     className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
-                    onChange={(e) =>
-                      handleFileChange(
-                        e,
-                        setTestimonialScreenshotFile,
-                        testimonialScreenshotFile,
-                      )
-                    }
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && validateImageFile(file)) {
+                        setTestimonialUploadFile(file);
+                        dispatch(
+                          setTestimonialScreenshotFile({
+                            ...testimonialScreenshotFile,
+                            type: file.type,
+                            url: URL.createObjectURL(file),
+                            file: null,
+                            markedForDeletion: true,
+                          } as Document),
+                        );
+                      }
+                    }}
                   />
                 </div>
-                {testimonialScreenshotFile.url && (
+                {testimonialScreenshotFile?.url && (
                   <Button
                     variant='outline'
                     className='hover:text-red-500'
