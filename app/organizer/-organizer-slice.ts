@@ -12,10 +12,6 @@ export interface Profile {
   googleBusiness: string;
   testimonials: string;
 }
-//  const [logoFile, setLogoFile] = useState<Document>(EMPTY_DOCUMENT);
-//   const [bannerFile, setBannerFile] = useState<Document>(EMPTY_DOCUMENT);
-//   const [testimonialScreenshotFile, setTestimonialScreenshotFile] =
-//     useState<Document>(EMPTY_DOCUMENT);
 
 export interface OrganizerSliceState {
   // Organizer Profile State

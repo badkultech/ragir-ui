@@ -17,6 +17,7 @@ import {
 import { useLazyGetOrganizerProfileQuery } from '@/lib/services/organizer';
 import { selectAuthState } from '@/lib/slices/auth';
 import { EMPTY_DOCUMENT } from '@/hooks/useDocumentsManager';
+import { Instagram, YoutubeIcon } from 'lucide-react';
 
 // fake profile toggle (replace with API data later)
 const hasProfile = true;
@@ -31,6 +32,7 @@ export default function OrganizerProfilePage() {
 
   const [getOrgProfile, { isLoading: profileLoading }] =
     useLazyGetOrganizerProfileQuery();
+
   useEffect(() => {
     if (organizationId) {
       getOrgProfile({ organizationId }).then((res) => {
@@ -59,7 +61,12 @@ export default function OrganizerProfilePage() {
       });
     }
   }, [organizationId]);
-
+  if (profileLoading)
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-white'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-4 border-orange-500 border-solid'></div>
+      </div>
+    );
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <OrganizerSidebar
@@ -121,12 +128,14 @@ export default function OrganizerProfilePage() {
                 </div>
 
                 {/* Logo + Name + Socials (logo overlaps by negative margin) */}
-                <div className='flex items-center -mt-12 px-2'>
-                  <img
-                    src={logoFile.url ?? '/demo-logo.png'}
-                    alt='Logo'
-                    className='w-28 h-28 rounded-full border-4 border-white shadow-md'
-                  />
+                <div className='flex items-center -mt-12 px-2 '>
+                  {logoFile.url && (
+                    <img
+                      src={logoFile.url ?? '/demo-logo.png'}
+                      alt='Logo'
+                      className='w-28 h-28 rounded-full border-4 border-white shadow-md z-0'
+                    />
+                  )}
 
                   <div className='ml-4'>
                     <h2 className='text-2xl font-semibold'>
@@ -137,17 +146,19 @@ export default function OrganizerProfilePage() {
 
                   <div className='ml-auto flex items-center space-x-3'>
                     <a href='#' target='_blank' rel='noreferrer'>
-                      <img
-                        src='/icons/youtube.svg'
-                        className='w-6 h-6'
-                        alt='YouTube'
+                      <YoutubeIcon
+                        size={35}
+                        className='text-red-400 hover:text-red-600'
                       />
                     </a>
-                    <a href='#' target='_blank' rel='noreferrer'>
-                      <img
-                        src='/icons/instagram.svg'
-                        className='w-6 h-6'
-                        alt='Instagram'
+                    <a
+                      href='#'
+                      aria-label='Follow us on Instagram'
+                      className='hover:scale-110 transition-transform duration-200'
+                    >
+                      <Instagram
+                        size={28}
+                        className='text-pink-400 hover:text-pink-600'
                       />
                     </a>
                   </div>
