@@ -11,13 +11,14 @@ import { useSaveGroupLeaderMutation } from "@/lib/services/organizer/trip/librar
 import { selectAuthState } from "@/lib/slices/auth";
 import { useSelector } from "react-redux";
 import RichTextEditor from "../editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 
 type AddTripLeaderFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
-  open?:boolean;
+  open?: boolean;
 };
 
 export function AddTripLeaderForm({
@@ -84,7 +85,7 @@ export function AddTripLeaderForm({
       console.error("❌ Failed to save trip leader:", err);
     }
   };
-
+  const isTripMode = mode === "trip";
 
 
 
@@ -94,13 +95,11 @@ export function AddTripLeaderForm({
       {/* Profile Image Upload */}
       {/* Top-right button */}
       <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
+        {isTripMode ? (
+          <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+        ) : (
+          <div className="mt-2" />
+        )}
       </div>
       <div className="flex flex-col items-center gap-3">
         {previewUrl ? (
@@ -165,20 +164,23 @@ export function AddTripLeaderForm({
           rows={5}
           maxLength={500}
         /> */}
-      <RichTextEditor
-        value={bio}
-          onChange={ setBio}
+        <RichTextEditor
+          value={bio}
+          onChange={setBio}
           placeholder="Enter here"
           maxLength={500}
-      />
+        />
 
       </div>
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="trip-leaders"
-      />
+      {mode === "trip" &&
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="trip-leaders"
+        />
+      }
+
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
         <Button variant="outline" className="rounded-full" onClick={onCancel}>

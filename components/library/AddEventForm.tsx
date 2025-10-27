@@ -285,12 +285,14 @@ export function AddEventForm({
       </div>
 
       {/* Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category='events'
-      />
+      {mode === "trip" &&
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category='events'
+        />
+      }
     </div>
   );
 }

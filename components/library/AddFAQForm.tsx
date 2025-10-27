@@ -159,12 +159,14 @@ export function AddFAQForm({
       </div>
 
       {/* Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="faqs"
-      />
+      {mode === "trip" &&
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="faqs"
+        />
+      }
     </div>
   );
 }

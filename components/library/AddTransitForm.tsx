@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import MDEditor from "@uiw/react-md-editor";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
@@ -20,14 +18,15 @@ type AddTransitFormProps = {
 
 
 const VEHICLES = [
-  "Traveler Van",
-  "CAR",
-  "Motorbike",
-  "Cruise",
-  "Airplane",
-  "Train",
-  "Bus",
+  { label: "Traveler Van", value: "TRAVELER_VAN" },
+  { label: "Car", value: "CAR" },
+  { label: "Motorbike", value: "MOTORBIKE" },
+  { label: "Cruise", value: "CRUISE" },
+  { label: "Airplane", value: "AIRPLANE" },
+  { label: "Train", value: "TRAIN" },
+  { label: "Bus", value: "BUS" },
 ];
+
 
 export function AddTransitForm({
   mode = "trip",
@@ -36,18 +35,18 @@ export function AddTransitForm({
   header,
   initialData,
 }: AddTransitFormProps) {
-  const [title, setTitle] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [departure, setDeparture] = useState("");
-  const [arrival, setArrival] = useState("");
-  const [vehicle, setVehicle] = useState<string[]>([]);
+  const [title, setTitle] = useState("Mumbai To Goa Transit");
+  const [from, setFrom] = useState("Mumbai");
+  const [to, setTo] = useState("Goa");
+  const [departure, setDeparture] = useState("13:00");
+  const [arrival, setArrival] = useState("15:00");
+  const [vehicle, setVehicle] = useState<string[]>(["CAR"]);
   const [otherVehicle, setOtherVehicle] = useState("");
-  const [arrangement, setArrangement] = useState<"organizer" | "traveler">(
-    "organizer"
+  const [arrangement, setArrangement] = useState<"ORGANIZER" | "SELF">(
+    "ORGANIZER"
   );
-  const [description, setDescription] = useState("");
-  const [packing, setPacking] = useState("");
+  const [description, setDescription] = useState("sdfsdf");
+  const [packing, setPacking] = useState("sdfdsfds");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
 
@@ -67,7 +66,7 @@ export function AddTransitForm({
     // Handle vehicle and arrangement
     setVehicle(initialData.vehicleType ? [initialData.vehicleType] : []);
     setArrangement(
-      initialData.arrangedBy?.toLowerCase() === "traveler" ? "traveler" : "organizer"
+      initialData.arrangedBy?.toUpperCase() === "SELF" ? "SELF" : "ORGANIZER"
     );
   }, [initialData]);
 
@@ -176,21 +175,23 @@ export function AddTransitForm({
         <label className="block text-[0.95rem] font-medium mb-2">
           Vehicle *
         </label>
+
         <div className="flex flex-wrap gap-2">
           {VEHICLES.map((v) => (
             <button
               type="button"
-              key={v}
-              onClick={() => toggleVehicle(v)}
-              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v)
+              key={v.value}
+              onClick={() => toggleVehicle(v.value)}
+              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
                 ? "bg-orange-500 text-white border-orange-500"
                 : "border-gray-300 hover:border-orange-400"
                 }`}
             >
-              {v}
+              {v.label}
             </button>
           ))}
         </div>
+
         <Input
           value={otherVehicle}
           onChange={(e) => setOtherVehicle(e.target.value)}
@@ -198,6 +199,7 @@ export function AddTransitForm({
           className="mt-2"
         />
       </div>
+
 
       {/* Arrangement */}
       <div>
@@ -208,16 +210,16 @@ export function AddTransitForm({
           <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
-              checked={arrangement === "organizer"}
-              onChange={() => setArrangement("organizer")}
+              checked={arrangement === "ORGANIZER"}
+              onChange={() => setArrangement("ORGANIZER")}
             />
             Arranged by the organizer
           </label>
           <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
-              checked={arrangement === "traveler"}
-              onChange={() => setArrangement("traveler")}
+              checked={arrangement === "SELF"}
+              onChange={() => setArrangement("SELF")}
             />
             Self arranged by the traveler
           </label>
@@ -299,12 +301,14 @@ export function AddTransitForm({
       </div>
 
       {/* Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="transit"
-      />
+      {mode === "trip" &&
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="transit"
+        />
+      }
     </div>
   );
 }

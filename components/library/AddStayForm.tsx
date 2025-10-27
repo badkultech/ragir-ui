@@ -1,23 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import MDEditor from "@uiw/react-md-editor";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 type AddStayFormProps = {
-  mode?: string;
+  mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
   header?: string;
+  initialData?: any; // ✅ NEW for edit prefill
 };
 
-export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStayFormProps) {
+export function AddStayForm({
+  mode = "trip",
+  onCancel,
+  onSave,
+  header,
+  initialData,
+}: AddStayFormProps) {
   const [title, setTitle] = useState("");
   const [sharingType, setSharingType] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -28,12 +33,38 @@ export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStay
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
 
+  const isTripMode = mode === "trip";
+
+  // ✅ Prefill form when editing existing stay
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("Prefilling stay form with:", initialData);
+
+    setTitle(initialData.title || initialData.name || "");
+    setSharingType(initialData.sharingType || "");
+    setCheckIn(initialData.checkIn || "");
+    setCheckOut(initialData.checkOut || "");
+    setLocation(initialData.location || "");
+    setDescription(initialData.description || "");
+    setPacking(initialData.packingSuggestion || "");
+  }, [initialData]);
+
+  // ✅ Handle file input
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setImages(Array.from(e.target.files));
     }
   };
 
+  // ✅ Handle "Choose from Library"
+  const handleLibrarySelect = (item: any) => {
+    setTitle(item.title || "");
+    setLocation(item.location || "");
+    setDescription(item.description || "");
+  };
+
+  // ✅ Submit data to parent
   const handleSubmit = () => {
     onSave({
       title,
@@ -48,30 +79,23 @@ export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStay
     });
   };
 
-  // 🟠 Callback when user picks item from Library
-  const handleLibrarySelect = (item: any) => {
-    setTitle(item.title || "");
-    setLocation(item.location || "");
-    setDescription(item.description || "");
-  };
-  const isTripMode = mode === "trip";
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+      {/* Header */}
       <div className="flex items-center justify-between w-full">
         {header && (
-          <div className="text-lg  font-semibold text-gray-800  pb-2">
+          <div className="text-lg font-semibold text-gray-800 pb-2">
             {header}
           </div>
         )}
-
       </div>
+
       {/* Top-right button */}
       {isTripMode ? (
         <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
       ) : (
-        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+        <div className="mt-2" />
       )}
-
 
       {/* Title */}
       <div>
@@ -84,7 +108,7 @@ export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStay
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+        <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
       </div>
@@ -97,27 +121,36 @@ export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStay
           className="w-full border rounded-lg p-2 text-sm text-gray-700"
         >
           <option value="">Type of Sharing</option>
-          <option value="single">Single Occupancy</option>
-          <option value="double">Double Occupancy</option>
-          <option value="triple">Triple Occupancy</option>
+          <option value="SINGLE">Single Occupancy</option>
+          <option value="DOUBLE">Double Occupancy</option>
+          <option value="TRIPLE">Triple Occupancy</option>
         </select>
       </div>
 
-      {/* Check-in/out + Location */}
+      {/* Check-in / Check-out + Location */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Check-in Time *
           </label>
-          <Input type="time" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+          <Input
+            type="time"
+            value={checkIn}
+            onChange={(e) => setCheckIn(e.target.value)}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Check-out Time *
           </label>
-          <Input type="time" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+          <Input
+            type="time"
+            value={checkOut}
+            onChange={(e) => setCheckOut(e.target.value)}
+          />
         </div>
       </div>
+
       <Input
         value={location}
         onChange={(e) => setLocation(e.target.value)}
@@ -130,7 +163,7 @@ export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStay
           Description
         </label>
         <RichTextEditor
-          placeholder="enter text"
+          placeholder="Enter description"
           value={description}
           onChange={setDescription}
         />
@@ -167,7 +200,7 @@ export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStay
           />
         </label>
         {images.length > 0 && (
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-orange-500 mt-2">
             {images.length} file(s) selected
           </p>
         )}
@@ -180,19 +213,21 @@ export function AddStayForm({ mode = "trip", onCancel, onSave, header }: AddStay
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] text-white"
         >
           Save
         </Button>
       </div>
 
-      {/* 🟠 Library Modal (category-specific) */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="stays"
-      />
+      {/* Library Modal */}
+      {isTripMode && (
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="stays"
+        />
+      )}
     </div>
   );
 }

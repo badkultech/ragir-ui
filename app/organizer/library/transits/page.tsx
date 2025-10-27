@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Bus, Pencil, Eye, Trash2 } from "lucide-react";
+import { Bus, Pencil, Eye, Trash2, Car, MapPin, User } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import { skipToken } from "@reduxjs/toolkit/query";
 import {
   Dialog,
@@ -19,22 +17,33 @@ import { Button } from "@/components/ui/button";
 import {
   useDeleteOrganizerTransitMutation,
   useGetOrganizerTransitsQuery,
-} from "@/lib/services/organizer/trip/library/transits";
+  useGetOrganizerTransitByIdQuery,
+} from "@/lib/services/organizer/trip/library/transit";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 export default function TransitPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
-  const [selectedTransit, setSelectedTransit] = useState<any>(null);
+  const [selectedTransitId, setSelectedTransitId] = useState<number | null>(null);
   const [updateId, setUpdateId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   const { data: transits = [], isLoading, refetch } = useGetOrganizerTransitsQuery(
     organizationId ? { organizationId } : skipToken
   );
+
+  const {
+    data: selectedTransit,
+    isFetching: isTransitLoading,
+  } = useGetOrganizerTransitByIdQuery(
+    selectedTransitId && organizationId
+      ? { organizationId, transitId: selectedTransitId }
+      : skipToken
+  );
+
 
   const [deleteTransit, { isLoading: isDeleting }] =
     useDeleteOrganizerTransitMutation();
@@ -47,7 +56,7 @@ export default function TransitPage() {
         transitId: selectedTransit.id,
       }).unwrap();
       setConfirmOpen(false);
-      setSelectedTransit(null);
+      setSelectedTransitId(null);
       refetch();
     } catch (err) {
       console.error("Failed to delete Transit", err);
@@ -89,8 +98,10 @@ export default function TransitPage() {
                   key={t.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
                 >
-                  <div className="h-20 bg-gray-50 flex items-center justify-center">
-                    <Bus className="w-10 h-10 text-gray-400" />
+                  <div className="h-20 flex px-5 py-2 mb-3">
+                    <div className="w-20 h-20 bg-gray-100 flex items-center justify-center rounded-xl">
+                      <Car className="w-10 h-10 text-gray-400" />
+                    </div>
                   </div>
 
                   <div className="p-4 flex-1 flex flex-col">
@@ -109,7 +120,7 @@ export default function TransitPage() {
                       <button
                         className="hover:text-blue-500"
                         onClick={() => {
-                          setSelectedTransit(t);
+                          setSelectedTransitId(t.id);
                           setViewOpen(true);
                         }}
                       >
@@ -120,7 +131,7 @@ export default function TransitPage() {
                       <button
                         className="hover:text-orange-500"
                         onClick={() => {
-                          setSelectedTransit(t);
+                          setSelectedTransitId(t.id);
                           setUpdateId(t.id);
                           setModalOpen(true);
                         }}
@@ -132,7 +143,7 @@ export default function TransitPage() {
                       <button
                         className="hover:text-red-500"
                         onClick={() => {
-                          setSelectedTransit(t);
+                          setSelectedTransitId(t.id);
                           setConfirmOpen(true);
                         }}
                       >
@@ -186,32 +197,120 @@ export default function TransitPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 👁 View Modal */}
-      <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-        <DialogContent className="sm:max-w-2xl rounded-2xl p-6">
-          <DialogHeader className="border-b pb-4">
-            <DialogTitle className="text-lg font-bold text-gray-900">
-              {selectedTransit?.fromLocation} → {selectedTransit?.toLocation}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="mt-5 space-y-3 text-sm text-gray-700">
-            <p>
-              <strong>Vehicle:</strong> {selectedTransit?.vehicleType}
-            </p>
-            <p>
-              <strong>Arranged By:</strong> {selectedTransit?.arrangedBy}
-            </p>
-            <p>
-              <strong>Timing:</strong>{" "}
-              {selectedTransit?.startTime} → {selectedTransit?.endTime}
-            </p>
-            <p>
-              <strong>Description:</strong>{" "}
-              {selectedTransit?.description || "—"}
-            </p>
-          </div>
+      <Dialog open={viewOpen} onOpenChange={(open) => {
+        setViewOpen(open);
+        if (!open) setSelectedTransitId(null);
+      }}>
+        <DialogContent className="max-w-2xl w-[90vw] rounded-2xl p-0 overflow-hidden">
+          {isTransitLoading ? (
+            <div className="p-10 text-center text-gray-500">
+              Loading transit details...
+            </div>
+          ) : (
+            <>
+              {/* Header Image */}
+              <div className="w-full h-48 bg-gray-100">
+                <img
+                  src={selectedTransit?.documents?.[0]?.url || "/placeholder-image.jpg"}
+                  alt="Transit"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center justify-between">
+                    {selectedTransit?.fromLocation} → {selectedTransit?.toLocation}
+                  </DialogTitle>
+                </DialogHeader>
+
+                {/* Description */}
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  {selectedTransit?.description ||
+                    "Travel comfortably on this route where your journey is as relaxing as your destination."}
+                </p>
+
+                {/* Divider */}
+                <div className="border-t my-4" />
+
+                {/* Info Section */}
+                <div className="space-y-3 text-sm text-gray-700">
+                  {/* Vehicle */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Car className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium">Vehicle</span>
+                    </div>
+                    <span className="text-gray-800">
+                      {Array.isArray(selectedTransit?.vehicleType)
+                        ? selectedTransit.vehicleType.join(" | ")
+                        : selectedTransit?.vehicleType || "—"}
+                    </span>
+                  </div>
+
+                  {/* Departure */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium">Departure</span>
+                    </div>
+                    <span className="text-gray-800">
+                      {selectedTransit?.fromLocation || "—"} &nbsp; | &nbsp;
+                      {selectedTransit?.startTime || "—"}
+                    </span>
+                  </div>
+
+                  {/* Arrival */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium">Arrival</span>
+                    </div>
+                    <span className="text-gray-800">
+                      {selectedTransit?.toLocation || "—"} &nbsp; | &nbsp;
+                      {selectedTransit?.endTime || "—"}
+                    </span>
+                  </div>
+
+                  {/* Mode of Arrangements */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium">Mode of Arrangements</span>
+                    </div>
+                    <span className="text-gray-800 text-right">
+                      {selectedTransit?.arrangedBy
+                        ? `Self Arranged by the ${selectedTransit.arrangedBy.toLowerCase()}`
+                        : "—"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t my-5" />
+
+                {/* Packing Suggestions */}
+                {selectedTransit?.packagingSuggestion && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      Packing Suggestions
+                    </h3>
+                    <div
+                      className="prose prose-sm max-w-none text-gray-700"
+                      dangerouslySetInnerHTML={{
+                        __html: selectedTransit.packagingSuggestion,
+                      }}
+                    />
+                  </div>
+                )}
+
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
+
+
     </div>
   );
 }

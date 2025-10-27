@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
@@ -14,18 +13,42 @@ type AddActivityFormProps = {
   onCancel: () => void;
   onSave: (data: any) => void;
   header?: string;
+  initialData?: any; // ✅ for edit mode
 };
 
-export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: AddActivityFormProps) {
+export function AddActivityForm({
+  mode = "trip",
+  onCancel,
+  onSave,
+  header,
+  initialData,
+}: AddActivityFormProps) {
   const [title, setTitle] = useState("");
   const [moodTags, setMoodTags] = useState<string[]>([]);
-  const [priceType, setPriceType] = useState<"included" | "chargeable">("included");
+  const [priceType, setPriceType] = useState<"INCLUDED" | "CHARGEABLE">("INCLUDED");
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+
+  const isTripMode = mode === "trip";
+
+  // ✅ Prefill when editing
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("Prefilling activity form with:", initialData);
+
+    setTitle(initialData.title || initialData.name || "");
+    setMoodTags(initialData.moodTags || []);
+    setPriceType(initialData.chargeable ? "CHARGEABLE" : "INCLUDED");
+    setLocation(initialData.location || "");
+    setTime(initialData.time || "");
+    setDescription(initialData.description || "");
+    setPacking(initialData.packingSuggestion || "");
+  }, [initialData]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setImages(Array.from(e.target.files));
@@ -38,27 +61,32 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
   };
 
   const handleSubmit = () => {
-    onSave({ title, moodTags, priceType, location, time, description, packing, images, mode });
+    onSave({
+      title,
+      moodTags,
+      priceType,
+      location,
+      time,
+      description,
+      packing,
+      images,
+      mode,
+    });
   };
-
-  const isTripMode = mode === "trip";
 
   return (
     <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
-      <div className="flex items-center justify-between w-full">
-        {header && (
-          <div className="text-lg  font-semibold text-gray-800  pb-2">
-            {header}
-          </div>
-        )}
-      </div>
-      {/* Top-right button */}
+      {/* Header */}
+      {header && (
+        <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>
+      )}
+
+      {/* Choose from Library */}
       {isTripMode ? (
         <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
       ) : (
-        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+        <div className="mt-2" />
       )}
-
 
       {/* Title */}
       <div>
@@ -69,21 +97,24 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-orange-500 mt-1">{title.length}/70 Characters</p>
+        <p className="text-xs text-right text-orange-500 mt-1">
+          {title.length}/70 Characters
+        </p>
       </div>
 
       {/* Mood Tags */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">Mood Tags *</label>
         <select
+          multiple
           value={moodTags}
           onChange={(e) => setMoodTags(Array.from(e.target.selectedOptions, o => o.value))}
           className="w-full border rounded-lg p-2 text-sm text-gray-700"
         >
-          <option value="adventure" className="">Adventure</option>
-          <option value="relaxing">Relaxing</option>
-          <option value="cultural">Cultural</option>
-          <option value="family">Family</option>
+          <option value="ADVENTURE">Adventure</option>
+          <option value="RELAXING">Relaxing</option>
+          <option value="CULTURAL">Cultural</option>
+          <option value="FAMILY">Family</option>
         </select>
       </div>
 
@@ -94,16 +125,16 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
           <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
-              checked={priceType === "included"}
-              onChange={() => setPriceType("included")}
+              checked={priceType === "INCLUDED"}
+              onChange={() => setPriceType("INCLUDED")}
             />
             Included
           </label>
-          <label className="flex items-center gap-2 text-[0.95rem]">
+          <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
-              checked={priceType === "chargeable"}
-              onChange={() => setPriceType("chargeable")}
+              checked={priceType === "CHARGEABLE"}
+              onChange={() => setPriceType("CHARGEABLE")}
             />
             Chargeable
           </label>
@@ -120,7 +151,6 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
             placeholder="Location"
           />
         </div>
-
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">Time</label>
           <Input
@@ -133,15 +163,7 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
 
       {/* Description */}
       <div>
-        <label className="block text-[0.95rem] font-medium  mb-1">Description</label>
-        {/* <Textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter here"
-          rows={5}
-          maxLength={800}
-        /> */}
-
+        <label className="block text-[0.95rem] font-medium mb-1">Description</label>
         <RichTextEditor
           value={description}
           onChange={setDescription}
@@ -150,7 +172,7 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
         />
       </div>
 
-      {/* Packing Suggestions */}
+      {/* Packing */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
         <RichTextEditor
@@ -181,17 +203,6 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
         )}
       </div>
 
-      {isTripMode && <div className="flex flex-col items-end gap-2">
-        <div className="flex justify-end items-center gap-2">
-          <Input type="checkbox" value="" className=" w-[22px]" />
-          <label className="block text-[0.95rem] font-medium">
-            Save in Library
-          </label>
-        </div>
-
-        <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-      </div>}
-
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
@@ -204,12 +215,14 @@ export function AddActivityForm({ mode = "trip", onCancel, onSave, header }: Add
       </div>
 
       {/* Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="activities"
-      />
+      {isTripMode && (
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="activities"
+        />
+      )}
     </div>
   );
 }

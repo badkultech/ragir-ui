@@ -14,4 +14,7 @@ export const TAGS = {
   travelerProfile: 'travelerProfile',
   tripLibraryGroupLeader: 'TripLibraryGroupLeader',
   organizerProfile: 'organizerProfile',
+  tripLibraryMeal: 'tripLibraryMeal',
+  tripLibraryStay: 'tripLibraryStay',
+  tripLibraryActivity: 'tripLibraryActivity',
 } as const;

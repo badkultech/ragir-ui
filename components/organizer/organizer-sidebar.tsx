@@ -4,38 +4,28 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutGrid,
-  Plus,
   CircleUser,
-  MapPinned,
-  Images,
   ChevronDown,
   ChevronRight,
   X,
-  BookOpen,
   Calendar,
-  Hotel,
   Car,
   UtensilsCrossed,
   PersonStanding,
-  Users,
-  HelpCircle,
-  Award,
   UserRoundPlus,
   Headphones,
   Settings,
-  Briefcase,
   CreditCard,
   House,
   UserRoundCog,
   MessageCircleQuestion,
-  LogOut,
 } from "lucide-react";
 import {
   LibraryIcon,
   TripIcon,
 } from "@/components/library/SvgComponents/Icons";
 import { useState, useEffect } from "react";
-import { LogoutModal } from "./LogoutModal";
+import { LogoutButton } from "../common/LogoutButton";
 
 type NavItem = {
   label: string;
@@ -63,8 +53,9 @@ const nav: NavItem[] = [
         href: "/organizer/library/events",
         icon: Calendar,
       },
-      { label: "Stays", href: "/organizer/library/stays", icon: House },
       { label: "Transit", href: "/organizer/library/transits", icon: Car },
+      { label: "Stays", href: "/organizer/library/stays", icon: House },
+
       {
         label: "Meals",
         href: "/organizer/library/meals",
@@ -84,7 +75,7 @@ const nav: NavItem[] = [
     ],
   },
   { label: "Team Members", href: "/organizer/team", icon: UserRoundPlus },
-  { label: "Support Center", href: "/organizer/support", icon: Headphones },
+  { label: "Support Center", href: "/organizer/queries", icon: Headphones },
   { label: "Billing", href: "/organizer/billing", icon: CreditCard },
   { label: "Settings", href: "/organizer/settings", icon: Settings },
 ];
@@ -104,7 +95,6 @@ export function OrganizerSidebar({
 }: OrganizerSidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState<Record<string, boolean>>({ ["Library"]: false });
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // ✅ modal state
 
   const isActive = (href?: string) =>
     href
@@ -123,16 +113,6 @@ export function OrganizerSidebar({
 
   const toggle = (label: string) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
-  };
-
-  const handleLogout = () => {
-    setShowLogoutModal(false);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    // Optionally redirect
-    window.location.href = "/superadmin/login";
-    // Add your logout logic here
-    console.log("User logged out");
   };
 
   return (
@@ -169,118 +149,106 @@ export function OrganizerSidebar({
 
         {/* Navigation */}
         <nav className="p-3 space-y-3 overflow-y-auto">
-          {nav.map(({ label, href, icon: Icon, boxedPlus, children }) => {
+          {nav.map(({ label, href, icon: Icon, children }) => {
             const active = isActive(href);
+            const hasChildren = !!children;
 
             return (
               <div key={label}>
                 <div
+                  onClick={() => {
+                    if (hasChildren) {
+                      toggle(label);
+                    }
+                  }}
                   className={[
-                    "flex items-center justify-between rounded-[8px]",
+                    "flex items-center justify-between rounded-[8px] cursor-pointer select-none",
                     active
                       ? "bg-gray-900 text-white shadow-sm"
                       : "text-gray-700 hover:bg-gray-50",
                   ].join(" ")}
                 >
-                  <Link
-                    href={href || "#"}
-                    className="group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all"
-                  >
-                    <Icon
-                      className={[
-                        "w-5 h-5",
-                        active
-                          ? "text-white"
-                          : "text-gray-700 group-hover:text-gray-900",
-                      ].join(" ")}
-                    />
-                    <span className="font-medium text-[1rem]">{label}</span>
-                  </Link>
-                  {children && (
-                    <button
-                      onClick={() => toggle(label)}
-                      className="flex items-center justify-center w-6 h-6 rounded-full transition-colors pr-1"
+                  {/* Label Section */}
+                  {hasChildren ? (
+                    <div className="flex flex-1 items-center gap-3 px-4 py-3">
+                      <Icon
+                        className={[
+                          "w-5 h-5",
+                          active ? "text-white" : "text-gray-700",
+                        ].join(" ")}
+                      />
+                      <span className="font-medium text-[1rem]">{label}</span>
+                    </div>
+                  ) : (
+                    <Link
+                      href={href || "#"}
+                      className="group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all"
                     >
+                      <Icon
+                        className={[
+                          "w-5 h-5",
+                          active
+                            ? "text-white"
+                            : "text-gray-700 group-hover:text-gray-900",
+                        ].join(" ")}
+                      />
+                      <span className="font-medium text-[1rem]">{label}</span>
+                    </Link>
+                  )}
+
+                  {/* Chevron for expandable items */}
+                  {hasChildren && (
+                    <div className="pr-3 transition-transform duration-200">
                       {open[label] ? (
                         <ChevronDown
-                          className={[
-                            "w-5 h-5 ",
-                            active ? "text-white" : "text-gray-700",
-                          ].join(" ")}
+                          className={`w-5 h-5 ${active ? "text-white" : "text-gray-700"
+                            }`}
                         />
                       ) : (
                         <ChevronRight
-                          className={[
-                            "w-5 h-5 ",
-                            active ? "text-white" : "text-gray-700",
-                          ].join(" ")}
+                          className={`w-5 h-5 ${active ? "text-white" : "text-gray-700"
+                            }`}
                         />
                       )}
-                    </button>
+                    </div>
                   )}
                 </div>
 
-                {/* Submenu */}
-                {children && open[label] && (
-                  <div className=" bg-gray-100 rounded-[8px]">
+                {/* Submenu Section */}
+                {hasChildren && open[label] && (
+                  <div className="bg-gray-100 rounded-[8px] mt-1">
                     <div className="mx-2 py-2 space-y-2">
-                      {children.map(
-                        ({ label, href, icon: ChildIcon, boxedPlus }) => {
-                          const childActive = isActive(href);
-                          return (
-                            <Link
-                              key={href}
-                              href={href || "#"}
-                              className={[
-                                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all",
-                                childActive
-                                  ? "bg-gray-50 text-gray-600"
-                                  : "text-gray-600 hover:bg-gray-50",
-                              ].join(" ")}
-                            >
-                              {boxedPlus ? (
-                                <span
-                                  className={[
-                                    "inline-flex h-5 w-5 items-center justify-center rounded border text-xs font-semibold",
-                                    childActive
-                                      ? "bg-white/10 border-white/20 text-white"
-                                      : "border-gray-300 text-gray-600 group-hover:border-gray-400",
-                                  ].join(" ")}
-                                >
-                                  <Plus className="h-3.5 w-3.5" />
-                                </span>
-                              ) : (
-                                <ChildIcon className="w-4 h-4" />
-                              )}
-                              <span>{label}</span>
-                            </Link>
-                          );
-                        }
-                      )}
+                      {children.map(({ label, href, icon: ChildIcon }) => {
+                        const childActive = isActive(href);
+                        return (
+                          <Link
+                            key={href}
+                            href={href || "#"}
+                            className={[
+                              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all",
+                              childActive
+                                ? "bg-gray-50 text-gray-900 font-medium"
+                                : "text-gray-600 hover:bg-gray-50",
+                            ].join(" ")}
+                          >
+                            <ChildIcon className="w-4 h-4" />
+                            <span>{label}</span>
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
             );
           })}
+
         </nav>
 
         <div className="mt-auto p-6">
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="flex items-center gap-2 text-red-600 font-medium hover:text-red-700 transition cursor-pointer"
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Log Out</span>
-          </button>
+          <LogoutButton />
         </div>
       </aside>
-      {/* Logout Modal */}
-      <LogoutModal
-        open={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={handleLogout}
-      />
     </>
   );
 }

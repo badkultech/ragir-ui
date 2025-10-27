@@ -14,6 +14,7 @@ export const ENDPOINTS = {
 
   // login
   LOGIN: '/auth/login',
+  CHANGE_PASSWORD: '/auth/change-password',
 
   // invite and password reset
   SETUP_PASSWORD: '/public/invite/setup-password',
@@ -81,6 +82,14 @@ export const ENDPOINTS = {
         `/org/${organizationId}/library/faqs`,
       TRANSIT:(organizationId: string) =>
         `/org/${organizationId}/library/transit`,
+      MEAL: (organizationId: string) =>
+        `/org/${organizationId}/library/meal`,
+      TRIP_LEADER: (organizationId: string) =>
+        `/org/${organizationId}/library/leader`,
+      STAY: (organizationId: string) =>
+        `/org/${organizationId}/library/stay`,
+      ACTIVITY: (organizationId: string) => 
+        `/org/${organizationId}/library/activity`,
     },
   },
 } as const;

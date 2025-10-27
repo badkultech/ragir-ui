@@ -83,13 +83,6 @@ export default function OrganizerProfilePage() {
               <h1 className='text-3xl font-semibold'>Organiser Profile</h1>
 
               <div className='flex items-center space-x-3'>
-                <Button
-                  variant='outline'
-                  className='rounded-full px-5 py-2 border-gray-300'
-                >
-                  Discard
-                </Button>
-
                 <Link href='/organizer/profile/edit'>
                   <Button className='rounded-full px-5 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white'>
                     Edit Profile
