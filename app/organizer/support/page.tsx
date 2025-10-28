@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { SidebarOpen } from "lucide-react";
+import { PlusCircle } from "lucide-react";
+import { AddNewTicketModal } from "@/components/organizer/support/AddNewTicketModal";
 
 const tickets = [
   {
@@ -15,7 +16,7 @@ const tickets = [
     status: "Open",
     created: "2 hours ago",
     updated: "2 hours ago",
-    user: "/user-avatar.png", // sample avatar path
+    user: "/user-avatar.png",
   },
   {
     id: "#T-1025",
@@ -48,6 +49,7 @@ export default function SupportCenter() {
     "All" | "Open" | "In Progress" | "Resolved"
   >("All");
   const [SidebarOpen, setSidebarOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const filteredTickets =
     filter === "All" ? tickets : tickets.filter((t) => t.status === filter);
 
@@ -57,9 +59,28 @@ export default function SupportCenter() {
         isOpen={SidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
+
       <div className="flex flex-col flex-1">
-        <AppHeader title="Support Center"  onMenuClick={() => setSidebarOpen(true)} />
-        <div className="p-6 space-y-6">
+        <AppHeader
+          title="Support Center"
+          onMenuClick={() => setSidebarOpen(true)}
+        />
+
+        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Header Row with New Ticket Button */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-gray-800">
+              Support Center
+            </h1>
+            <Button
+              className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <PlusCircle className="w-4 h-4" />
+              New Ticket
+            </Button>
+          </div>
+
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="border-orange-500 border">
@@ -146,8 +167,9 @@ export default function SupportCenter() {
               </Card>
             ))}
           </div>
-        </div>
+        </main>
       </div>
+      <AddNewTicketModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
