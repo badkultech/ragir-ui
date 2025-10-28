@@ -75,7 +75,7 @@ const nav: NavItem[] = [
     ],
   },
   { label: "Team Members", href: "/organizer/team", icon: UserRoundPlus },
-  { label: "Support Center", href: "/organizer/queries", icon: Headphones },
+  { label: "Support Center", href: "/organizer/support", icon: Headphones },
   { label: "Billing", href: "/organizer/billing", icon: CreditCard },
   { label: "Settings", href: "/organizer/settings", icon: Settings },
 ];
