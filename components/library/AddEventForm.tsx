@@ -45,7 +45,6 @@ export function AddEventForm({
   const [imagesPreview, setImagesPreview] = useState<string[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [success, setSuccess] = useState(false);
   const { toast } = useToast();
   
   
@@ -103,7 +102,7 @@ export function AddEventForm({
   if (!description.trim()) newErrors.description = "Description is required";
   if (!location.trim()) newErrors.location = "Location is required";
 
-  // Add more if needed (e.g., time, packing)
+  
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
@@ -322,9 +321,9 @@ try {
       {mode === "trip" &&
         <LibrarySelectModal
           open={libraryOpen}
-          onClose={() => setLibraryOpen(false)}
-          onSelect={handleLibrarySelect}
-          category='events'
+          onClose = {() => setLibraryOpen(false)}
+          onSelect = {handleLibrarySelect}
+          category = 'events'
         />
       }
     </div>
