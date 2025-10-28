@@ -476,6 +476,7 @@ export function AddNewItemModal({
             <>
               <StepHeader title={updateId ? "Edit Trip Leader" : "Add Trip Leader"} />
               <AddTripLeaderForm
+                updateId={updateId}
                 mode="library"
                 onCancel={handleBack}
                 onSave={(data: any) => {

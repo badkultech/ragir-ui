@@ -60,9 +60,13 @@ export function AddEventForm({
     }
   };
   const [getDayDescription] = useLazyGetOrganizerDayDescriptionByIdQuery();
+
+
+  
   console.log('imagesPreview', documents);
   useEffect(() => {
     if (updateId) {
+      
       getDayDescription({ organizationId, dayDescriptionId: updateId })
         .then((res) => {
           // RTK Query lazy trigger returns a union; narrow before using
