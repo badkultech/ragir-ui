@@ -17,7 +17,6 @@ import { AddNewItemModal } from '@/components/library/AddNewItemModal';
 import { LibraryHeader } from '@/components/library/LibraryHeader';
 import Link from 'next/link';
 import {
-  useCreateOrganizerDayDescriptionMutation,
   useDeleteOrganizerDayDescriptionMutation,
   useGetOrganizerDayDescriptionQuery,
 } from '@/lib/services/organizer/trip/library/day-description';
