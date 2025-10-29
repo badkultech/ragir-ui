@@ -4,14 +4,17 @@ export interface Trip {
   title: string;
   startDate: string;
   endDate: string;
+  startTime: string;
+  endTime: string;
   totalDays: number;
   minGroupSize: number;
   maxGroupSize: number;
   minAge: number;
   maxAge: number;
   moodTags: string[];
-  locations: string[];
+  cityTags: string[];
   highlights: string;
+  groupLeaderId: number;
 }
 
 export interface TripResponse {

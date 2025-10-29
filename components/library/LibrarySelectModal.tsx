@@ -16,6 +16,8 @@ import { useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useGetOrganizerTransitsQuery } from "@/lib/services/organizer/trip/library/transit";
+import { useGetGroupLeadersQuery } from "@/lib/services/organizer/trip/library/leader";
+
 
 
 
@@ -67,10 +69,18 @@ const {
         { organizationId },
         { skip: shouldSkip, refetchOnMountOrArgChange: true }
       )
-    : useGetOrganizerTransitsQuery(
+    : category === "transit"
+    ? useGetOrganizerTransitsQuery(
         { organizationId },
         { skip: shouldSkip, refetchOnMountOrArgChange: true }
-      );
+      )
+    : category === "trip-leaders"
+    ? useGetGroupLeadersQuery(organizationId ?? "", {
+        skip: shouldSkip,
+        refetchOnMountOrArgChange: true,
+      })
+    : { data: [], isLoading: false, isError: false };
+
 
       // : category === "stays"
       // ? useGetOrganizerStaysQuery()

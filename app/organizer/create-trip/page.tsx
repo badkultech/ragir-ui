@@ -53,6 +53,8 @@ import { LibrarySelectModal } from '@/components/library/LibrarySelectModal';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import { useCreateTripMutation } from '@/lib/services/organizer/trip/library/create-trip';
 import { CustomDateTimePicker } from '@/components/ui/date-time-picker';
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '@/lib/slices/auth';
 
 export default function CreateTripPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -60,6 +62,10 @@ export default function CreateTripPage() {
   const [leaderModalOpen, setLeaderModalOpen] = useState(false);
   const [chooseModalOpen, setChooseModalOpen] = useState(false);
   const [selectedGroupLeaderId, setSelectedGroupLeaderId] = useState("");
+  const [leaders, setLeaders] = useState<any[]>([]); // ✅ Store added/selected leaders
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
 
   const router = useRouter();
 
@@ -169,8 +175,8 @@ export default function CreateTripPage() {
 
   const [formData, setFormData] = useState({
     tripTitle: 'Himalayan group',
-    startDate: formattedDateISO,
-    endDate: formattedDateISO,
+    startDate: "",
+    endDate: "",
     totalDays: 1, // default 1 day
     minGroupSize: 2,
     maxGroupSize: 20,
@@ -183,23 +189,41 @@ export default function CreateTripPage() {
 
   const handleSaveTrip = async () => {
     try {
-      // ✅ get org ID (from redux or localStorage)
-      const organizationId =
-        localStorage.getItem("organizationId") ||
-        "00000000-0000-0000-0000-000000000000";
+
+      // ✅ Convert start and end into proper Date objects
+      const startDateObj = new Date(formData.startDate);
+      const endDateObj = new Date(formData.endDate);
+
+      // ✅ Extract date parts in yyyy-mm-dd
+      const startDateOnly = startDateObj.toISOString().split("T")[0];
+      const endDateOnly = endDateObj.toISOString().split("T")[0];
+
+     const formatTime = (date: Date) => {
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    };
+
+    const startTime = formatTime(startDateObj);
+    const endTime = formatTime(endDateObj);
+
+
 
       // ✅ prepare your payload as FormData
       const data = new FormData();
-      data.append("title", formData.tripTitle);
-      data.append("startDate", formData.startDate);
-      data.append("endDate", formData.endDate);
+      data.append("name", formData.tripTitle);
+      data.append("startDate", startDateOnly);
+      data.append("endDate", endDateOnly);
+      // ✅ Send time in required nested object format (stringified)
+      data.append("startTime",JSON.stringify(startTime));
+      data.append("endTime",JSON.stringify(endTime));
       data.append("totalDays", formData.totalDays.toString());
       data.append("minGroupSize", formData.minGroupSize.toString());
       data.append("maxGroupSize", formData.maxGroupSize.toString());
       data.append("minAge", formData.minAge.toString());
       data.append("maxAge", formData.maxAge.toString());
       data.append("highlights", formData.tripHighlights);
-
       // ✅ Add arrays (convert to JSON string for FormData)
       data.append("moodTags", JSON.stringify(selectedTags));
       data.append("groupLeaderId", selectedGroupLeaderId); // <-- ensure you have this variable set
@@ -215,10 +239,10 @@ export default function CreateTripPage() {
 
       // ✅ redirect after success
       router.push(
-                  `/organizer/create-trip/Itinerary?startDate=${encodeURIComponent(
-                    formData.startDate
-                  )}&endDate=${encodeURIComponent(formData.endDate)}&totalDays=${formData.totalDays}`
-                );
+        `/organizer/create-trip/Itinerary?startDate=${encodeURIComponent(
+          formData.startDate
+        )}&endDate=${encodeURIComponent(formData.endDate)}&totalDays=${formData.totalDays}`
+      );
     } catch (error) {
       console.error("❌ Trip creation failed:", error);
       alert("Failed to create trip. Please try again.");
@@ -481,7 +505,7 @@ export default function CreateTripPage() {
             {/* Mood Tags */}
             <div className='mb-6 mt-6'>
               <Label className='block text-gray-600 mb-3 font-medium'>
-                Mood Tags
+                Mood Tags<span className='text-black'>*</span>
               </Label>
               <div className='flex flex-wrap gap-3'>
                 {tags.map((tag) => (
@@ -506,7 +530,7 @@ export default function CreateTripPage() {
             {/* Locations */}
             <div className='mb-6'>
               <Label className='block text-gray-600 mb-2 font-medium'>
-                Trip Locations
+                City Tags<span className='text-black'>*</span>
               </Label>
               <div className='space-y-3'>
                 <div className='flex gap-2'>
@@ -589,6 +613,58 @@ export default function CreateTripPage() {
             <p className='text-gray-400 text-base'>
               Select from existing leaders or add new
             </p>
+
+            {leaders.map((leader, index) => (
+              <div
+                key={leader.id || index}
+                className="flex items-center justify-between gap-3 border rounded-xl p-3 shadow-sm bg-gray-50 hover:bg-gray-100 transition"
+              >
+                {/* Left side: Leader info */}
+                <div className="flex items-center gap-3">
+                  {/* Image */}
+                  {leader.imageUrl || leader.profileImageUrl ? (
+                    <img
+                      src={leader.imageUrl || leader.profileImageUrl}
+                      alt={leader.name || leader.title || "Leader"}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                      <span className="text-xs">No Img</span>
+                    </div>
+                  )}
+
+                  {/* Details */}
+                  <div>
+                    <p className="font-medium text-gray-800">
+                      {leader.name || leader.title || "Unnamed"}
+                    </p>
+                    {(leader.tagline || leader.description) && (
+                      <p className="text-xs text-gray-500">
+                        {leader.tagline || leader.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right side: Remove button */}
+                <button
+                  onClick={() =>
+                    setLeaders((prev) =>
+                      prev.filter((_, i) => i !== index)
+                    )
+                  }
+                  className="text-gray-400 hover:text-red-500 transition text-xl font-bold"
+                  title="Remove Leader"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+
+
+
           </div>
 
           <div className='flex items-center gap-4 mt-10 justify-end-safe'>
@@ -633,9 +709,19 @@ export default function CreateTripPage() {
                 onCancel={() => setLeaderModalOpen(false)}
                 onSave={(leaderData) => {
                   console.log("✅ Leader Saved:", leaderData);
+
+                  // ✅ Save in state so it shows in UI
+                  // setLeaders((prev) => [...prev, leaderData]);
+
+                  // ✅ Also store ID for backend
+                  if (leaderData.id) {
+                    setSelectedGroupLeaderId(leaderData.id);
+                  }
+
                   setLeaderModalOpen(false);
                 }}
               />
+
             </div>
           </DialogContent>
         </Dialog>
@@ -653,7 +739,7 @@ export default function CreateTripPage() {
 
             // (Optional) If you want to show the name somewhere:
             // setSelectedLeaderName(item.name);
-
+            setLeaders((prev) => [...prev, item]);
             setChooseModalOpen(false);
           }}
         />
