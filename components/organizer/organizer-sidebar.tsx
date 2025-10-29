@@ -19,6 +19,8 @@ import {
   House,
   UserRoundCog,
   MessageCircleQuestion,
+  Users,
+  TextSearch,
 } from "lucide-react";
 import {
   LibraryIcon,
@@ -76,6 +78,8 @@ const nav: NavItem[] = [
   },
   { label: "Team Members", href: "/organizer/team", icon: UserRoundPlus },
   { label: "Support Center", href: "/organizer/support", icon: Headphones },
+  { label: "Leads", href: "/organizer/leads", icon: Users },
+  { label: "Queries", href: "/organizer/queries", icon: TextSearch },
   { label: "Billing", href: "/organizer/billing", icon: CreditCard },
   { label: "Settings", href: "/organizer/settings", icon: Settings },
 ];
