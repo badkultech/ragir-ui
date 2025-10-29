@@ -42,6 +42,9 @@ export function AddEventForm({
   const [documents, setDocuments] = useState<Array<Document>>([]);
   const [imagesPreview, setImagesPreview] = useState<string[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [saveInLibrary, setSaveInLibrary] = useState(false);
+  const [saveAsName, setSaveAsName] = useState('');
+
 
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
@@ -264,16 +267,30 @@ export function AddEventForm({
         )}
       </div >
 
-      {isTripMode && <div className="flex flex-col items-end gap-2">
-        <div className="flex justify-end items-center gap-2">
-          <Input type="checkbox" value="" className=" w-[22px]" />
-          <label className="block text-[0.95rem] font-medium">
-            Save in Library
-          </label>
-        </div>
+      {isTripMode && (
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+            <Input
+              type="checkbox"
+              checked={saveInLibrary}
+              onChange={(e) => setSaveInLibrary(e.target.checked)}
+              className="w-[22px]"
+            />
+            <label className="block text-[0.95rem] font-medium">
+              Save in Library
+            </label>
+          </div>
 
-        <Input type="text" value="" id="" placeholder="Save As" className="p-4 w-[12rem] right" />
-      </div>}
+          <Input
+            type="text"
+            value={saveAsName}
+            onChange={(e) => setSaveAsName(e.target.value)}
+            placeholder="Save As"
+            className="p-4 w-[12rem]"
+          />
+        </div>
+      )}
+
 
       {/* Footer */}
       <div className='flex justify-end items-center gap-4 mt-6'>
