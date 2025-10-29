@@ -75,6 +75,8 @@ export const ENDPOINTS = {
   ORGANIZATION_PROFILE: (organizationId: string) =>
     `/org/${organizationId}/profile`,
   ORGANIZER: {
+    TRIP:(organizationId:string)=>
+     `/org/${organizationId}/trip`,
     LIBRARY: {
       DAY_DESCRIPTION: (organizationId: string) =>
         `/org/${organizationId}/library/day-description`,

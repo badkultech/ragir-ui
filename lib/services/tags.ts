@@ -8,6 +8,7 @@ export const TAGS = {
   admins: 'admins',
   organizations: 'organizations',
   orgs: 'org',
+  trip:'trip',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',

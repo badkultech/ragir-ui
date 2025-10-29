@@ -51,12 +51,15 @@ import { AddTripLeaderForm } from '@/components/library/AddTripLeaderForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LibrarySelectModal } from '@/components/library/LibrarySelectModal';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
+import { useCreateTripMutation } from '@/lib/services/organizer/trip/library/create-trip';
 
 export default function CreateTripPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [leaderModalOpen, setLeaderModalOpen] = useState(false);
   const [chooseModalOpen, setChooseModalOpen] = useState(false);
+  const [selectedGroupLeaderId, setSelectedGroupLeaderId] = useState("");
+
   const router = useRouter();
 
   const tags = [
@@ -174,6 +177,53 @@ export default function CreateTripPage() {
     maxAge: 50,
     tripHighlights: '',
   });
+
+  const [createTrip, { isLoading }] = useCreateTripMutation();
+
+  const handleSaveTrip = async () => {
+    try {
+      // ✅ get org ID (from redux or localStorage)
+      const organizationId =
+        localStorage.getItem("organizationId") ||
+        "00000000-0000-0000-0000-000000000000";
+
+      // ✅ prepare your payload as FormData
+      const data = new FormData();
+      data.append("title", formData.tripTitle);
+      data.append("startDate", formData.startDate);
+      data.append("endDate", formData.endDate);
+      data.append("totalDays", formData.totalDays.toString());
+      data.append("minGroupSize", formData.minGroupSize.toString());
+      data.append("maxGroupSize", formData.maxGroupSize.toString());
+      data.append("minAge", formData.minAge.toString());
+      data.append("maxAge", formData.maxAge.toString());
+      data.append("highlights", formData.tripHighlights);
+
+      // ✅ Add arrays (convert to JSON string for FormData)
+      data.append("moodTags", JSON.stringify(selectedTags));
+      data.append("groupLeaderId", selectedGroupLeaderId); // <-- ensure you have this variable set
+      data.append("cityTags", JSON.stringify(cityTags)); // backend specifically expects 'cityTags'
+
+      // ✅ call RTK mutation
+      const response = await createTrip({
+        organizationId,
+        data,
+      }).unwrap();
+
+      console.log("✅ Trip created:", response);
+
+      // ✅ redirect after success
+      router.push(
+        `/organizer/create-trip/Itinerary?tripId=${response.trip}&startDate=${formData.startDate}&endDate=${formData.endDate}`
+      );
+    } catch (error) {
+      console.error("❌ Trip creation failed:", error);
+      alert("Failed to create trip. Please try again.");
+    }
+  };
+
+
+
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -551,14 +601,10 @@ export default function CreateTripPage() {
             </Button>
             <Button
 
-              onClick={() =>
-                router.push(
-                  `/organizer/create-trip/Itinerary?startDate=${formData.startDate}&endDate=${formData.endDate}`
-                )
-              }
+              onClick={handleSaveTrip}
               className='px-8 py-2 rounded-full font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 transition flex items-center gap-2'
             >
-              Save & Next
+              {isLoading ? "Saving..." : "Save & Next"}
               <svg
                 className='w-5 h-5'
                 fill='none'
@@ -605,7 +651,13 @@ export default function CreateTripPage() {
           category="trip-leaders"
           onSelect={(item) => {
             console.log("✅ Selected Leader from Library:", item);
-            // TODO: You can save this selected leader in state if needed
+
+            // ✅ Save selected leader’s ID for backend
+            setSelectedGroupLeaderId(item.id);
+
+            // (Optional) If you want to show the name somewhere:
+            // setSelectedLeaderName(item.name);
+
             setChooseModalOpen(false);
           }}
         />
