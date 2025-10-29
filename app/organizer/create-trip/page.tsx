@@ -216,8 +216,8 @@ export default function CreateTripPage() {
       data.append("startDate", startDateOnly);
       data.append("endDate", endDateOnly);
       // ✅ Send time in required nested object format (stringified)
-      data.append("startTime",JSON.stringify(startTime));
-      data.append("endTime",JSON.stringify(endTime));
+      data.append("startTime",(startTime));
+      data.append("endTime",(endTime));
       data.append("totalDays", formData.totalDays.toString());
       data.append("minGroupSize", formData.minGroupSize.toString());
       data.append("maxGroupSize", formData.maxGroupSize.toString());
