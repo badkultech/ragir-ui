@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { AppHeader } from '@/components/app-header';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import { Button } from '@/components/ui/button';
@@ -10,62 +9,76 @@ import {
   useLazyGetOrganizerProfileQuery,
   useUpdateOrganizerProfileMutation,
 } from '@/lib/services/organizer';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
+import { Trash2, X } from 'lucide-react';
+import {
+  Document,
+  EMPTY_DOCUMENT,
+  useDocumentsManager,
+} from '@/hooks/useDocumentsManager';
+import {
+  organizerState,
+  setBannerFile,
+  setLogoFile,
+  setProfile,
+  setTestimonialScreenshotFile,
+} from '../../-organizer-slice';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function OrganizerProfileEditPage() {
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [testimonialScreenshotFile, setTestimonialScreenshotFile] =
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const state = useSelector(organizerState);
+
+  const { logoFile, bannerFile, testimonialScreenshotFile, profile } = state;
+  // Keep actual File objects in local component state (Files are non-serializable)
+  const [logoUploadFile, setLogoUploadFile] = useState<File | null>(null);
+  const [bannerUploadFile, setBannerUploadFile] = useState<File | null>(null);
+  const [testimonialUploadFile, setTestimonialUploadFile] =
     useState<File | null>(null);
-  const [certifications, setCertifications] = useState<File[]>([]);
-
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
-
-  const [organizerName, setOrganizerName] = useState('');
-  const [tagline, setTagline] = useState('');
-  const [description, setDescription] = useState('');
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  const [instagramHandle, setInstagramHandle] = useState('');
-  const [youtubeChannel, setYoutubeChannel] = useState('');
-  const [googleBusiness, setGoogleBusiness] = useState('');
-  const [testimonials, setTestimonials] = useState('');
-
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
+
   const [updatedOrgProfile, { isLoading }] =
     useUpdateOrganizerProfileMutation();
+
+  const {
+    documents: certificationsDocuments,
+    error: certificationsError,
+    handleAddFiles: handleCertificationsAddFiles,
+    handleMarkForDeletion: handleCertificationsMarkForDeletion,
+    setDocuments: setCertificationsDocuments,
+  } = useDocumentsManager();
+
   const [getOrgProfile, { isLoading: profileLoading }] =
     useLazyGetOrganizerProfileQuery();
 
   useEffect(() => {
     if (organizationId) {
       getOrgProfile({ organizationId }).then((res) => {
-        console.log('Fetched profile:', res);
         if (res.data) {
           const data = res.data as any;
-          setOrganizerName(data.organizerName || '');
-          setTagline(data.tagline || '');
-          setDescription(data.description || '');
-          setWebsiteUrl(data.websiteUrl || '');
-          setInstagramHandle(data.instagramHandle || '');
-          setYoutubeChannel(data.youtubeChannel || '');
-          setGoogleBusiness(data.googleBusiness || '');
-          setTestimonials(data.testimonials || '');
-          setLogoPreview(data.displayPicture?.url || null);
-          setBannerPreview(data.bannerImage?.url || null);
-          setTestimonialScreenshotFile(
-            data.testimonialScreenshot?.file || null,
+          dispatch(
+            setProfile({
+              organizerName: data.organizerName || '',
+              tagline: data.tagline || '',
+              description: data.description || '',
+              websiteUrl: data.websiteUrl || '',
+              instagramHandle: data.instagramHandle || '',
+              youtubeChannel: data.youtubeChannel || '',
+              googleBusiness: data.googleBusiness || '',
+              testimonials: data.testimonials || '',
+            }),
           );
+          dispatch(setLogoFile(data.displayPicture || EMPTY_DOCUMENT));
+          dispatch(setBannerFile(data.bannerImage || EMPTY_DOCUMENT));
+          dispatch(setTestimonialScreenshotFile(data.testimonialScreenshot));
+
           if (data.certifications) {
-            const certFiles = data.certifications
-              .filter((cert: any) => cert.file)
-              .map((cert: any) => {
-                // Create a dummy File object for display purposes
-                return new File([], cert.file);
-              });
-            setCertifications(certFiles);
+            setCertificationsDocuments(data.certifications);
           }
         }
       });
@@ -87,65 +100,80 @@ export default function OrganizerProfileEditPage() {
     return true;
   };
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setter: (file: File) => void,
-    previewSetter?: (url: string) => void,
-  ) => {
-    const file = e.target.files?.[0];
-    if (file && validateImageFile(file)) {
-      setter(file);
-      if (previewSetter) previewSetter(URL.createObjectURL(file));
-    }
-  };
-
-  const handleCertificationChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles = files.filter(validateImageFile);
-    setCertifications((prev) => [...prev, ...validFiles]);
-  };
-
   const handleSaveProfile = async () => {
     try {
       const formData = new FormData();
 
-      formData.append('organizerName', organizerName);
-      formData.append('tagline', tagline);
-      formData.append('description', description);
-      formData.append('websiteUrl', websiteUrl);
-      formData.append('instagramHandle', instagramHandle);
-      formData.append('youtubeChannel', youtubeChannel);
-      formData.append('googleBusiness', googleBusiness);
-      formData.append('testimonials', testimonials);
+      // 🧱 1️⃣ Append simple string fields dynamically
+      const textFields: Record<string, any> = {
+        organizerName: profile.organizerName,
+        tagline: profile.tagline,
+        description: profile.description,
+        websiteUrl: profile.websiteUrl,
+        instagramHandle: profile.instagramHandle,
+        youtubeChannel: profile.youtubeChannel,
+        googleBusiness: profile.googleBusiness,
+        testimonials: profile.testimonials,
+      };
 
-      if (logoFile) {
-        formData.append('displayPicture.file', logoFile);
-      }
-      if (bannerFile) {
-        formData.append('bannerImage.file', bannerFile);
-      }
-      if (testimonialScreenshotFile) {
-        formData.append(
-          'testimonialScreenshot.file',
-          testimonialScreenshotFile,
-        );
-      }
-
-      certifications.forEach((file, index) => {
-        formData.append(`certifications[${index}].file`, file);
+      Object.entries(textFields).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) formData.append(key, value);
       });
+
+      // 🖼️ 2️⃣ Helper to append file-related data
+      const appendFileData = (
+        keyPrefix: string,
+
+        uploadFile?: File | null,
+      ) => {
+        // Append actual file
+        if (uploadFile) formData.append(`${keyPrefix}.file`, uploadFile);
+      };
+
+      // 🧩 3️⃣ Append file-related data using helper
+      appendFileData('displayPicture', logoUploadFile);
+      appendFileData('bannerImage', bannerUploadFile);
+      appendFileData('testimonialScreenshot', testimonialUploadFile);
+
+      // 📜 4️⃣ Append certifications
+      certificationsDocuments.forEach((doc, index) => {
+        if (!doc) return;
+
+        const baseKey = `certifications[${index}]`;
+
+        if (doc.file) formData.append(`${baseKey}.file`, doc.file);
+        if (doc.id !== null) formData.append(`${baseKey}.id`, String(doc.id));
+        if (typeof doc.markedForDeletion !== 'undefined')
+          formData.append(
+            `${baseKey}.markedForDeletion`,
+            String(doc.markedForDeletion),
+          );
+        if (doc.type) formData.append(`${baseKey}.type`, doc.type);
+      });
+
+      // 🚀 5️⃣ API call
       const response = await updatedOrgProfile({
-        organizationId: organizationId,
+        organizationId,
         data: formData,
-      });
+      }).unwrap();
+
       console.log('Profile updated successfully:', response);
+      if (response) router.back();
     } catch (error) {
       console.error('Failed to update profile:', error);
     }
   };
 
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) handleCertificationsAddFiles(e.target.files);
+  };
+
+  if (profileLoading)
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-white'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-4 border-orange-500 border-solid'></div>
+      </div>
+    );
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <OrganizerSidebar
@@ -165,25 +193,58 @@ export default function OrganizerProfileEditPage() {
 
             {/* Logo Upload */}
             <div className='flex items-center space-x-6'>
-              {logoPreview && (
+              {logoFile.url && (
                 <img
-                  src={logoPreview}
+                  src={logoFile.url}
                   alt='Logo'
                   className='w-20 h-20 rounded-full border object-cover'
                 />
               )}
               <div>
-                <div className='relative inline-block'>
-                  <Button variant='outline'>Upload New Image</Button>
-                  <input
-                    id='logo-upload'
-                    type='file'
-                    accept='image/*'
-                    className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
-                    onChange={(e) =>
-                      handleFileChange(e, setLogoFile, setLogoPreview)
-                    }
-                  />
+                <div className='flex items-center gap-2'>
+                  <div className='relative inline-block'>
+                    <Button variant='outline'>Upload New Image</Button>
+                    <input
+                      id='logo-upload'
+                      type='file'
+                      accept='image/*'
+                      className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && validateImageFile(file)) {
+                          // store raw File locally, and only store metadata in Redux
+                          setLogoUploadFile(file);
+                          dispatch(
+                            setLogoFile({
+                              ...logoFile,
+                              type: file.type,
+                              url: URL.createObjectURL(file),
+                              file: null,
+                              markedForDeletion: true,
+                            } as Document),
+                          );
+                        }
+                      }}
+                    />
+                  </div>
+                  {logoFile.url && (
+                    <Button
+                      variant='outline'
+                      className='hover:text-red-500'
+                      onClick={() => {
+                        dispatch(
+                          setLogoFile({
+                            ...logoFile,
+                            markedForDeletion: true,
+                            url: '',
+                            file: null,
+                          }),
+                        );
+                      }}
+                    >
+                      <Trash2 />
+                    </Button>
+                  )}
                 </div>
                 <p className='text-xs text-gray-400 mt-1'>
                   PNG, JPG, or WEBP up to 2MB
@@ -195,8 +256,15 @@ export default function OrganizerProfileEditPage() {
             <div>
               <label className='block text-sm mb-1'>Organizer Name</label>
               <Input
-                value={organizerName}
-                onChange={(e) => setOrganizerName(e.target.value)}
+                value={profile?.organizerName}
+                onChange={(e) => {
+                  dispatch(
+                    setProfile({
+                      ...profile,
+                      organizerName: e.target.value,
+                    }),
+                  );
+                }}
                 placeholder='Enter here'
               />
             </div>
@@ -205,25 +273,57 @@ export default function OrganizerProfileEditPage() {
             <div>
               <label className='block text-sm mb-1'>Cover Image / Banner</label>
               <div className='border border-dashed rounded-lg p-6 text-center'>
-                {bannerPreview && (
+                {bannerFile.url && (
                   <img
-                    src={bannerPreview}
+                    src={bannerFile.url}
                     alt='Banner'
                     className='w-full h-40 object-cover rounded-lg mb-4'
                   />
                 )}
                 <>
-                  <div className='relative inline-block'>
-                    <Button variant='outline'>Upload Banner Image</Button>
-                    <input
-                      id='banner-upload'
-                      type='file'
-                      accept='image/*'
-                      className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
-                      onChange={(e) =>
-                        handleFileChange(e, setBannerFile, setBannerPreview)
-                      }
-                    />
+                  <div className='flex items-center gap-2 text-center justify-center'>
+                    <div className='relative inline-block'>
+                      <Button variant='outline'>Upload Banner Image</Button>{' '}
+                      <input
+                        id='banner-upload'
+                        type='file'
+                        accept='image/*'
+                        className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && validateImageFile(file)) {
+                            setBannerUploadFile(file);
+                            dispatch(
+                              setBannerFile({
+                                ...bannerFile,
+                                type: file.type,
+                                url: URL.createObjectURL(file),
+                                file: null,
+                                markedForDeletion: true,
+                              } as Document),
+                            );
+                          }
+                        }}
+                      />
+                    </div>
+                    {bannerFile.url && (
+                      <Button
+                        variant='outline'
+                        className='hover:text-red-500'
+                        onClick={() => {
+                          dispatch(
+                            setBannerFile({
+                              ...bannerFile,
+                              markedForDeletion: true,
+                              url: '',
+                              file: null,
+                            }),
+                          );
+                        }}
+                      >
+                        <Trash2 />
+                      </Button>
+                    )}
                   </div>
                   <p className='text-xs text-gray-400 mt-1'>
                     1920px x 480px recommended
@@ -240,8 +340,10 @@ export default function OrganizerProfileEditPage() {
             <div>
               <label className='block text-sm mb-1'>Tagline</label>
               <Input
-                value={tagline}
-                onChange={(e) => setTagline(e.target.value)}
+                value={profile?.tagline}
+                onChange={(e) =>
+                  dispatch(setProfile({ ...profile, tagline: e.target.value }))
+                }
                 placeholder='Enter here'
               />
             </div>
@@ -249,8 +351,12 @@ export default function OrganizerProfileEditPage() {
             <div>
               <label className='block text-sm mb-1'>Description</label>
               <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={profile?.description}
+                onChange={(e) =>
+                  dispatch(
+                    setProfile({ ...profile, description: e.target.value }),
+                  )
+                }
                 rows={4}
                 placeholder='Enter here'
               />
@@ -265,32 +371,57 @@ export default function OrganizerProfileEditPage() {
               <div>
                 <label className='block text-sm mb-1'>Website URL</label>
                 <Input
-                  value={websiteUrl}
-                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                  value={profile?.websiteUrl}
+                  onChange={(e) =>
+                    dispatch(
+                      setProfile({ ...profile, websiteUrl: e.target.value }),
+                    )
+                  }
                   placeholder='https://'
                 />
               </div>
               <div>
                 <label className='block text-sm mb-1'>Instagram Handle</label>
                 <Input
-                  value={instagramHandle}
-                  onChange={(e) => setInstagramHandle(e.target.value)}
+                  value={profile?.instagramHandle}
+                  onChange={(e) =>
+                    dispatch(
+                      setProfile({
+                        ...profile,
+                        instagramHandle: e.target.value,
+                      }),
+                    )
+                  }
                   placeholder='@handle'
                 />
               </div>
               <div>
                 <label className='block text-sm mb-1'>YouTube Channel</label>
                 <Input
-                  value={youtubeChannel}
-                  onChange={(e) => setYoutubeChannel(e.target.value)}
+                  value={profile?.youtubeChannel}
+                  onChange={(e) =>
+                    dispatch(
+                      setProfile({
+                        ...profile,
+                        youtubeChannel: e.target.value,
+                      }),
+                    )
+                  }
                   placeholder='youtube.com/channel'
                 />
               </div>
               <div>
                 <label className='block text-sm mb-1'>Google Business</label>
                 <Input
-                  value={googleBusiness}
-                  onChange={(e) => setGoogleBusiness(e.target.value)}
+                  value={profile.googleBusiness}
+                  onChange={(e) =>
+                    dispatch(
+                      setProfile({
+                        ...profile,
+                        googleBusiness: e.target.value,
+                      }),
+                    )
+                  }
                   placeholder='Business link'
                 />
               </div>
@@ -299,33 +430,76 @@ export default function OrganizerProfileEditPage() {
             <div>
               <label className='block text-sm mb-1'>Testimonials</label>
               <Textarea
-                value={testimonials}
-                onChange={(e) => setTestimonials(e.target.value)}
+                value={profile?.testimonials}
+                onChange={(e) =>
+                  dispatch(
+                    setProfile({ ...profile, testimonials: e.target.value }),
+                  )
+                }
                 rows={2}
                 placeholder='Optional'
               />
             </div>
 
             <div className='border border-dashed rounded-lg p-6 text-center'>
-              <div className='relative inline-block'>
-                <Button variant='outline'>Upload Screenshot</Button>
-                <input
-                  id='testimonial-upload'
-                  type='file'
-                  accept='image/*'
-                  className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
-                  onChange={(e) =>
-                    handleFileChange(e, setTestimonialScreenshotFile)
-                  }
+              {testimonialScreenshotFile?.url && (
+                <img
+                  src={testimonialScreenshotFile.url}
+                  alt='Banner'
+                  className='w-full h-40 object-cover rounded-lg mb-4'
                 />
+              )}
+              <div className='flex items-center gap-2 text-center justify-center'>
+                <div className='relative inline-block'>
+                  <Button variant='outline'>Upload Screenshot</Button>
+                  <input
+                    id='testimonial-upload'
+                    type='file'
+                    accept='image/*'
+                    className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && validateImageFile(file)) {
+                        setTestimonialUploadFile(file);
+                        dispatch(
+                          setTestimonialScreenshotFile({
+                            ...testimonialScreenshotFile,
+                            type: file.type,
+                            url: URL.createObjectURL(file),
+                            file: null,
+                            markedForDeletion: true,
+                          } as Document),
+                        );
+                      }
+                    }}
+                  />
+                </div>
+                {testimonialScreenshotFile?.url && (
+                  <Button
+                    variant='outline'
+                    className='hover:text-red-500'
+                    onClick={() =>
+                      dispatch(
+                        setTestimonialScreenshotFile({
+                          ...testimonialScreenshotFile,
+                          markedForDeletion: true,
+                          url: '',
+                          file: null,
+                        }),
+                      )
+                    }
+                  >
+                    <Trash2 />
+                  </Button>
+                )}
               </div>
             </div>
             <div className='grid grid-cols-2 gap-4'>
-              {testimonialScreenshotFile && (
+              {/* {testimonialScreenshotFile && (
                 <p className='text-sm text-gray-700 mt-2'>
                   Uploaded: <strong>{testimonialScreenshotFile.name}</strong>
                 </p>
-              )}
+              )} */}
             </div>
           </section>
 
@@ -338,26 +512,41 @@ export default function OrganizerProfileEditPage() {
                 <Button variant='outline'>Upload Certification</Button>
                 <input
                   type='file'
-                  onChange={handleCertificationChange}
+                  onChange={onFileChange}
                   multiple
                   accept='image/*'
                   className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
                 />
               </div>
+              {certificationsError && (
+                <p style={{ color: 'red' }}>{certificationsError}</p>
+              )}
               <p className='text-xs text-gray-400 mt-1'>
                 Accepted formats: PNG, JPG, WEBP (Max 2MB)
               </p>
             </div>
 
-            <div className='grid grid-cols-2 gap-4'>
-              {certifications.map((file, i) => (
-                <div
-                  key={i}
-                  className='p-4 border rounded-lg text-center text-sm'
-                >
-                  {file.name}
-                </div>
-              ))}
+            <div style={{ display: 'flex', gap: 8 }}>
+              {certificationsDocuments.map(
+                (cert, idx) =>
+                  cert.url && (
+                    <div key={idx}>
+                      {cert.url && (
+                        <div className='hover:relative p-4'>
+                          <img src={cert.url} alt='Failed.' width={80} />
+                          <span
+                            className='absolute top-0 right-0 cursor-pointer'
+                            onClick={() =>
+                              handleCertificationsMarkForDeletion(cert.id, idx)
+                            }
+                          >
+                            <X className='w-4 h-4' />
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ),
+              )}
             </div>
           </section>
 

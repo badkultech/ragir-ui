@@ -34,7 +34,14 @@ export function ManagerNotificationDropdown({
     isLoading,
     isError,
     refetch,
-  } = useGetUserNotificationsQuery({ organizationId, userId });
+  } = useGetUserNotificationsQuery({ organizationId, userId }
+    , {
+      // ✅ These options prevent refetching on each mount or navigation
+      refetchOnMountOrArgChange: false,
+      refetchOnFocus: false,
+      refetchOnReconnect: false,
+    }
+  );
 
   const [markAsSeen] = useMarkNotificationAsSeenMutation();
 
@@ -106,37 +113,36 @@ export function ManagerNotificationDropdown({
 
           {data.notifications.length
             ? data.notifications.map((n) => (
-                <div
-                  key={n.id}
-                  onClick={() => handleMarkAsSeen(n.id)}
-                  className={`px-4 py-3 transition hover:bg-gray-50 cursor-pointer ${
-                    n.isSeen ? "bg-white" : "bg-blue-50"
+              <div
+                key={n.id}
+                onClick={() => handleMarkAsSeen(n.id)}
+                className={`px-4 py-3 transition hover:bg-gray-50 cursor-pointer ${n.isSeen ? "bg-white" : "bg-blue-50"
                   }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium text-gray-900">{n.title}</p>
-                      <p className="text-sm text-gray-600 mt-0.5">
-                        {n.message}
-                      </p>
-                    </div>
-                    {!n.isSeen && (
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></span>
-                    )}
-                  </div>
-                  {n.sentAt && (
-                    <p className="text-xs text-gray-400 mt-2">
-                      {new Date(n.sentAt).toLocaleString()}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-medium text-gray-900">{n.title}</p>
+                    <p className="text-sm text-gray-600 mt-0.5">
+                      {n.message}
                     </p>
+                  </div>
+                  {!n.isSeen && (
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></span>
                   )}
                 </div>
-              ))
+                {n.sentAt && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    {new Date(n.sentAt).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            ))
             : !isLoading && (
-                <div className="p-6 text-center text-sm text-gray-500">
-                  🎉 You’re all caught up!
-                  <p className="mt-1">No new notifications</p>
-                </div>
-              )}
+              <div className="p-6 text-center text-sm text-gray-500">
+                🎉 You’re all caught up!
+                <p className="mt-1">No new notifications</p>
+              </div>
+            )}
         </div>
 
         {/* Footer */}

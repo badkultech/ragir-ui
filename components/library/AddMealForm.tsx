@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import MDEditor from "@uiw/react-md-editor";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
@@ -15,14 +13,21 @@ type AddMealFormProps = {
   onCancel: () => void;
   onSave: (data: any) => void;
   header?: string;
+  initialData?: any; // ✅ same as AddTransitForm
 };
 
-export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMealFormProps) {
-  const [title, setTitle] = useState("");
-  const [mealType, setMealType] = useState("");
-  const [mealTime, setMealTime] = useState("");
+export function AddMealForm({
+  mode = "trip",
+  onCancel,
+  onSave,
+  header,
+  initialData,
+}: AddMealFormProps) {
+  const [title, setTitle] = useState("My Meal");
+  const [mealType, setMealType] = useState("LUNCH");
+  const [mealTime, setMealTime] = useState("12:00");
   const [included, setIncluded] = useState<"included" | "chargeable">("included");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("Mumbai, India");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
@@ -31,16 +36,40 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
   const [saveAsName, setSaveAsName] = useState('');
 
 
+  const isTripMode = mode === "trip";
+
+  // ✅ Prefill form when editing (like AddTransitForm)
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("🚀 Prefilling meal form with:", initialData);
+
+    setTitle(initialData.title || initialData.name || "");
+    setMealType(
+      typeof initialData.mealType === "string"
+        ? initialData.mealType.toUpperCase()
+        : "LUNCH"
+    );
+    setMealTime(initialData.mealTime || "12:00");
+    setIncluded(initialData.chargeable ? "chargeable" : "included");
+    setLocation(initialData.location || "");
+    setDescription(initialData.description || "");
+    setPacking(initialData.packingSuggestion || "");
+  }, [initialData]);
+
+  // ✅ File upload handler
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setImages(Array.from(e.target.files));
   };
 
+  // ✅ Select from library
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
     setLocation(item.location || "");
     setDescription(item.description || "");
   };
 
+  // ✅ Save
   const handleSubmit = () => {
     onSave({
       title,
@@ -55,28 +84,30 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
     });
   };
 
-  const isTripMode = mode === 'trip';
-
   return (
-    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+    <div
+      className="flex flex-col gap-6"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
+      {/* Header */}
       <div className="flex items-center justify-between w-full">
         {header && (
-          <div className="text-lg  font-semibold text-gray-800  pb-2">
+          <div className="text-lg font-semibold text-gray-800 pb-2">
             {header}
           </div>
         )}
       </div>
-      {/* Top-right button */}
+
+      {/* Top-right button (Trip Mode Only) */}
       {isTripMode ? (
         <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
       ) : (
-        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+        <div className="mt-2" />
       )}
-
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium  mb-2">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Title *
         </label>
         <Input
@@ -93,7 +124,7 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
       {/* Meal Type & Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-[0.95rem] font-medium  mb-2">
+          <label className="block text-[0.95rem] font-medium mb-2">
             Meal Type *
           </label>
           <select
@@ -102,11 +133,12 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
             className="w-full border rounded-lg p-2 text-sm text-gray-700"
           >
             <option value="">Select</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="lunch">Lunch</option>
-            <option value="snack">Snack</option>
-            <option value="dinner">Dinner</option>
+            <option value="BREAKFAST">Breakfast</option>
+            <option value="LUNCH">Lunch</option>
+            <option value="SNACK">Snack</option>
+            <option value="DINNER">Dinner</option>
           </select>
+
           <label className="flex items-center gap-2 my-4">
             <input
               type="radio"
@@ -116,8 +148,9 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
             Included
           </label>
         </div>
+
         <div>
-          <label className="block text-[0.95rem] font-medium  mb-2">
+          <label className="block text-[0.95rem] font-medium mb-2">
             Time
           </label>
           <Input
@@ -130,25 +163,22 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
             <input
               type="radio"
               checked={included === "chargeable"}
-              onChange={() => setIncluded("chargeable")
-              }
+              onChange={() => setIncluded("chargeable")}
             />
             Chargeable
           </label>
         </div>
       </div>
 
-      {/* Included / Chargeable */}
-
       {/* Location */}
       <div>
-
         <label className="block text-[0.95rem] font-medium mb-1">
           Location
         </label>
         <Input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
+          placeholder="Enter location"
         />
       </div>
 
@@ -158,7 +188,7 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
           Description
         </label>
         <RichTextEditor
-          placeholder="enter text"
+          placeholder="Enter description"
           value={description}
           onChange={setDescription}
         />
@@ -172,7 +202,7 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
         <RichTextEditor
           value={packing}
           onChange={setPacking}
-          placeholder="Enter here"
+          placeholder="Enter packing suggestions"
           maxLength={800}
         />
       </div>
@@ -194,8 +224,9 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
             onChange={handleFileChange}
           />
         </label>
+
         {images.length > 0 && (
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-orange-500 mt-2">
             {images.length} file(s) selected
           </p>
         )}
@@ -225,7 +256,6 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
         </div>
       )}
 
-
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>
@@ -239,13 +269,15 @@ export function AddMealForm({ mode = "trip", onCancel, onSave, header }: AddMeal
         </Button>
       </div>
 
-      {/* Choose from Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="meals"
-      />
+      {/* Library Modal */}
+      {mode === "trip" && (
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="meals"
+        />
+      )}
     </div>
   );
 }

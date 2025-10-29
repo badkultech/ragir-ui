@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
-import { useGetGroupLeaderByIdQuery, useGetGroupLeadersQuery } from "@/lib/services/organizer/trip/library/leader";
+import { useDeleteGroupLeaderMutation, useGetGroupLeaderByIdQuery, useGetGroupLeadersQuery } from "@/lib/services/organizer/trip/library/leader";
 import { ViewLeaderModal } from "@/components/library/ViewLeaderModal";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
@@ -38,6 +38,18 @@ export default function TripLeadersPage() {
   const handleModalClose = (shouldRefresh?: boolean) => {
     setModalOpen(false);
     if (shouldRefresh) refetch();
+  };
+
+  const [deleteLeader] = useDeleteGroupLeaderMutation();
+
+  const handleDelete = async (LeaderId: string | number) => {
+    if (!confirm("Are you sure you want to delete this meal?")) return;
+    try {
+      await deleteLeader({ organizationId, LeaderId }).unwrap();
+      refetch();
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+    }
   };
 
   if (isLoading) {
@@ -118,6 +130,10 @@ export default function TripLeadersPage() {
                     <button
                       title="Edit"
                       className="hover:text-orange-500 transition"
+                      onClick={()=>{
+                        setSelectedLeaderId(leader.id);
+                        setModalOpen(true);
+                      }}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
@@ -134,6 +150,7 @@ export default function TripLeadersPage() {
                     <button
                       title="Delete"
                       className="hover:text-red-500 transition"
+                      onClick={()=>handleDelete(leader.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -157,6 +174,7 @@ export default function TripLeadersPage() {
         leader={selectedLeader ?? null} // ✅ convert undefined → null
       />
       <AddNewItemModal
+        updateId={selectedLeaderId}
         open={modalOpen}
         onClose={() => handleModalClose(true)}
         initialStep="trip-leader"

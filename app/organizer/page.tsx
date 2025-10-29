@@ -1,6 +1,5 @@
 "use client";
 
-import { Sidebar } from "@/components/organizer/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { useState } from "react";
@@ -17,7 +16,7 @@ export default function OrganizerPage() {
               onClose={() => setSidebarOpen(false)}
             />
       <div className="flex-1">
-        <AppHeader title="Organizers" />
+       <AppHeader title="Organizers" onMenuClick={() => setSidebarOpen(true)} />
       </div>
     </div>
   );

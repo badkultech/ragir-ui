@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton"; // for loading state
 import { useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/faq";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { useGetOrganizerTransitsQuery } from "@/lib/services/organizer/trip/library/transits";
+import { useGetOrganizerTransitsQuery } from "@/lib/services/organizer/trip/library/transit";
 
 
 

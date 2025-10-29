@@ -7,7 +7,7 @@ export interface TransitRequest extends LibraryRequest {
   endTime: string;
   vehicleType: string;
   customVehicleType?: string;
-  arrangedBy: string;
+  arrangedBy: "ORGANIZER" | "SELF";
   description?: string;
   packagingSuggestion?: string;
 }
@@ -19,7 +19,7 @@ export interface TransitResponse extends LibraryResponse {
   endTime: string;
   vehicleType: string;
   customVehicleType?: string;
-  arrangedBy: string;
+  arrangedBy: "ORGANIZER" | "SELF";
   description?: string;
   packagingSuggestion?: string;
 }

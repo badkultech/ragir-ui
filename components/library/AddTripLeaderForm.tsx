@@ -1,26 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import { useSaveGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
+import { useLazyGetGroupLeaderByIdQuery, useSaveGroupLeaderMutation, useUpdateGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useSelector } from "react-redux";
 import RichTextEditor from "../editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 
 
 type AddTripLeaderFormProps = {
+  updateId?:number|null;
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
-  open?:boolean;
+  open?: boolean;
 };
 
 export function AddTripLeaderForm({
+  updateId,
   mode = "trip",
   onCancel,
   onSave,
@@ -36,6 +39,37 @@ export function AddTripLeaderForm({
   const { userData } = useSelector(selectAuthState);
   const orgId = userData?.organizationPublicId;
 
+ const [getDayDescription] = useLazyGetGroupLeaderByIdQuery();
+
+
+  
+ 
+  useEffect(() => {
+    if (updateId) {
+      
+      getDayDescription({ organizationId :orgId, leaderId: updateId })
+        .then((res) => {
+          // RTK Query lazy trigger returns a union; narrow before using
+          if ('data' in res && res.data) {
+            const data = res.data as any;
+            setName(data.name);
+            setTagline(data.tagline);
+            setBio(data.bio);
+            setLibraryOpen(data.libraryOpen);
+            setProfileImage(data.profileImage);
+          } else {
+            console.warn('Failed to load response', res);
+          }
+        })
+        .catch((error) => {
+          console.warn('Error to load dayDescription', error);
+        });
+    }
+  }, [updateId]);
+
+
+
+  const [updateGroupLeader]=useUpdateGroupLeaderMutation();
   const handleLibrarySelect = (item: any) => {
     setName(item.title || "");
     setTagline(item.description || "");
@@ -74,17 +108,33 @@ export function AddTripLeaderForm({
         console.log("➡️", key, value);
       }
 
-      const response = await saveGroupLeader({
+      
+    let response;
+    if (updateId) {
+      // 🟢 Update existing leader
+      response = await updateGroupLeader({
+        organizationId: orgId,
+        LeaderId: updateId,
+        data: formData,
+      }).unwrap();
+
+      console.log("✅ Trip Leader updated successfully:", response);
+    } else {
+      // 🟠 Create new leader
+      response = await saveGroupLeader({
         organizationId: orgId,
         data: formData,
       }).unwrap();
 
-      onSave(response);
+      console.log("✅ Trip Leader created successfully:", response);
+    }
+
+    onSave(response);
     } catch (err) {
       console.error("❌ Failed to save trip leader:", err);
     }
   };
-
+  const isTripMode = mode === "trip";
 
 
 
@@ -94,13 +144,11 @@ export function AddTripLeaderForm({
       {/* Profile Image Upload */}
       {/* Top-right button */}
       <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
+        {isTripMode ? (
+          <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+        ) : (
+          <div className="mt-2" />
+        )}
       </div>
       <div className="flex flex-col items-center gap-3">
         {previewUrl ? (
@@ -165,20 +213,23 @@ export function AddTripLeaderForm({
           rows={5}
           maxLength={500}
         /> */}
-      <RichTextEditor
-        value={bio}
-          onChange={ setBio}
+        <RichTextEditor
+          value={bio}
+          onChange={setBio}
           placeholder="Enter here"
           maxLength={500}
-      />
+        />
 
       </div>
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="trip-leaders"
-      />
+      {mode === "trip" &&
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="trip-leaders"
+        />
+      }
+
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
         <Button variant="outline" className="rounded-full" onClick={onCancel}>
