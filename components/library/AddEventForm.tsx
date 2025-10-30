@@ -18,9 +18,6 @@ import {
 import RichTextEditor from '../editor/RichTextEditor';
 import { ChooseFromLibraryButton } from './ChooseFromLibraryButton';
 import { useToast } from "@/components/ui/use-toast";
-import { addEventSchema, AddEventFormData } from "@/lib/schemas/forms/eventForm";
-import { validateForm } from "@/lib/utils/validateForm";
-
 
 type AddEventFormProps = {
   mode?: 'library' | 'trip';
@@ -46,7 +43,7 @@ export function AddEventForm({
   const [documents, setDocuments] = useState<Array<Document>>([]);
   const [imagesPreview, setImagesPreview] = useState<string[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
- const [errors, setErrors] = useState<Record<string, string>>({});
+ const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
   
   
@@ -97,61 +94,35 @@ export function AddEventForm({
     setDescription(item.description || '');
   };
 
-//   const validateForm = () => {
-//   const newErrors: { [key: string]: string } = {};
+  const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
 
-//   if (!title.trim()) newErrors.title = "Title is required";
-//   if (!description.trim()) newErrors.description = "Description is required";
-//   if (!location.trim()) newErrors.location = "Location is required";
+  if (!title.trim()) newErrors.title = "Title is required";
+  if (!description.trim()) newErrors.description = "Description is required";
+  if (!location.trim()) newErrors.location = "Location is required";
 
   
-//   setErrors(newErrors);
-//   return Object.keys(newErrors).length === 0;
-// };
-
-
-//   const handleSubmit = async (replace = false) => {
-
-//   // Run validation
-//   const isValid = validateForm();
-//   if (!isValid) return;
-
-//   //  Trigger save
-// try {
-//   await onSave(
-//       { title, description, location, time, packing, documents, mode },
-//       replace
-//     );
-//   toast({ title: "Success", description: "Event saved successfully!" });
-// } catch {
-//   toast({ title: "Error", description: "Failed to save event", variant: "destructive" });
-// }};
-
-
-
-const handleSubmit = async (replace = false) => {
-  const result = validateForm(addEventSchema, {
-    title,
-    description,
-    location,
-  });
-
-  if (!result.valid) {
-    setErrors(result.errors);
-    return;
-  }
-
-  try {
-    await onSave( { title, description, location, time, packing, documents, mode }, replace);
-    toast({ title: "Success", description: "Event saved successfully!" });
-  } catch {
-    toast({
-      title: "Error",
-      description: "Failed to save event",
-      variant: "destructive",
-    });
-  }
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
 };
+
+
+  const handleSubmit = async (replace = false) => {
+
+  // Run validation
+  const isValid = validateForm();
+  if (!isValid) return;
+
+  //  Trigger save
+try {
+  await onSave(
+      { title, description, location, time, packing, documents, mode },
+      replace
+    );
+  toast({ title: "Success", description: "Event saved successfully!" });
+} catch {
+  toast({ title: "Error", description: "Failed to save event", variant: "destructive" });
+}};
 
   const isTripMode = mode === "trip";
 
