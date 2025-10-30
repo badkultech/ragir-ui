@@ -17,7 +17,6 @@ export const tripAPI = baseAPI.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      transformResponse: (response: ApiResponse<TripResponse>) => response.data,
       invalidatesTags: [TAGS.trip],
     }),
 
@@ -40,7 +39,6 @@ export const tripAPI = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripId}`,
         method: 'GET',
       }),
-      transformResponse: (response: ApiResponse<TripResponse>) => response.data,
       providesTags: [TAGS.trip],
     }),
 

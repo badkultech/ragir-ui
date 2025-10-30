@@ -1,6 +1,8 @@
+import { LibraryItem } from '@/components/library/LibrarySelectModal';
 import { Document, EMPTY_DOCUMENT } from '@/hooks/useDocumentsManager';
 import { RootState } from '@/lib/slices/store';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { set } from 'lodash';
 
 export interface Profile {
   organizerName: string;
@@ -13,6 +15,18 @@ export interface Profile {
   testimonials: string;
 }
 
+export interface TripFormData {
+  tripTitle: string;
+  startDate: string;
+  endDate: string;
+  totalDays: number;
+  minGroupSize: number;
+  maxGroupSize: number;
+  minAge: number;
+  maxAge: number;
+  tripHighlights: string;
+}
+ 
 export interface OrganizerSliceState {
   // Organizer Profile State
   profile: Profile;
@@ -21,6 +35,14 @@ export interface OrganizerSliceState {
   bannerFile: Document;
   testimonialScreenshotFile: Document;
   certificationsDocuments: Array<Document>;
+  leaderModalOpen: boolean;
+  selectedTags: string[];
+  chooseModalOpen: boolean;
+  selectedGroupLeaderId: string;
+  leaders: LibraryItem[];
+  cityInput: string;
+  formData: TripFormData
+  cityTags: string[];
 }
 
 export const initialOrganizerSliceState: OrganizerSliceState = {
@@ -39,6 +61,30 @@ export const initialOrganizerSliceState: OrganizerSliceState = {
   bannerFile: EMPTY_DOCUMENT,
   testimonialScreenshotFile: EMPTY_DOCUMENT,
   certificationsDocuments: [],
+
+  // create trip states
+  leaderModalOpen: false,
+  selectedTags: [],
+  chooseModalOpen: false,
+  selectedGroupLeaderId: '',
+  leaders: [],
+  cityInput: '',
+  formData: {
+    tripTitle: 'Himalayan group',
+    startDate: '',
+    endDate: '',
+    totalDays: 1,
+    minGroupSize: 2,
+    maxGroupSize: 20,
+    minAge: 18,
+    maxAge: 50,
+    tripHighlights: '',
+  },
+  cityTags: [
+    'Jaipur',
+    'Mumbai',
+    'Pune',
+  ],
 };
 
 export const organizerSlice = createSlice({
@@ -66,6 +112,34 @@ export const organizerSlice = createSlice({
     ) => {
       state.certificationsDocuments = action.payload;
     },
+
+    // create trip Actinons
+    setLeaderModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.leaderModalOpen = action.payload;
+    },
+
+    setSelectedTags: (state, action: PayloadAction<string[]>) => {
+      state.selectedTags = action.payload;
+    },
+    setChooseModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.chooseModalOpen = action.payload;
+    },
+    setSelectedGroupLeaderId: (state, action: PayloadAction<string>) => {
+      state.selectedGroupLeaderId = action.payload;
+    },
+    setLeaders: (state, action: PayloadAction<LibraryItem[]>) => {
+      state.leaders = action.payload;
+    },
+    setCityInput: (state, action: PayloadAction<string>) => {
+      state.cityInput = action.payload;
+    },
+    setFormData: (state, action: PayloadAction<TripFormData>) => {
+      state.formData = action.payload;
+    },
+    setCityTags: (state, action: PayloadAction<string[]>) => {
+      state.cityTags = action.payload;
+    }
+
   },
 });
 
@@ -75,6 +149,16 @@ export const {
   setTestimonialScreenshotFile,
   setCertificationsDocuments,
   setProfile,
+
+  // create trip Actions
+  setLeaderModalOpen,
+  setSelectedTags,
+  setChooseModalOpen,
+  setSelectedGroupLeaderId,
+  setLeaders,
+  setCityInput,
+  setFormData,
+  setCityTags,
 } = organizerSlice.actions;
 // dataContextSlice.sta
 

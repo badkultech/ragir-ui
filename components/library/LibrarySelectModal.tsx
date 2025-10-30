@@ -21,13 +21,18 @@ import { useGetGroupLeadersQuery } from "@/lib/services/organizer/trip/library/l
 
 
 
-type LibraryItem = {
+export type LibraryItem = {
   id: string;
   title: string;
   location?: string;
   description?: string;
   image?: string;
   answer?: string;
+  imageUrl?: string;
+  profileImageUrl?: string;
+  tagline?: string;
+  name?: string;
+
 };
 
 type Category =

@@ -1,7 +1,8 @@
 // Define response types (you can update according to your backend response)
 export interface Trip {
-  id: string;
-  title: string;
+  tripId: string;
+  publicId: string;
+  name: string;
   startDate: string;
   endDate: string;
   startTime: string;
@@ -18,5 +19,9 @@ export interface Trip {
 }
 
 export interface TripResponse {
-  trip: Trip;
+  status: string;
+  message: string;
+  data: Trip;
+  error?: string;
+  timestamp?: string;
 }
