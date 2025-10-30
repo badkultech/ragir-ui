@@ -28,7 +28,7 @@ export const ENDPOINTS = {
 
   PARTNER: '/public/join_as_partner',
 
-   // ======= Group Leader Library =======
+  // ======= Group Leader Library =======
   GET_ALL_GROUP_LEADERS: (organizationId: string) =>
     `/org/${organizationId}/library/leader`,
 
@@ -80,7 +80,7 @@ export const ENDPOINTS = {
         `/org/${organizationId}/library/day-description`,
       FAQ: (organizationId: string) =>
         `/org/${organizationId}/library/faqs`,
-      TRANSIT:(organizationId: string) =>
+      TRANSIT: (organizationId: string) =>
         `/org/${organizationId}/library/transit`,
       MEAL: (organizationId: string) =>
         `/org/${organizationId}/library/meal`,
@@ -88,9 +88,14 @@ export const ENDPOINTS = {
         `/org/${organizationId}/library/leader`,
       STAY: (organizationId: string) =>
         `/org/${organizationId}/library/stay`,
-      ACTIVITY: (organizationId: string) => 
+      ACTIVITY: (organizationId: string) =>
         `/org/${organizationId}/library/activity`,
     },
+    TRIP_LEADS: (organizationId: string, tripPublicId: string) =>
+      `/org/${organizationId}/trip/${tripPublicId}/leads`,
+    TRIP_ORG_LEADS: (organizationId: string) =>
+      `/org/${organizationId}/org-trip-leads`,
+
   },
 } as const;
 
