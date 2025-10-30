@@ -106,7 +106,12 @@ export function AddTransitForm({
   return Object.keys(newErrors).length === 0;
 };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+  // Run validation
+  const isValid = validateForm();
+  if (!isValid) return;
+
+  try{
     onSave({
       title,
       from,
@@ -120,7 +125,12 @@ export function AddTransitForm({
       images,
       mode,
     });
-  };
+   toast({ title: "Success", description: "Transit saved successfully!" });
+  } catch{
+   toast({ title: "Error", description: "Failed to save Transit", variant: "destructive" });
+    }
+  }
+
 
   const isTripMode = mode === "trip";
 
