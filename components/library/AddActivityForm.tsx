@@ -7,6 +7,7 @@ import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "@/components/ui/use-toast";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -32,6 +33,8 @@ export function AddActivityForm({
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const { toast } = useToast();
 
   const isTripMode = mode === "trip";
 
@@ -60,8 +63,30 @@ export function AddActivityForm({
     setDescription(item.description || "");
   };
 
-  const handleSubmit = () => {
-    onSave({
+  const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!title.trim()) newErrors.title = "Title is required";
+  if (!moodTags) newErrors.moodTags = "Mood Tags are required";
+  if (!priceType.trim()) newErrors.priceType = "Price Type is required";  
+  if (!description.trim()) newErrors.description = "Description is required";
+  if (!location.trim()) newErrors.location = "Location is required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
+const handleSubmit = async () => {
+
+  // Run validation
+  const isValid = validateForm();
+  if (!isValid) return;
+
+  //  Trigger save
+try {
+  await onSave({
       title,
       moodTags,
       priceType,
@@ -72,7 +97,12 @@ export function AddActivityForm({
       images,
       mode,
     });
-  };
+  toast({ title: "Success", description: "Activity saved successfully!" });
+} catch {
+  toast({ title: "Error", description: "Failed to save Activity", variant: "destructive" });
+}};
+
+ 
 
   return (
     <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
@@ -97,6 +127,7 @@ export function AddActivityForm({
           placeholder="Enter title"
           maxLength={70}
         />
+          {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
         <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
@@ -116,6 +147,7 @@ export function AddActivityForm({
           <option value="CULTURAL">Cultural</option>
           <option value="FAMILY">Family</option>
         </select>
+         {errors.moodTags && <p className="text-xs text-red-500 mt-1">{errors.moodTags}</p>}
       </div>
 
       {/* Price Type */}
@@ -139,6 +171,7 @@ export function AddActivityForm({
             Chargeable
           </label>
         </div>
+        {errors.priceType && <p className="text-xs text-red-500 mt-1">{errors.priceType}</p>}
       </div>
 
       {/* Location + Time */}
@@ -150,6 +183,7 @@ export function AddActivityForm({
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location"
           />
+          {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
         </div>
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">Time</label>
@@ -207,7 +241,7 @@ export function AddActivityForm({
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
         <Button
-          onClick={handleSubmit}
+          onClick={() => handleSubmit()}
           className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
           Save

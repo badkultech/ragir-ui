@@ -69,7 +69,7 @@ export function AddMealForm({
     setDescription(item.description || "");
   };
 
-   const validateForm = () => {
+  const validateForm = () => {
   const newErrors: { [key: string]: string } = {};
 
   if (!title.trim()) newErrors.title = "Title is required";
@@ -101,9 +101,9 @@ export function AddMealForm({
       images,
       mode,
     });
-    toast({ title: "Success", description: "Event saved successfully!" });
+    toast({ title: "Success", description: "Meal saved successfully!" });
   } catch{
-
+       toast({ title: "Error", description: "Failed to save Meal", variant: "destructive" });
   }
   };
 
