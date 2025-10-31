@@ -12,6 +12,7 @@ import { selectAuthState } from "@/lib/slices/auth";
 import { useSelector } from "react-redux";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "../ui/use-toast";
 
 
 type AddTripLeaderFormProps = {
@@ -38,6 +39,8 @@ export function AddTripLeaderForm({
   const [saveGroupLeader, { isLoading }] = useSaveGroupLeaderMutation();
   const { userData } = useSelector(selectAuthState);
   const orgId = userData?.organizationPublicId;
+  const { toast } = useToast();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
  const [getDayDescription] = useLazyGetGroupLeaderByIdQuery();
 
@@ -84,11 +87,24 @@ export function AddTripLeaderForm({
     }
   };
 
+  const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!name.trim()) newErrors.name = "Name is required";
+  if (!bio.trim()) newErrors.bio = "Bio required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
   const handleSubmit = async () => {
     if (!orgId) {
       console.error("Missing org ID");
       return;
     }
+    const isValid = validateForm();
+    if (!isValid) return;
 
     try {
       const formData = new FormData();
@@ -126,12 +142,18 @@ export function AddTripLeaderForm({
         data: formData,
       }).unwrap();
 
-      console.log("✅ Trip Leader created successfully:", response);
-    }
-
-    onSave(response);
+      onSave(response);
+      toast({
+        title: "Success",
+        description: "Trip leader saved successfully!",
+      });
     } catch (err) {
-      console.error("❌ Failed to save trip leader:", err);
+      console.error("Error saving trip leader:", err);
+      toast({
+        title: "Error",
+        description: "Failed to save trip leader",
+        variant: "destructive",
+      });
     }
   };
   const isTripMode = mode === "trip";
@@ -187,6 +209,7 @@ export function AddTripLeaderForm({
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter name"
         />
+        {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
       </div>
 
       {/* Tagline */}
@@ -219,6 +242,7 @@ export function AddTripLeaderForm({
           placeholder="Enter here"
           maxLength={500}
         />
+        {errors.bio && <p className="text-xs text-red-500 mt-1">{errors.bio}</p>}
 
       </div>
       {mode === "trip" &&
