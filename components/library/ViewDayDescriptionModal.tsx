@@ -32,10 +32,10 @@ export function ViewDayDescriptionModal({
             name: "Rajasthan Folk Festival",
             location: "Jodhpur, Rajasthan",
             description:
-                "Experience traditional music and dance performances by local artisans, showcasing the region's rich heritage and storytelling...",
+                "Experience traditional music and dance performances by local artisans, showcasing the region’s rich heritage and storytelling. Participate in interactive cultural workshops where you can learn about folk instruments, local crafts, and traditional dance forms directly from the artists themselves.",
             documents: [
                 { url: "/andaman-beach-scene.png" },
-                { url: "/adventure-traveler-in-nature.jpg" },
+                { url: "/elegant-tea-logo.png" },
                 { url: "/coorg-coffee-plantation.png" },
                 { url: "/darjeeling-tea-gardens.png" },
                 { url: "/andaman-beach-clear-water.png" },
@@ -70,10 +70,17 @@ export function ViewDayDescriptionModal({
         <>
             <Dialog open={open} onOpenChange={onClose}>
                 <DialogContent
-                    className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-3xl p-0 overflow-hidden rounded-2xl"
+                    className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-2xl p-0 overflow-hidden rounded-2xl"
                 >
 
-                    <div className="max-h-[90vh] overflow-y-auto">
+                    <div className="max-h-[90vh] overflow-y-auto px-4 py-3 font-barlow">
+
+                         <DialogHeader>
+                                <DialogTitle className="text-lg md:text-lg font-[600] text-gray-900 px-1 pb-3">
+                                    {content.name}
+                                </DialogTitle>
+                            </DialogHeader>
+
                         {/* Hero Image */}
                         {mainImage ? (
                             <Image
@@ -81,7 +88,7 @@ export function ViewDayDescriptionModal({
                                 alt={content.name}
                                 width={800}
                                 height={400}
-                                className="w-full h-56 md:h-64 object-cover"
+                                className="w-full h-56 md:h-60 rounded-[12px] object-cover"
                             />
                         ) : (
                             <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">
@@ -91,11 +98,11 @@ export function ViewDayDescriptionModal({
 
                         {/* Small Images Row */}
                         {smallImages.length > 0 && (
-                            <div className="flex gap-2 px-4 mt-2 mb-2">
+                            <div className="flex gap-2 mt-2 mb-2">
                                 {smallImages.slice(0, 4).map((img: any, idx: number) => (
                                     <div
                                         key={idx}
-                                        className="relative w-[80px] h-[60px] sm:w-[100px] sm:h-[70px] rounded-md overflow-hidden"
+                                        className="relative w-[80px] h-[60px] sm:w-[130px] sm:h-[110px] rounded-md overflow-hidden"
                                     >
                                         <Image
                                             src={img.url}
@@ -115,7 +122,7 @@ export function ViewDayDescriptionModal({
                                             setTimeout(() => setGalleryOpen(true), 200); // open inner after a short delay
                                         }}
 
-                                        className="relative w-[80px] h-[60px] sm:w-[100px] sm:h-[70px] rounded-md overflow-hidden bg-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-400 transition"
+                                        className="relative w-[80px] h-[60px] sm:w-[130px] sm:h-[110px] rounded-md overflow-hidden bg-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-400 transition"
                                     >
                                         <span className="text-gray-800 font-medium text-sm">
                                             +{gallery.length - 5} more
@@ -126,21 +133,25 @@ export function ViewDayDescriptionModal({
                         )}
 
                         {/* Text Content */}
-                        <div className="p-5 pb-6">
-                            <DialogHeader>
-                                <DialogTitle className="text-lg md:text-xl font-semibold text-gray-900">
-                                    {content.name}
-                                </DialogTitle>
-                            </DialogHeader>
-
-                            <div className="flex items-center text-gray-600 text-sm mt-1">
-                                <MapPin className="w-4 h-4 mr-1 text-gray-500" />
-                                {content.location}
-                            </div>
-
-                            <p className="text-gray-700 text-sm mt-4 leading-relaxed">
+                        <div className="">
+                              <p className="text-gray-700 text-[14px] mt-4 leading-relaxed">
                                 {content.description}
                             </p>
+
+                            <div className="flex justify-between items-center text-gray-600 text-sm mt-4 w-full border-b-1 border-[#E4E4E4] border-t-1 py-3">
+                                <div className="flex items-center">
+                                     <MapPin className="w-6 h-5 mr-2 text-gray-900" />
+                                     <h3 className="text-base font-normal text-gray-800">
+                                        Location
+                                    </h3>
+                                </div>
+                               <div className="flex items-center">
+                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
+                               </div>
+                               
+                            </div>
+
+                         
 
                             {/* Packing Suggestions */}
                             {content.packingSuggestions && (
