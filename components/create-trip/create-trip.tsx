@@ -45,7 +45,7 @@ import RichTextEditor from '@/components/editor/RichTextEditor';
 import { AddTripLeaderForm } from '@/components/library/AddTripLeaderForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {  LibrarySelectModal } from '@/components/library/LibrarySelectModal';
-import { useCreateTripMutation, useLazyGetTripByIdQuery } from '@/lib/services/organizer/trip/library/create-trip';
+import { useCreateTripMutation, useLazyGetTripByIdQuery } from '@/lib/services/organizer/trip/create-trip';
 import { CustomDateTimePicker } from '@/components/ui/date-time-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
@@ -222,7 +222,7 @@ export function CreateTrip({ tripId }: Props) {
             console.log("✅ Trip created:", response);
 
             // ✅ Capture tripId from backend response
-            const tripId = response?.data.tripId; // make sure your backend returns it
+            const tripId = response?.data.publicId; // make sure your backend returns it
 
             if (tripId) {
                 // 🔸 Option 1: Save to localStorage (so next page can access it)

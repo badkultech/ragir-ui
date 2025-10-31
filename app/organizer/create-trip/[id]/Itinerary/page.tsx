@@ -11,7 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CustomDateTimePicker } from "@/components/ui/date-time-picker";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { useLazyGetTripByIdQuery } from "@/lib/services/organizer/trip/library/create-trip";
+import { useLazyGetTripByIdQuery } from "@/lib/services/organizer/trip/create-trip";
+import { useLazyGetItineraryByTripIdQuery, useUpdateItineraryMutation } from "@/lib/services/organizer/trip/itinerary";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 // Type for each day
 interface Day {
@@ -58,11 +61,33 @@ export default function ItineraryPage() {
   const [startingPoint, setStartingPoint] = useState("Mumbai");
   const [endPoint, setEndPoint] = useState("Goa");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [updateItinerary, { isLoading: updating }] = useUpdateItineraryMutation();
+  const { userData } = useSelector(selectAuthState);
+const [ triggerGetItineraryByTripId,{data:itineraryData}]=useLazyGetItineraryByTripIdQuery();
+
+
+
 
 
   const tripIdFromUrl = searchParams.get("tripId");
   const [triggerGetTrip, { data: tripData, isLoading, isError }] = useLazyGetTripByIdQuery();
 
+
+  const handleFetchItinerary = async (tripPublicId: string) => {
+    const organizationId = userData?.organizationPublicId;  
+    if (!organizationId) {
+      console.log("❌ Missing organizationId");
+      return;
+    }
+    try {
+      console.log("🔄 Fetching itinerary for tripPublicId:", tripPublicId)
+      const response = await triggerGetItineraryByTripId({ organizationId, tripPublicId }).unwrap()
+        
+      console.log("✅ Fetched itinerary:", response)
+      } catch (err) {
+        console.error("❌ Failed to fetch itinerary:", err)
+        }
+        };
   // 🧭 New function to fetch trip only when Prev is clicked
   const handlePrevClick = async () => {
     const storedTripId = localStorage.getItem("createdTripId");
@@ -76,7 +101,7 @@ export default function ItineraryPage() {
       console.log("❌ Missing tripId or organizationId");
     }
 
-    router.push("/organizer/create-trip");
+    router.push(`/organizer/create-trip/${tripId}`);
   };
 
 
@@ -111,6 +136,59 @@ export default function ItineraryPage() {
   const handleAddDetails = (idx: number) => {
     setShowDetails((prev) => prev.map((val, i) => (i === idx ? true : val)));
   };
+
+const handleUpdateItinerary = async () => {
+    const organizationId = userData?.organizationPublicId;
+  const tripPublicId =
+    id ||
+    searchParams.get("tripPublicId") ||
+    localStorage.getItem("createdTripPublicId");
+
+  if (!organizationId || !tripPublicId) {
+    console.log("❌ Missing organizationId or tripPublicId");
+    return;
+  }
+
+
+  const payload = {
+    startPoint: startingPoint,
+    endPoint: endPoint,
+    startDate: startDate.split("T")[0], // Extract date part only
+    startTime: {
+      hour: new Date(startDate).getHours(),
+      minute: new Date(startDate).getMinutes(),
+      second: new Date(startDate).getSeconds(),
+      nano: 0,
+    },
+    endDate: endDate.split("T")[0],
+    endTime: {  
+      hour: new Date(endDate).getHours(),
+      minute: new Date(endDate).getMinutes(),
+      second: new Date(endDate).getSeconds(),
+      nano: 0,
+    },
+  };
+
+  try {
+    console.log("📤 Sending Itinerary Update:", payload);
+    // Ensure tripPublicId is a string (handle string | string[] from useParams)
+    const tripIdString = Array.isArray(tripPublicId) ? tripPublicId[0] : (tripPublicId as string);
+
+    const response = await updateItinerary({
+      organizationId,
+      tripPublicId: tripIdString,
+      data: payload,
+    }).unwrap();
+    console.log("✅ Itinerary updated successfully:", response);
+
+    // After successful update, move to next page
+    router.push("/organizer/create-trip/exclusions");
+  } catch (err) {
+    console.error("❌ Failed to update itinerary:", err);
+  }
+};
+
+
 
   return (
     <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
@@ -206,7 +284,7 @@ export default function ItineraryPage() {
             <WizardFooter
               onPrev={handlePrevClick}
               onDraft={() => console.log("Draft itinerary saved")}
-              onNext={() => router.push("/organizer/create-trip/exclusions")}
+              onNext={handleUpdateItinerary}
             />
           </div>
         </div>
