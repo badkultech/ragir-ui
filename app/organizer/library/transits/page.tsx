@@ -20,6 +20,7 @@ import {
   useGetOrganizerTransitByIdQuery,
 } from "@/lib/services/organizer/trip/library/transit";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { ViewModal } from "@/components/library/ViewModal";
 
 export default function TransitPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -120,7 +121,6 @@ export default function TransitPage() {
                       <button
                         className="hover:text-blue-500"
                         onClick={() => {
-                          setSelectedTransitId(t.id);
                           setViewOpen(true);
                         }}
                       >
@@ -197,7 +197,7 @@ export default function TransitPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={viewOpen} onOpenChange={(open) => {
+      {/* <Dialog open={viewOpen} onOpenChange={(open) => {
         setViewOpen(open);
         if (!open) setSelectedTransitId(null);
       }}>
@@ -208,7 +208,7 @@ export default function TransitPage() {
             </div>
           ) : (
             <>
-              {/* Header Image */}
+             
               <div className="w-full h-48 bg-gray-100">
                 <img
                   src={selectedTransit?.documents?.[0]?.url || "/placeholder-image.jpg"}
@@ -224,18 +224,18 @@ export default function TransitPage() {
                   </DialogTitle>
                 </DialogHeader>
 
-                {/* Description */}
+                
                 <p className="mt-3 text-sm text-gray-600 leading-relaxed">
                   {selectedTransit?.description ||
                     "Travel comfortably on this route where your journey is as relaxing as your destination."}
                 </p>
 
-                {/* Divider */}
+             
                 <div className="border-t my-4" />
 
-                {/* Info Section */}
+            
                 <div className="space-y-3 text-sm text-gray-700">
-                  {/* Vehicle */}
+                
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Car className="w-4 h-4 text-gray-500" />
@@ -248,7 +248,7 @@ export default function TransitPage() {
                     </span>
                   </div>
 
-                  {/* Departure */}
+                
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-gray-500" />
@@ -260,7 +260,7 @@ export default function TransitPage() {
                     </span>
                   </div>
 
-                  {/* Arrival */}
+                
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-gray-500" />
@@ -272,7 +272,7 @@ export default function TransitPage() {
                     </span>
                   </div>
 
-                  {/* Mode of Arrangements */}
+            
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-gray-500" />
@@ -286,10 +286,8 @@ export default function TransitPage() {
                   </div>
                 </div>
 
-                {/* Divider */}
                 <div className="border-t my-5" />
 
-                {/* Packing Suggestions */}
                 {selectedTransit?.packagingSuggestion && (
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">
@@ -308,9 +306,13 @@ export default function TransitPage() {
             </>
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog>  */}
 
-
+      <ViewModal
+        step='transit'
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+      />
     </div>
   );
 }

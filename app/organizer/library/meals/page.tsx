@@ -9,6 +9,7 @@ import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { Loader2 } from "lucide-react";
 import { useDeleteMealMutation, useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
+import { ViewModal } from "@/components/library/ViewModal";
 
 export default function MealsPage() {
   const organizationId = useOrganizationId();
@@ -21,6 +22,7 @@ export default function MealsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
 
   // ✅ Filter search results
   const filtered = meals.filter((meal) =>
@@ -103,7 +105,11 @@ export default function MealsPage() {
 
                     {/* Actions */}
                     <div className="mt-6 flex justify-end gap-3 text-gray-500">
-                      <button className="hover:text-orange-500">
+                      <button className="hover:text-orange-500" 
+                       onClick={() => { 
+                          setViewModalOpen(true);
+                        }}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -147,6 +153,11 @@ export default function MealsPage() {
         updateId={editMeal?.id}
         initialStep="meal"
         editData={editMeal}
+      />
+       <ViewModal
+        step='meals'
+        open={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
       />
     </div>
   );

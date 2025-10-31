@@ -8,7 +8,7 @@ import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useDeleteStayMutation, useGetStaysQuery } from "@/lib/services/organizer/trip/library/stay";
-
+import { ViewModal } from "@/components/library/ViewModal";
 
 export default function StaysPage() {
   const organizationId = useOrganizationId();
@@ -24,6 +24,7 @@ export default function StaysPage() {
   const [editStay, setEditStay] = useState<any>(null);
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
 
   // ✅ Filtered data
   const filtered = stays.filter((stay) =>
@@ -109,7 +110,11 @@ export default function StaysPage() {
 
                     {/* Actions */}
                     <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                      <button className="hover:text-orange-500">
+                      <button className="hover:text-orange-500"
+                      onClick={() => {
+                         
+                          setViewModalOpen(true);
+                        }}>
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -153,6 +158,11 @@ export default function StaysPage() {
         initialStep="stay"
         updateId={editStay?.id}
         editData={editStay}
+      />
+       <ViewModal
+        step='stays'
+        open={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
       />
     </div>
   );

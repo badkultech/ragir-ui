@@ -22,7 +22,7 @@ import {
 } from '@/lib/services/organizer/trip/library/day-description';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
-import { ViewDayDescriptionModal } from '@/components/library/ViewDayDescriptionModal';
+import { ViewModal } from '@/components/library/ViewModal';
 
 const mockEvents = [
   {
@@ -195,7 +195,8 @@ export default function EventsPage() {
         onClose={() => setModalOpen(false)}
         initialStep='event' // 👈 opens AddStayForm directly
       />
-      <ViewDayDescriptionModal
+      <ViewModal
+        step='day-description'
         open={viewModalOpen}
         onClose={() => setViewModalOpen(false)}
         data={selectedDay}
