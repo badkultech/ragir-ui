@@ -122,6 +122,7 @@ export default function TransitPage() {
                         className="hover:text-blue-500"
                         onClick={() => {
                           setViewOpen(true);
+                          setSelectedTransitId(t.id);
                         }}
                       >
                         <Eye className="w-4 h-4" />
@@ -311,7 +312,9 @@ export default function TransitPage() {
       <ViewModal
         step='transit'
         open={viewOpen}
-        onClose={() => setViewOpen(false)}
+        data={selectedTransit}
+        onClose={() => {setViewOpen(false)
+          setSelectedTransitId(null);}}
       />
     </div>
   );

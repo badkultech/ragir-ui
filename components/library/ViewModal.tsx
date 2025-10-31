@@ -13,6 +13,7 @@ import { FullImageGalleryModal } from "./FullImageGalleryModal";
 import Home from "@/app/prelaunch/page";
 import { MealType } from "@/lib/services/organizer/trip/library/meal/types";
 
+
 interface ViewModalProps {
     open: boolean;
     onClose: () => void;
@@ -27,7 +28,7 @@ export function ViewModal({
     data,
 }: ViewModalProps) {
 
-    const USE_LOCAL_FALLBACK = true; // 👈 toggle this to false when backend is ready
+    const USE_LOCAL_FALLBACK = false; // 👈 toggle this to false when backend is ready
 
     const content = useMemo(() => {
         if (!USE_LOCAL_FALLBACK && data) return data;
@@ -165,7 +166,7 @@ export function ViewModal({
                                     </h3>
                                 </div>
                                <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.vehicle}</h3>
+                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.vehicleType}</h3>
                                </div>
                       </div>
                        <div className="flex justify-between items-center">
@@ -176,7 +177,7 @@ export function ViewModal({
                                     </h3>
                                 </div>
                                <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.departure}</h3>
+                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.endTime}</h3>
                                </div>
                       </div>
                        <div className="flex justify-between items-center">
@@ -187,7 +188,7 @@ export function ViewModal({
                                     </h3>
                                 </div>
                                <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.arrival}</h3>
+                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.startTime}</h3>
                                </div>
                       </div>
                       <div className="flex justify-between items-center">
@@ -198,7 +199,7 @@ export function ViewModal({
                                     </h3>
                                 </div>
                                <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.arrangement}</h3>
+                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.arrangedBy}</h3>
                                </div>
                       </div>
                    </>
@@ -396,13 +397,13 @@ export function ViewModal({
                          
 
                             {/* Packing Suggestions */}
-                            {content.packingSuggestions && (
+                            {content.packingSuggestion && typeof content.packingSuggestion == "object" && (
                                 <div className="mt-6">
                                     <h3 className="text-base font-semibold text-gray-900 mb-3">
                                         Packing Suggestions
                                     </h3>
 
-                                    {Object.entries(content.packingSuggestions as Record<string, string[]>).map(
+                                    {Object.entries(content.packingSuggestion as Record<string, string[]>).map(
                                         ([key, list]) => (
                                             <div key={key} className="mb-4">
                                                 <p className="font-medium text-gray-600 capitalize mb-1">

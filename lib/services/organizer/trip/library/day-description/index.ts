@@ -83,7 +83,7 @@ export const organizerAPI = baseAPI.injectEndpoints({
 export const {
   useUpdateOrganizerDayDescriptionMutation,
   useCreateOrganizerDayDescriptionMutation,
-  useLazyGetOrganizerDayDescriptionByIdQuery,
+  useGetOrganizerDayDescriptionByIdQuery,
   useGetOrganizerDayDescriptionQuery,
   useDeleteOrganizerDayDescriptionMutation,
 } = organizerAPI;

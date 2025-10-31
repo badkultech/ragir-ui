@@ -7,17 +7,16 @@ import { MapPin, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { useDeleteStayMutation, useGetStaysQuery } from "@/lib/services/organizer/trip/library/stay";
+import {
+  useDeleteStayMutation,
+  useGetStaysQuery,
+  useGetStayByIdQuery,
+} from "@/lib/services/organizer/trip/library/stay";
 import { ViewModal } from "@/components/library/ViewModal";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function StaysPage() {
   const organizationId = useOrganizationId();
-
-  // ✅ API integration
-  const { data: stays = [], isLoading, isError, refetch } =
-    useGetStaysQuery(organizationId);
-
-  const [deleteStay] = useDeleteStayMutation();
 
   // ✅ Local state
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,6 +24,23 @@ export default function StaysPage() {
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedStayId, setSelectedStayId] = useState<number | null>(null);
+
+  // ✅ API integration
+  const {
+    data: stays = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useGetStaysQuery(organizationId);
+  const { data: selectedStay, isFetching: isTransitLoading } =
+    useGetStayByIdQuery(
+      selectedStayId && organizationId
+        ? { organizationId, stayId: selectedStayId }
+        : skipToken
+    );
+
+  const [deleteStay] = useDeleteStayMutation();
 
   // ✅ Filtered data
   const filtered = stays.filter((stay) =>
@@ -97,9 +113,7 @@ export default function StaysPage() {
 
                   {/* Content */}
                   <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-semibold text-gray-900">
-                      {stay.name}
-                    </h3>
+                    <h3 className="font-semibold text-gray-900">{stay.name}</h3>
                     <div className="flex items-center text-gray-600 text-sm mt-1">
                       <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                       {stay.location || "—"}
@@ -110,11 +124,13 @@ export default function StaysPage() {
 
                     {/* Actions */}
                     <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                      <button className="hover:text-orange-500"
-                      onClick={() => {
-                         
+                      <button
+                        className="hover:text-orange-500"
+                        onClick={() => {
+                          setSelectedStayId(stay.id);
                           setViewModalOpen(true);
-                        }}>
+                        }}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -159,10 +175,14 @@ export default function StaysPage() {
         updateId={editStay?.id}
         editData={editStay}
       />
-       <ViewModal
-        step='stays'
+      <ViewModal
+        step="stays"
         open={viewModalOpen}
-        onClose={() => setViewModalOpen(false)}
+        data={selectedStay}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedStayId(null); // Reset selected stay ID when closing modal
+        }}
       />
     </div>
   );
