@@ -163,7 +163,7 @@ export function ViewDayDescriptionModal({
                                     {Object.entries(content.packingSuggestions as Record<string, string[]>).map(
                                         ([key, list]) => (
                                             <div key={key} className="mb-4">
-                                                <p className="font-medium text-gray-800 capitalize mb-1">
+                                                <p className="font-medium text-gray-600 capitalize mb-1">
                                                     {key}
                                                 </p>
                                                 <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
