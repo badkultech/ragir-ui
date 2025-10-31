@@ -20,17 +20,21 @@ import { AppHeader } from "@/components/app-header";
 import { ConfirmConversionModal } from "@/components/organizer/ConfirmConversionModal";
 
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { useDeleteTripLeadMutation, useGetTripLeadsQuery, useUpdateTripLeadMutation } from "@/lib/services/organizer/trip/leads";
+import { useDeleteTripLeadMutation, useGetTripLeadsByStatusQuery, useGetTripLeadsQuery, useUpdateTripLeadMutation } from "@/lib/services/organizer/trip/leads";
 import { TripLeadsStatus } from "@/lib/services/organizer/trip/leads/types";
+import { LeadFilters } from "@/components/leads/LeadFilters";
 
 
 export default function LeadsPage() {
   const { tripId } = useParams();
   const organizationId = useOrganizationId();
 
-  const { data: leads = [], isLoading, refetch } = useGetTripLeadsQuery({
+  const [status, setStatus] = useState("all");
+
+  const { data: leads = [], isLoading, refetch } = useGetTripLeadsByStatusQuery({
     organizationId,
     tripId: tripId as string,
+    status,
   });
 
   const [updateTripLead] = useUpdateTripLeadMutation();
@@ -133,38 +137,7 @@ export default function LeadsPage() {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap gap-3 mb-6 items-center">
-            <div className="flex-1 min-w-[180px] sm:min-w-[220px]">
-              <Input
-                placeholder="Search"
-                className="w-full rounded-full border border-gray-200 bg-white h-9 sm:h-10 text-sm px-4 shadow-sm focus-visible:ring-1 focus-visible:ring-gray-300"
-              />
-            </div>
-
-            <Select>
-              <SelectTrigger className="w-[160px] rounded-full border border-gray-200 h-9 sm:h-10 text-sm bg-white shadow-sm">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border border-gray-200 bg-white shadow-lg">
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-                <SelectItem value="converted">Converted</SelectItem>
-                <SelectItem value="nudged">Nudged Again</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select>
-              <SelectTrigger className="w-[160px] rounded-full border border-gray-200 h-9 sm:h-10 text-sm bg-white shadow-sm">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border border-gray-200 bg-white shadow-lg">
-                <SelectItem value="newest">Newest to Oldest</SelectItem>
-                <SelectItem value="oldest">Oldest to Newest</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
+          <LeadFilters onStatusChange={(val) => setStatus(val)} />;
           {/* Leads List */}
           <div className="space-y-4">
             {isLoading ? (

@@ -4,7 +4,6 @@ import { TAGS } from "@/lib/services/tags";
 import { TripLeadsResponse } from "./types";
 import { LibraryApiResponse } from "../library/types";
 
-
 export const tripLeadsAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 Get all trip leads
@@ -95,12 +94,34 @@ export const tripLeadsAPI = baseAPI.injectEndpoints({
         res.data,
       invalidatesTags: [{ type: TAGS.tripLeads }],
     }),
+
+    // 🔹 Get all leads (organization-wide)
     getAllTripLeads: builder.query<TripLeadsResponse[], string>({
       query: (organizationId) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP_ORG_LEADS(organizationId)}`, // backend supports org-wide leads
+        url: `${ENDPOINTS.ORGANIZER.TRIP_ORG_LEADS(organizationId)}`,
         method: "GET",
       }),
-      transformResponse: (res: LibraryApiResponse<TripLeadsResponse[]>) => res.data,
+      transformResponse: (res: LibraryApiResponse<TripLeadsResponse[]>) =>
+        res.data,
+      providesTags: [{ type: TAGS.tripLeads }],
+    }),
+
+    // 🔹 NEW: Get trip leads by status (org-wide or trip-specific)
+    getTripLeadsByStatus: builder.query<
+      TripLeadsResponse[],
+      { organizationId: string; status: string; tripId?: string }
+    >({
+      query: ({ organizationId, status, tripId }) => {
+        const baseUrl = tripId
+          ? ENDPOINTS.ORGANIZER.TRIP_LEADS(organizationId, tripId)
+          : ENDPOINTS.ORGANIZER.TRIP_ORG_LEADS(organizationId);
+        return {
+          url: `${baseUrl}?status=${status}`,
+          method: "GET",
+        };
+      },
+      transformResponse: (res: LibraryApiResponse<TripLeadsResponse[]>) =>
+        res.data,
       providesTags: [{ type: TAGS.tripLeads }],
     }),
   }),
@@ -113,5 +134,5 @@ export const {
   useUpdateTripLeadMutation,
   useDeleteTripLeadMutation,
   useGetAllTripLeadsQuery,
-
+  useGetTripLeadsByStatusQuery, 
 } = tripLeadsAPI;
