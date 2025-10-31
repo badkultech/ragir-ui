@@ -4,6 +4,7 @@ import { GroupLeaderRequest, GroupLeaderResponse } from "./types";
 import { baseAPI } from "@/lib/services";
 import { LibraryApiResponse } from "../types";
 import { TAGS } from "@/lib/services/tags";
+import { method } from "lodash";
 
 export const groupLeaderAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -49,8 +50,39 @@ export const groupLeaderAPI = baseAPI.injectEndpoints({
         res.data,
       invalidatesTags: [{ type: TAGS.tripLibraryGroupLeader }],
     }),
+
+    //  delete group leader
+
+    deleteGroupLeader: builder.mutation<
+    { success: boolean; message?: string },
+      { organizationId: string; LeaderId: string | number }
+      >({
+        query: ({ organizationId , LeaderId}) =>({
+        url: `${ENDPOINTS.ORGANIZER.LIBRARY.TRIP_LEADER(organizationId)}/${LeaderId}`,
+          method: "DELETE",
+        }),
+        transformResponse: (res: LibraryApiResponse<{ success: boolean }>) =>
+        res.data,
+      invalidatesTags: [{ type: TAGS.tripLibraryGroupLeader }],
+      }),
+
+        // ✅ Update GroupLeader (PUT)
+          updateGroupLeader: builder.mutation<
+            GroupLeaderResponse,
+            { organizationId: string; LeaderId: string | number; data: FormData }
+          >({
+            query: ({ organizationId, LeaderId, data }) => ({
+              url: `${ENDPOINTS.ORGANIZER.LIBRARY.TRIP_LEADER(organizationId)}/${LeaderId}`,
+              method: "PUT",
+              body: data,
+            }),
+            transformResponse: (res: LibraryApiResponse<GroupLeaderResponse>) => res.data,
+            invalidatesTags: [{ type: TAGS.tripLibraryGroupLeader }],
+          }),
+
+
   }),
 });
 
-export const { useGetGroupLeadersQuery, useSaveGroupLeaderMutation, useGetGroupLeaderByIdQuery, } =
+export const { useGetGroupLeadersQuery, useSaveGroupLeaderMutation, useLazyGetGroupLeaderByIdQuery, useGetGroupLeaderByIdQuery, useDeleteGroupLeaderMutation, useUpdateGroupLeaderMutation,} =
   groupLeaderAPI;

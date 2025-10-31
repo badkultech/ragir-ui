@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import { useSaveGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
+import { useLazyGetGroupLeaderByIdQuery, useSaveGroupLeaderMutation, useUpdateGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useSelector } from "react-redux";
 import RichTextEditor from "../editor/RichTextEditor";
@@ -16,6 +16,7 @@ import { useToast } from "../ui/use-toast";
 
 
 type AddTripLeaderFormProps = {
+  updateId?:number|null;
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
@@ -23,6 +24,7 @@ type AddTripLeaderFormProps = {
 };
 
 export function AddTripLeaderForm({
+  updateId,
   mode = "trip",
   onCancel,
   onSave,
@@ -40,6 +42,37 @@ export function AddTripLeaderForm({
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+ const [getDayDescription] = useLazyGetGroupLeaderByIdQuery();
+
+
+  
+ 
+  useEffect(() => {
+    if (updateId) {
+      
+      getDayDescription({ organizationId :orgId, leaderId: updateId })
+        .then((res) => {
+          // RTK Query lazy trigger returns a union; narrow before using
+          if ('data' in res && res.data) {
+            const data = res.data as any;
+            setName(data.name);
+            setTagline(data.tagline);
+            setBio(data.bio);
+            setLibraryOpen(data.libraryOpen);
+            setProfileImage(data.profileImage);
+          } else {
+            console.warn('Failed to load response', res);
+          }
+        })
+        .catch((error) => {
+          console.warn('Error to load dayDescription', error);
+        });
+    }
+  }, [updateId]);
+
+
+
+  const [updateGroupLeader]=useUpdateGroupLeaderMutation();
   const handleLibrarySelect = (item: any) => {
     setName(item.title || "");
     setTagline(item.description || "");
@@ -91,7 +124,20 @@ export function AddTripLeaderForm({
         console.log("➡️", key, value);
       }
 
-      const response = await saveGroupLeader({
+      
+    let response;
+    if (updateId) {
+      // 🟢 Update existing leader
+      response = await updateGroupLeader({
+        organizationId: orgId,
+        LeaderId: updateId,
+        data: formData,
+      }).unwrap();
+
+      console.log("✅ Trip Leader updated successfully:", response);
+    } else {
+      // 🟠 Create new leader
+      response = await saveGroupLeader({
         organizationId: orgId,
         data: formData,
       }).unwrap();

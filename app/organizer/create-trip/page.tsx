@@ -51,6 +51,7 @@ import { AddTripLeaderForm } from '@/components/library/AddTripLeaderForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LibrarySelectModal } from '@/components/library/LibrarySelectModal';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
+import { CustomDateTimePicker } from '@/components/ui/date-time-picker';
 
 export default function CreateTripPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -161,12 +162,12 @@ export default function CreateTripPage() {
   const [cityInput, setCityInput] = useState('');
 
   const today = new Date();
-  const formattedDate = today.toLocaleDateString('en-GB');
+  const formattedDateISO = today.toISOString().slice(0, 16);
 
   const [formData, setFormData] = useState({
     tripTitle: 'Himalayan group',
-    startDate: formattedDate,
-    endDate: formattedDate,
+    startDate: formattedDateISO,
+    endDate: formattedDateISO,
     totalDays: 1, // default 1 day
     minGroupSize: 2,
     maxGroupSize: 20,
@@ -247,7 +248,7 @@ export default function CreateTripPage() {
             {/* Trip Title */}
             <div className='mb-6'>
               <Label className='block text-gray-600 mb-2 font-medium'>
-                Trip Title
+                Trip Title <span className='text-black'>*</span>
               </Label>
               <div className='relative'>
                 <Input
@@ -267,39 +268,32 @@ export default function CreateTripPage() {
             </div>
 
             {/* Start and End Dates */}
-            <div className='grid md:grid-cols-2 gap-6 mb-6'>
-              <div>
-                <Label className='block text-gray-600 mb-2 font-medium'>
-                  Start Date
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              {/* Start Date */}
+              <div className="flex flex-col gap-1">
+                <Label className="text-gray-600 font-medium">
+                  Start Date<span className='text-black'>*</span>
                 </Label>
-                <div className='relative'>
-                  <input
-                    type='datetime-local'
-                    placeholder='dd-mm-yyyy --:--'
-                    value={formData.startDate}
-                    onChange={(value) =>
-                      handleInputChange('startDate', value.target.value)
-                    }
-                    className='w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500'
-                  />
-                </div>
+                <CustomDateTimePicker
+                  value={formData.startDate}
+                  onChange={(val) => handleInputChange('startDate', val)}
+                  placeholder="Select start date & time"
+                />
               </div>
-              <div>
-                <Label className='block text-gray-600 mb-2 font-medium'>
-                  End Date
+
+              {/* End Date */}
+              <div className="flex flex-col gap-1">
+                <Label className="text-gray-600 font-medium">
+                  End Date<span className='text-black'>*</span>
                 </Label>
-                <div className='relative'>
-                  <input
-                    value={formData.endDate}
-                    onChange={(value) =>
-                      handleInputChange('endDate', value.target.value)
-                    }
-                    type='datetime-local'
-                    className='w-full border px-3 py-2  rounded-lg outline-none text-sm'
-                  />
-                </div>
+                <CustomDateTimePicker
+                  value={formData.endDate}
+                  onChange={(val) => handleInputChange('endDate', val)}
+                  placeholder="Select end date & time"
+                />
               </div>
             </div>
+
 
             {/* Total Days */}
             <div>
@@ -321,7 +315,7 @@ export default function CreateTripPage() {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-5'>
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Minimum Group Size <span className='text-red-500'>*</span>
+                  Minimum Group Size <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input
@@ -348,7 +342,7 @@ export default function CreateTripPage() {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Group Size <span className='text-red-500'>*</span>
+                  Maximum Group Size <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input
@@ -379,7 +373,7 @@ export default function CreateTripPage() {
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
                   Minimum Age (18yrs or above){' '}
-                  <span className='text-red-500'>*</span>
+                  <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input
@@ -406,7 +400,7 @@ export default function CreateTripPage() {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Age <span className='text-red-500'>*</span>
+                  Maximum Age <span className='text-black'>*</span>
                 </Label>
                 <div className='relative'>
                   <Input
@@ -551,11 +545,13 @@ export default function CreateTripPage() {
             </Button>
             <Button
 
-              onClick={() =>
+              onClick={() => {
                 router.push(
-                  `/organizer/create-trip/Itinerary?startDate=${formData.startDate}&endDate=${formData.endDate}`
-                )
-              }
+                  `/organizer/create-trip/Itinerary?startDate=${encodeURIComponent(
+                    formData.startDate
+                  )}&endDate=${encodeURIComponent(formData.endDate)}&totalDays=${formData.totalDays}`
+                );
+              }}
               className='px-8 py-2 rounded-full font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 transition flex items-center gap-2'
             >
               Save & Next

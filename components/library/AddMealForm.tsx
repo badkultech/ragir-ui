@@ -35,6 +35,8 @@ export function AddMealForm({
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const {toast} = useToast();
+  const [saveInLibrary, setSaveInLibrary] = useState(false);
+  const [saveAsName, setSaveAsName] = useState('');
 
   const isTripMode = mode === "trip";
 
@@ -260,17 +262,24 @@ export function AddMealForm({
         )}
       </div>
 
-      {/* Save to Library (Trip Mode Only) */}
       {isTripMode && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
-            <Input type="checkbox" value="" className="w-[22px]" />
+            <Input
+              type="checkbox"
+              checked={saveInLibrary}
+              onChange={(e) => setSaveInLibrary(e.target.checked)}
+              className="w-[22px]"
+            />
             <label className="block text-[0.95rem] font-medium">
               Save in Library
             </label>
           </div>
+
           <Input
             type="text"
+            value={saveAsName}
+            onChange={(e) => setSaveAsName(e.target.value)}
             placeholder="Save As"
             className="p-4 w-[12rem]"
           />
