@@ -17,6 +17,7 @@ import {
 } from '@/lib/services/organizer/trip/library/day-description/types';
 import RichTextEditor from '../editor/RichTextEditor';
 import { ChooseFromLibraryButton } from './ChooseFromLibraryButton';
+import { useToast } from "@/components/ui/use-toast";
 
 type AddEventFormProps = {
   mode?: 'library' | 'trip';
@@ -42,13 +43,17 @@ export function AddEventForm({
   const [documents, setDocuments] = useState<Array<Document>>([]);
   const [imagesPreview, setImagesPreview] = useState<string[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+ const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { toast } = useToast();
+  
+  
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState('');
 
 
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
-
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setDocuments([
@@ -97,12 +102,35 @@ export function AddEventForm({
     setDescription(item.description || '');
   };
 
-  const handleSubmit = (replace = false) => {
-    onSave(
+  const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!title.trim()) newErrors.title = "Title is required";
+  if (!description.trim()) newErrors.description = "Description is required";
+  if (!location.trim()) newErrors.location = "Location is required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
+  const handleSubmit = async (replace = false) => {
+
+  // Run validation
+  const isValid = validateForm();
+  if (!isValid) return;
+
+  //  Trigger save
+try {
+  await onSave(
       { title, description, location, time, packing, documents, mode },
-      replace,
+      replace
     );
-  };
+  toast({ title: "Success", description: "Event saved successfully!" });
+} catch {
+  toast({ title: "Error", description: "Failed to save event", variant: "destructive" });
+}};
 
   const isTripMode = mode === "trip";
 
@@ -135,6 +163,7 @@ export function AddEventForm({
           placeholder='Enter title'
           maxLength={70}
         />
+         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
         <p className='text-xs text-right text-gray-400 mt-1'>
           {title.length}/70 Characters
         </p>
@@ -157,6 +186,7 @@ export function AddEventForm({
           onChange={setDescription}
           maxLength={800}
         />
+         {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
         <p className='text-xs text-right text-gray-400 mt-1'>
           {description.length}/800 Words
         </p>
@@ -173,6 +203,7 @@ export function AddEventForm({
             onChange={(e) => setLocation(e.target.value)}
             placeholder='Location'
           />
+           {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
         </div>
 
       </div>
@@ -234,7 +265,7 @@ export function AddEventForm({
               .map((document, i) => (
                 <div
                   key={i}
-                  className='relative w-16 h-16 rounded overflow-hidden'
+              className='relative w-16 h-16 rounded overflow-hidden'
                 >
                   <span
                     key={i}
@@ -309,9 +340,9 @@ export function AddEventForm({
       {mode === "trip" &&
         <LibrarySelectModal
           open={libraryOpen}
-          onClose={() => setLibraryOpen(false)}
-          onSelect={handleLibrarySelect}
-          category='events'
+          onClose = {() => setLibraryOpen(false)}
+          onSelect = {handleLibrarySelect}
+          category = 'events'
         />
       }
     </div>

@@ -200,8 +200,8 @@ export default function EventsPage() {
       <AddNewItemModal
         open={modalOpen}
         updateId={updateId}
-        onClose={() => setModalOpen(false)}
-        initialStep="event" // 👈 opens AddStayForm directly
+        onClose = {() => setModalOpen(false)}
+        initialStep='event' // 👈 opens AddStayForm directly
       />
       <ViewModal
         step="day-description"

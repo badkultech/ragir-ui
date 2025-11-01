@@ -7,6 +7,7 @@ import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "../ui/use-toast";
 
 type AddStayFormProps = {
   mode?: "library" | "trip";
@@ -32,10 +33,10 @@ export function AddStayForm({
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState('');
-
-
   const isTripMode = mode === "trip";
 
   // ✅ Prefill form when editing existing stay
@@ -67,8 +68,29 @@ export function AddStayForm({
     setDescription(item.description || "");
   };
 
+
+const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!title.trim()) newErrors.title = "Title is required";
+  if (!sharingType.trim()) newErrors.sharingType = "Sharing Type is required";
+  if (!checkIn.trim()) newErrors.checkIn = "Check In Time is required";
+  if (!checkOut.trim()) newErrors.checkOut = "Check Out Time is required";
+  if (!description.trim()) newErrors.description = "Description is required";
+  if (!location.trim()) newErrors.location = "Location is required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
   // ✅ Submit data to parent
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+
+    const isValid = validateForm();
+  if (!isValid) return;
+  
+  try{
     onSave({
       title,
       sharingType,
@@ -80,6 +102,11 @@ export function AddStayForm({
       images,
       mode,
     });
+     toast({ title: "Success", description: "Stay saved successfully!" });
+  }
+  catch{
+    toast({ title: "Error", description: "Failed to save Stay", variant: "destructive" });
+  }
   };
 
   return (
@@ -111,6 +138,7 @@ export function AddStayForm({
           placeholder="Enter title"
           maxLength={70}
         />
+         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
         <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
@@ -128,6 +156,7 @@ export function AddStayForm({
           <option value="DOUBLE">Double Occupancy</option>
           <option value="TRIPLE">Triple Occupancy</option>
         </select>
+         {errors.sharingType && <p className="text-xs text-red-500 mt-1">{errors.sharingType}</p>}
       </div>
 
       {/* Check-in / Check-out + Location */}
@@ -141,6 +170,7 @@ export function AddStayForm({
             value={checkIn}
             onChange={(e) => setCheckIn(e.target.value)}
           />
+           {errors.checkIn && <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -151,6 +181,7 @@ export function AddStayForm({
             value={checkOut}
             onChange={(e) => setCheckOut(e.target.value)}
           />
+          {errors.checkOut && <p className="text-xs text-red-500 mt-1">{errors.checkOut}</p>}
         </div>
       </div>
 
@@ -159,6 +190,7 @@ export function AddStayForm({
         onChange={(e) => setLocation(e.target.value)}
         placeholder="Location"
       />
+      {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
 
       {/* Description */}
       <div>
@@ -170,6 +202,7 @@ export function AddStayForm({
           value={description}
           onChange={setDescription}
         />
+        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
       </div>
 
       {/* Packing Suggestions */}

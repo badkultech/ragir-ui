@@ -7,6 +7,7 @@ import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "@/components/ui/use-toast";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
@@ -49,9 +50,10 @@ export function AddTransitForm({
   const [packing, setPacking] = useState("sdfdsfds");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const { toast } = useToast();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState('');
-
 
   useEffect(() => {
     if (!initialData) return;
@@ -90,7 +92,28 @@ export function AddTransitForm({
     setDescription(item.description || "");
   };
 
-  const handleSubmit = () => {
+  const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!title.trim()) newErrors.title = "Title is required";
+  if (!from.trim()) newErrors.title = "Transit Route is required";
+  if (!to.trim()) newErrors.title = "Transit Route is required";
+  if (!departure.trim()) newErrors.deaparture = "Departure is required";
+  if (!arrival.trim()) newErrors.arrival = "Arrival is required";
+  if (!description.trim()) newErrors.description = "Description is required";
+   if (!vehicle) newErrors.vechicle = "Vehicle Description is required";
+   if (!arrangement.trim()) newErrors.arrangement = "Arrangement Details are required"
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+  const handleSubmit = async () => {
+  // Run validation
+  const isValid = validateForm();
+  if (!isValid) return;
+
+  try{
     onSave({
       title,
       from,
@@ -104,7 +127,12 @@ export function AddTransitForm({
       images,
       mode,
     });
-  };
+   toast({ title: "Success", description: "Transit saved successfully!" });
+  } catch{
+   toast({ title: "Error", description: "Failed to save Transit", variant: "destructive" });
+    }
+  }
+
 
   const isTripMode = mode === "trip";
 
@@ -136,6 +164,7 @@ export function AddTransitForm({
           placeholder="Enter title"
           maxLength={70}
         />
+        {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
         <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
@@ -158,6 +187,7 @@ export function AddTransitForm({
             placeholder="To (Destination Point)"
           />
         </div>
+        {errors.from || errors.to && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
           <Input
             type="time"
@@ -171,6 +201,8 @@ export function AddTransitForm({
             onChange={(e) => setArrival(e.target.value)}
           />
         </div>
+      {errors.arrival || errors.departure && <p className="text-xs text-red-500 mt-1">{errors.arrival}</p>}
+
       </div>
 
       {/* Vehicle */}
@@ -201,6 +233,8 @@ export function AddTransitForm({
           placeholder="Other (Specify)"
           className="mt-2"
         />
+
+        {errors.vechicle && <p className="text-xs text-red-500 mt-1">{errors.vehicle}</p>}
       </div>
 
 
@@ -227,6 +261,7 @@ export function AddTransitForm({
             Self arranged by the traveler
           </label>
         </div>
+        {errors.arrangement && <p className="text-xs text-red-500 mt-1">{errors.arrangement}</p>}
       </div>
 
       {/* Description */}
@@ -239,6 +274,7 @@ export function AddTransitForm({
           onChange={setDescription}
           maxLength={800}
         />
+        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
 
       </div>
 

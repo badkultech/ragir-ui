@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "@/components/ui/use-toast";
 
 type AddFAQFormProps = {
   mode?: "library" | "trip";
@@ -34,6 +35,8 @@ export function AddFAQForm({
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const { toast } = useToast();
 
   // Mutations
   const [createFaq, { isLoading: creating }] = useCreateOrganizerFaqMutation();
@@ -62,7 +65,23 @@ export function AddFAQForm({
     setAnswer(item.answer || "");
   };
 
+
+ const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!answer.trim()) newErrors.answer = "Answer is required";
+  if (!question.trim()) newErrors.question = "Question required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
   const handleSubmit = async () => {
+
+    const isValid = validateForm();
+    if (!isValid) return;
+
     const formData = new FormData();
     formData.append("name", question);
     formData.append("answer", answer);
@@ -81,8 +100,9 @@ export function AddFAQForm({
         }).unwrap();
       }
       onSave({ question, answer });
+       toast({ title: "Success", description: "FAQ saved successfully!" });
     } catch (err) {
-      console.error("Error saving FAQ:", err);
+      toast({ title: "Error", description: "Failed to save FAQ", variant: "destructive" });
     }
   };
 
@@ -118,6 +138,7 @@ export function AddFAQForm({
           placeholder="Enter question"
           maxLength={200}
         />
+         {errors.question && <p className="text-xs text-red-500 mt-1">{errors.question}</p>}
         <p className="text-xs text-right text-orange-500 mt-1">
           {question.length}/200 Characters
         </p>
@@ -135,6 +156,7 @@ export function AddFAQForm({
           rows={5}
           maxLength={1000}
         />
+         {errors.answer && <p className="text-xs text-red-500 mt-1">{errors.answer}</p>}
         <p className="text-xs text-right text-orange-500 mt-1">
           {answer.length}/1000 Characters
         </p>
