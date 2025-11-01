@@ -15,9 +15,12 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 
 // Dynamically import your privacy page so it doesn’t load until needed
-const PrivacyPolicyPage = dynamic(() => import("@/app/organizer/privacy-policy/page"), {
-  ssr: false,
-});
+const PrivacyPolicyPage = dynamic(
+  () => import("@/app/organizer/privacy-policy/page"),
+  {
+    ssr: false,
+  }
+);
 
 export default function OrganizerRegisterPage() {
   const [showPwd, setShowPwd] = useState(false);
@@ -81,7 +84,6 @@ export default function OrganizerRegisterPage() {
         );
         // decode immediately instead of waiting for Redux
         const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
-
 
         router.replace("/organizer/profile/empty");
       }
@@ -232,11 +234,12 @@ export default function OrganizerRegisterPage() {
                   />
                   <span className="text-sm text-gray-700">
                     I agree to all the{" "}
-                    <span className="font-semibold">Terms</span> and{" "}
+                    <span className="font-semibold hover:underline">Terms</span>{" "}
+                    and{" "}
                     <button
                       type="button"
                       onClick={() => setShowPolicy(true)}
-                      className="font-semibold text-blue-600 hover:underline"
+                      className="font-semibold hover:underline"
                     >
                       Privacy Policy
                     </button>

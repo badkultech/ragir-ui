@@ -90,33 +90,41 @@ export default function AdminLogin() {
         </div>
 
         <div className="relative z-10 flex items-center justify-center h-full p-6">
-         <div className="w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl p-8 sm:p-10">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 !font-poppins">Admin Login</h1>
+          <div className="w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl p-8 sm:p-10">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 !font-poppins">
+              Admin Login
+            </h1>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Enter Email</label>
+                <label className="block text-sm sm:text-base font-medium text-gray-900 mb-2">
+                  Enter Email
+                </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-2xl border-0 bg-blue-50 px-4 py-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full rounded-2xl border-1 bg-white  px-4 py-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
                 />
                 {email.length > 0 && !emailValid && (
-                  <p className="text-[#FF804C] text-sm mt-2">Enter valid email address</p>
+                  <p className="text-[#FF804C] text-sm mt-2">
+                    Enter valid email address
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Password</label>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                  Password
+                </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full rounded-2xl border-0 bg-blue-50 px-4 py-3 pr-12 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full rounded-2xl border-1 bg-white px-4 py-3 pr-12 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                   <button
                     type="button"
@@ -135,9 +143,14 @@ export default function AdminLogin() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-orange-500 bg-gray-100 border-gray-300 rounded focus:ring-orange-400 focus:ring-2"
+                  className="w-4 h-4 text-orange-500 bg-gray-100 border-gray-300 rounded-[50%] focus:ring-orange-400 focus:ring-2"
                 />
-                <label htmlFor="remember-me" className="ml-3 text-sm sm:text-base text-gray-700">Remember Me</label>
+                <label
+                  htmlFor="remember-me"
+                  className="ml-3 text-xs sm:text-base text-gray-600"
+                >
+                  Remember Me
+                </label>
               </div>
 
               <div>
@@ -146,13 +159,21 @@ export default function AdminLogin() {
                   disabled={!isFormValid || isLoading}
                   className="w-full font-semibold text-base sm:text-lg py-3 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FD401A] text-white hover:shadow-lg"
                 >
-                  <LoadingOverlay isLoading={isLoading} message="Logging in..." />
+                  <LoadingOverlay
+                    isLoading={isLoading}
+                    message="Logging in..."
+                  />
                   <span className="relative">Login to Dashboard</span>
                 </button>
               </div>
 
               <div className="text-center">
-                <Link href="/admin/forgot-password" className="text-[#FF804C] text-sm sm:text-base hover:underline font-medium">Forgot password?</Link>
+                <Link
+                  href="/admin/forgot-password"
+                  className="text-[#FF804C] text-sm sm:text-base hover:underline font-medium"
+                >
+                  Forgot password?
+                </Link>
               </div>
             </form>
           </div>
