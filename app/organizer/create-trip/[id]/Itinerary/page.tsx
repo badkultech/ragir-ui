@@ -5,12 +5,16 @@ import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader";
 import { AppHeader } from "@/components/app-header";
 import { DetailsOptions } from "@/components/create-trip/addDetails";
 import { WizardFooter } from "@/components/create-trip/wizard-footer";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { FileUploadCard } from "@/components/create-trip/file-upload-card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CustomDateTimePicker } from "@/components/ui/date-time-picker";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
+import { useLazyGetTripByIdQuery } from "@/lib/services/organizer/trip/create-trip";
+import { useLazyGetItineraryByTripIdQuery, useUpdateItineraryMutation } from "@/lib/services/organizer/trip/itinerary";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 // Type for each day
 interface Day {
@@ -22,9 +26,12 @@ export default function ItineraryPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const { id } = useParams()
+  console.log("router prarams query====from itinerary",id)
+
   const startDateParam = searchParams.get("startDate") || new Date().toISOString();
-const endDateParam = searchParams.get("endDate") || new Date().toISOString();
-const totalDaysParam = parseInt(searchParams.get("totalDays") || "1", 10);
+  const endDateParam = searchParams.get("endDate") || new Date().toISOString();
+  const totalDaysParam = parseInt(searchParams.get("totalDays") || "1", 10);
 
   // Normalize startDate from query param
   const normalizeDate = (value: string) => {
@@ -48,12 +55,55 @@ const totalDaysParam = parseInt(searchParams.get("totalDays") || "1", 10);
   const startDateParamRaw = searchParams.get("startDate") || "2025-09-20T09:00";
 
   const [startDate, setStartDate] = useState(startDateParam);
-const [endDate, setEndDate] = useState(endDateParam);
+  const [endDate, setEndDate] = useState(endDateParam);
   const [days, setDays] = useState<Day[]>([]);
   const [showDetails, setShowDetails] = useState<boolean[]>([]);
   const [startingPoint, setStartingPoint] = useState("Mumbai");
   const [endPoint, setEndPoint] = useState("Goa");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [updateItinerary, { isLoading: updating }] = useUpdateItineraryMutation();
+  const { userData } = useSelector(selectAuthState);
+const [ triggerGetItineraryByTripId,{data:itineraryData}]=useLazyGetItineraryByTripIdQuery();
+
+
+
+
+
+  const tripIdFromUrl = searchParams.get("tripId");
+  const [triggerGetTrip, { data: tripData, isLoading, isError }] = useLazyGetTripByIdQuery();
+
+
+  const handleFetchItinerary = async (tripPublicId: string) => {
+    const organizationId = userData?.organizationPublicId;  
+    if (!organizationId) {
+      console.log("❌ Missing organizationId");
+      return;
+    }
+    try {
+      console.log("🔄 Fetching itinerary for tripPublicId:", tripPublicId)
+      const response = await triggerGetItineraryByTripId({ organizationId, tripPublicId }).unwrap()
+        
+      console.log("✅ Fetched itinerary:", response)
+      } catch (err) {
+        console.error("❌ Failed to fetch itinerary:", err)
+        }
+        };
+  // 🧭 New function to fetch trip only when Prev is clicked
+  const handlePrevClick = async () => {
+    const storedTripId = localStorage.getItem("createdTripId");
+    const organizationId = localStorage.getItem("organizationId");
+    const tripId = tripIdFromUrl || storedTripId;
+
+    if (tripId && organizationId) {
+      console.log("🔄 Fetching trip before going back...");
+      await triggerGetTrip({ organizationId, tripId });
+    } else {
+      console.log("❌ Missing tripId or organizationId");
+    }
+
+    router.push(`/organizer/create-trip/${tripId}`);
+  };
+
 
   // Generate days dynamically & auto calculate endDate
   useEffect(() => {
@@ -87,8 +137,61 @@ const [endDate, setEndDate] = useState(endDateParam);
     setShowDetails((prev) => prev.map((val, i) => (i === idx ? true : val)));
   };
 
+const handleUpdateItinerary = async () => {
+    const organizationId = userData?.organizationPublicId;
+  const tripPublicId =
+    id ||
+    searchParams.get("tripPublicId") ||
+    localStorage.getItem("createdTripPublicId");
+
+  if (!organizationId || !tripPublicId) {
+    console.log("❌ Missing organizationId or tripPublicId");
+    return;
+  }
+
+
+  const payload = {
+    startPoint: startingPoint,
+    endPoint: endPoint,
+    startDate: startDate.split("T")[0], // Extract date part only
+    startTime: {
+      hour: new Date(startDate).getHours(),
+      minute: new Date(startDate).getMinutes(),
+      second: new Date(startDate).getSeconds(),
+      nano: 0,
+    },
+    endDate: endDate.split("T")[0],
+    endTime: {  
+      hour: new Date(endDate).getHours(),
+      minute: new Date(endDate).getMinutes(),
+      second: new Date(endDate).getSeconds(),
+      nano: 0,
+    },
+  };
+
+  try {
+    console.log("📤 Sending Itinerary Update:", payload);
+    // Ensure tripPublicId is a string (handle string | string[] from useParams)
+    const tripIdString = Array.isArray(tripPublicId) ? tripPublicId[0] : (tripPublicId as string);
+
+    const response = await updateItinerary({
+      organizationId,
+      tripPublicId: tripIdString,
+      data: payload,
+    }).unwrap();
+    console.log("✅ Itinerary updated successfully:", response);
+
+    // After successful update, move to next page
+    router.push("/organizer/create-trip/exclusions");
+  } catch (err) {
+    console.error("❌ Failed to update itinerary:", err);
+  }
+};
+
+
+
   return (
-   <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
+    <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -133,7 +236,7 @@ const [endDate, setEndDate] = useState(endDateParam);
                       value={startDate}
                       onChange={setStartDate}
                       placeholder="Select start date & time"
-                     className="mt-3 self-end w-full"
+                      className="mt-3 self-end w-full"
 
 
                     />
@@ -165,23 +268,23 @@ const [endDate, setEndDate] = useState(endDateParam);
                   className="w-full max-w-full"
                 />
               </div>
-             
-                <CustomDateTimePicker
-                  value={endDate}
-                  onChange={setEndDate}
-                  placeholder="Select end date & time"
-                  className="mt-3 self-end w-full"
 
-                />
-              
+              <CustomDateTimePicker
+                value={endDate}
+                onChange={setEndDate}
+                placeholder="Select end date & time"
+                className="mt-3 self-end w-full"
+
+              />
+
             </div>
           </div>
 
           <div className="pr-9">
             <WizardFooter
-              onPrev={() => router.push("/organizer/create-trip")}
+              onPrev={handlePrevClick}
               onDraft={() => console.log("Draft itinerary saved")}
-              onNext={() => router.push("/organizer/create-trip/exclusions")}
+              onNext={handleUpdateItinerary}
             />
           </div>
         </div>
