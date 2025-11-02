@@ -8,19 +8,40 @@ import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { Loader2 } from "lucide-react";
-import { useDeleteMealMutation, useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
+import {
+  useDeleteMealMutation,
+  useGetMealsQuery,
+  useGetMealByIdQuery,
+} from "@/lib/services/organizer/trip/library/meal";
+import { ViewModal } from "@/components/library/ViewModal";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function MealsPage() {
   const organizationId = useOrganizationId();
 
-  // ✅ API Call
-  const { data: meals = [], isLoading, isError, refetch } = useGetMealsQuery(organizationId);
-  const [deleteMeal] = useDeleteMealMutation();
-  const [editMeal, setEditMeal] = useState<any>(null);
   // ✅ UI States
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedMealId, setSelectedMealId] = useState<number | null>(null);
+
+  // ✅ API Call
+  const {
+    data: meals = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useGetMealsQuery(organizationId);
+  const { data: selectedMeal, isFetching: isTransitLoading } =
+    useGetMealByIdQuery(
+      selectedMealId && organizationId
+        ? { organizationId, mealId: selectedMealId }
+        : skipToken
+    );
+
+  const [deleteMeal] = useDeleteMealMutation();
+  const [editMeal, setEditMeal] = useState<any>(null);
 
   // ✅ Filter search results
   const filtered = meals.filter((meal) =>
@@ -41,7 +62,10 @@ export default function MealsPage() {
   return (
     <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
-      <OrganizerSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <OrganizerSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
@@ -61,7 +85,10 @@ export default function MealsPage() {
             </div>
           ) : isError ? (
             <div className="text-center text-red-500 py-10">
-              Failed to load meals. <button onClick={() => refetch()} className="underline">Retry</button>
+              Failed to load meals.{" "}
+              <button onClick={() => refetch()} className="underline">
+                Retry
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -103,7 +130,13 @@ export default function MealsPage() {
 
                     {/* Actions */}
                     <div className="mt-6 flex justify-end gap-3 text-gray-500">
-                      <button className="hover:text-orange-500">
+                      <button
+                        className="hover:text-orange-500"
+                        onClick={() => {
+                          setViewModalOpen(true);
+                          setSelectedMealId(meal.id); // ✅ store selected meal ID for viewing
+                        }}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -147,6 +180,15 @@ export default function MealsPage() {
         updateId={editMeal?.id}
         initialStep="meal"
         editData={editMeal}
+      />
+      <ViewModal
+        step="meals"
+        open={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedMealId(null);
+        }}
+        data={selectedMeal}
       />
     </div>
   );

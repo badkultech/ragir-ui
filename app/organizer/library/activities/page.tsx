@@ -7,22 +7,42 @@ import { MapPin, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { useDeleteActivityMutation, useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
-
+import {
+  useDeleteActivityMutation,
+  useGetActivitiesQuery,
+  useGetActivityByIdQuery,
+} from "@/lib/services/organizer/trip/library/activity";
+import { ViewModal } from "@/components/library/ViewModal";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function ActivitiesPage() {
   const organizationId = useOrganizationId();
-
-  // ✅ API hooks
-  const { data: activities = [], isLoading, isError, refetch } =
-    useGetActivitiesQuery(organizationId);
-  const [deleteActivity] = useDeleteActivityMutation();
 
   // ✅ Local UI state
   const [modalOpen, setModalOpen] = useState(false);
   const [editActivity, setEditActivity] = useState<any>(null);
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(
+    null
+  );
+
+  // ✅ API hooks
+  const {
+    data: activities = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useGetActivitiesQuery(organizationId);
+
+  const { data: selectedActivity, isFetching: isTransitLoading } =
+    useGetActivityByIdQuery(
+      selectedActivityId && organizationId
+        ? { organizationId, activityId: selectedActivityId }
+        : skipToken
+    );
+  const [deleteActivity] = useDeleteActivityMutation();
 
   // ✅ Filtering
   const filtered = activities.filter((a) =>
@@ -64,7 +84,8 @@ export default function ActivitiesPage() {
           {/* Loading / Error / Empty states */}
           {isLoading ? (
             <div className="flex justify-center items-center h-40 text-gray-500">
-              <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading activities...
+              <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading
+              activities...
             </div>
           ) : isError ? (
             <div className="text-center text-red-500 py-10">
@@ -95,7 +116,9 @@ export default function ActivitiesPage() {
 
                   {/* Content */}
                   <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-semibold text-gray-900">{activity.name}</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      {activity.name}
+                    </h3>
                     <div className="flex items-center text-gray-600 text-sm mt-1">
                       <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                       {activity.location || "—"}
@@ -106,7 +129,13 @@ export default function ActivitiesPage() {
 
                     {/* Actions */}
                     <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                      <button className="hover:text-orange-500">
+                      <button
+                        className="hover:text-orange-500"
+                        onClick={() => {
+                          setSelectedActivityId(activity.id);
+                          setViewModalOpen(true);
+                        }}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
@@ -150,6 +179,15 @@ export default function ActivitiesPage() {
         initialStep="activity"
         updateId={editActivity?.id}
         editData={editActivity}
+      />
+      <ViewModal
+        step="activity"
+        open={viewModalOpen}
+        data={selectedActivity}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedActivityId(null); // Reset selected activity ID when closing modal
+        }}
       />
     </div>
   );
