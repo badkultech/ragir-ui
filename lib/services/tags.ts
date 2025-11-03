@@ -21,4 +21,5 @@ export const TAGS = {
   tripLibraryStay: 'tripLibraryStay',
   tripLibraryActivity: 'tripLibraryActivity',
   tripLeads: 'tripLeads',
+  tickets: "tickets",
 } as const;

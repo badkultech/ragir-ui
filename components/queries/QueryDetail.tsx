@@ -9,22 +9,24 @@ export default function QueryDetail({ query, onBack, onReport }: any) {
   // If query already responded, preload one response
   const [chat, setChat] = useState<
     { sender: "user" | "you"; text: string; time: string }[]
-  >([
-    {
-      sender: "user",
-      text: query.question,
-      time: "10:30 AM",
-    },
-    ...(query.status === "responded"
-      ? [
-          {
-            sender: "you",
-            text: "Yes, all camping equipment including tents, sleeping bags, and mats are provided.",
-            time: "10:45 AM",
-          },
-        ]
-      : []),
-  ]);
+  >(
+    [
+      {
+        sender: "user",
+        text: query.question,
+        time: "10:30 AM",
+      },
+      ...(query.status === "responded"
+        ? [
+            {
+              sender: "you",
+              text: "Yes, all camping equipment including tents, sleeping bags, and mats are provided.",
+              time: "10:45 AM",
+            },
+          ]
+        : []),
+    ] as { sender: "user" | "you"; text: string; time: string }[]
+  );
 
   const handleSendResponse = (text: string) => {
     const now = new Date();

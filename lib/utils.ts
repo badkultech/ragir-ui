@@ -92,11 +92,16 @@ export const ENDPOINTS = {
         `/org/${organizationId}/library/stay`,
       ACTIVITY: (organizationId: string) =>
         `/org/${organizationId}/library/activity`,
+
     },
     TRIP_LEADS: (organizationId: string, tripPublicId: string) =>
       `/org/${organizationId}/trip/${tripPublicId}/leads`,
     TRIP_ORG_LEADS: (organizationId: string) =>
       `/org/${organizationId}/org-trip-leads`,
+    TICKETS: (userId: string) => `/organizer/${userId}/ticket`,
+    TICKET_BY_ID: (id: number | string) => `/organizer/ticket/${id}`,
+    TICKET_COMMENT: (ticketId: number | string) =>
+      `/organizer/ticket/${ticketId}/comment`,
 
   },
 } as const;
