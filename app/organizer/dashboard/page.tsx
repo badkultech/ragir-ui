@@ -19,6 +19,7 @@ import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { LibraryIcon } from "@/components/library/SvgComponents/Icons";
 import { CreateTripModal } from "@/components/trip/CreateTripModal";
+import Link from "next/link";
 
 export default function DashboardMainContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -85,6 +86,7 @@ export default function DashboardMainContent() {
             </Card>
 
             {/* All Leads */}
+             <Link href="/organizer/leads/all">
             <Card>
               <CardContent className="flex flex-col items-center justify-center h-32 space-y-2">
                 <div className="bg-gray-100 p-2 rounded-full">
@@ -94,8 +96,10 @@ export default function DashboardMainContent() {
                 <h2 className="text-2xl font-bold">24</h2>
               </CardContent>
             </Card>
+            </Link>
 
             {/* All Queries */}
+            <Link href="/organizer/queries">
             <Card>
               <CardContent className="flex flex-col items-center justify-center h-32 space-y-2">
                 <div className="bg-gray-100 p-2 rounded-full">
@@ -105,29 +109,34 @@ export default function DashboardMainContent() {
                 <h2 className="text-2xl font-bold">42</h2>
               </CardContent>
             </Card>
+            </Link>
 
             {/* Library */}
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center h-32 space-y-2">
-                <div className="bg-gray-100 p-2 rounded-full">
-                  <LibraryIcon width="5" height="5" />
-                </div>
-                <p className="text-sm text-muted-foreground">Library</p>
-                <h2 className="text-2xl font-bold">–</h2>
-              </CardContent>
-            </Card>
+            <Link href="/organizer/library">
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center h-32 space-y-3">
+                  <div className="bg-gray-100 p-4 rounded-full">
+                    <LibraryIcon width="5" height="5" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Library</p>
+                  <h2 className="text-2xl font-bold"></h2>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
 
           {/* Recent Activity */}
           <Card>
             <CardHeader className="flex items-center justify-between border-b pb-2">
               <CardTitle>Recent Activity</CardTitle>
+              <Link href="/organizer/trips/activities">
               <Button
                 size="sm"
-                className="bg-orange-500 hover:bg-orange-600 text-white"
+                className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
               >
                 View All
               </Button>
+              </Link>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-4 pt-4">
               {activities.map((activity, i) => (
@@ -155,12 +164,14 @@ export default function DashboardMainContent() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold">This Month</h2>
+              <Link href="/organizer/trips" className="">
               <Button
                 size="sm"
-                className="bg-orange-500 hover:bg-orange-600 text-white"
+                className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
               >
                 View All
               </Button>
+              </Link>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -218,14 +229,15 @@ export default function DashboardMainContent() {
             </div>
           </section>
         </main>
-      </div>
+      </div >
       {/* Create Trip Modal */}
-      <CreateTripModal
+      < CreateTripModal
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        onClose={() => setOpenModal(false)
+        }
         onStartFromScratch={() => console.log("New trip")}
         onUseSimilarTrip={() => console.log("Use similar trip")}
       />
-    </div>
+    </div >
   );
 }

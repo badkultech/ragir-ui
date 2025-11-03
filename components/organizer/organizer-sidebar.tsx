@@ -78,8 +78,8 @@ const nav: NavItem[] = [
   },
   { label: "Team Members", href: "/organizer/team", icon: UserRoundPlus },
   { label: "Support Center", href: "/organizer/support", icon: Headphones },
-  { label: "Leads", href: "/organizer/leads/all-leads", icon: Users },
-  { label: "Queries", href: "/organizer/queries", icon: TextSearch },
+  { label: "Leads", href: "/organizer/leads/all", icon: Users },
+  { label: "Queries", href: "/organizer/queries/all", icon: TextSearch },
   { label: "Billing", href: "/organizer/billing", icon: CreditCard },
   { label: "Settings", href: "/organizer/settings", icon: Settings },
 ];

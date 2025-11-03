@@ -1,4 +1,5 @@
 import { userAgent } from 'next/server';
+import { itineraryAPI } from './organizer/trip/itinerary';
 
 export const TAGS = {
   dayDescriptions: 'dayDescriptions',
@@ -8,6 +9,8 @@ export const TAGS = {
   admins: 'admins',
   organizations: 'organizations',
   orgs: 'org',
+  trip:'trip',
+  itinerary: 'itinerary',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',
@@ -18,4 +21,5 @@ export const TAGS = {
   tripLibraryStay: 'tripLibraryStay',
   tripLibraryActivity: 'tripLibraryActivity',
   tripLeads: 'tripLeads',
+  tickets: "tickets",
 } as const;
