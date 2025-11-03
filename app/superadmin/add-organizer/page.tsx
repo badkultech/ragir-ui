@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, ChevronLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import {
   useGetNextOrganizatioNumberQuery,
   useCreateOrganizationMutation,
@@ -112,11 +112,14 @@ export default function RegisterOrganizer() {
           onMenuClick={() => setSidebarOpen(true)}
         />
 
-        <main className="flex flex-1 items-center justify-center p-3">
+        <main className="flex flex-1 items-left justify-left p-2">
           <div className="bg-white rounded-lg shadow-sm border p-4 w-full max-w-3xl">
-            <form onSubmit={onSubmit} className="space-y-5">
+            <form
+              onSubmit={onSubmit}
+              className="space-y-6 flex flex-col items-left"
+            >
               {/* Header */}
-              <div className="flex items-center mb-2">
+              <div className="flex items-center mb-2 w-3/4">
                 <Link
                   href="/superadmin/organizer"
                   className="mr-3 p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -129,7 +132,7 @@ export default function RegisterOrganizer() {
               </div>
 
               {/* Organizer ID */}
-              <div>
+              <div className="w-3/4">
                 <Label htmlFor="organizerId" className="text-sm font-medium">
                   Organizer ID
                 </Label>
@@ -138,12 +141,12 @@ export default function RegisterOrganizer() {
                   value={data ?? ""}
                   readOnly
                   disabled
-                  className="bg-gray-100 text-gray-500 cursor-not-allowed mt-1"
+                  className="bg-gray-100 text-gray-500 cursor-not-allowed  w-full"
                 />
               </div>
 
               {/* Organizer Name */}
-              <div>
+              <div className="w-3/4">
                 <Label htmlFor="name" className="text-sm font-medium">
                   Organizer Name <span className="text-red-500">*</span>
                 </Label>
@@ -152,15 +155,15 @@ export default function RegisterOrganizer() {
                   placeholder="Enter organizer name"
                   value={formData.name}
                   onChange={onChange}
-                  className={`mt-1 ${errors.name ? "border-red-500" : ""}`}
+                  className={`w-full ${errors.name ? "border-red-500" : ""}`}
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                  <p className="text-red-500 text-xs ">{errors.name}</p>
                 )}
               </div>
 
               {/* Email */}
-              <div>
+              <div className="w-3/4">
                 <Label htmlFor="email" className="text-sm font-medium">
                   Email Address <span className="text-red-500">*</span>
                 </Label>
@@ -170,15 +173,15 @@ export default function RegisterOrganizer() {
                   placeholder="Enter email"
                   value={formData.email}
                   onChange={onChange}
-                  className={`mt-1 ${errors.email ? "border-red-500" : ""}`}
+                  className={` w-full ${errors.email ? "border-red-500" : ""}`}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                  <p className="text-red-500 text-xs ">{errors.email}</p>
                 )}
               </div>
 
               {/* Phone */}
-              <div>
+              <div className="w-3/4">
                 <Label htmlFor="phone" className="text-sm font-medium">
                   Phone No.
                 </Label>
@@ -196,18 +199,18 @@ export default function RegisterOrganizer() {
                       if (digits.length > 10) digits = digits.slice(0, 10);
                       setFormData((f) => ({ ...f, phone: digits }));
                     }}
-                    className={`h-10 px-3 text-sm rounded-l-none ${
+                    className={`h-10 px-3 text-sm rounded-l-none w-full ${
                       errors.phone ? "border-red-500" : ""
                     }`}
                   />
                 </div>
                 {errors.phone && (
-                  <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                  <p className="text-red-500 text-xs ">{errors.phone}</p>
                 )}
               </div>
 
               {/* Business Type */}
-              <div>
+              <div className="w-3/4">
                 <Label className="text-sm font-medium">Business Type</Label>
                 <Select
                   value={formData.businessType}
@@ -219,7 +222,7 @@ export default function RegisterOrganizer() {
                   }
                 >
                   <SelectTrigger
-                    className={`mt-1 h-10 text-sm ${
+                    className={` h-10 text-sm w-full ${
                       errors.businessType ? "border-red-500" : ""
                     }`}
                   >
@@ -232,14 +235,14 @@ export default function RegisterOrganizer() {
                   </SelectContent>
                 </Select>
                 {errors.businessType && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-red-500 text-xs ">
                     {errors.businessType}
                   </p>
                 )}
               </div>
 
               {/* Submit */}
-              <div className="pt-1">
+              <div className="pt-2 w-3/4">
                 <button
                   type="submit"
                   disabled={submitting}
