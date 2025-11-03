@@ -1,177 +1,128 @@
 "use client";
 
-import {
-  Plus,
-  Users,
-  Building2,
-  UserCheck,
-  Clock,
-  TrendingUp,
-  Shield,
-} from "lucide-react";
+import { Plus, Building2, UserCheck, Clock, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { Sidebar } from "@/components/superadmin/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { useGetTenantStatsQuery } from "@/lib/services/superadmin";
 import { useState } from "react";
+import { AddCircle } from "@/components/common/AddCircle";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const {
-    data: tenantStatsData,
-    isLoading: loading,
-    error,
-  } = useGetTenantStatsQuery();
+  const { data: tenantStatsData } = useGetTenantStatsQuery();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main Content */}
-      <div className="flex-1">
-        <AppHeader
-          title="Dashboard"
-          onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
-        />
+      <div className="flex-1 flex flex-col">
+        <AppHeader title="Dashboard" onMenuClick={() => setSidebarOpen(true)} />
 
-        {/* Main Content Area */}
-        <main className="flex-1 p-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Dashboard Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {/* Active Admins */}
-              <Link href={"/superadmin/admins"}>
-                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                  <div className="p-2 bg-green-100 rounded-lg mb-4">
-                    <UserCheck className="w-6 h-6 text-green-600" />
+        {/* Main Content */}
+        <main className="flex-1 p-4">
+          <div className="max-w-7xl mx-auto grid gap-4">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Link href="/superadmin/admins">
+                <div className="bg-white rounded-lg border p-4 shadow-sm flex flex-col items-center text-center hover:shadow-md transition">
+                  <div className="p-2 bg-green-100 rounded-lg mb-2">
+                    <UserCheck className="w-5 h-5 text-green-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  <h3 className="text-xl font-semibold text-gray-900">
                     {tenantStatsData?.activeAdmins ?? 0}
                   </h3>
-                  <p className="text-gray-600 text-sm">Active Admins</p>
+                  <p className="text-gray-600 text-xs">Active Admins</p>
                 </div>
               </Link>
-              {/* Pending Admins */}
-              <Link href={"/superadmin/admins"}>
-                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <Clock className="w-6 h-6 text-orange-600" />
-                    </div>
+
+              <Link href="/superadmin/admins">
+                <div className="bg-white rounded-lg border p-4 shadow-sm flex flex-col items-center text-center hover:shadow-md transition">
+                  <div className="p-2 bg-orange-100 rounded-lg mb-2">
+                    <Clock className="w-5 h-5 text-orange-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  <h3 className="text-xl font-semibold text-gray-900">
                     {tenantStatsData?.pendingAdmins ?? 0}
                   </h3>
-                  <p className="text-gray-600 text-sm">Pending Admins</p>
+                  <p className="text-gray-600 text-xs">Pending Admins</p>
                 </div>
               </Link>
-              {/* Active Organizations */}
-              <Link href={"/superadmin/organizer"}>
-                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Building2 className="w-6 h-6 text-blue-600" />
-                    </div>
+
+              <Link href="/superadmin/organizer">
+                <div className="bg-white rounded-lg border p-4 shadow-sm flex flex-col items-center text-center hover:shadow-md transition">
+                  <div className="p-2 bg-blue-100 rounded-lg mb-2">
+                    <Building2 className="w-5 h-5 text-blue-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  <h3 className="text-xl font-semibold text-gray-900">
                     {tenantStatsData?.activeOrganizations ?? 0}
                   </h3>
-                  <p className="text-gray-600 text-sm">Active Organizers</p>
+                  <p className="text-gray-600 text-xs">Active Organizers</p>
                 </div>
               </Link>
-              <Link href={"/superadmin/organizer"}>
-                {/* Pending Organizations */}
-                <div className="bg-white rounded-lg shadow-sm border p-6 flex flex-col items-center text-center">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <TrendingUp className="w-6 h-6 text-purple-600" />
-                    </div>
+
+              <Link href="/superadmin/organizer">
+                <div className="bg-white rounded-lg border p-4 shadow-sm flex flex-col items-center text-center hover:shadow-md transition">
+                  <div className="p-2 bg-purple-100 rounded-lg mb-2">
+                    <TrendingUp className="w-5 h-5 text-purple-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  <h3 className="text-xl font-semibold text-gray-900">
                     {tenantStatsData?.pendingOrganizations ?? 0}
                   </h3>
-                  <p className="text-gray-600 text-sm">Pending Organizers</p>
+                  <p className="text-gray-600 text-xs">Pending Organizers</p>
                 </div>
               </Link>
             </div>
-            {/* Add Sections Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Add Admin Section */}
-              <div className="bg-white rounded-lg shadow-sm border p-8">
-                <div className="text-center max-w-md mx-auto">
-                  {/* Add Admin Icon */}
-                  <div className="mb-6 flex justify-center">
-                    <div className="relative">
-                      <div className="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-full flex items-center justify-center">
-                        <Link href="/superadmin/add-admin">
-                          <Plus className="w-4 h-4 text-white" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Content */}
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                    Add Admin
-                  </h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">
-                    Assign roles and grant secure access to your dashboard
-                  </p>
-
-                  <Link
-                    href="/superadmin/add-admin"
-                    className="inline-flex items-center justify-center px-8 py-3 rounded-full font-medium border-2 border-white shadow-lg text-gray-900 hover:shadow-xl transition-shadow"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Admin
-                  </Link>
+            {/* Add Sections */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Add Admin */}
+              <div className="bg-white rounded-lg border p-5 text-center shadow-sm hover:shadow-md transition">
+                <div className="mb-4 flex justify-center">
+                  <AddCircle href="/superadmin/add-admin" />
                 </div>
+
+                <h3 className="text-xl font-semibold mb-2">Add Admin</h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed">
+                  Assign roles and grant secure access to your dashboard
+                </p>
+
+                <Link
+                  href="/superadmin/add-admin"
+                  className="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-medium border shadow hover:shadow-md transition"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
+                    color: "white",
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Admin
+                </Link>
               </div>
 
-              {/* Add Organizer Section */}
-              <div className="bg-white rounded-lg shadow-sm border p-8">
-                <div className="text-center max-w-md mx-auto">
-                  {/* Add Organizer Icon */}
-                  <div className="mb-6 flex justify-center">
-                    <div className="relative">
-                      <div className="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-full flex items-center justify-center">
-                        <Link href="/superadmin/add-organizer">
-                          <Plus className="w-4 h-4 text-white" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                    Add Organizer
-                  </h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">
-                    Manage event organizers and assign responsibilities
-                  </p>
-
-                  <Link
-                    href="/superadmin/add-organizer"
-                    className="inline-flex items-center justify-center px-8 py-3 rounded-full font-medium border-2 border-white shadow-lg text-gray-900 hover:shadow-xl transition-shadow"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Organizer
-                  </Link>
+              {/* Add Organizer */}
+              <div className="bg-white rounded-lg border p-5 text-center shadow-sm hover:shadow-md transition">
+                <div className="mb-4 flex justify-center">
+                  <AddCircle href="/superadmin/add-organizer" />
                 </div>
+
+                <h3 className="text-xl font-semibold mb-2">Add Organizer</h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed">
+                  Manage event organizers and assign responsibilities
+                </p>
+
+                <Link
+                  href="/superadmin/add-organizer"
+                  className="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-medium border shadow hover:shadow-md transition"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
+                    color: "white",
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Organizer
+                </Link>
               </div>
             </div>
           </div>

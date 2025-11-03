@@ -13,8 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronLeft } from "lucide-react";
 import {
   useGetNextOrganizatioNumberQuery,
   useCreateOrganizationMutation,
@@ -51,15 +50,12 @@ export default function RegisterOrganizer() {
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof FormFields, string>>
-  >({});
+  const [errors, setErrors] = useState<Partial<Record<keyof FormFields, string>>>({});
   const [submitting, setSubmitting] = useState(false);
 
   const { data } = useGetNextOrganizatioNumberQuery(organizationId);
   const [createOrganization] = useCreateOrganizationMutation();
 
-  // ✅ Validation
   const validate = () => {
     const next: typeof errors = {};
     if (!formData.name.trim()) next.name = "Organizer name is required";
@@ -76,13 +72,11 @@ export default function RegisterOrganizer() {
     return Object.keys(next).length === 0;
   };
 
-  // ✅ Handle input changes
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((f) => ({ ...f, [id]: value }));
   };
 
-  // ✅ Submito
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -92,8 +86,8 @@ export default function RegisterOrganizer() {
       const payload: RegisterOrganizerRequest = {
         entityName: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
-        businessType: formData.businessType, // ✅ no array
-        organizationNumber: data ?? "", // ✅ corrected field name
+        businessType: formData.businessType,
+        organizationNumber: data ?? "",
         primaryPhone: formData.phone.trim(),
       };
 
@@ -109,189 +103,158 @@ export default function RegisterOrganizer() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-            {/* Main Content */}
-            <div className="flex-1">
-              <AppHeader
-                title="Register New Organizer"
-                onMenuClick={() => setSidebarOpen(true)} // 👈 pass toggle
-              />
 
-        <main className="flex-1 p-6 sm:p-8">
-          <div className="max-w-5xl mx-auto">
-            <form
-              onSubmit={onSubmit}
-              className="bg-white rounded-lg shadow-sm border p-6 sm:p-8"
-            >
-              <div className="space-y-6 max-w-2xl">
-                {/* Back + Title */}
-                <div className="flex items-center mb-6">
-                  <h1 className="text-2xl font-semibold text-gray-900">
-                    Register New Organizer
-                  </h1>
-                </div>
-                {/* Organizer ID */}
-                <div>
-                  <Label
-                    htmlFor="organizerId"
-                    className="text-sm font-medium text-gray-900 mb-2 block"
-                  >
-                    Organizer ID
-                  </Label>
+      <div className="flex flex-col flex-1">
+        <AppHeader
+          title="Register New Organizer"
+          onMenuClick={() => setSidebarOpen(true)}
+        />
+
+        <main className="flex flex-1 items-center justify-center p-3">
+          <div className="bg-white rounded-lg shadow-sm border p-4 w-full max-w-3xl">
+            <form onSubmit={onSubmit} className="space-y-5">
+              {/* Header */}
+              <div className="flex items-center mb-2">
+                <Link
+                  href="/superadmin/organizer"
+                  className="mr-3 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-600" />
+                </Link>
+                <h1 className="text-xl font-semibold text-gray-900">
+                  Register New Organizer
+                </h1>
+              </div>
+
+              {/* Organizer ID */}
+              <div>
+                <Label htmlFor="organizerId" className="text-sm font-medium">
+                  Organizer ID
+                </Label>
+                <Input
+                  id="organizerId"
+                  value={data ?? ""}
+                  readOnly
+                  disabled
+                  className="bg-gray-100 text-gray-500 cursor-not-allowed mt-1"
+                />
+              </div>
+
+              {/* Organizer Name */}
+              <div>
+                <Label htmlFor="name" className="text-sm font-medium">
+                  Organizer Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="Enter organizer name"
+                  value={formData.name}
+                  onChange={onChange}
+                  className={`mt-1 ${errors.name ? "border-red-500" : ""}`}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Email Address <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter email"
+                  value={formData.email}
+                  onChange={onChange}
+                  className={`mt-1 ${errors.email ? "border-red-500" : ""}`}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              {/* Phone */}
+              <div>
+                <Label htmlFor="phone" className="text-sm font-medium">
+                  Phone No.
+                </Label>
+                <div className="flex">
+                  <span className="inline-flex items-center justify-center px-3 h-10 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-600 text-sm">
+                    +91
+                  </span>
                   <Input
-                    id="organizerId"
-                    value={data ?? ""}
-                    readOnly
-                    disabled
-                    className="bg-gray-100 text-gray-500 cursor-not-allowed h-10 px-3 text-sm"
-                  />
-                </div>
-
-                {/* Organizer Name */}
-                <div>
-                  <Label
-                    htmlFor="name"
-                    className="text-sm font-medium text-gray-900 mb-2 block"
-                  >
-                    Organizer Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name"
-                    placeholder="Enter organizer name"
-                    value={formData.name}
-                    onChange={onChange}
-                    className={`h-10 px-3 text-sm placeholder:text-gray-400 ${
-                      errors.name ? "border-red-500 focus:border-red-500" : ""
-                    }`}
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                  )}
-                </div>
-
-                {/* Email */}
-                <div>
-                  <Label
-                    htmlFor="email"
-                    className="text-sm font-medium text-gray-900 mb-2 block"
-                  >
-                    Email Address <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter email"
-                    value={formData.email}
-                    onChange={onChange}
-                    className={`h-10 px-3 text-sm placeholder:text-gray-400 ${
-                      errors.email ? "border-red-500 focus:border-red-500" : ""
-                    }`}
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                  )}
-                </div>
-
-                {/* Phone */}
-                <div>
-                  <Label
-                    htmlFor="phone"
-                    className="text-sm font-medium text-gray-900 mb-2 block"
-                  >
-                    Phone No.
-                  </Label>
-                  <div className="flex">
-                    <span className="inline-flex items-center justify-center px-3 h-10 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-600 text-sm">
-                      +91
-                    </span>
-                    <Input
-                      id="phone"
-                      inputMode="numeric"
-                      value={formData.phone}
-                      onChange={(e) => {
-                        // keep only digits
-                        let digits = e.target.value.replace(/\D/g, "");
-
-                        // trim leading zeros
-                        digits = digits.replace(/^0+/, "");
-
-                        // limit to 10 digits
-                        if (digits.length > 10) {
-                          digits = digits.slice(0, 10);
-                        }
-
-                        setFormData((f) => ({ ...f, phone: digits }));
-                      }}
-                      className={`h-10 px-3 text-sm rounded-l-none ${
-                        errors.phone
-                          ? "border-red-500 focus:border-red-500"
-                          : ""
-                      }`}
-                    />
-                  </div>
-                  {errors.phone && (
-                    <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-                  )}
-                </div>
-
-                {/* Business Type */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-900 mb-2 block">
-                    Business Type
-                  </Label>
-                  <Select
-                    value={formData.businessType}
-                    onValueChange={(v) =>
-                      setFormData((f) => ({
-                        ...f,
-                        businessType: v as BusinessType["code"],
-                      }))
-                    }
-                  >
-                    <SelectTrigger
-                      className={`h-10 text-sm ${
-                        errors.businessType ? "border-red-500" : ""
-                      }`}
-                    >
-                      <SelectValue placeholder="Select business type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="TOUR_OPERATOR">
-                        Tour Operator
-                      </SelectItem>
-                      <SelectItem value="TRAVEL_AGENCY">
-                        Travel Agency
-                      </SelectItem>
-                      <SelectItem value="OTHER">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.businessType && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.businessType}
-                    </p>
-                  )}
-                </div>
-
-                {/* Submit */}
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full h-11 text-sm font-medium text-white rounded-full shadow-lg hover:shadow-xl transition-shadow disabled:opacity-60"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
+                    id="phone"
+                    inputMode="numeric"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      let digits = e.target.value.replace(/\D/g, "");
+                      digits = digits.replace(/^0+/, "");
+                      if (digits.length > 10) digits = digits.slice(0, 10);
+                      setFormData((f) => ({ ...f, phone: digits }));
                     }}
-                  >
-                    <LoadingOverlay
-                      isLoading={submitting}
-                      message="Registering..."
-                    />
-                    Register Organizer
-                  </button>
+                    className={`h-10 px-3 text-sm rounded-l-none ${
+                      errors.phone ? "border-red-500" : ""
+                    }`}
+                  />
                 </div>
+                {errors.phone && (
+                  <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                )}
+              </div>
+
+              {/* Business Type */}
+              <div>
+                <Label className="text-sm font-medium">Business Type</Label>
+                <Select
+                  value={formData.businessType}
+                  onValueChange={(v) =>
+                    setFormData((f) => ({
+                      ...f,
+                      businessType: v as BusinessType["code"],
+                    }))
+                  }
+                >
+                  <SelectTrigger
+                    className={`mt-1 h-10 text-sm ${
+                      errors.businessType ? "border-red-500" : ""
+                    }`}
+                  >
+                    <SelectValue placeholder="Select business type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="TOUR_OPERATOR">Tour Operator</SelectItem>
+                    <SelectItem value="TRAVEL_AGENCY">Travel Agency</SelectItem>
+                    <SelectItem value="OTHER">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.businessType && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.businessType}
+                  </p>
+                )}
+              </div>
+
+              {/* Submit */}
+              <div className="pt-1">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full h-10 text-sm font-medium text-white rounded-full shadow hover:shadow-md transition disabled:opacity-60"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
+                  }}
+                >
+                  <LoadingOverlay
+                    isLoading={submitting}
+                    message="Registering..."
+                  />
+                  Register Organizer
+                </button>
               </div>
             </form>
           </div>
