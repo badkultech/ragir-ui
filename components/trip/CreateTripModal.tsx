@@ -74,7 +74,7 @@ export function CreateTripModal({
           <Link href="/organizer/trip-overview">
             <Button
               variant="ghost"
-              className= " cursor-pointer
+              className="cursor-pointer
               w-full justify-start h-auto py-5 px-5
               bg-gray-50 hover:bg-gray-100 rounded-xl
               flex items-center gap-4 text-left
