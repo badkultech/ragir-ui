@@ -1,28 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import RichTextEditor from "@/components/editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "@/components/ui/use-toast";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  header?: string;
+  initialData?: any; // ✅ for edit mode
 };
 
-export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActivityFormProps) {
+export function AddActivityForm({
+  mode = "trip",
+  onCancel,
+  onSave,
+  header,
+  initialData,
+}: AddActivityFormProps) {
   const [title, setTitle] = useState("");
   const [moodTags, setMoodTags] = useState<string[]>([]);
-  const [priceType, setPriceType] = useState<"included" | "chargeable">("included");
+  const [priceType, setPriceType] = useState<"INCLUDED" | "CHARGEABLE">("INCLUDED");
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const { toast } = useToast();
+  const [saveInLibrary, setSaveInLibrary] = useState(false);
+  const [saveAsName, setSaveAsName] = useState('');
+
+
+
+  const isTripMode = mode === "trip";
+
+  // ✅ Prefill when editing
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("Prefilling activity form with:", initialData);
+
+    setTitle(initialData.title || initialData.name || "");
+    setMoodTags(initialData.moodTags || []);
+    setPriceType(initialData.chargeable ? "CHARGEABLE" : "INCLUDED");
+    setLocation(initialData.location || "");
+    setTime(initialData.time || "");
+    setDescription(initialData.description || "");
+    setPacking(initialData.packingSuggestion || "");
+  }, [initialData]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setImages(Array.from(e.target.files));
@@ -34,112 +67,158 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
     setDescription(item.description || "");
   };
 
-  const handleSubmit = () => {
-    onSave({ title, moodTags, priceType, location, time, description, packing, images, mode });
-  };
+  const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!title.trim()) newErrors.title = "Title is required";
+  if (!moodTags) newErrors.moodTags = "Mood Tags are required";
+  if (!priceType.trim()) newErrors.priceType = "Price Type is required";  
+  if (!description.trim()) newErrors.description = "Description is required";
+  if (!location.trim()) newErrors.location = "Location is required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
+const handleSubmit = async () => {
+
+  // Run validation
+  const isValid = validateForm();
+  if (!isValid) return;
+
+  //  Trigger save
+try {
+  await onSave({
+      title,
+      moodTags,
+      priceType,
+      location,
+      time,
+      description,
+      packing,
+      images,
+      mode,
+    });
+  toast({ title: "Success", description: "Activity saved successfully!" });
+} catch {
+  toast({ title: "Error", description: "Failed to save Activity", variant: "destructive" });
+}};
+
+ 
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
-      </div>
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+      {/* Header */}
+      {header && (
+        <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>
+      )}
+
+      {/* Choose from Library */}
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" />
+      )}
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">{title.length}/70 Characters</p>
+          {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+        <p className="text-xs text-right text-orange-500 mt-1">
+          {title.length}/70 Characters
+        </p>
       </div>
 
       {/* Mood Tags */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Mood Tags *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Mood Tags *</label>
         <select
           multiple
           value={moodTags}
           onChange={(e) => setMoodTags(Array.from(e.target.selectedOptions, o => o.value))}
           className="w-full border rounded-lg p-2 text-sm text-gray-700"
         >
-          <option value="adventure">Adventure</option>
-          <option value="relaxing">Relaxing</option>
-          <option value="cultural">Cultural</option>
-          <option value="family">Family</option>
+          <option value="ADVENTURE">Adventure</option>
+          <option value="RELAXING">Relaxing</option>
+          <option value="CULTURAL">Cultural</option>
+          <option value="FAMILY">Family</option>
         </select>
+         {errors.moodTags && <p className="text-xs text-red-500 mt-1">{errors.moodTags}</p>}
       </div>
 
       {/* Price Type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Price Charge *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Price Charge *</label>
         <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
-              checked={priceType === "included"}
-              onChange={() => setPriceType("included")}
+              checked={priceType === "INCLUDED"}
+              onChange={() => setPriceType("INCLUDED")}
             />
             Included
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-[0.85rem]">
             <input
               type="radio"
-              checked={priceType === "chargeable"}
-              onChange={() => setPriceType("chargeable")}
+              checked={priceType === "CHARGEABLE"}
+              onChange={() => setPriceType("CHARGEABLE")}
             />
             Chargeable
           </label>
         </div>
+        {errors.priceType && <p className="text-xs text-red-500 mt-1">{errors.priceType}</p>}
       </div>
 
       {/* Location + Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Location"
-        />
-        <Input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-        />
+        <div>
+          <label className="block text-[0.95rem] font-medium mb-2">Location</label>
+          <Input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Location"
+          />
+          {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+        </div>
+        <div>
+          <label className="block text-[0.95rem] font-medium mb-2">Time</label>
+          <Input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <Textarea
+        <label className="block text-[0.95rem] font-medium mb-1">Description</label>
+        <RichTextEditor
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={setDescription}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">{description.length}/800 Words</p>
       </div>
 
-      {/* Packing Suggestions */}
+      {/* Packing */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
-        <Textarea
+        <RichTextEditor
           value={packing}
-          onChange={(e) => setPacking(e.target.value)}
+          onChange={setPacking}
           placeholder="Enter here"
-          rows={5}
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">{packing.length}/800 Words</p>
       </div>
 
       {/* Image Upload */}
@@ -162,24 +241,51 @@ export function AddActivityForm({ mode = "library", onCancel, onSave }: AddActiv
         )}
       </div>
 
+      {isTripMode && (
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+            <Input
+              type="checkbox"
+              checked={saveInLibrary}
+              onChange={(e) => setSaveInLibrary(e.target.checked)}
+              className="w-[22px]"
+            />
+            <label className="block text-[0.95rem] font-medium">
+              Save in Library
+            </label>
+          </div>
+
+          <Input
+            type="text"
+            value={saveAsName}
+            onChange={(e) => setSaveAsName(e.target.value)}
+            placeholder="Save As"
+            className="p-4 w-[12rem]"
+          />
+        </div>
+      )}
+
+
       {/* Footer */}
-      <div className="flex justify-end items-center gap-4 mt-6">
+      <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
         <Button
-          onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          onClick={() => handleSubmit()}
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
           Save
         </Button>
       </div>
 
       {/* Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="activities"
-      />
+      {isTripMode && (
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="activities"
+        />
+      )}
     </div>
   );
 }

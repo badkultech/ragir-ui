@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,25 @@ import { AddTripLeaderForm } from "./AddTripLeaderForm";
 import { AddEventForm } from "@/components/library/AddEventForm";
 import { AddTransitForm } from "./AddTransitForm";
 import { AddFAQForm } from "@/components/library/AddFAQForm";
+
+import {
+  useCreateOrganizerDayDescriptionMutation,
+  useUpdateOrganizerDayDescriptionMutation,
+} from "@/lib/services/organizer/trip/library/day-description";
+
+import {
+  useCreateOrganizerTransitMutation,
+  useUpdateOrganizerTransitMutation,
+  useGetOrganizerTransitByIdQuery,
+} from "@/lib/services/organizer/trip/library/transit";
+
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { Document } from "@/lib/services/organizer/trip/library/day-description/types";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useCreateMealMutation, useUpdateMealMutation } from "@/lib/services/organizer/trip/library/meal";
+import { useCreateStayMutation, useUpdateStayMutation } from "@/lib/services/organizer/trip/library/stay";
+import { useCreateActivityMutation, useUpdateActivityMutation } from "@/lib/services/organizer/trip/library/activity";
 
 /* ===== types ===== */
 type Step =
@@ -71,44 +90,157 @@ function StepHeader({ title }: { title: string }) {
 type AddNewItemModalProps = {
   open: boolean;
   onClose: () => void;
+  updateId?: number | null;
   initialStep?: Step;
+  editData?: any; // ✅ NEW: existing meal data for edit
 };
 
 export function AddNewItemModal({
   open,
   onClose,
+  updateId,
   initialStep = "select",
+  editData,
 }: AddNewItemModalProps) {
   const [step, setStep] = useState<Step>("select");
   const [selected, setSelected] = useState<CategoryItem | null>(null);
+
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  // Day description (events) mutations
+  const [createOrganizerDayDescription] =
+    useCreateOrganizerDayDescriptionMutation();
+  const [updateOrganizerDayDescription] =
+    useUpdateOrganizerDayDescriptionMutation();
+
+  // Transit create/update mutations
+  const [createOrganizerTransit] = useCreateOrganizerTransitMutation();
+  const [updateOrganizerTransit] = useUpdateOrganizerTransitMutation();
+
+  const [createMeal] = useCreateMealMutation();
+  const [updateMeal] = useUpdateMealMutation();
+
+  const [createStay] = useCreateStayMutation();
+  const [updateStay] = useUpdateStayMutation();
+
+  const [createActivity] = useCreateActivityMutation();
+  const [updateActivity] = useUpdateActivityMutation();
+
+  // Set step when modal opens (respects initialStep always)
+  useEffect(() => {
+    if (!open) return;
+    setStep(initialStep);
+    setSelected(null);
+  }, [open, initialStep]);
+
+  /* ---------- Handlers ---------- */
 
   const handleNext = () => {
     if (selected) setStep(selected.step);
   };
 
-  React.useEffect(() => {
-    if (open) {
-      setStep(initialStep);
-      setSelected(null);
-    }
-  }, [open, initialStep]);
+  // Save handler for day description / event-like items (you had this before)
+  const handleSaveEvent = (data: any) => {
+    const formData = new FormData();
+    formData.append("name", data.title);
+    formData.append("description", data.description);
+    formData.append("location", data.location);
+    formData.append("time", data.time);
+    formData.append("packingSuggestion", data.packing);
+    formData.append("addToLibrary", "true");
 
-  const handleBack = () => {
-    // If modal was opened directly with initialStep (not select), then close on back
-    if (initialStep !== "select") {
-      onClose();
-    } else {
-      setStep("select");
-      setSelected(null);
+    if (data.documents) {
+      data.documents.forEach((document: Document, index: number) => {
+        if (document.file) formData.append(`documents[${index}].file`, document.file);
+        if (document.markedForDeletion)
+          formData.append(
+            `documents[${index}].markedForDeletion`,
+            document.markedForDeletion.toString()
+          );
+      });
     }
+
+    const request = updateId
+      ? updateOrganizerDayDescription({
+        organizationId,
+        data: formData,
+        dayDescriptionId: updateId.toString(),
+      })
+      : createOrganizerDayDescription({ organizationId, data: formData });
+
+    request
+      .unwrap()
+      .then(() => {
+        onClose();
+      })
+      .catch((err) => {
+        console.error("Failed to save event/day description:", err);
+      });
   };
 
+  // Save handler for transit (used for both add & edit)
+  const handleSaveTransit = (data: any, editingId?: number | null) => {
+    const formData = new FormData();
+    formData.append("fromLocation", data.from);
+    formData.append("toLocation", data.to);
+    formData.append("startTime", data.departure);
+    formData.append("endTime", data.arrival);
+    formData.append(
+      "vehicleType",
+      Array.isArray(data.vehicle) ? data.vehicle[0] : data.vehicle || ""
+    );
+    formData.append("customVehicleType", data.otherVehicle || "");
+    formData.append("arrangedBy", (data.arrangement || "organizer").toUpperCase());
+    formData.append("description", data.description || "");
+    formData.append("packagingSuggestion", data.packing || "");
+    formData.append("addToLibrary", "true");
+    formData.append("name", data.title || "");
+
+    if (data.images?.length) {
+      data.images.forEach((file: File, index: number) =>
+        formData.append(`documents[${index}].file`, file)
+      );
+    }
+
+    const request = editingId
+      ? updateOrganizerTransit({
+        organizationId,
+        transitId: editingId,
+        data: formData,
+      })
+      : createOrganizerTransit({
+        organizationId,
+        data: formData,
+      });
+
+    request
+      .unwrap()
+      .then(() => {
+        // close modal on success
+        onClose();
+      })
+      .catch((err) => {
+        console.error("Failed to save transit:", err);
+      });
+  };
+
+  const handleBack = () => {
+    // If modal opened directly to a specific step (not 'select'), close on back
+    if (initialStep !== "select") {
+      onClose();
+      return;
+    }
+    setStep("select");
+    setSelected(null);
+  };
+
+  /* ====================== RENDER ====================== */
   return (
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          // reset local state and call parent close once
           setStep("select");
           setSelected(null);
           onClose();
@@ -116,33 +248,26 @@ export function AddNewItemModal({
       }}
     >
       <DialogContent className="w-full max-w-3xl rounded-2xl overflow-hidden">
-        {/* inner scroll container keeps outer border radius intact */}
         <div className="max-h-[90vh] overflow-y-auto">
+          {/* ---------------- Step: Select ---------------- */}
           {step === "select" && (
             <>
               <StepHeader title="Add New Item" />
 
               <div className="grid grid-cols-2 gap-4 mt-4">
-                {categories
-                  .slice(0, 6)
-                  .map(({ label, icon: Icon, step: stepKey }) => (
-                    <button
-                      key={label}
-                      onClick={() =>
-                        setSelected({ label, icon: Icon, step: stepKey })
-                      }
-                      className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${
-                        selected?.label === label
-                          ? "border-orange-500 shadow-md"
-                          : "border-gray-200 hover:border-orange-400"
+                {categories.slice(0, 6).map(({ label, icon: Icon, step }) => (
+                  <button
+                    key={label}
+                    onClick={() => setSelected({ label, icon: Icon, step })}
+                    className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${selected?.label === label
+                      ? "border-orange-500 shadow-md"
+                      : "border-gray-200 hover:border-orange-400"
                       }`}
-                    >
-                      <Icon className="h-6 w-6 text-gray-600 mb-2" />
-                      <span className="text-sm font-medium text-gray-700">
-                        {label}
-                      </span>
-                    </button>
-                  ))}
+                  >
+                    <Icon className="h-6 w-6 text-gray-600 mb-2" />
+                    <span className="text-sm font-medium text-gray-700">{label}</span>
+                  </button>
+                ))}
               </div>
 
               <div className="mt-4">
@@ -154,16 +279,13 @@ export function AddNewItemModal({
                       step: "faq",
                     })
                   }
-                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${
-                    selected?.label === "FAQs"
-                      ? "border-orange-500 shadow-md"
-                      : "border-gray-200 hover:border-orange-400"
-                  }`}
+                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${selected?.label === "FAQs"
+                    ? "border-orange-500 shadow-md"
+                    : "border-gray-200 hover:border-orange-400"
+                    }`}
                 >
                   <HelpCircle className="h-6 w-6 text-gray-600 mb-2" />
-                  <span className="text-sm font-medium text-gray-700">
-                    FAQs
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">FAQs</span>
                 </button>
               </div>
 
@@ -184,52 +306,177 @@ export function AddNewItemModal({
             </>
           )}
 
+          {/* ---------------- Step: Event ---------------- */}
+          {step === "event" && (
+            <>
+              <StepHeader title={updateId ? "Edit Day Description" : "Add Day Description"} />
+              <AddEventForm
+                updateId={updateId}
+                mode="library"
+                onCancel={handleBack}
+                onSave={handleSaveEvent}
+              />
+            </>
+          )}
+
+          {/* ---------------- Step: Stay ---------------- */}
           {step === "stay" && (
             <>
-              <StepHeader title="Add Stay" />
+              <StepHeader title={updateId ? "Edit Stay" : "Add Stay"} />
               <AddStayForm
                 mode="library"
-                onCancel={handleBack}
-                onSave={(data: any) => {
-                  console.log("Stay saved:", data);
-                  onClose();
+                initialData={editData}
+                onCancel={onClose}
+                onSave={async (data: any) => {
+                  try {
+                    const fd = new FormData();
+                    fd.append("name", data.title);
+                    fd.append("location", data.location);
+                    fd.append("description", data.description || "");
+                    fd.append("packingSuggestion", data.packing || "");
+                    fd.append("sharingType", data.sharingType || "");
+                    fd.append("checkIn", data.checkIn || "");
+                    fd.append("checkOut", data.checkOut || "");
+                    data.images.forEach((img: File) => fd.append("images", img));
+
+                    if (updateId) {
+                      // 🟢 Update existing stay
+                      await updateStay({
+                        organizationId,
+                        stayId: updateId,
+                        data: fd,
+                      }).unwrap();
+                    } else {
+                      // 🟠 Create new stay
+                      await createStay({ organizationId, data: fd }).unwrap();
+                    }
+
+                    onClose();
+                  } catch (error) {
+                    console.error("Error saving stay:", error);
+                    alert("Failed to save stay");
+                  }
                 }}
               />
             </>
           )}
 
+
+          {/* ---------------- Step: Transit ---------------- */}
+          {step === "transit" && (
+            <>
+              <StepHeader title={updateId ? "Edit Transit" : "Add Transit"} />
+              {updateId ? (
+                <TransitEditLoader
+                  updateId={updateId}
+                  onCancel={handleBack}
+                  onClose={onClose}
+                  onSave={(data: any) => handleSaveTransit(data, updateId)}
+                />
+              ) : (
+                <AddTransitForm
+                  mode="library"
+                  onCancel={handleBack}
+                  onSave={(data: any) => handleSaveTransit(data)}
+                />
+              )}
+            </>
+          )}
+
+          {/* ---------------- Step: Meal ---------------- */}
           {step === "meal" && (
             <>
-              <StepHeader title="Add Meal" />
+              <StepHeader title={updateId ? "Edit Meal" : "Add Meal"} />
               <AddMealForm
                 mode="library"
+                initialData={editData} // ✅ NEW: Pass existing meal for edit
                 onCancel={handleBack}
-                onSave={(data: any) => {
-                  console.log("Meal saved:", data);
-                  onClose();
+                onSave={async (formData: any) => {
+                  try {
+                    const fd = new FormData();
+                    fd.append("name", formData.title);
+                    fd.append("mealType", formData.mealType.toUpperCase());
+                    fd.append("location", formData.location);
+                    fd.append("description", formData.description || "");
+                    fd.append("packingSuggestion", formData.packing || "");
+                    fd.append("chargeable", String(formData.included === "chargeable"));
+                    formData.images.forEach((img: File) => fd.append("images", img));
+
+                    if (updateId) {
+                      // ✅ Update existing meal
+                      await updateMeal({
+                        organizationId,
+                        mealId: updateId,
+                        data: fd,
+                      }).unwrap();
+                    } else {
+                      // ✅ Create new meal
+                      await createMeal({
+                        organizationId,
+                        data: fd,
+                      }).unwrap();
+                    }
+
+                    onClose();
+                  } catch (err) {
+                    console.error("Error saving meal:", err);
+                    alert("Failed to save meal.");
+                  }
                 }}
               />
             </>
           )}
 
+
+          {/* ---------------- Step: Activity ---------------- */}
           {step === "activity" && (
             <>
-              <StepHeader title="Add Activity" />
+              <StepHeader title={updateId ? "Edit Activity" : "Add Activity"} />
               <AddActivityForm
                 mode="library"
-                onCancel={handleBack}
-                onSave={(data: any) => {
-                  console.log("Activity saved:", data);
-                  onClose();
+                initialData={editData}
+                onCancel={onClose}
+                onSave={async (data: any) => {
+                  try {
+                    const fd = new FormData();
+                    fd.append("name", data.title);
+                    fd.append("location", data.location || "");
+                    fd.append("description", data.description || "");
+                    fd.append("packingSuggestion", data.packing || "");
+                    fd.append("priceCharge", data.priceType);
+                    fd.append("time", data.time || "");
+                    data.moodTags.forEach((tag: string) => fd.append("moodTags", tag.toUpperCase()));
+                    data.images.forEach((img: File) => fd.append("images", img));
+
+                    if (updateId) {
+                      // 🟢 Update existing activity
+                      await updateActivity({
+                        organizationId,
+                        activityId: updateId,
+                        data: fd,
+                      }).unwrap();
+                    } else {
+                      // 🟠 Create new activity
+                      await createActivity({ organizationId, data: fd }).unwrap();
+                    }
+
+                    onClose();
+                  } catch (error) {
+                    console.error("Error saving activity:", error);
+                    alert("Failed to save activity");
+                  }
                 }}
               />
             </>
           )}
 
+
+          {/* ---------------- Step: Trip Leader ---------------- */}
           {step === "trip-leader" && (
             <>
-              <StepHeader title="Add Trip Leader" />
+              <StepHeader title={updateId ? "Edit Trip Leader" : "Add Trip Leader"} />
               <AddTripLeaderForm
+                updateId={updateId}
                 mode="library"
                 onCancel={handleBack}
                 onSave={(data: any) => {
@@ -240,49 +487,70 @@ export function AddNewItemModal({
             </>
           )}
 
-          {step === "event" && (
-            <>
-              <StepHeader title="Add Event" />
-              <AddEventForm
-                mode="library"
-                onCancel={handleBack}
-                onSave={(data: any, replace?: boolean) => {
-                  console.log("Event saved:", data, "replace?", replace);
-                  onClose();
-                }}
-              />
-            </>
-          )}
-
-          {step === "transit" && (
-            <>
-              <StepHeader title="Add Transit" />
-              <AddTransitForm
-                mode="library"
-                onCancel={handleBack}
-                onSave={(data: any) => {
-                  console.log("Transit saved:", data);
-                  onClose();
-                }}
-              />
-            </>
-          )}
-
+          {/* ---------------- Step: FAQ ---------------- */}
           {step === "faq" && (
             <>
-              <StepHeader title="Add FAQ" />
+              <StepHeader title={updateId ? "Edit FAQ" : "Add FAQ"} />
               <AddFAQForm
+                updateId={updateId}
                 mode="library"
                 onCancel={handleBack}
-                onSave={(data: any) => {
-                  console.log("FAQ saved:", data);
-                  onClose();
-                }}
+                onSave={() => onClose()}
               />
             </>
           )}
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/* ----------------------------------
+   TransitEditLoader component (separate)
+   - Uses RTK query to fetch transit by ID
+   - Prefills AddTransitForm when data is ready
+---------------------------------- */
+function TransitEditLoader({
+  updateId,
+  onCancel,
+  onClose,
+  onSave,
+}: {
+  updateId: number;
+  onCancel: () => void;
+  onClose: () => void;
+  onSave: (data: any) => void;
+}) {
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  const { data: transit, isLoading, isFetching, error } = useGetOrganizerTransitByIdQuery(
+    organizationId && updateId ? { organizationId, transitId: updateId } : skipToken
+  );
+
+  useEffect(() => {
+    console.log("Fetching transit data for ID:", updateId, "Org:", organizationId);
+  }, [updateId, organizationId]);
+
+
+  if (isLoading)
+    return (
+      <div className="text-center text-gray-500 py-10">Loading transit details...</div>
+    );
+
+  if (!transit)
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Unable to load transit data.
+      </div>
+    );
+
+  return (
+    <AddTransitForm
+      mode="library"
+      initialData={transit}
+      onCancel={onCancel}
+      onSave={onSave}
+    />
   );
 }

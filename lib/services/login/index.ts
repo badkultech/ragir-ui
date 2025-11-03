@@ -2,7 +2,7 @@
 import { ApiResponse } from '../common-types';
 import { ENDPOINTS } from '@/lib/utils';
 import { LoginDTO } from '../otp/types';
-import { loginRequest } from './types';
+import { changePasswordRequest, loginRequest } from './types';
 import { baseAPI } from '..';
 
 export const loginAPI = baseAPI.injectEndpoints({
@@ -15,7 +15,14 @@ export const loginAPI = baseAPI.injectEndpoints({
       }),
       transformResponse: (response: ApiResponse<LoginDTO>) => response.data,
     }),
+    changePassword: builder.mutation<void, changePasswordRequest>({
+      query: (body) => ({
+        url: `${ENDPOINTS.CHANGE_PASSWORD}`,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = loginAPI;
+export const { useLoginMutation, useChangePasswordMutation } = loginAPI;

@@ -11,13 +11,28 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton"; // for loading state
+import { useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/faq";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { useGetOrganizerTransitsQuery } from "@/lib/services/organizer/trip/library/transit";
+import { useGetGroupLeadersQuery } from "@/lib/services/organizer/trip/library/leader";
 
-type LibraryItem = {
+
+
+
+export type LibraryItem = {
   id: string;
   title: string;
   location?: string;
   description?: string;
   image?: string;
+  answer?: string;
+  imageUrl?: string;
+  profileImageUrl?: string;
+  tagline?: string;
+  name?: string;
+
 };
 
 type Category =
@@ -36,72 +51,6 @@ type Props = {
   category: Category;
 };
 
-// Mock data (replace with API calls later)
-const mockData: Record<Category, LibraryItem[]> = {
-  events: [
-    {
-      id: "1",
-      title: "Rajasthan Folk Festival",
-      description: "Cultural performances",
-    },
-  ],
-  stays: [
-    {
-      id: "2",
-      title: "Hotel Taj",
-      location: "Mumbai",
-      description: "Luxury 5-star hotel",
-    },
-    {
-      id: "3",
-      title: "Beach Resort",
-      location: "Goa",
-      description: "Sea-facing resort",
-    },
-  ],
-  transit: [
-    { id: "4", title: "Mumbai → Goa Express", description: "AC Sleeper Bus" },
-  ],
-  meals: [
-    {
-      id: "5",
-      title: "Trishna Restaurant",
-      location: "Mumbai",
-      description: "Seafood cuisine",
-    },
-  ],
-  activities: [
-    {
-      id: "6",
-      title: "Scuba Diving",
-      location: "Andaman",
-      description: "Certified instructors",
-    },
-  ],
-  "trip-leaders": [
-    {
-      id: "1",
-      title: "John Does",
-      description: "Adventure awaits beyond comfort zones",
-      image: "/leaders/john.jpg", // mock path
-    },
-    {
-      id: "2",
-      title: "Sarah Lee",
-      description: "Guiding with passion and purpose",
-      image: "/leaders/sarah.jpg",
-    },
-  ],
-
-  faqs: [
-    {
-      id: "8",
-      title: "What is included?",
-      description: "Accommodation, meals, transport",
-    },
-  ],
-};
-
 export function LibrarySelectModal({
   open,
   onClose,
@@ -110,15 +59,65 @@ export function LibrarySelectModal({
 }: Props) {
   const [selected, setSelected] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
+const { userData } = useSelector(selectAuthState);
+const organizationId = userData?.organizationPublicId;
 
-  const items = mockData[category].filter(
+const shouldSkip = !organizationId;
+
+const {
+  data: itemsData,
+  isLoading,
+  isError,
+} =
+  category === "faqs"
+    ? useGetOrganizerFaqsQuery(
+        { organizationId },
+        { skip: shouldSkip, refetchOnMountOrArgChange: true }
+      )
+    : category === "transit"
+    ? useGetOrganizerTransitsQuery(
+        { organizationId },
+        { skip: shouldSkip, refetchOnMountOrArgChange: true }
+      )
+    : category === "trip-leaders"
+    ? useGetGroupLeadersQuery(organizationId ?? "", {
+        skip: shouldSkip,
+        refetchOnMountOrArgChange: true,
+      })
+    : { data: [], isLoading: false, isError: false };
+
+
+      // : category === "stays"
+      // ? useGetOrganizerStaysQuery()
+      // : category === "meals"
+      // ? useGetOrganizerMealsQuery()
+      // : category === "transit"
+      // ?
+      // : category === "activities"
+      // ? useGetOrganizerActivitiesQuery()
+      // : category === "events"
+      // ? useGetOrganizerEventsQuery()
+      // : useGetOrganizerTripLeadersQuery();
+
+  const items: LibraryItem[] =
+    itemsData?.map((item: any) => ({
+      id: item.id?.toString(),
+      title: item.title || item.name || "Untitled",
+      answer: item.answer,
+      location: item.location || item.city || "",
+      description: item.description || item.details || "",
+      image: item.imageUrl || item.photo || "",
+    })) ?? [];
+
+  // 🔍 Search filter
+  const filteredItems = items.filter(
     (item) =>
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       (item.location || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSelect = () => {
-    const item = mockData[category].find((i) => i.id === selected);
+    const item = items.find((i) => i.id === selected);
     if (item) {
       onSelect(item);
       onClose();
@@ -131,69 +130,118 @@ export function LibrarySelectModal({
         <DialogHeader>
           <DialogTitle>Add from Library</DialogTitle>
         </DialogHeader>
+
         <div className="flex flex-col gap-4">
-          {/* Search */}
+          {/* 🔍 Search */}
           <Input
             placeholder="Search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          {/* Items */}
-          <div className="flex flex-col gap-4">
-            {items.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setSelected(item.id)}
-                className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
-                  selected === item.id
-                    ? "border-orange-500 shadow"
-                    : "border-gray-200 hover:border-orange-400"
-                }`}
-              >
-                <div className="font-medium text-gray-900">{item.title}</div>
-                {item.location && (
-                  <div className="text-sm text-gray-600">{item.location}</div>
-                )}
-                {item.description && (
-                  <div className="text-xs text-gray-500 line-clamp-2">
-                    {item.description}
-                  </div>
-                )}
-              </button>
-            ))}
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex flex-col gap-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full rounded-lg" />
+              ))}
+            </div>
+          )}
 
-            {items.length === 0 && (
-              <p className="text-sm text-gray-500">No items found</p>
-            )}
-          </div>
+          {/* Error state */}
+          {isError && (
+            <p className="text-sm text-red-500">Failed to load items</p>
+          )}
+
+          {/* Items list */}
+          {!isLoading && !isError && (
+            <>
+              {category === "trip-leaders" ? (
+                <div className="flex flex-col gap-4">
+                  {filteredItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelected(item.id)}
+                      onDoubleClick={() => {
+                        setSelected(item.id);
+                        onSelect(item);
+                        onClose();
+                      }}
+                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
+                        selected === item.id
+                          ? "border-orange-500 shadow"
+                          : "border-gray-200 hover:border-orange-400"
+                      }`}
+                    >
+                      <img
+                        src={item.image || "/default-avatar.png"}
+                        alt={item.title}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {item.title}
+                        </div>
+                        {item.description && (
+                          <div className="text-sm text-gray-600">
+                            "{item.description}"
+                          </div>
+                        )}
+                         {item.answer && (
+                          <div className="text-sm text-gray-600">
+                            "{item.answer}"
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {filteredItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelected(item.id)}
+                      onDoubleClick={() => {
+                        setSelected(item.id);
+                        onSelect(item);
+                        onClose();
+                      }}
+                      className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
+                        selected === item.id
+                          ? "border-orange-500 shadow"
+                          : "border-gray-200 hover:border-orange-400"
+                      }`}
+                    >
+                      <div className="font-medium text-gray-900">
+                        {item.title}
+                      </div>
+                      {item.location && (
+                        <div className="text-sm text-gray-600">
+                          {item.location}
+                        </div>
+                      )}
+                      {item.description && (
+                        <div className="text-xs text-gray-500 line-clamp-2">
+                          {item.description}
+                        </div>
+                      )}
+                       {item.answer && (
+                        <div className="text-sm text-gray-600">
+                          {item.answer}
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                  {filteredItems.length === 0 && (
+                    <p className="text-sm text-gray-500">No items found</p>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
-        {category === "trip-leaders" &&
-          items.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setSelected(item.id)}
-              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
-                selected === item.id
-                  ? "border-orange-500 shadow"
-                  : "border-gray-200 hover:border-orange-400"
-              }`}
-            >
-              <img
-                src={item.image || "/default-avatar.png"}
-                alt={item.title}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div>
-                <div className="font-medium text-gray-900">{item.title}</div>
-                {item.description && (
-                  <div className="text-sm text-gray-600">
-                    "{item.description}"
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
+
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline" className="rounded-full px-6">

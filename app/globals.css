@@ -37,6 +37,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --font-barlow: 'Barlow', sans-serif;
+  --font-poppins: 'Poppins', sans-serif;
 }
 
 .dark {
@@ -125,6 +127,14 @@
 /* Add this to your globals.css or component CSS */
 .admin-register * {
   font-family: 'Poppins', sans-serif !important;
+}
+
+.font-barlow {
+  font-family: var(--font-barlow);
+}
+
+.font-poppins {
+  font-family: var(--font-poppins);
 }
 
 

@@ -1,41 +1,98 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import RichTextEditor from "../editor/RichTextEditor";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "../ui/use-toast";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  header?: string;
+  initialData?: any; // ✅ same as AddTransitForm
 };
 
-export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormProps) {
-  const [title, setTitle] = useState("");
-  const [mealType, setMealType] = useState("");
-  const [mealTime, setMealTime] = useState("");
+export function AddMealForm({
+  mode = "trip",
+  onCancel,
+  onSave,
+  header,
+  initialData,
+}: AddMealFormProps) {
+  const [title, setTitle] = useState("My Meal");
+  const [mealType, setMealType] = useState("LUNCH");
+  const [mealTime, setMealTime] = useState("12:00");
   const [included, setIncluded] = useState<"included" | "chargeable">("included");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("Mumbai, India");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const {toast} = useToast();
+  const [saveInLibrary, setSaveInLibrary] = useState(false);
+  const [saveAsName, setSaveAsName] = useState('');
 
+  const isTripMode = mode === "trip";
+
+  // ✅ Prefill form when editing (like AddTransitForm)
+  useEffect(() => {
+    if (!initialData) return;
+
+    console.log("🚀 Prefilling meal form with:", initialData);
+
+    setTitle(initialData.title || initialData.name || "");
+    setMealType(
+      typeof initialData.mealType === "string"
+        ? initialData.mealType.toUpperCase()
+        : "LUNCH"
+    );
+    setMealTime(initialData.mealTime || "12:00");
+    setIncluded(initialData.chargeable ? "chargeable" : "included");
+    setLocation(initialData.location || "");
+    setDescription(initialData.description || "");
+    setPacking(initialData.packingSuggestion || "");
+  }, [initialData]);
+
+  // ✅ File upload handler
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setImages(Array.from(e.target.files));
   };
 
+  // ✅ Select from library
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
     setLocation(item.location || "");
     setDescription(item.description || "");
   };
 
-  const handleSubmit = () => {
-    onSave({
+  const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!title.trim()) newErrors.title = "Title is required";
+  if (!mealTime.trim()) newErrors.title = "Meal Time is required";
+  if (!mealType.trim()) newErrors.title = "Meal Type is required";
+  if (!description.trim()) newErrors.description = "Description is required";
+  if (!location.trim()) newErrors.location = "Location is required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
+  // ✅ Save
+  const handleSubmit = async () => {
+     const isValid = validateForm();
+  if (!isValid) return;
+
+  try{
+   await onSave({
       title,
       mealType,
       mealTime,
@@ -46,24 +103,36 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
       images,
       mode,
     });
+    toast({ title: "Success", description: "Meal saved successfully!" });
+  } catch{
+       toast({ title: "Error", description: "Failed to save Meal", variant: "destructive" });
+  }
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
+    <div
+      className="flex flex-col gap-6"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between w-full">
+        {header && (
+          <div className="text-lg font-semibold text-gray-800 pb-2">
+            {header}
+          </div>
+        )}
       </div>
+
+      {/* Top-right button (Trip Mode Only) */}
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" />
+      )}
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Title *
         </label>
         <Input
@@ -72,7 +141,8 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
           placeholder="Enter title"
           maxLength={70}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+        <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
       </div>
@@ -80,7 +150,7 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
       {/* Meal Type & Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-[0.95rem] font-medium mb-2">
             Meal Type *
           </label>
           <select
@@ -89,14 +159,25 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
             className="w-full border rounded-lg p-2 text-sm text-gray-700"
           >
             <option value="">Select</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="lunch">Lunch</option>
-            <option value="snack">Snack</option>
-            <option value="dinner">Dinner</option>
+            <option value="BREAKFAST">Breakfast</option>
+            <option value="LUNCH">Lunch</option>
+            <option value="SNACK">Snack</option>
+            <option value="DINNER">Dinner</option>
           </select>
+
+          <label className="flex items-center gap-2 my-4">
+            <input
+              type="radio"
+              checked={included === "included"}
+              onChange={() => setIncluded("included")}
+            />
+            Included
+          </label>
+          {errors.mealType && <p className="text-xs text-red-500 mt-1">{errors.mealType}</p>}
         </div>
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-[0.95rem] font-medium mb-2">
             Time
           </label>
           <Input
@@ -104,51 +185,43 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
             value={mealTime}
             onChange={(e) => setMealTime(e.target.value)}
           />
+
+          <label className="flex items-center gap-2 my-4">
+            <input
+              type="radio"
+              checked={included === "chargeable"}
+              onChange={() => setIncluded("chargeable")}
+            />
+            Chargeable
+          </label>
+          {errors.mealTime && <p className="text-xs text-red-500 mt-1">{errors.mealTime}</p>}
         </div>
       </div>
 
-      {/* Included / Chargeable */}
-      <div className="flex items-center gap-6">
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            checked={included === "included"}
-            onChange={() => setIncluded("included")}
-          />
-          Included
-        </label>
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            checked={included === "chargeable"}
-            onChange={() => setIncluded("chargeable")}
-          />
-          Chargeable
-        </label>
-      </div>
-
       {/* Location */}
-      <Input
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        placeholder="Location"
-      />
+      <div>
+        <label className="block text-[0.95rem] font-medium mb-1">
+          Location
+        </label>
+        <Input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Enter location"
+        />
+        {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+      </div>
 
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Description
         </label>
-        <Textarea
+        <RichTextEditor
+          placeholder="Enter description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter here"
-          rows={5}
-          maxLength={800}
+          onChange={setDescription}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {description.length}/800 Words
-        </p>
+        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
       </div>
 
       {/* Packing Suggestions */}
@@ -156,16 +229,12 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Packing Suggestions
         </label>
-        <Textarea
+        <RichTextEditor
           value={packing}
-          onChange={(e) => setPacking(e.target.value)}
-          placeholder="Enter here"
-          rows={5}
+          onChange={setPacking}
+          placeholder="Enter packing suggestions"
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {packing.length}/800 Words
-        </p>
       </div>
 
       {/* Image Upload */}
@@ -185,33 +254,60 @@ export function AddMealForm({ mode = "library", onCancel, onSave }: AddMealFormP
             onChange={handleFileChange}
           />
         </label>
+
         {images.length > 0 && (
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-orange-500 mt-2">
             {images.length} file(s) selected
           </p>
         )}
       </div>
 
+      {isTripMode && (
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+            <Input
+              type="checkbox"
+              checked={saveInLibrary}
+              onChange={(e) => setSaveInLibrary(e.target.checked)}
+              className="w-[22px]"
+            />
+            <label className="block text-[0.95rem] font-medium">
+              Save in Library
+            </label>
+          </div>
+
+          <Input
+            type="text"
+            value={saveAsName}
+            onChange={(e) => setSaveAsName(e.target.value)}
+            placeholder="Save As"
+            className="p-4 w-[12rem]"
+          />
+        </div>
+      )}
+
       {/* Footer */}
-      <div className="flex justify-end items-center gap-4 mt-6">
+      <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
           Save
         </Button>
       </div>
 
-      {/* Choose from Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="meals"
-      />
+      {/* Library Modal */}
+      {mode === "trip" && (
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="meals"
+        />
+      )}
     </div>
   );
 }

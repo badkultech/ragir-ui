@@ -16,6 +16,15 @@ import {
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import Link from "next/link";
+import {
+  useDeleteOrganizerDayDescriptionMutation,
+  useGetOrganizerDayDescriptionQuery,
+  useGetOrganizerDayDescriptionByIdQuery,
+} from "@/lib/services/organizer/trip/library/day-description";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { ViewModal } from "@/components/library/ViewModal";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const mockEvents = [
   {
@@ -46,6 +55,28 @@ export default function EventsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [updateId, setUpdateId] = useState<number | null>(null);
+
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedDayId, setSelectedDayId] = useState<any>(null);
+
+  const { data: dayDescriptions } = useGetOrganizerDayDescriptionQuery({
+    organizationId,
+  });
+
+  const { data: selectedDay, isFetching: isTransitLoading } =
+    useGetOrganizerDayDescriptionByIdQuery(
+      selectedDayId && organizationId
+        ? { organizationId, dayDescriptionId: selectedDayId }
+        : skipToken
+    );
+
+  const [deleteOrganizerDayDescription] =
+    useDeleteOrganizerDayDescriptionMutation();
+  console.log(organizationId, dayDescriptions);
 
   const filtered = mockEvents.filter((event) =>
     event.title.toLowerCase().includes(search.toLowerCase())
@@ -63,36 +94,39 @@ export default function EventsPage() {
       <div className="flex-1 flex flex-col">
         <AppHeader title="Events" />
 
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 p-6 md:p-4">
           {/* Header */}
           <LibraryHeader
             title="Ragir Library"
             buttonLabel="Add Event"
-            onAddClick={() => setModalOpen(true)}
+            onAddClick={() => {
+              setUpdateId(null);
+              setModalOpen(true);
+            }}
           />
           {/* Search */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <Input
-              placeholder="Search Library..."
+              placeholder='Search Library...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-80 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
+              className='w-full sm:w-80 border-orange-300 focus:border-orange-500 focus:ring-orange-500'
             />
-          </div>
+          </div> */}
 
           {/* Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((event) => (
+            {dayDescriptions?.map((dayDescription) => (
               <div
-                key={event.id}
+                key={dayDescription.id}
                 className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
               >
                 {/* Image */}
                 <div className="h-32 bg-gray-100 flex items-center justify-center">
-                  {event.image ? (
+                  {dayDescription.documents ? (
                     <img
-                      src={event.image}
-                      alt={event.title}
+                      src={dayDescription.documents[0].url}
+                      alt={dayDescription.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -102,24 +136,50 @@ export default function EventsPage() {
 
                 {/* Content */}
                 <div className="p-4 flex-1 flex flex-col">
-                  <h3 className="font-semibold text-gray-900">{event.title}</h3>
+                  <h3 className="font-bold text-gray-900">
+                    <strong> {dayDescription.name}</strong>
+                  </h3>
                   <div className="flex items-center text-gray-600 text-sm mt-1">
                     <MapPin className="w-4 h-4 mr-1 text-gray-500" />
-                    {event.location}
+                    {dayDescription.location}
                   </div>
-                  <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                    {event.description}
-                  </p>
+                  <p
+                    className="text-sm text-gray-500 mt-2 line-clamp-2"
+                    dangerouslySetInnerHTML={{
+                      __html: dayDescription.description || "",
+                    }}
+                  ></p>
 
                   {/* Actions */}
                   <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                    <button className="hover:text-orange-500">
+                    <button
+                      className="hover:text-orange-500"
+                      onClick={() => {
+                        setSelectedDayId(dayDescription.id);
+                        setViewModalOpen(true);
+                      }}
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="hover:text-orange-500">
+
+                    <button
+                      className="hover:text-orange-500"
+                      onClick={() => {
+                        setUpdateId(dayDescription.id);
+                        setModalOpen(true);
+                      }}
+                    >
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button className="hover:text-red-500">
+                    <button
+                      className="hover:text-red-500"
+                      onClick={() => {
+                        deleteOrganizerDayDescription({
+                          dayDescriptionId: dayDescription.id,
+                          organizationId,
+                        }).unwrap();
+                      }}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -139,8 +199,18 @@ export default function EventsPage() {
       {/* Add New Item Modal */}
       <AddNewItemModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        initialStep="event" // 👈 opens AddStayForm directly
+        updateId={updateId}
+        onClose = {() => setModalOpen(false)}
+        initialStep='event' // 👈 opens AddStayForm directly
+      />
+      <ViewModal
+        step="day-description"
+        open={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedDayId(null);
+        }}
+        data={selectedDay}
       />
     </div>
   );

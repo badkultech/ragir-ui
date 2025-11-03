@@ -1,51 +1,135 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
+import {
+  useCreateOrganizerFaqMutation,
+  useUpdateOrganizerFaqMutation,
+  useGetOrganizerFaqByIdQuery,
+} from "@/lib/services/organizer/trip/library/faq";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
+import { useToast } from "@/components/ui/use-toast";
 
 type AddFAQFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
+  updateId?: number | null; // 👈 added for edit mode
 };
 
 export function AddFAQForm({
-  mode = "library",
+  mode = "trip",
   onCancel,
   onSave,
+  updateId,
 }: AddFAQFormProps) {
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const { toast } = useToast();
+
+  // Mutations
+  const [createFaq, { isLoading: creating }] = useCreateOrganizerFaqMutation();
+  const [updateFaq, { isLoading: updating }] = useUpdateOrganizerFaqMutation();
+
+  // 👇 Fetch FAQ by ID if editing
+  const {
+    data: existingFaq,
+    isLoading: loadingFaq,
+  } = useGetOrganizerFaqByIdQuery(
+    updateId && organizationId
+      ? { organizationId, faqId: updateId }
+      : skipToken
+  );
+
+  // 👇 Prefill when data arrives
+  useEffect(() => {
+    if (existingFaq) {
+      setQuestion(existingFaq.name || "");
+      setAnswer(existingFaq.answer || "");
+    }
+  }, [existingFaq]);
 
   const handleLibrarySelect = (item: any) => {
     setQuestion(item.title || "");
-    setAnswer(item.description || "");
+    setAnswer(item.answer || "");
   };
 
-  const handleSubmit = () => {
-    onSave({ question, answer, mode });
+
+ const validateForm = () => {
+  const newErrors: { [key: string]: string } = {};
+
+  if (!answer.trim()) newErrors.answer = "Answer is required";
+  if (!question.trim()) newErrors.question = "Question required";
+
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+  const handleSubmit = async () => {
+
+    const isValid = validateForm();
+    if (!isValid) return;
+
+    const formData = new FormData();
+    formData.append("name", question);
+    formData.append("answer", answer);
+
+    try {
+      if (updateId) {
+        await updateFaq({
+          organizationId,
+          faqId: updateId,
+          data: formData,
+        }).unwrap();
+      } else {
+        await createFaq({
+          organizationId,
+          data: formData,
+        }).unwrap();
+      }
+      onSave({ question, answer });
+       toast({ title: "Success", description: "FAQ saved successfully!" });
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to save FAQ", variant: "destructive" });
+    }
   };
 
-  return (
-    <div className="flex flex-col gap-6">
-      {/* Top-right button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-          onClick={() => setLibraryOpen(true)}
-        >
-          Choose from Library
-        </Button>
+  if (loadingFaq) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Loading FAQ details...
       </div>
+    );
+  }
+  const isTripMode = mode === "trip";
+  return (
+    <div
+      className="flex flex-col gap-6"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
+      {/* Top-right button */}
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+      )}
+
 
       {/* Question */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Question *
         </label>
         <Input
@@ -54,14 +138,15 @@ export function AddFAQForm({
           placeholder="Enter question"
           maxLength={200}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+         {errors.question && <p className="text-xs text-red-500 mt-1">{errors.question}</p>}
+        <p className="text-xs text-right text-orange-500 mt-1">
           {question.length}/200 Characters
         </p>
       </div>
 
       {/* Answer */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-[0.95rem] font-medium mb-2">
           Answer *
         </label>
         <Textarea
@@ -71,7 +156,8 @@ export function AddFAQForm({
           rows={5}
           maxLength={1000}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
+         {errors.answer && <p className="text-xs text-red-500 mt-1">{errors.answer}</p>}
+        <p className="text-xs text-right text-orange-500 mt-1">
           {answer.length}/1000 Characters
         </p>
       </div>
@@ -83,19 +169,26 @@ export function AddFAQForm({
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          disabled={creating || updating}
+          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
-          Save
+          {creating || updating
+            ? "Saving..."
+            : updateId
+              ? "Update"
+              : "Save"}
         </Button>
       </div>
 
       {/* Library Modal */}
-      <LibrarySelectModal
-        open={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        category="faqs"
-      />
+      {mode === "trip" &&
+        <LibrarySelectModal
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={handleLibrarySelect}
+          category="faqs"
+        />
+      }
     </div>
   );
 }
