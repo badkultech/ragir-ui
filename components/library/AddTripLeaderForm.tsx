@@ -147,7 +147,8 @@ export function AddTripLeaderForm({
         title: "Success",
         description: "Trip leader saved successfully!",
       });
-    } catch (err) {
+    }
+   } catch (err) {
       console.error("Error saving trip leader:", err);
       toast({
         title: "Error",
