@@ -44,7 +44,7 @@ const nav: NavItem[] = [
     href: "/organizer/profile",
     icon: CircleUser,
   },
-  { label: "Trip", href: "/organizer/create-trip", icon: TripIcon },
+  { label: "Trip", href: "/organizer/trip-overview", icon: TripIcon },
   {
     label: "Library",
     href: "/organizer/library",
