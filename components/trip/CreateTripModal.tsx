@@ -1,13 +1,14 @@
 "use client";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Copy, X } from "lucide-react";
+import { Plus, Copy } from "lucide-react";
+import Link from "next/link";
 
 interface CreateTripModalProps {
   open: boolean;
@@ -25,59 +26,75 @@ export function CreateTripModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-md w-[90%] max-w-[420px] rounded-2xl p-6 mx-auto
-                   overflow-hidden shadow-lg border border-gray-200"
+        className="
+          w-[95%] sm:max-w-lg md:max-w-xl lg:max-w-2xl 
+          rounded-2xl p-8 bg-white border border-gray-100 shadow-xl 
+          mx-auto overflow-y-auto max-h-[85vh]
+          scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent
+        "
       >
-        <DialogHeader className="flex items-center justify-between">
-          <DialogTitle className="text-xl font-semibold text-center w-full">
+        {/* Header */}
+        <DialogHeader className="text-center mb-6">
+          <DialogTitle className="text-2xl font-semibold text-gray-800">
             Create New Trip
           </DialogTitle>
-          <DialogClose asChild>
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition"
-            >
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </DialogClose>
         </DialogHeader>
 
-        <div className="space-y-3 mt-6">
+        {/* Content */}
+        <div className="space-y-5">
           {/* Start from Scratch */}
           <Button
             variant="ghost"
-            className="w-full justify-start h-auto py-4 bg-gray-50 hover:bg-gray-100
-                       rounded-xl text-left flex items-center space-x-3"
+            className="cursor-pointer
+              w-full justify-start h-auto py-5 px-5
+              bg-gray-50 hover:bg-gray-100 rounded-xl
+              flex items-center gap-4 text-left
+              transition-all duration-200
+            "
             onClick={onStartFromScratch}
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-500 text-white flex-shrink-0">
-              <Plus className="w-5 h-5" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white flex-shrink-0">
+              <Plus className="w-6 h-6" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium text-base">Start from Scratch</span>
-              <span className="text-sm text-gray-500">
-                Create a completely new trip with custom details
-              </span>
+              <Link href="/organizer/create-trip">
+                <span className="font-semibold text-lg text-gray-800 cursor-pointer">
+                  Start from Scratch
+                </span>
+
+                <span className="text-sm text-gray-500 leading-snug " >
+                  Create a completely new trip with custom details.
+                </span>
+              </Link>
             </div>
           </Button>
 
           {/* Use Similar Trip */}
-          <Button
-            variant="ghost"
-            className="w-full justify-start h-auto py-4 bg-gray-50 hover:bg-gray-100
-                       rounded-xl text-left flex items-center space-x-3"
-            onClick={onUseSimilarTrip}
-          >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex-shrink-0">
-              <Copy className="w-5 h-5" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium text-base">Use Similar Trip</span>
-              <span className="text-sm text-gray-500">
-                Select an existing trip and modify it based on your needs
-              </span>
-            </div>
-          </Button>
+
+          <Link href="/organizer/trip-overview">
+            <Button
+              variant="ghost"
+              className= " cursor-pointer
+              w-full justify-start h-auto py-5 px-5
+              bg-gray-50 hover:bg-gray-100 rounded-xl
+              flex items-center gap-4 text-left
+              transition-all duration-200
+            "
+              onClick={onUseSimilarTrip}
+            >
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex-shrink-0">
+                <Copy className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold text-lg text-gray-800">
+                  Use Similar Trip
+                </span>
+                <span className="text-sm text-gray-500 leading-snug">
+                  Select an existing trip and modify it based on your needs.
+                </span>
+              </div>
+            </Button>
+          </Link>
         </div>
       </DialogContent>
     </Dialog>
