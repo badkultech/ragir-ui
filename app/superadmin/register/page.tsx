@@ -34,6 +34,7 @@ export default function AdminRegister() {
   const router = useRouter();
   const [setupPassword] = useSetupPasswordMutation();
   const { userData } = useSelector(selectAuthState);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   // populate email from query params
   useEffect(() => {
@@ -115,20 +116,20 @@ export default function AdminRegister() {
           className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8"
         >
           <h1 className="text-2xl font-bold mb-6 text-gray-900">
-            Admin Register
+            Register as Admin
           </h1>
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              Enter Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled
-              className="w-full bg-gray-100 text-gray-500 cursor-not-allowed rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+              className="w-full bg-gray-100 cursor-not-allowed rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
             />
             {email.length > 0 && !emailValid && (
               <p className="text-[#FF804C] text-sm mt-1">
@@ -139,7 +140,7 @@ export default function AdminRegister() {
 
           {/* Password */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-900 mb-2">
               Create Password
             </label>
             <div className="relative">
@@ -148,6 +149,8 @@ export default function AdminRegister() {
                 placeholder="Enter a strong password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setShowInstructions(true)}
+                onBlur={() => setShowInstructions(false)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
               />
               <button
@@ -160,45 +163,47 @@ export default function AdminRegister() {
             </div>
 
             {/* Password Strength */}
-            <div className="mt-4 space-y-1">
-              <div className="flex items-center text-sm">
-                {rules.length ? (
-                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                ) : (
-                  <XCircle className="text-gray-400 mr-2" size={16} />
-                )}
-                <span className="text-gray-600">8+ characters</span>
+            {showInstructions && (
+              <div className="mt-4 space-y-1">
+                <div className="flex items-center text-sm">
+                  {rules.length ? (
+                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                  ) : (
+                    <XCircle className="text-gray-400 mr-2" size={16} />
+                  )}
+                  <span className="text-gray-600">8+ characters</span>
+                </div>
+                <div className="flex items-center text-sm">
+                  {rules.uppercase ? (
+                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                  ) : (
+                    <XCircle className="text-gray-400 mr-2" size={16} />
+                  )}
+                  <span className="text-gray-600">1 uppercase letter</span>
+                </div>
+                <div className="flex items-center text-sm">
+                  {rules.number ? (
+                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                  ) : (
+                    <XCircle className="text-gray-400 mr-2" size={16} />
+                  )}
+                  <span className="text-gray-600">1 number</span>
+                </div>
+                <div className="flex items-center text-sm">
+                  {rules.special ? (
+                    <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
+                  ) : (
+                    <XCircle className="text-gray-400 mr-2" size={16} />
+                  )}
+                  <span className="text-gray-600">1 special symbol (!@#$)</span>
+                </div>
               </div>
-              <div className="flex items-center text-sm">
-                {rules.uppercase ? (
-                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                ) : (
-                  <XCircle className="text-gray-400 mr-2" size={16} />
-                )}
-                <span className="text-gray-600">1 uppercase letter</span>
-              </div>
-              <div className="flex items-center text-sm">
-                {rules.number ? (
-                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                ) : (
-                  <XCircle className="text-gray-400 mr-2" size={16} />
-                )}
-                <span className="text-gray-600">1 number</span>
-              </div>
-              <div className="flex items-center text-sm">
-                {rules.special ? (
-                  <CheckCircle2 className="text-[#FF804C] mr-2" size={16} />
-                ) : (
-                  <XCircle className="text-gray-400 mr-2" size={16} />
-                )}
-                <span className="text-gray-600">1 special symbol (!@#$)</span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Confirm Password */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-900 mb-2">
               Confirm Password
             </label>
             <div className="relative">

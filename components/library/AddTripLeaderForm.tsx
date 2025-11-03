@@ -13,10 +13,11 @@ import { useSelector } from "react-redux";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "../ui/use-toast";
+import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 
 
 type AddTripLeaderFormProps = {
-  updateId?:number|null;
+  updateId?: number | null;
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
@@ -42,15 +43,15 @@ export function AddTripLeaderForm({
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
- const [getDayDescription] = useLazyGetGroupLeaderByIdQuery();
+  const [getDayDescription] = useLazyGetGroupLeaderByIdQuery();
 
 
-  
- 
+
+
   useEffect(() => {
     if (updateId) {
-      
-      getDayDescription({ organizationId :orgId, leaderId: updateId })
+
+      getDayDescription({ organizationId: orgId, leaderId: updateId })
         .then((res) => {
           // RTK Query lazy trigger returns a union; narrow before using
           if ('data' in res && res.data) {
@@ -72,7 +73,7 @@ export function AddTripLeaderForm({
 
 
 
-  const [updateGroupLeader]=useUpdateGroupLeaderMutation();
+  const [updateGroupLeader] = useUpdateGroupLeaderMutation();
   const handleLibrarySelect = (item: any) => {
     setName(item.title || "");
     setTagline(item.description || "");
@@ -88,15 +89,15 @@ export function AddTripLeaderForm({
   };
 
   const validateForm = () => {
-  const newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: string } = {};
 
-  if (!name.trim()) newErrors.name = "Name is required";
-  if (!bio.trim()) newErrors.bio = "Bio required";
+    if (!name.trim()) newErrors.name = "Name is required";
+    if (!bio.trim()) newErrors.bio = "Bio required";
 
-  
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
     if (!orgId) {
@@ -124,37 +125,30 @@ export function AddTripLeaderForm({
         console.log("➡️", key, value);
       }
 
-      
-    let response;
-    if (updateId) {
-      // 🟢 Update existing leader
-      response = await updateGroupLeader({
-        organizationId: orgId,
-        LeaderId: updateId,
-        data: formData,
-      }).unwrap();
 
-      console.log("✅ Trip Leader updated successfully:", response);
-    } else {
-      // 🟠 Create new leader
-      response = await saveGroupLeader({
-        organizationId: orgId,
-        data: formData,
-      }).unwrap();
+      let response;
+      if (updateId) {
+        // 🟢 Update existing leader
+        response = await updateGroupLeader({
+          organizationId: orgId,
+          LeaderId: updateId,
+          data: formData,
+        }).unwrap();
 
-      onSave(response);
-      toast({
-        title: "Success",
-        description: "Trip leader saved successfully!",
-      });
-    }
-   } catch (err) {
+        console.log("✅ Trip Leader updated successfully:", response);
+      } else {
+        // 🟠 Create new leader
+        response = await saveGroupLeader({
+          organizationId: orgId,
+          data: formData,
+        }).unwrap();
+
+        onSave(response);
+        showSuccess("Trip leader saved successfully!");
+      }
+    } catch (err) {
       console.error("Error saving trip leader:", err);
-      toast({
-        title: "Error",
-        description: "Failed to save trip leader",
-        variant: "destructive",
-      });
+      showApiError("Failed to save trip leader");
     }
   };
   const isTripMode = mode === "trip";

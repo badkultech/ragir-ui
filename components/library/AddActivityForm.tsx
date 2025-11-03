@@ -8,6 +8,7 @@ import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "@/components/ui/use-toast";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -26,19 +27,19 @@ export function AddActivityForm({
 }: AddActivityFormProps) {
   const [title, setTitle] = useState("");
   const [moodTags, setMoodTags] = useState<string[]>([]);
-  const [priceType, setPriceType] = useState<"INCLUDED" | "CHARGEABLE">("INCLUDED");
+  const [priceType, setPriceType] = useState<"INCLUDED" | "CHARGEABLE">(
+    "INCLUDED"
+  );
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
-   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const { toast } = useToast();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState('');
-
-
+  const [saveAsName, setSaveAsName] = useState("");
 
   const isTripMode = mode === "trip";
 
@@ -68,48 +69,47 @@ export function AddActivityForm({
   };
 
   const validateForm = () => {
-  const newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: string } = {};
 
-  if (!title.trim()) newErrors.title = "Title is required";
-  if (!moodTags) newErrors.moodTags = "Mood Tags are required";
-  if (!priceType.trim()) newErrors.priceType = "Price Type is required";  
-  if (!description.trim()) newErrors.description = "Description is required";
-  if (!location.trim()) newErrors.location = "Location is required";
+    if (!title.trim()) newErrors.title = "Title is required";
+    if (!moodTags) newErrors.moodTags = "Mood Tags are required";
+    if (!priceType.trim()) newErrors.priceType = "Price Type is required";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (!location.trim()) newErrors.location = "Location is required";
 
-  
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
+  const handleSubmit = async () => {
+    // Run validation
+    const isValid = validateForm();
+    if (!isValid) return;
 
-const handleSubmit = async () => {
-
-  // Run validation
-  const isValid = validateForm();
-  if (!isValid) return;
-
-  //  Trigger save
-try {
-  await onSave({
-      title,
-      moodTags,
-      priceType,
-      location,
-      time,
-      description,
-      packing,
-      images,
-      mode,
-    });
-  toast({ title: "Success", description: "Activity saved successfully!" });
-} catch {
-  toast({ title: "Error", description: "Failed to save Activity", variant: "destructive" });
-}};
-
- 
+    //  Trigger save
+    try {
+      await onSave({
+        title,
+        moodTags,
+        priceType,
+        location,
+        time,
+        description,
+        packing,
+        images,
+        mode,
+      });
+      showSuccess("Activity saved successfully!");
+    } catch {
+      showApiError("Failed to save Activity");
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+    <div
+      className="flex flex-col gap-6"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
       {/* Header */}
       {header && (
         <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>
@@ -131,7 +131,9 @@ try {
           placeholder="Enter title"
           maxLength={70}
         />
-          {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+        {errors.title && (
+          <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+        )}
         <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
@@ -139,11 +141,15 @@ try {
 
       {/* Mood Tags */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Mood Tags *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">
+          Mood Tags *
+        </label>
         <select
           multiple
           value={moodTags}
-          onChange={(e) => setMoodTags(Array.from(e.target.selectedOptions, o => o.value))}
+          onChange={(e) =>
+            setMoodTags(Array.from(e.target.selectedOptions, (o) => o.value))
+          }
           className="w-full border rounded-lg p-2 text-sm text-gray-700"
         >
           <option value="ADVENTURE">Adventure</option>
@@ -151,12 +157,16 @@ try {
           <option value="CULTURAL">Cultural</option>
           <option value="FAMILY">Family</option>
         </select>
-         {errors.moodTags && <p className="text-xs text-red-500 mt-1">{errors.moodTags}</p>}
+        {errors.moodTags && (
+          <p className="text-xs text-red-500 mt-1">{errors.moodTags}</p>
+        )}
       </div>
 
       {/* Price Type */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Price Charge *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">
+          Price Charge *
+        </label>
         <div className="flex items-center gap-6">
           <label className="flex items-center gap-2 text-[0.85rem]">
             <input
@@ -175,19 +185,25 @@ try {
             Chargeable
           </label>
         </div>
-        {errors.priceType && <p className="text-xs text-red-500 mt-1">{errors.priceType}</p>}
+        {errors.priceType && (
+          <p className="text-xs text-red-500 mt-1">{errors.priceType}</p>
+        )}
       </div>
 
       {/* Location + Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-[0.95rem] font-medium mb-2">Location</label>
+          <label className="block text-[0.95rem] font-medium mb-2">
+            Location
+          </label>
           <Input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location"
           />
-          {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+          {errors.location && (
+            <p className="text-xs text-red-500 mt-1">{errors.location}</p>
+          )}
         </div>
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">Time</label>
@@ -201,7 +217,9 @@ try {
 
       {/* Description */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">Description</label>
+        <label className="block text-[0.95rem] font-medium mb-1">
+          Description
+        </label>
         <RichTextEditor
           value={description}
           onChange={setDescription}
@@ -212,7 +230,9 @@ try {
 
       {/* Packing */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Packing Suggestions
+        </label>
         <RichTextEditor
           value={packing}
           onChange={setPacking}
@@ -223,7 +243,9 @@ try {
 
       {/* Image Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 6)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Images (Max 6)
+        </label>
         <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition">
           <Upload className="w-6 h-6 text-gray-400 mb-2" />
           <span className="text-sm text-gray-600">Upload Images</span>
@@ -237,7 +259,9 @@ try {
           />
         </label>
         {images.length > 0 && (
-          <p className="text-sm text-gray-500 mt-2">{images.length} file(s) selected</p>
+          <p className="text-sm text-gray-500 mt-2">
+            {images.length} file(s) selected
+          </p>
         )}
       </div>
 
@@ -265,10 +289,11 @@ try {
         </div>
       )}
 
-
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
         <Button
           onClick={() => handleSubmit()}
           className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"

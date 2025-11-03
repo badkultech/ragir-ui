@@ -15,6 +15,7 @@ import { selectAuthState } from "@/lib/slices/auth";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "@/components/ui/use-toast";
+import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 
 type AddFAQFormProps = {
   mode?: "library" | "trip";
@@ -36,21 +37,19 @@ export function AddFAQForm({
   const [answer, setAnswer] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const { toast } = useToast();
+  const { toast } = useToast();
 
   // Mutations
   const [createFaq, { isLoading: creating }] = useCreateOrganizerFaqMutation();
   const [updateFaq, { isLoading: updating }] = useUpdateOrganizerFaqMutation();
 
   // 👇 Fetch FAQ by ID if editing
-  const {
-    data: existingFaq,
-    isLoading: loadingFaq,
-  } = useGetOrganizerFaqByIdQuery(
-    updateId && organizationId
-      ? { organizationId, faqId: updateId }
-      : skipToken
-  );
+  const { data: existingFaq, isLoading: loadingFaq } =
+    useGetOrganizerFaqByIdQuery(
+      updateId && organizationId
+        ? { organizationId, faqId: updateId }
+        : skipToken
+    );
 
   // 👇 Prefill when data arrives
   useEffect(() => {
@@ -65,20 +64,17 @@ export function AddFAQForm({
     setAnswer(item.answer || "");
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
 
- const validateForm = () => {
-  const newErrors: { [key: string]: string } = {};
+    if (!answer.trim()) newErrors.answer = "Answer is required";
+    if (!question.trim()) newErrors.question = "Question required";
 
-  if (!answer.trim()) newErrors.answer = "Answer is required";
-  if (!question.trim()) newErrors.question = "Question required";
-
-  
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
-
     const isValid = validateForm();
     if (!isValid) return;
 
@@ -100,9 +96,9 @@ export function AddFAQForm({
         }).unwrap();
       }
       onSave({ question, answer });
-       toast({ title: "Success", description: "FAQ saved successfully!" });
+      showSuccess("FAQ saved successfully!");
     } catch (err) {
-      toast({ title: "Error", description: "Failed to save FAQ", variant: "destructive" });
+      showApiError("destructive");
     }
   };
 
@@ -126,7 +122,6 @@ export function AddFAQForm({
         <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
       )}
 
-
       {/* Question */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
@@ -138,7 +133,9 @@ export function AddFAQForm({
           placeholder="Enter question"
           maxLength={200}
         />
-         {errors.question && <p className="text-xs text-red-500 mt-1">{errors.question}</p>}
+        {errors.question && (
+          <p className="text-xs text-red-500 mt-1">{errors.question}</p>
+        )}
         <p className="text-xs text-right text-orange-500 mt-1">
           {question.length}/200 Characters
         </p>
@@ -156,7 +153,9 @@ export function AddFAQForm({
           rows={5}
           maxLength={1000}
         />
-         {errors.answer && <p className="text-xs text-red-500 mt-1">{errors.answer}</p>}
+        {errors.answer && (
+          <p className="text-xs text-red-500 mt-1">{errors.answer}</p>
+        )}
         <p className="text-xs text-right text-orange-500 mt-1">
           {answer.length}/1000 Characters
         </p>
@@ -172,23 +171,19 @@ export function AddFAQForm({
           disabled={creating || updating}
           className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
         >
-          {creating || updating
-            ? "Saving..."
-            : updateId
-              ? "Update"
-              : "Save"}
+          {creating || updating ? "Saving..." : updateId ? "Update" : "Save"}
         </Button>
       </div>
 
       {/* Library Modal */}
-      {mode === "trip" &&
+      {mode === "trip" && (
         <LibrarySelectModal
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
           onSelect={handleLibrarySelect}
           category="faqs"
         />
-      }
+      )}
     </div>
   );
 }
