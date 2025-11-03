@@ -8,6 +8,7 @@ import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "../ui/use-toast";
+import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
@@ -27,16 +28,18 @@ export function AddMealForm({
   const [title, setTitle] = useState("My Meal");
   const [mealType, setMealType] = useState("LUNCH");
   const [mealTime, setMealTime] = useState("12:00");
-  const [included, setIncluded] = useState<"included" | "chargeable">("included");
+  const [included, setIncluded] = useState<"included" | "chargeable">(
+    "included"
+  );
   const [location, setLocation] = useState("Mumbai, India");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const {toast} = useToast();
+  const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState('');
+  const [saveAsName, setSaveAsName] = useState("");
 
   const isTripMode = mode === "trip";
 
@@ -72,41 +75,39 @@ export function AddMealForm({
   };
 
   const validateForm = () => {
-  const newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: string } = {};
 
-  if (!title.trim()) newErrors.title = "Title is required";
-  if (!mealTime.trim()) newErrors.title = "Meal Time is required";
-  if (!mealType.trim()) newErrors.title = "Meal Type is required";
-  if (!description.trim()) newErrors.description = "Description is required";
-  if (!location.trim()) newErrors.location = "Location is required";
+    if (!title.trim()) newErrors.title = "Title is required";
+    if (!mealTime.trim()) newErrors.title = "Meal Time is required";
+    if (!mealType.trim()) newErrors.title = "Meal Type is required";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (!location.trim()) newErrors.location = "Location is required";
 
-  
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
-
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // ✅ Save
   const handleSubmit = async () => {
-     const isValid = validateForm();
-  if (!isValid) return;
+    const isValid = validateForm();
+    if (!isValid) return;
 
-  try{
-   await onSave({
-      title,
-      mealType,
-      mealTime,
-      included,
-      location,
-      description,
-      packing,
-      images,
-      mode,
-    });
-    toast({ title: "Success", description: "Meal saved successfully!" });
-  } catch{
-       toast({ title: "Error", description: "Failed to save Meal", variant: "destructive" });
-  }
+    try {
+      await onSave({
+        title,
+        mealType,
+        mealTime,
+        included,
+        location,
+        description,
+        packing,
+        images,
+        mode,
+      });
+      showSuccess("Meal saved successfully!");
+    } catch {
+      showApiError("Failed to save Meal");
+    }
   };
 
   return (
@@ -132,16 +133,16 @@ export function AddMealForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">
-          Title *
-        </label>
+        <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter title"
           maxLength={70}
         />
-         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+        {errors.title && (
+          <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+        )}
         <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
@@ -173,13 +174,13 @@ export function AddMealForm({
             />
             Included
           </label>
-          {errors.mealType && <p className="text-xs text-red-500 mt-1">{errors.mealType}</p>}
+          {errors.mealType && (
+            <p className="text-xs text-red-500 mt-1">{errors.mealType}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-[0.95rem] font-medium mb-2">
-            Time
-          </label>
+          <label className="block text-[0.95rem] font-medium mb-2">Time</label>
           <Input
             type="time"
             value={mealTime}
@@ -194,7 +195,9 @@ export function AddMealForm({
             />
             Chargeable
           </label>
-          {errors.mealTime && <p className="text-xs text-red-500 mt-1">{errors.mealTime}</p>}
+          {errors.mealTime && (
+            <p className="text-xs text-red-500 mt-1">{errors.mealTime}</p>
+          )}
         </div>
       </div>
 
@@ -208,7 +211,9 @@ export function AddMealForm({
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter location"
         />
-        {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+        {errors.location && (
+          <p className="text-xs text-red-500 mt-1">{errors.location}</p>
+        )}
       </div>
 
       {/* Description */}
@@ -221,7 +226,9 @@ export function AddMealForm({
           value={description}
           onChange={setDescription}
         />
-        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
+        {errors.description && (
+          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
+        )}
       </div>
 
       {/* Packing Suggestions */}

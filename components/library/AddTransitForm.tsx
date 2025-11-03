@@ -8,6 +8,7 @@ import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "@/components/ui/use-toast";
+import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
@@ -16,7 +17,6 @@ type AddTransitFormProps = {
   header?: string;
   initialData?: any; // ✅ NEW
 };
-
 
 const VEHICLES = [
   { label: "Traveler Van", value: "TRAVELER_VAN" },
@@ -27,7 +27,6 @@ const VEHICLES = [
   { label: "Train", value: "TRAIN" },
   { label: "Bus", value: "BUS" },
 ];
-
 
 export function AddTransitForm({
   mode = "trip",
@@ -53,7 +52,7 @@ export function AddTransitForm({
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState('');
+  const [saveAsName, setSaveAsName] = useState("");
 
   useEffect(() => {
     if (!initialData) return;
@@ -93,51 +92,54 @@ export function AddTransitForm({
   };
 
   const validateForm = () => {
-  const newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: string } = {};
 
-  if (!title.trim()) newErrors.title = "Title is required";
-  if (!from.trim()) newErrors.title = "Transit Route is required";
-  if (!to.trim()) newErrors.title = "Transit Route is required";
-  if (!departure.trim()) newErrors.deaparture = "Departure is required";
-  if (!arrival.trim()) newErrors.arrival = "Arrival is required";
-  if (!description.trim()) newErrors.description = "Description is required";
-   if (!vehicle) newErrors.vechicle = "Vehicle Description is required";
-   if (!arrangement.trim()) newErrors.arrangement = "Arrangement Details are required"
-  
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    if (!title.trim()) newErrors.title = "Title is required";
+    if (!from.trim()) newErrors.title = "Transit Route is required";
+    if (!to.trim()) newErrors.title = "Transit Route is required";
+    if (!departure.trim()) newErrors.deaparture = "Departure is required";
+    if (!arrival.trim()) newErrors.arrival = "Arrival is required";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (!vehicle) newErrors.vechicle = "Vehicle Description is required";
+    if (!arrangement.trim())
+      newErrors.arrangement = "Arrangement Details are required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
-  // Run validation
-  const isValid = validateForm();
-  if (!isValid) return;
+    // Run validation
+    const isValid = validateForm();
+    if (!isValid) return;
 
-  try{
-    onSave({
-      title,
-      from,
-      to,
-      departure,
-      arrival,
-      vehicle: vehicle.length ? vehicle : otherVehicle,
-      arrangement,
-      description,
-      packing,
-      images,
-      mode,
-    });
-   toast({ title: "Success", description: "Transit saved successfully!" });
-  } catch{
-   toast({ title: "Error", description: "Failed to save Transit", variant: "destructive" });
+    try {
+      onSave({
+        title,
+        from,
+        to,
+        departure,
+        arrival,
+        vehicle: vehicle.length ? vehicle : otherVehicle,
+        arrangement,
+        description,
+        packing,
+        images,
+        mode,
+      });
+      showSuccess("Transit saved successfully!");
+    } catch {
+      showApiError("Failed to save Transit");
     }
-  }
-
+  };
 
   const isTripMode = mode === "trip";
 
   return (
-    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+    <div
+      className="flex flex-col gap-6"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
       <div className="flex items-center justify-between w-full">
         {header && (
           <div className="text-lg  font-semibold text-gray-800  pb-2">
@@ -164,7 +166,9 @@ export function AddTransitForm({
           placeholder="Enter title"
           maxLength={70}
         />
-        {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+        {errors.title && (
+          <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+        )}
         <p className="text-xs text-right text-orange-500 mt-1">
           {title.length}/70 Characters
         </p>
@@ -187,7 +191,10 @@ export function AddTransitForm({
             placeholder="To (Destination Point)"
           />
         </div>
-        {errors.from || errors.to && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+        {errors.from ||
+          (errors.to && (
+            <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+          ))}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
           <Input
             type="time"
@@ -201,8 +208,10 @@ export function AddTransitForm({
             onChange={(e) => setArrival(e.target.value)}
           />
         </div>
-      {errors.arrival || errors.departure && <p className="text-xs text-red-500 mt-1">{errors.arrival}</p>}
-
+        {errors.arrival ||
+          (errors.departure && (
+            <p className="text-xs text-red-500 mt-1">{errors.arrival}</p>
+          ))}
       </div>
 
       {/* Vehicle */}
@@ -217,10 +226,11 @@ export function AddTransitForm({
               type="button"
               key={v.value}
               onClick={() => toggleVehicle(v.value)}
-              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
-                ? "bg-orange-500 text-white border-orange-500"
-                : "border-gray-300 hover:border-orange-400"
-                }`}
+              className={`px-4 py-2 rounded-lg border text-sm ${
+                vehicle.includes(v.value)
+                  ? "bg-orange-500 text-white border-orange-500"
+                  : "border-gray-300 hover:border-orange-400"
+              }`}
             >
               {v.label}
             </button>
@@ -234,9 +244,10 @@ export function AddTransitForm({
           className="mt-2"
         />
 
-        {errors.vechicle && <p className="text-xs text-red-500 mt-1">{errors.vehicle}</p>}
+        {errors.vechicle && (
+          <p className="text-xs text-red-500 mt-1">{errors.vehicle}</p>
+        )}
       </div>
-
 
       {/* Arrangement */}
       <div>
@@ -261,7 +272,9 @@ export function AddTransitForm({
             Self arranged by the traveler
           </label>
         </div>
-        {errors.arrangement && <p className="text-xs text-red-500 mt-1">{errors.arrangement}</p>}
+        {errors.arrangement && (
+          <p className="text-xs text-red-500 mt-1">{errors.arrangement}</p>
+        )}
       </div>
 
       {/* Description */}
@@ -274,8 +287,9 @@ export function AddTransitForm({
           onChange={setDescription}
           maxLength={800}
         />
-        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
-
+        {errors.description && (
+          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
+        )}
       </div>
 
       {/* Packing Suggestions */}
@@ -339,7 +353,6 @@ export function AddTransitForm({
         </div>
       )}
 
-
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>
@@ -354,14 +367,14 @@ export function AddTransitForm({
       </div>
 
       {/* Library Modal */}
-      {mode === "trip" &&
+      {mode === "trip" && (
         <LibrarySelectModal
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
           onSelect={handleLibrarySelect}
           category="transit"
         />
-      }
+      )}
     </div>
   );
 }

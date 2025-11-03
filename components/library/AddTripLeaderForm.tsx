@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "../ui/use-toast";
+import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 
 
 type AddTripLeaderFormProps = {
@@ -143,17 +144,10 @@ export function AddTripLeaderForm({
       }).unwrap();
 
       onSave(response);
-      toast({
-        title: "Success",
-        description: "Trip leader saved successfully!",
-      });
+      showSuccess("Trip leader saved successfully!");
     } catch (err) {
       console.error("Error saving trip leader:", err);
-      toast({
-        title: "Error",
-        description: "Failed to save trip leader",
-        variant: "destructive",
-      });
+      showApiError("Failed to save trip leader");
     }
   };
   const isTripMode = mode === "trip";
