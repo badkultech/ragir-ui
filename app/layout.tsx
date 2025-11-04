@@ -1,6 +1,9 @@
 import { Poppins, Barlow } from "next/font/google";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import ClientLayout from "./ClientLayout";
+import { ReduxProvider } from "@/lib/redux-provider";
+import HydratedAuth from "@/components/AuthLoader";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "Ragir - Organizer Dashboard",
@@ -25,9 +28,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${poppins.variable} ${barlow.variable}`}>
-      <body className="font-poppins antialiased">
-        <ClientLayout>{children}</ClientLayout>
+    <html lang="en" className="">
+      <body className="font-poppins antialiased ">
+        <ReduxProvider>
+          <HydratedAuth>
+            {children}
+            <Toaster />
+          </HydratedAuth>
+        </ReduxProvider>
       </body>
     </html>
   );

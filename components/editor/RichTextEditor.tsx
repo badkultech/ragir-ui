@@ -30,7 +30,6 @@ export default function RichTextEditor({
   const [charCount, setCharCount] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   const [activeFormats, setActiveFormats] = useState({
     bold: false,
@@ -39,18 +38,13 @@ export default function RichTextEditor({
     ul: false,
     ol: false,
   });
-  const [activeHeading, setActiveHeading] = useState<"p" | "h1" | "h2" | "h3">("p");
+  const [activeHeading, setActiveHeading] = useState<"p" | "h1" | "h2" | "h3">(
+    "p"
+  );
   const isTransformingRef = useRef(false);
 
-  // ✅ Ensure component only runs on client
+  // Sync editor from external value
   useEffect(() => {
-    if (typeof window !== "undefined") setMounted(true);
-  }, []);
-  if (!mounted) return null;
-
-  // === Sync editor from external value ===
-  useEffect(() => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
     if (!isFocused && value !== el.innerHTML && !isTransformingRef.current) {
@@ -60,10 +54,11 @@ export default function RichTextEditor({
     }
   }, [value, isFocused]);
 
-  // === Update toolbar state (bold/italic/heading) ===
+  // Update toolbar state (bold/italic/heading)
   const updateActiveFormats = useCallback(() => {
-    if (typeof document === "undefined") return;
-    const blockTag = (document.queryCommandValue("formatBlock") || "p").toString().toLowerCase();
+    const blockTag = (document.queryCommandValue("formatBlock") || "p")
+      .toString()
+      .toLowerCase();
     setActiveHeading(
       blockTag.includes("h1")
         ? "h1"
@@ -73,6 +68,7 @@ export default function RichTextEditor({
         ? "h3"
         : "p"
     );
+
     setActiveFormats({
       bold: document.queryCommandState("bold"),
       italic: document.queryCommandState("italic"),
@@ -83,39 +79,35 @@ export default function RichTextEditor({
   }, []);
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
     const handler = () => updateActiveFormats();
     document.addEventListener("selectionchange", handler);
     return () => document.removeEventListener("selectionchange", handler);
   }, [updateActiveFormats]);
 
-  // === Handle input ===
+  // Handle input
   const handleInput = useCallback(() => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
     const html = el.innerHTML.trim();
     const text = el.innerText || "";
     setCharCount(text.length);
     onChange(html);
+
+    // Log HTML for backend debug
+    console.clear();
+    console.log(
+      "%c📤 HTML sent to backend:",
+      "color: orange; font-weight: bold;"
+    );
+    console.log(html);
+
     updateActiveFormats();
   }, [onChange, updateActiveFormats]);
 
-  // === Helper: restore caret ===
-  const placeCaretAtEnd = (el: HTMLElement) => {
-    if (typeof window === "undefined" || typeof document === "undefined") return;
-    const range = document.createRange();
-    const sel = window.getSelection();
-    range.selectNodeContents(el);
-    range.collapse(false);
-    sel?.removeAllRanges();
-    sel?.addRange(range);
-  };
-
-  // === Markdown shortcut transform ===
+  // Markdown shortcut (safe delayed transform)
   const handleMarkdownKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (typeof document === "undefined" || typeof window === "undefined") return;
     if (e.key !== " " && e.key !== "Enter") return;
+
     const el = editorRef.current;
     if (!el) return;
 
@@ -124,7 +116,9 @@ export default function RichTextEditor({
     const range = selection.getRangeAt(0);
     const container = range.startContainer;
     const block =
-      container.nodeType === 3 ? container.parentElement : (container as HTMLElement);
+      container.nodeType === 3
+        ? container.parentElement
+        : (container as HTMLElement);
     if (!block) return;
 
     const text = block.innerText.trimStart();
@@ -156,9 +150,18 @@ export default function RichTextEditor({
     }, 0);
   };
 
-  // === Formatting commands ===
+  // Helper: restore caret
+  function placeCaretAtEnd(el: HTMLElement) {
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  }
+
+  // Formatting commands
   const applyFormat = (cmd: string) => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
     el.focus();
@@ -166,8 +169,8 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
+  // Block-level formatting
   const applyBlockFormat = (tag: "p" | "h1" | "h2" | "h3") => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
     el.focus();
@@ -175,8 +178,8 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
+  // Insert list
   const insertList = (type: "ul" | "ol") => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
     el.focus();
@@ -187,8 +190,8 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 50);
   };
 
+  // Alignment
   const setAlign = (align: "left" | "center" | "right") => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
     el.focus();
@@ -202,9 +205,8 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
-  // === Max length enforcement ===
+  // Max length enforcement
   const handleBeforeInput = (e: InputEvent) => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
     const text = el.innerText || "";
@@ -215,9 +217,8 @@ export default function RichTextEditor({
     if (newLength > maxLength) e.preventDefault();
   };
 
-  // === Paste event ===
+  // Paste event
   const handlePaste = (e: ClipboardEvent) => {
-    if (typeof document === "undefined") return;
     e.preventDefault();
     const el = editorRef.current;
     if (!el) return;
@@ -226,12 +227,13 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
-  // === Attach listeners ===
+  // Attach listeners
   useEffect(() => {
-    if (typeof document === "undefined") return;
     const el = editorRef.current;
     if (!el) return;
-    el.addEventListener("beforeinput", (e) => handleBeforeInput(e as InputEvent));
+    el.addEventListener("beforeinput", (e) =>
+      handleBeforeInput(e as InputEvent)
+    );
     el.addEventListener("paste", (e) => handlePaste(e as ClipboardEvent));
   }, []);
 
@@ -239,6 +241,7 @@ export default function RichTextEditor({
     <div className="border border-gray-200 rounded-xl overflow-hidden focus-within:border-orange-400 transition">
       {/* Toolbar */}
       <div className="flex items-center flex-wrap gap-2 px-3 py-2 border-b border-gray-100 text-gray-600 text-sm bg-white">
+        {/* Basic formatting */}
         <ToolbarButton
           active={activeFormats.bold}
           onClick={() => applyFormat("bold")}
@@ -257,6 +260,26 @@ export default function RichTextEditor({
 
         <div className="h-4 w-px bg-gray-200 mx-1" />
 
+        {/* Heading buttons with active highlight */}
+        {/* <ToolbarButton
+          active={activeHeading === "h1"}
+          onClick={() => applyBlockFormat("h1")}
+          icon={<span className="text-xs font-bold">H1</span>}
+        />
+        <ToolbarButton
+          active={activeHeading === "h2"}
+          onClick={() => applyBlockFormat("h2")}
+          icon={<span className="text-xs font-bold">H2</span>}
+        />
+        <ToolbarButton
+          active={activeHeading === "h3"}
+          onClick={() => applyBlockFormat("h3")}
+          icon={<span className="text-xs font-bold">H3</span>}
+        /> */}
+
+        <div className="h-4 w-px bg-gray-200 mx-1" />
+
+        {/* Lists */}
         <ToolbarButton
           active={activeFormats.ul}
           onClick={() => insertList("ul")}
@@ -270,10 +293,24 @@ export default function RichTextEditor({
 
         <div className="h-4 w-px bg-gray-200 mx-1" />
 
-        <ToolbarButton onClick={() => setAlign("left")} icon={<AlignLeft className="w-4 h-4" />} />
-        <ToolbarButton onClick={() => setAlign("center")} icon={<AlignCenter className="w-4 h-4" />} />
-        <ToolbarButton onClick={() => setAlign("right")} icon={<AlignRight className="w-4 h-4" />} />
-        <ToolbarButton onClick={() => setShowPreview(true)} icon={<Eye className="w-4 h-4" />} />
+        {/* Alignment */}
+        <ToolbarButton
+          onClick={() => setAlign("left")}
+          icon={<AlignLeft className="w-4 h-4" />}
+        />
+        <ToolbarButton
+          onClick={() => setAlign("center")}
+          icon={<AlignCenter className="w-4 h-4" />}
+        />
+        <ToolbarButton
+          onClick={() => setAlign("right")}
+          icon={<AlignRight className="w-4 h-4" />}
+        />
+
+        <ToolbarButton
+          onClick={() => setShowPreview(true)}
+          icon={<Eye className="w-4 h-4" />}
+        />
       </div>
 
       {/* Editable Area */}
@@ -301,8 +338,6 @@ export default function RichTextEditor({
           {charCount}/{maxLength} Characters
         </span>
       </div>
-
-      {/* Preview Modal */}
       {showPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-2xl w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto p-6 relative">
@@ -327,7 +362,6 @@ export default function RichTextEditor({
         </div>
       )}
 
-      {/* === Inline Styling === */}
       <style jsx>{`
         [contenteditable][data-placeholder]:empty:before {
           content: attr(data-placeholder);
@@ -335,7 +369,7 @@ export default function RichTextEditor({
           pointer-events: none;
         }
 
-        /* Headings */
+        /* ✅ Distinct heading styles */
         :global(.prose h1) {
           font-size: 1.5rem;
           font-weight: 700;
@@ -355,17 +389,17 @@ export default function RichTextEditor({
           color: #374151;
         }
 
-        /* Lists */
+        /* ✅ Lists */
         :global(.prose ul),
         :global(.prose ol) {
           margin-left: 1.5rem;
           padding-left: 0.5rem;
         }
+
         :global(.prose li) {
           margin-bottom: 0.25rem;
         }
 
-        /* Focus */
         :global(div[contenteditable]:focus) {
           outline: none;
         }
