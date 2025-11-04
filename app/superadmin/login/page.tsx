@@ -43,7 +43,6 @@ export default function AdminLogin() {
           localStorage.setItem("accessToken", result.accessToken);
           localStorage.setItem("refreshToken", result.refreshToken);
         } else {
-          // still store tokens (adjust according to your auth flow)
           localStorage.setItem("accessToken", result.accessToken);
           localStorage.setItem("refreshToken", result.refreshToken);
         }
@@ -70,13 +69,12 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col !font-poppins">
+    <div className="min-h-screen flex flex-col overflow-hidden !font-poppins">
       <AppHeader showAvatar={false} showLogo={true} />
 
       <main className="relative flex-1">
-        {/* Background image placed in an absolute container so it always covers the viewport */}
+        {/* Background image */}
         <div className="absolute inset-0 -z-10">
-          {/* IMPORTANT: file is pulled from /public/bg.jpg (case-sensitive) */}
           <Image
             src="/bg.jpg"
             alt="Background"
@@ -85,38 +83,49 @@ export default function AdminLogin() {
             style={{ objectFit: "cover" }}
             sizes="100vw"
           />
-          {/* optional subtle overlay to keep form readable */}
+          {/* Light overlay for readability */}
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[rgba(255,255,255,0.06)] to-transparent" />
         </div>
 
-        <div className="relative z-10 flex items-center justify-center h-full p-6">
-         <div className="w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-xl p-8 sm:p-10">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 !font-poppins">Admin Login</h1>
+        {/* Centered card */}
+        <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
+          <div className="w-full max-w-sm sm:max-w-md bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8 border border-orange-100">
+            <h1 className="text-xl sm:text-2xl font-bold mb-5 text-gray-900 text-center">
+              Admin Login
+            </h1>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email */}
               <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Enter Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-2xl border-0 bg-blue-50 px-4 py-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full rounded-xl border-0 bg-blue-50 px-4 py-3 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
                 />
                 {email.length > 0 && !emailValid && (
-                  <p className="text-[#FF804C] text-sm mt-2">Enter valid email address</p>
+                  <p className="text-[#FD6E34] text-xs mt-2">
+                    Enter a valid email address
+                  </p>
                 )}
               </div>
 
+              {/* Password */}
               <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full rounded-2xl border-0 bg-blue-50 px-4 py-3 pr-12 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="w-full rounded-xl border-0 bg-blue-50 px-4 py-3 pr-10 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                   <button
                     type="button"
@@ -129,30 +138,46 @@ export default function AdminLogin() {
                 </div>
               </div>
 
+              {/* Remember Me */}
               <div className="flex items-center">
                 <input
                   id="remember-me"
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-orange-500 bg-gray-100 border-gray-300 rounded focus:ring-orange-400 focus:ring-2"
+                  className="w-5 h-5 appearance-none rounded-full border border-gray-300 bg-gray-100 checked:bg-gradient-to-r checked:from-[#FEA901] checked:via-[#FD6E34] checked:to-[#FD401A] checked:border-transparent cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-400"
                 />
-                <label htmlFor="remember-me" className="ml-3 text-sm sm:text-base text-gray-700">Remember Me</label>
+                <label
+                  htmlFor="remember-me"
+                  className="ml-3 text-sm text-gray-700 select-none cursor-pointer"
+                >
+                  Remember Me
+                </label>
               </div>
 
+              {/* Submit */}
               <div>
                 <button
                   type="submit"
                   disabled={!isFormValid || isLoading}
-                  className="w-full font-semibold text-base sm:text-lg py-3 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FD401A] text-white hover:shadow-lg"
+                  className="w-full font-semibold text-sm sm:text-base py-3 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] text-white hover:opacity-90 hover:shadow-lg"
                 >
-                  <LoadingOverlay isLoading={isLoading} message="Logging in..." />
+                  <LoadingOverlay
+                    isLoading={isLoading}
+                    message="Logging in..."
+                  />
                   <span className="relative">Login to Dashboard</span>
                 </button>
               </div>
 
+              {/* Forgot Password */}
               <div className="text-center">
-                <Link href="/admin/forgot-password" className="text-[#FF804C] text-sm sm:text-base hover:underline font-medium">Forgot password?</Link>
+                <Link
+                  href="/superadmin/forgot-password"
+                  className="text-[#FD6E34] text-sm hover:underline font-medium"
+                >
+                  Forgot password?
+                </Link>
               </div>
             </form>
           </div>
