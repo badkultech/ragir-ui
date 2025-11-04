@@ -9,6 +9,16 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  // 👇 Add this block
+  productionBrowserSourceMaps: true,
+  webpack: (config, { isServer }) => {
+    // Enable readable source maps during build (for easier debugging)
+    if (isServer) {
+      config.devtool = 'source-map';
+    }
 
-export default nextConfig
+    return config;
+  },
+};
+
+export default nextConfig;
