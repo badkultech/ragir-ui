@@ -1,4 +1,3 @@
-
 export { LearningGradient } from './learningGradient';
 export { JungleGradient } from './jungleGradient';
 export { MountainGradient } from './mountainGradient';
@@ -13,3 +12,6 @@ export { MotorSportsGradient } from './motorSportsGradient';
 export { WeekendGradient } from './weekendGradient';
 export { WomenOnlyGradient } from './womenOnlyGradient';
 export { PartyGradient } from './partyGradient';
+export { YouTubeIcon } from './youtubeIcon';
+export { InstagramIcon } from './instagramIcon';
+export { ImagePlaceHolder } from './imagePlaceHolder';
