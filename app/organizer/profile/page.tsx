@@ -17,7 +17,12 @@ import {
 import { useLazyGetOrganizerProfileQuery } from '@/lib/services/organizer';
 import { selectAuthState } from '@/lib/slices/auth';
 import { EMPTY_DOCUMENT } from '@/hooks/useDocumentsManager';
-import { Instagram, YoutubeIcon } from 'lucide-react';
+
+import {
+  ImagePlaceHolder,
+  InstagramIcon,
+  YouTubeIcon,
+} from '@/components/library/SvgComponents/GradientsOfMoods';
 
 // fake profile toggle (replace with API data later)
 const hasProfile = true;
@@ -76,11 +81,11 @@ export default function OrganizerProfilePage() {
       <div className='flex-1 flex flex-col'>
         <AppHeader title='Organizer Profile' />
 
-        <main className='flex-1 p-6 md:p-8'>
+        <main className='flex-1 p-10 md:p-10'>
           <div className='max-w-6xl mx-auto'>
             {/* Top row: page heading + buttons */}
             <div className='flex items-start justify-between mb-4'>
-              <h1 className='text-3xl font-semibold'>Organiser Profile</h1>
+              <h1 className='text-3xl font-semibold'>Organizer Profile</h1>
 
               <div className='flex items-center space-x-3'>
                 <Link href='/organizer/profile/edit'>
@@ -113,63 +118,60 @@ export default function OrganizerProfilePage() {
               <div className='space-y-6'>
                 {/* Cover Image */}
                 <div className='relative w-full h-56 rounded-xl overflow-hidden'>
-                  <img
-                    src={bannerFile.url ?? '/demo-cover.jpg'}
-                    alt='Cover'
-                    className='w-full h-full object-cover rounded-xl'
-                  />
+                  {bannerFile.url ? (
+                    <img
+                      src={bannerFile.url ?? '/demo-cover.jpg'}
+                      alt='Cover'
+                      className='w-full h-full object-cover rounded-xl'
+                    />
+                  ) : (
+                    <div className='w-full h-full flex items-center justify-center bg-[#EFF1F3]'>
+                      <ImagePlaceHolder width='240px' height='100%' />
+                    </div>
+                  )}
                 </div>
-
                 {/* Logo + Name + Socials (logo overlaps by negative margin) */}
                 <div className='flex items-center -mt-12 px-2 '>
-                  {logoFile.url && (
+                  {logoFile.url ? (
                     <img
                       src={logoFile.url ?? '/demo-logo.png'}
                       alt='Logo'
                       className='w-28 h-28 rounded-full border-4 border-white shadow-md z-0'
                     />
+                  ) : (
+                    <ImagePlaceHolder
+                      className='w-28 h-28 rounded-full border-4 border-white shadow-md z-0'
+                      width='240px'
+                      height='100px'
+                    />
                   )}
 
                   <div className='ml-4'>
-                    <h2 className='text-2xl font-semibold'>
+                    <p className='font-[Poppins] pt-8 font-medium text-2xl leading-[1.4] tracking-[0.005em]'>
                       {profile.organizerName}
-                    </h2>
-                    <p className='text-gray-500'>{profile.tagline}</p>
+                    </p>
+                    <p className='font-[Poppins] pt-3 text[##757575] font-normal text-base leading-[1.4] tracking-[0.005em]'>
+                      {profile.tagline}
+                    </p>
                   </div>
 
-                  <div className='ml-auto flex items-center space-x-3'>
+                  <div className='ml-auto flex items-center space-x-4'>
                     <a href='#' target='_blank' rel='noreferrer'>
-                      <YoutubeIcon
-                        size={35}
-                        className='text-red-400 hover:text-red-600'
-                      />
+                      <YouTubeIcon />
                     </a>
                     <a
                       href='#'
                       aria-label='Follow us on Instagram'
                       className='hover:scale-110 transition-transform duration-200'
                     >
-                      <Instagram
-                        size={28}
-                        className='text-pink-400 hover:text-pink-600'
-                      />
+                      <InstagramIcon />
                     </a>
                   </div>
                 </div>
-
                 {/* Description */}
-                <div className='rounded-lg bg-gray-50 p-6 text-gray-700 text-sm leading-relaxed border border-gray-100'>
-                  {/* Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industry's
-                  standard dummy text ever since the 1500s, when an unknown
-                  printer took a galley of type and scrambled it to make a type
-                  specimen book. It has survived not only five centuries, but
-                  also the leap into electronic typesetting, remaining
-                  essentially unchanged. */}
+                <div className='mt-10 font-[Poppins] font-normal text-base leading-[1.4] tracking-[0.005em] rounded-lg bg-[#F7F7F7] p-6 text[#757575]  border border-[#E4E4E4]'>
                   {profile.description}
                 </div>
-
-                {/* (optional) other actions or meta can go here */}
               </div>
             )}
           </div>
