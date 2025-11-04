@@ -21,35 +21,49 @@ export function FullImageGalleryModal({
 }: FullImageGalleryModalProps) {
   const [mounted, setMounted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    // Only runs in browser
+    if (typeof document !== "undefined") {
+      setPortalTarget(document.body);
+    }
+    setMounted(true);
+  }, []);
 
   const next = () => setCurrentIndex((prev) => (prev + 1) % images.length);
   const prev = () =>
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
 
-  // Keyboard navigation
+  // ✅ Keyboard navigation with window guard
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") next();
       if (e.key === "ArrowLeft") prev();
       if (e.key === "Escape") onClose();
     };
-    if (open) window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
+
+    if (open) {
+      window.addEventListener("keydown", handleKey);
+    }
+    return () => {
+      if (open) window.removeEventListener("keydown", handleKey);
+    };
   }, [open, images.length]);
 
-  if (!mounted || !open || !images?.length) return null;
+  if (!mounted || !open || !images?.length || !portalTarget) return null;
 
   const currentImage = images[currentIndex]?.url;
 
-  // ✅ Render directly into document.body
+  // ✅ Only render portal once document.body is available
   return createPortal(
     <div
       className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-center"
       style={{ overscrollBehavior: "none" }}
     >
-      {/* Close + Title Bar */}
+      {/* Header */}
       <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
         <h2 className="text-white text-base sm:text-lg font-medium truncate max-w-[80%]">
           {title}
@@ -62,7 +76,7 @@ export function FullImageGalleryModal({
         </button>
       </div>
 
-      {/* Image Viewer */}
+      {/* Image viewer */}
       <div className="relative w-full h-full flex items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
@@ -83,7 +97,7 @@ export function FullImageGalleryModal({
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Buttons */}
+        {/* Navigation */}
         {images.length > 1 && (
           <>
             <button
@@ -107,6 +121,6 @@ export function FullImageGalleryModal({
         {currentIndex + 1} / {images.length}
       </div>
     </div>,
-    document.body
+    portalTarget
   );
 }
