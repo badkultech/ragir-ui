@@ -58,7 +58,15 @@ export default function RegisterOrganizer() {
 
   const validate = () => {
     const next: typeof errors = {};
-    if (!formData.name.trim()) next.name = "Organizer name is required";
+     if (!formData.name.trim()) {
+    next.name = "Organizer name is required";
+  } else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
+    next.name = "Name can only contain letters and spaces";
+  } else if (formData.name.trim().length < 3) {
+    next.name = "Name must be at least 3 characters long";
+  } else if (formData.name.trim().length > 70) {
+    next.name = "Name cannot exceed 70 characters";
+  }
     if (
       !formData.email.trim() ||
       !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)
@@ -112,7 +120,7 @@ export default function RegisterOrganizer() {
           onMenuClick={() => setSidebarOpen(true)}
         />
 
-        <main className="flex flex-1 items-left justify-left p-2">
+        <main className="flex flex-1 items-left justify-left p-2 ">
           <div className="bg-white rounded-lg shadow-sm border p-4 w-full max-w-3xl">
             <form
               onSubmit={onSubmit}
@@ -155,6 +163,7 @@ export default function RegisterOrganizer() {
                   placeholder="Enter organizer name"
                   value={formData.name}
                   onChange={onChange}
+                  maxLength={70}
                   className={`w-full ${errors.name ? "border-red-500" : ""}`}
                 />
                 {errors.name && (
