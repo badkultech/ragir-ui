@@ -162,7 +162,7 @@ export default function AdminRegister() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {password && <p className="text-[#FF804C] text-sm mt-1">For a strong password, includes:</p> }
+            {showInstructions && <p className="text-[#FF804C] text-sm mt-1">For a strong password, includes:</p> }
             {/* Password Strength */}
             {showInstructions && (
               <div className="mt-4 space-y-1">
