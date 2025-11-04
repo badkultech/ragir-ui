@@ -16,7 +16,6 @@ import { PricingSummary } from "@/components/create-trip/pricing-summary";
 import { Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { WizardFooter } from "@/components/create-trip/wizard-footer";
-import { Sidebar } from "@/components/organizer/sidebar";
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";

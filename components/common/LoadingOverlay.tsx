@@ -155,7 +155,7 @@ export default function LoadingOverlay({ isLoading, message = "Loading" }: Loadi
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            animate={{ rotateX, rotateY }}
+            // animate={{ rotateX, rotateY }}
             transition={{ type: "spring", stiffness: 150, damping: 20 }}
           >
             {/* Multiple layered glow backgrounds */}
