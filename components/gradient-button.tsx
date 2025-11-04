@@ -11,21 +11,23 @@ const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>(
   ({ className, variant = "primary", children, ...props }, ref) => {
     return (
       <button
-        className={cn(
-          "w-full py-4 px-6 rounded-full font-semibold text-white transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed",
-          variant === "primary" && "bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600",
-          variant === "secondary" &&
-            "bg-transparent border-2 border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white",
-          className,
-        )}
         ref={ref}
         {...props}
+        className={cn(
+          "w-full py-4 px-6 rounded-full font-semibold transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed",
+          variant === "primary" &&
+            "text-white bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90",
+          variant === "secondary" &&
+            "bg-transparent border-2 border-[#FD6E34] text-[#FD6E34] hover:bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:text-white",
+          className
+        )}
       >
         {children}
       </button>
     )
-  },
+  }
 )
+
 GradientButton.displayName = "GradientButton"
 
 export { GradientButton }
