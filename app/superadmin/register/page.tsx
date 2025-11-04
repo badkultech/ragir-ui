@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
 import { getDashboardPath } from "@/lib/utils";
-import { GradientButton } from "@/components/gradient-button";
 import { useToast } from "@/hooks/use-toast";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError } from "@/lib/utils/toastHelpers";
@@ -17,6 +16,7 @@ import App from "next/app";
 import { AppHeader } from "@/components/app-header";
 import { jwtDecode } from "jwt-decode";
 import { AuthTokenPayload } from "@/hooks/useDecodedToken";
+import { GradientButton } from "@/components/gradient-button";
 
 export default function AdminRegister() {
   const searchParams = useSearchParams();
@@ -103,7 +103,7 @@ export default function AdminRegister() {
   return (
     <div className="min-h-screen flex flex-col font-poppins">
       {/* Header */}
-      <AppHeader showAvatar={false} />
+      <AppHeader showAvatar={false} showLogo={true}/>
 
       {/* Background */}
       <div
@@ -151,6 +151,7 @@ export default function AdminRegister() {
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setShowInstructions(true)}
                 onBlur={() => setShowInstructions(false)}
+                maxLength={20}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
               />
               <button
@@ -161,10 +162,7 @@ export default function AdminRegister() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-
             {showInstructions && <p className="text-[#FF804C] text-sm mt-1">For a strong password, includes:</p> }
-
-
             {/* Password Strength */}
             {showInstructions && (
               <div className="mt-4 space-y-1">
@@ -233,7 +231,7 @@ export default function AdminRegister() {
           </div>
 
           {/* Submit Button */}
-          <GradientButton type="submit" disabled={!isFormValid || isLoading}>
+          <GradientButton  type="submit" disabled={!isFormValid || isLoading}>
             Create Admin Account
             <LoadingOverlay
               isLoading={isLoading}
