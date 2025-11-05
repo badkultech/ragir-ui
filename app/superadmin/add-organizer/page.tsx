@@ -25,7 +25,6 @@ import {
   BusinessType,
   RegisterOrganizerRequest,
 } from "@/lib/services/superadmin/add-organizer/type";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { AppHeader } from "@/components/app-header";
 
 type FormFields = {
@@ -261,10 +260,6 @@ export default function RegisterOrganizer() {
                       "linear-gradient(135deg, #FEA901 0%, #FD6E34 25%, #FE336A 75%, #FD401A 100%)",
                   }}
                 >
-                  <LoadingOverlay
-                    isLoading={submitting}
-                    message="Registering..."
-                  />
                   Register Organizer
                 </button>
               </div>
