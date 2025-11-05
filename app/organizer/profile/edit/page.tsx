@@ -287,16 +287,15 @@ export default function OrganizerProfileEditPage() {
               <label className="block text-lg mb-1">Cover Image / Banner</label>
               <div className="border border-dashed rounded-lg p-6 bg-gray-100 text-center relative">
                 {bannerFile.url && (
-                  <div className="relative inline-block w-full">
+                  <div className="relative group inline-block w-full">
                     <img
                       src={bannerFile.url}
                       alt="Banner"
                       className="w-full h-40 object-cover rounded-lg mb-4"
                     />
-                    {/* ✅ Delete Button on top-right corner */}
                     <button
                       type="button"
-                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-50"
+                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50"
                       onClick={() => {
                         dispatch(
                           setBannerFile({
@@ -312,6 +311,7 @@ export default function OrganizerProfileEditPage() {
                     </button>
                   </div>
                 )}
+
                 {/* ✅ Upload Button Centered */}
                 <div className="relative flex flex-col items-center justify-center">
                   <Button
@@ -459,79 +459,78 @@ export default function OrganizerProfileEditPage() {
                 placeholder="Optional"
               />
             </div>
-                <h3 className="text-center">or</h3>
+            <h3 className="text-center">or</h3>
 
             <div className="border border-dashed rounded-lg bg-gray-100 p-6 text-center relative">
-  {/* ✅ Preview image */}
-  {testimonialScreenshotFile?.url && (
-    <div className="relative inline-block w-full">
-      <img
-        src={testimonialScreenshotFile.url}
-        alt="Screenshot"
-        className="w-full h-40 object-cover rounded-lg mb-4"
-      />
-      {/* ✅ Delete button top-right */}
-      <button
-        type="button"
-        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-50"
-        onClick={() =>
-          dispatch(
-            setTestimonialScreenshotFile({
-              ...testimonialScreenshotFile,
-              markedForDeletion: true,
-              url: "",
-              file: null,
-            })
-          )
-        }
-      >
-        <Trash2 className="text-red-500 w-4 h-4" />
-      </button>
-    </div>
-  )}
+              {/* ✅ Preview image */}
+              {testimonialScreenshotFile?.url && (
+                <div className="relative group inline-block w-full">
+                  <img
+                    src={testimonialScreenshotFile.url}
+                    alt="Screenshot"
+                    className="w-full h-40 object-cover rounded-lg mb-4"
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50"
+                    onClick={() =>
+                      dispatch(
+                        setTestimonialScreenshotFile({
+                          ...testimonialScreenshotFile,
+                          markedForDeletion: true,
+                          url: "",
+                          file: null,
+                        })
+                      )
+                    }
+                  >
+                    <Trash2 className="text-red-500 w-4 h-4" />
+                  </button>
+                </div>
+              )}
 
-  {/* ✅ Centered upload area */}
-  <div className="flex flex-col items-center justify-center mt-2 space-y-2">
-    <div className="relative flex flex-col items-center justify-center">
-      <Button
-        variant="outline"
-        className="flex items-center justify-center w-12 h-12 rounded-lg shadow-sm hover:bg-gray-100 transition"
-      >
-        <UploadIcon className="w-5 h-5" />
-      </Button>
+              {/* ✅ Centered upload area */}
+              <div className="flex flex-col items-center justify-center mt-2 space-y-2">
+                <div className="relative flex flex-col items-center justify-center">
+                  <Button
+                    variant="outline"
+                    className="flex items-center justify-center w-12 h-12 rounded-lg shadow-sm hover:bg-gray-100 transition"
+                  >
+                    <UploadIcon className="w-5 h-5" />
+                  </Button>
 
-      <h3 className="mt-3 text-center text-base font-semibold text-gray-800">
-        Upload Screenshot
-      </h3>
+                  <h3 className="mt-3 text-center text-base font-semibold text-gray-800">
+                    Upload Screenshot
+                  </h3>
 
-      {/* ✅ Hidden input */}
-      <input
-        id="testimonial-upload"
-        type="file"
-        accept="image/*"
-        className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file && validateImageFile(file)) {
-            setTestimonialUploadFile(file);
-            dispatch(
-              setTestimonialScreenshotFile({
-                ...testimonialScreenshotFile,
-                type: file.type,
-                url: URL.createObjectURL(file),
-                file: null,
-                markedForDeletion: true,
-              } as Document)
-            );
-          }
-        }}
-      />
-    </div>
-    <p className="text-xs text-gray-400 text-center">
-      1920px x 480px recommended
-    </p>
-  </div>
-</div>
+                  {/* ✅ Hidden input */}
+                  <input
+                    id="testimonial-upload"
+                    type="file"
+                    accept="image/*"
+                    className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && validateImageFile(file)) {
+                        setTestimonialUploadFile(file);
+                        dispatch(
+                          setTestimonialScreenshotFile({
+                            ...testimonialScreenshotFile,
+                            type: file.type,
+                            url: URL.createObjectURL(file),
+                            file: null,
+                            markedForDeletion: true,
+                          } as Document)
+                        );
+                      }
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-gray-400 text-center">
+                  1920px x 480px recommended
+                </p>
+              </div>
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               {/* {testimonialScreenshotFile && (
@@ -568,28 +567,33 @@ export default function OrganizerProfileEditPage() {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="flex flex-wrap gap-5 mt-4">
               {certificationsDocuments.map(
                 (cert, idx) =>
                   cert.url && (
-                    <div key={idx}>
-                      {cert.url && (
-                        <div className="hover:relative p-4">
-                          <img src={cert.url} alt="Failed." width={80} />
-                          <span
-                            className="absolute top-0 right-0 cursor-pointer"
-                            onClick={() =>
-                              handleCertificationsMarkForDeletion(cert.id, idx)
-                            }
-                          >
-                            <X className="w-4 h-4" />
-                          </span>
-                        </div>
-                      )}
+                    <div
+                      key={idx}
+                      className="relative group w-20 h-auto rounded-lg overflow-hidden border"
+                    >
+                      <img
+                        src={cert.url}
+                        alt="Certification"
+                        className="w-full h-full object-cover"
+                      />
+
+                      {/* ❌ Delete icon (visible only on hover) */}
+                      <button
+                        type="button"
+                        className="absolute top-1 right-1 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50"
+                        onClick={() => handleCertificationsMarkForDeletion(cert.id, idx)}
+                      >
+                        <X className="w-4 h-4 text-red-500" />
+                      </button>
                     </div>
                   )
               )}
             </div>
+
           </section>
 
           <div className="flex justify-end space-x-4">
