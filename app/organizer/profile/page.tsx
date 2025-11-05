@@ -23,6 +23,7 @@ import {
   InstagramIcon,
   YouTubeIcon,
 } from '@/components/library/SvgComponents/GradientsOfMoods';
+import { GradientButton } from '@/components/gradient-button';
 
 // fake profile toggle (replace with API data later)
 const hasProfile = true;
@@ -89,9 +90,9 @@ export default function OrganizerProfilePage() {
 
               <div className='flex items-center space-x-3'>
                 <Link href='/organizer/profile/edit'>
-                  <Button className='rounded-full px-5 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white'>
+                  <GradientButton className='rounded-full px-5 py-2  text-white'>
                     Edit Profile
-                  </Button>
+                  </GradientButton>
                 </Link>
               </div>
             </div>

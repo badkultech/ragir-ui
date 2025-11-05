@@ -28,6 +28,7 @@ import {
 } from "@/lib/services/user";
 import { useRouter } from "next/navigation";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
+import { GradientButton } from "@/components/gradient-button";
 
 type MoodsState = {
   mountain: boolean;
@@ -534,10 +535,10 @@ export default function TravelerProfile() {
 
             {/* Save Button */}
             <div className="flex justify-end mt-6 mb-2">
-              <button
+              <GradientButton
                 onClick={handleSaveProfile}
                 disabled={saving}
-                className="px-8 py-3 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-8 py-3 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {saving ? (
                   <>
@@ -562,7 +563,7 @@ export default function TravelerProfile() {
                     </svg>
                   </>
                 )}
-              </button>
+              </GradientButton>
             </div>
           </div>
         </main>

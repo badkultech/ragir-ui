@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { GradientButton } from "./gradient-button"
 
 interface Activity {
   id: string
@@ -99,7 +100,7 @@ export function AddFromLibraryModal({ isOpen, onClose }: AddFromLibraryModalProp
                 className="pl-10"
               />
             </div>
-            <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+            <GradientButton className="hover:from-orange-600 hover:to-red-600 text-white">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -115,7 +116,7 @@ export function AddFromLibraryModal({ isOpen, onClose }: AddFromLibraryModalProp
                 />
               </svg>
               View Folder
-            </Button>
+            </GradientButton>
           </div>
         </div>
 
