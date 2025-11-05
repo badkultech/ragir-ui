@@ -101,6 +101,10 @@ export default function OrganizerProfileEditPage() {
     return true;
   };
 
+  const handleCancel = () => {
+    router.back();
+  }
+
   const handleSaveProfile = async () => {
     try {
       const formData = new FormData();
@@ -159,7 +163,7 @@ export default function OrganizerProfileEditPage() {
       }).unwrap();
 
       console.log("Profile updated successfully:", response);
-      if (response) router.back();
+      if (response) router.push("/organizer/profile");
     } catch (error) {
       console.error("Failed to update profile:", error);
     }
@@ -194,7 +198,7 @@ export default function OrganizerProfileEditPage() {
 
             {/* Logo Upload */}
             <label className="block text-lg mb-5 font-medium">
-              Display Picture/ Logo
+              Display Picture / Logo
             </label>
             <div className="flex items-center space-x-6">
               {logoFile.url && (
@@ -281,66 +285,69 @@ export default function OrganizerProfileEditPage() {
             {/* Banner Upload */}
             <div>
               <label className="block text-lg mb-1">Cover Image / Banner</label>
-              <div className="border border-dashed rounded-lg p-6 bg-gray-100 text-center">
+              <div className="border border-dashed rounded-lg p-6 bg-gray-100 text-center relative">
                 {bannerFile.url && (
-                  <img
-                    src={bannerFile.url}
-                    alt="Banner"
-                    className="w-full h-40 object-cover rounded-lg mb-4"
-                  />
-                )}
-                <>
-                  <div className="flex items-center gap-2 text-center justify-center">
-                    <div className="relative inline-block">
-                      <Button variant="outline" className="mb-2">
-                        <UploadIcon></UploadIcon>{" "}
-                      </Button>{" "}
-                      <h3>Upload Banner Image</h3>
-                      <input
-                        id="banner-upload"
-                        type="file"
-                        accept="image/*"
-                        className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file && validateImageFile(file)) {
-                            setBannerUploadFile(file);
-                            dispatch(
-                              setBannerFile({
-                                ...bannerFile,
-                                type: file.type,
-                                url: URL.createObjectURL(file),
-                                file: null,
-                                markedForDeletion: true,
-                              } as Document)
-                            );
-                          }
-                        }}
-                      />
-                    </div>
-                    {bannerFile.url && (
-                      <Button
-                        variant="outline"
-                        className="hover:text-red-500"
-                        onClick={() => {
-                          dispatch(
-                            setBannerFile({
-                              ...bannerFile,
-                              markedForDeletion: true,
-                              url: "",
-                              file: null,
-                            })
-                          );
-                        }}
-                      >
-                        <Trash2 />
-                      </Button>
-                    )}
+                  <div className="relative group inline-block w-full">
+                    <img
+                      src={bannerFile.url}
+                      alt="Banner"
+                      className="w-full h-40 object-cover rounded-lg mb-4"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50"
+                      onClick={() => {
+                        dispatch(
+                          setBannerFile({
+                            ...bannerFile,
+                            markedForDeletion: true,
+                            url: "",
+                            file: null,
+                          })
+                        );
+                      }}
+                    >
+                      <Trash2 className="text-red-500 w-4 h-4" />
+                    </button>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
+                )}
+
+                {/* ✅ Upload Button Centered */}
+                <div className="relative flex flex-col items-center justify-center">
+                  <Button
+                    variant="outline"
+                    className="flex items-center justify-center w-12 h-12 rounded-lg shadow-sm hover:bg-gray-100 transition"
+                  >
+                    <UploadIcon className="w-5 h-5" />
+                  </Button>
+                  <h3 className="mt-3 text-center text-base font-semibold text-gray-800">
+                    Upload Banner Image
+                  </h3>
+                  <p className="text-xs text-gray-400 text-center">
                     1920px x 480px recommended
                   </p>
-                </>
+                  <input
+                    id="banner-upload"
+                    type="file"
+                    accept="image/*"
+                    className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && validateImageFile(file)) {
+                        setBannerUploadFile(file);
+                        dispatch(
+                          setBannerFile({
+                            ...bannerFile,
+                            type: file.type,
+                            url: URL.createObjectURL(file),
+                            file: null,
+                            markedForDeletion: true,
+                          } as Document)
+                        );
+                      }
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -350,7 +357,7 @@ export default function OrganizerProfileEditPage() {
             <h2 className="text-lg font-medium">About the Organizer</h2>
 
             <div>
-              <label className="block text-sm mb-1">Tagline</label>
+              <label className="block text-sm mb-1 font-medium ">Tagline</label>
               <Input
                 value={profile?.tagline}
                 onChange={(e) =>
@@ -361,7 +368,7 @@ export default function OrganizerProfileEditPage() {
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Description</label>
+              <label className="block text-sm mb-1 font-medium">Description</label>
               <Textarea
                 value={profile?.description}
                 onChange={(e) =>
@@ -377,11 +384,11 @@ export default function OrganizerProfileEditPage() {
 
           {/* ================= Social Profiles ================= */}
           <section className="bg-white rounded-xl border p-6 space-y-6">
-            <h2 className="text-lg font-medium">Social Profiles</h2>
+            <h2 className="text-lg font-medium ">Social Profiles</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm mb-1">Website URL</label>
+                <label className="block text-sm mb-1 font-medium">Website URL</label>
                 <Input
                   value={profile?.websiteUrl}
                   onChange={(e) =>
@@ -393,7 +400,7 @@ export default function OrganizerProfileEditPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Instagram Handle</label>
+                <label className="block text-sm mb-1 font-medium">Instagram Handle</label>
                 <Input
                   value={profile?.instagramHandle}
                   onChange={(e) =>
@@ -408,7 +415,7 @@ export default function OrganizerProfileEditPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">YouTube Channel</label>
+                <label className="block text-sm mb-1 font-medium">YouTube Channel</label>
                 <Input
                   value={profile?.youtubeChannel}
                   onChange={(e) =>
@@ -423,7 +430,7 @@ export default function OrganizerProfileEditPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Google Business</label>
+                <label className="block text-sm mb-1 font-medium">Google Business</label>
                 <Input
                   value={profile.googleBusiness}
                   onChange={(e) =>
@@ -440,7 +447,7 @@ export default function OrganizerProfileEditPage() {
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Testimonials</label>
+              <label className="block text-sm mb-1 font-medium">Testimonials</label>
               <Textarea
                 value={profile?.testimonials}
                 onChange={(e) =>
@@ -452,21 +459,51 @@ export default function OrganizerProfileEditPage() {
                 placeholder="Optional"
               />
             </div>
+            <h3 className="text-center">or</h3>
 
-            <div className="border border-dashed rounded-lg bg-gray-100 p-6 text-center">
+            <div className="border border-dashed rounded-lg bg-gray-100 p-6 text-center relative">
+              {/* ✅ Preview image */}
               {testimonialScreenshotFile?.url && (
-                <img
-                  src={testimonialScreenshotFile.url}
-                  alt="Banner"
-                  className="w-full h-40 object-cover rounded-lg mb-4"
-                />
+                <div className="relative group inline-block w-full">
+                  <img
+                    src={testimonialScreenshotFile.url}
+                    alt="Screenshot"
+                    className="w-full h-40 object-cover rounded-lg mb-4"
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50"
+                    onClick={() =>
+                      dispatch(
+                        setTestimonialScreenshotFile({
+                          ...testimonialScreenshotFile,
+                          markedForDeletion: true,
+                          url: "",
+                          file: null,
+                        })
+                      )
+                    }
+                  >
+                    <Trash2 className="text-red-500 w-4 h-4" />
+                  </button>
+                </div>
               )}
-              <div className="flex items-center gap-2 text-center justify-center">
-                <div className="relative inline-block">
-                  <Button variant="outline">
-                    <UploadIcon></UploadIcon>
+
+              {/* ✅ Centered upload area */}
+              <div className="flex flex-col items-center justify-center mt-2 space-y-2">
+                <div className="relative flex flex-col items-center justify-center">
+                  <Button
+                    variant="outline"
+                    className="flex items-center justify-center w-12 h-12 rounded-lg shadow-sm hover:bg-gray-100 transition"
+                  >
+                    <UploadIcon className="w-5 h-5" />
                   </Button>
-                  <h3 className="mt-2">Upload Screenshot</h3>
+
+                  <h3 className="mt-3 text-center text-base font-semibold text-gray-800">
+                    Upload Screenshot
+                  </h3>
+
+                  {/* ✅ Hidden input */}
                   <input
                     id="testimonial-upload"
                     type="file"
@@ -489,26 +526,12 @@ export default function OrganizerProfileEditPage() {
                     }}
                   />
                 </div>
-                {testimonialScreenshotFile?.url && (
-                  <Button
-                    variant="outline"
-                    className="hover:text-red-500"
-                    onClick={() =>
-                      dispatch(
-                        setTestimonialScreenshotFile({
-                          ...testimonialScreenshotFile,
-                          markedForDeletion: true,
-                          url: "",
-                          file: null,
-                        })
-                      )
-                    }
-                  >
-                    <Trash2 />
-                  </Button>
-                )}
+                <p className="text-xs text-gray-400 text-center">
+                  1920px x 480px recommended
+                </p>
               </div>
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               {/* {testimonialScreenshotFile && (
                 <p className='text-sm text-gray-700 mt-2'>
@@ -544,35 +567,42 @@ export default function OrganizerProfileEditPage() {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="flex flex-wrap gap-5 mt-4">
               {certificationsDocuments.map(
                 (cert, idx) =>
                   cert.url && (
-                    <div key={idx}>
-                      {cert.url && (
-                        <div className="hover:relative p-4">
-                          <img src={cert.url} alt="Failed." width={80} />
-                          <span
-                            className="absolute top-0 right-0 cursor-pointer"
-                            onClick={() =>
-                              handleCertificationsMarkForDeletion(cert.id, idx)
-                            }
-                          >
-                            <X className="w-4 h-4" />
-                          </span>
-                        </div>
-                      )}
+                    <div
+                      key={idx}
+                      className="relative group w-20 h-auto rounded-lg overflow-hidden border"
+                    >
+                      <img
+                        src={cert.url}
+                        alt="Certification"
+                        className="w-full h-full object-cover"
+                      />
+
+                      {/* ❌ Delete icon (visible only on hover) */}
+                      <button
+                        type="button"
+                        className="absolute top-1 right-1 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50"
+                        onClick={() => handleCertificationsMarkForDeletion(cert.id, idx)}
+                      >
+                        <X className="w-4 h-4 text-red-500" />
+                      </button>
                     </div>
                   )
               )}
             </div>
+
           </section>
 
           <div className="flex justify-end space-x-4">
-            <Button variant="outline">Save as Draft</Button>
+            <Button 
+              onClick={handleCancel}
+            variant="outline" className="rounded-2xl">Cancel</Button>
             <Button
               onClick={handleSaveProfile}
-              className="bg-gradient-to-r from-orange-500 to-pink-500 text-white"
+              className="bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-2xl"
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : "Save Profile"}

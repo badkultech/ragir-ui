@@ -99,7 +99,7 @@ export default function DashboardMainContent() {
             </Link>
 
             {/* All Queries */}
-            <Link href="/organizer/queries">
+            <Link href="/organizer/queries/all">
             <Card>
               <CardContent className="flex flex-col items-center justify-center h-32 space-y-2">
                 <div className="bg-gray-100 p-2 rounded-full">

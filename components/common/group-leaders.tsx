@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { GradientButton } from "../gradient-button"
 
 interface Leader {
   id: string
@@ -105,12 +106,12 @@ export function GroupLeaders() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Group Leaders</h2>
-        <Button
+        <GradientButton
           onClick={() => setIsModalOpen(true)}
-          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+          className="hover:from-orange-600 hover:to-red-600 text-white"
         >
           + Add New Leader
-        </Button>
+        </GradientButton>
       </div>
 
       <p className="text-gray-600">Select from existing leaders or add new</p>

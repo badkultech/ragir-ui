@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 
 export default function OrganizerProfileEmptyPage() {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <OrganizerSidebar />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-full">
         <AppHeader title="Organizer Profile" />
 
-        <main className="flex-1 p-6 md:p-8 flex flex-col items-center justify-center text-center">
+        <main className="flex-1 flex flex-col items-center justify-center text-center px-6">
           <h1 className="text-2xl font-semibold mb-2">Complete Your Profile</h1>
           <p className="text-gray-500 mb-6 max-w-md">
             Add your details to showcase your identity and manage your events

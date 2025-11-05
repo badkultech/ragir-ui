@@ -43,38 +43,36 @@ export function CreateTripModal({
         {/* Content */}
         <div className="space-y-5">
           {/* Start from Scratch */}
-          <Button
-            variant="ghost"
-            className="cursor-pointer
+          <Link href="/organizer/create-trip">
+            <Button
+              variant="ghost"
+              className="cursor-pointer
               w-full justify-start h-auto py-5 px-5
               bg-gray-50 hover:bg-gray-100 rounded-xl
               flex items-center gap-4 text-left
               transition-all duration-200
             "
-            onClick={onStartFromScratch}
-          >
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white flex-shrink-0">
-              <Plus className="w-6 h-6" />
-            </div>
-            <div className="flex flex-col items-start">
-              <Link href="/organizer/create-trip">
-                <span className="font-semibold text-lg text-gray-800 cursor-pointer">
+              onClick={onStartFromScratch}
+            >
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white flex-shrink-0">
+                <Plus className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold text-lg text-gray-800">
                   Start from Scratch
                 </span>
-
                 <span className="text-sm text-gray-500 leading-snug " >
                   Create a completely new trip with custom details.
                 </span>
-              </Link>
-            </div>
-          </Button>
-
+              </div>
+            </Button>
+          </Link>
           {/* Use Similar Trip */}
 
           <Link href="/organizer/trip-overview">
             <Button
               variant="ghost"
-              className= " cursor-pointer
+              className="cursor-pointer
               w-full justify-start h-auto py-5 px-5
               bg-gray-50 hover:bg-gray-100 rounded-xl
               flex items-center gap-4 text-left

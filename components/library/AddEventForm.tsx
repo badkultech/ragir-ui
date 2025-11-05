@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, X } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import { update } from "lodash";
-import { useGetOrganizerDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
+import { useLazyGetOrganizerDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
 
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
@@ -66,7 +66,7 @@ export function AddEventForm({
       ]);
     }
   };
-  const [getDayDescription] = useGetOrganizerDayDescriptionByIdQuery();
+  const [getDayDescription] = useLazyGetOrganizerDayDescriptionByIdQuery();
 
   console.log("imagesPreview", documents);
   useEffect(() => {

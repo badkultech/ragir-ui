@@ -86,4 +86,5 @@ export const {
   useGetOrganizerDayDescriptionByIdQuery,
   useGetOrganizerDayDescriptionQuery,
   useDeleteOrganizerDayDescriptionMutation,
+  useLazyGetOrganizerDayDescriptionByIdQuery
 } = organizerAPI;

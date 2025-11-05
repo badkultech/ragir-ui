@@ -1,14 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     unoptimized: true,
   },
-}
+  // 👇 Add this block
+  productionBrowserSourceMaps: true,
+  webpack: (config, { isServer }) => {
+    // Enable readable source maps during build (for easier debugging)
+    if (isServer) {
+      config.devtool = 'source-map';
+    }
 
-export default nextConfig
+    return config;
+  },
+};
+
+export default nextConfig;

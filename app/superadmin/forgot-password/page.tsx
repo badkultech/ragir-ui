@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Mail } from "lucide-react";
 import { useForgotPasswordMutation } from "@/lib/services/setup-password";
-import { toast } from "@/hooks/use-toast";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { GradientButton } from "@/components/gradient-button";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
@@ -118,10 +116,6 @@ export default function ForgotPasswordPage() {
                   disabled={isLoading || !email || !!emailError}
                 >
                   Send Reset Link
-                  <LoadingOverlay
-                    isLoading={isLoading}
-                    message="Sending Reset Link..."
-                  />
                 </GradientButton>
 
                 <div className="text-center pt-2">

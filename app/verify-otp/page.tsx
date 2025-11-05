@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { GradientButton } from "@/components/gradient-button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import {
   useGenerateOtpMutation,
   useValidateOtpMutation,
@@ -201,10 +200,6 @@ export default function VerifyOTPPage() {
                       : ""
                   }`}
                 >
-                  <LoadingOverlay
-                    isLoading={isLoading}
-                    message="Verifying OTP"
-                  />
                   Verify and Continue
                   <ArrowRight className="h-5 w-5" />
                 </GradientButton>

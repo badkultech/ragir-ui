@@ -1,6 +1,7 @@
   "use client";
   import { useState, ChangeEvent } from "react";
   import { Calendar } from "lucide-react";
+import { GradientButton } from "../gradient-button";
 
   export  function DayDescriptionModal({ onClose }: { onClose: () => void }) {
     const [images, setImages] = useState<File[]>([]);
@@ -149,9 +150,9 @@
             className="px-7 py-2 rounded-full border bg-white text-gray-500 font-medium hover:bg-gray-50 transition">
               Cancel
             </button>
-            <button className="px-8 py-2 rounded-full font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 transition">
+            <GradientButton className="px-8 py-2 rounded-full font-medium text-white  shadow hover:from-orange-500 hover:to-pink-600 transition">
               Save
-            </button>
+            </GradientButton>
           </div>
         </div>
       </div>

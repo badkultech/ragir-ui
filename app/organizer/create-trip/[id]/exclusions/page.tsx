@@ -9,7 +9,6 @@ import { WizardFooter } from "@/components/create-trip/wizard-footer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Sidebar } from "@/components/organizer/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 

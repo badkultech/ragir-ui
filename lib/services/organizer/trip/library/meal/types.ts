@@ -27,3 +27,14 @@ export interface MealResponse extends LibraryResponse {
     description?: string;
     packingSuggestion?: string;
 }
+
+export const mealTypeLabels: Record<string, string> = {
+  BREAKFAST: "Breakfast",
+  LUNCH: "Lunch",
+  DINNER: "Dinner",
+  SNACKS: "Snacks",
+  BRUNCH: "Brunch",
+  SUPPER: "Supper",
+  TEA_TIME: "Tea Time",
+  OTHER: "Other",
+};

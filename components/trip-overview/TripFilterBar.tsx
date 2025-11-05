@@ -73,10 +73,11 @@ export default function TripFilterBar({ tab }: { tab: string }) {
             <div className="p-4">
               <Calendar
                 mode="range"
-                selected={dateRange}
-                onSelect={setDateRange}
+                selected={dateRange.from && dateRange.to ? { from: dateRange.from, to: dateRange.to } : undefined}
+                onSelect={(range) => setDateRange(range ? { from: range.from, to: range.to } : { from: undefined, to: undefined })}
                 numberOfMonths={1}
                 className="rounded-md border"
+                required={false}
                 styles={{
                   day_selected: {
                     backgroundColor: "#FF6B00",

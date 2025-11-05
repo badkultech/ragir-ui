@@ -424,7 +424,7 @@ export default function CreateTripPage() {
                     <MDEditor
                       value={formData.tripHighlights}
                       onChange={(val) =>
-                        handleInputChange("tripHighlights", val)
+                        handleInputChange("tripHighlights", val ?? "")
                       }
                       preview="edit" // Can be 'edit', 'live', or 'preview'
                       hideToolbar={false}

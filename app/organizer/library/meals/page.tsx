@@ -15,6 +15,7 @@ import {
 } from "@/lib/services/organizer/trip/library/meal";
 import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { mealTypeLabels } from "@/lib/services/organizer/trip/library/meal/types";
 
 export default function MealsPage() {
   const organizationId = useOrganizationId();
@@ -122,9 +123,9 @@ export default function MealsPage() {
                     </p>
 
                     {/* Meal Type Tag */}
-                    {meal.mealType && (
+                    {meal.mealType !== undefined && (
                       <span className="absolute top-4 right-4 bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
-                        {meal.mealType}
+                        {mealTypeLabels[meal.mealType]}
                       </span>
                     )}
 

@@ -208,7 +208,7 @@ export default function SupportCenter() {
         onAddComment={async (ticketId, comment) => {
           await addComment({
             ticketId,
-            data: { comment },
+            data: { comment, id: ticketId },
           }).unwrap();
         }}
       />
