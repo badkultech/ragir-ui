@@ -101,6 +101,10 @@ export default function OrganizerProfileEditPage() {
     return true;
   };
 
+  const handleCancel = () => {
+    router.back();
+  }
+
   const handleSaveProfile = async () => {
     try {
       const formData = new FormData();
@@ -589,7 +593,9 @@ export default function OrganizerProfileEditPage() {
           </section>
 
           <div className="flex justify-end space-x-4">
-            <Button variant="outline" className="rounded-2xl">Save as Draft</Button>
+            <Button 
+              onClick={handleCancel}
+            variant="outline" className="rounded-2xl">Cancel</Button>
             <Button
               onClick={handleSaveProfile}
               className="bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-2xl"
