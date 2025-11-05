@@ -159,7 +159,7 @@ export default function OrganizerProfileEditPage() {
       }).unwrap();
 
       console.log("Profile updated successfully:", response);
-      if (response) router.back();
+      if (response) router.push("/organizer/profile");
     } catch (error) {
       console.error("Failed to update profile:", error);
     }
