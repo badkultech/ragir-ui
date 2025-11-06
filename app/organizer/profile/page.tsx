@@ -222,7 +222,8 @@ export default function OrganizerProfilePage() {
                   </div>
 
                   <div className='ml-auto flex items-center space-x-4'>
-                    <a href='#' target='_blank' rel='noreferrer'>
+                    <a href='#' target='_blank' rel='noreferrer'
+                    className='hover:scale-110 transition-transform duration-200'>
                       <YouTubeIcon />
                     </a>
                     <a
