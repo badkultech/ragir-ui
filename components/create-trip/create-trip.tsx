@@ -700,6 +700,7 @@ export function CreateTrip({ tripId }: Props) {
                         <div className="flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
                             <AddTripLeaderForm
                                 onCancel={() => dispatch(setLeaderModalOpen(false))}
+                                mode='trip'
                                 onSave={(leaderData) => {
                                     console.log("✅ Leader Saved:", leaderData);
 
