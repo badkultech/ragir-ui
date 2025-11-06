@@ -4,7 +4,7 @@ import { AppHeader } from '@/components/app-header';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   organizerState,
@@ -35,6 +35,69 @@ export default function OrganizerProfilePage() {
   const organizationId = userData?.organizationPublicId;
   const dispatch = useDispatch();
   const { logoFile, bannerFile, testimonialScreenshotFile, profile } = state;
+
+  // Local LazyImage helper: skeleton + fade-in, handles cached images
+  const LazyImage = ({
+    src,
+    alt = '',
+    className = '',
+  }: {
+    src: string;
+    alt?: string;
+    className?: string;
+  }) => {
+    const [loaded, setLoaded] = useState(false);
+    const [showSkeleton, setShowSkeleton] = useState(true);
+    const imgRef = useRef<HTMLImageElement | null>(null);
+
+    useEffect(() => {
+      let cancelled = false;
+      setLoaded(false);
+      setShowSkeleton(true);
+
+      const el = imgRef.current;
+      const finish = () => {
+        if (cancelled) return;
+        setTimeout(() => {
+          if (!cancelled) {
+            setLoaded(true);
+            setShowSkeleton(false);
+          }
+        }, 200);
+      };
+
+      if (el && el.complete) {
+        finish();
+        return () => {
+          cancelled = true;
+        };
+      }
+
+      const onLoad = () => finish();
+      el?.addEventListener('load', onLoad);
+      return () => {
+        cancelled = true;
+        el?.removeEventListener('load', onLoad);
+      };
+    }, [src]);
+
+    return (
+      <div className={`relative overflow-hidden ${className}`}>
+        {showSkeleton && (
+          <div className='absolute inset-0 bg-gray-200 animate-pulse z-0' />
+        )}
+        <img
+          ref={imgRef}
+          src={src}
+          alt={alt}
+          loading='lazy'
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-10 ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      </div>
+    );
+  };
 
   const [getOrgProfile, { isLoading: profileLoading }] =
     useLazyGetOrganizerProfileQuery();
@@ -120,10 +183,10 @@ export default function OrganizerProfilePage() {
                 {/* Cover Image */}
                 <div className='relative w-full h-56 rounded-xl overflow-hidden'>
                   {bannerFile.url ? (
-                    <img
+                    <LazyImage
                       src={bannerFile.url ?? '/demo-cover.jpg'}
                       alt='Cover'
-                      className='w-full h-full object-cover rounded-xl'
+                      className='w-full h-full rounded-xl'
                     />
                   ) : (
                     <div className='w-full h-full flex items-center justify-center bg-[#EFF1F3]'>
@@ -134,11 +197,13 @@ export default function OrganizerProfilePage() {
                 {/* Logo + Name + Socials (logo overlaps by negative margin) */}
                 <div className='flex items-center -mt-12 px-2 '>
                   {logoFile.url ? (
-                    <img
-                      src={logoFile.url ?? '/demo-logo.png'}
-                      alt='Logo'
-                      className='w-28 h-28 rounded-full border-4 border-white shadow-md z-0'
-                    />
+                    <div className=' w-28 h-28 rounded-full border-4 border-white shadow-md z-10 overflow-hidden'>
+                      <LazyImage
+                        src={logoFile.url ?? '/demo-logo.png'}
+                        alt='Logo'
+                        className='w-28 h-28 rounded-full'
+                      />
+                    </div>
                   ) : (
                     <ImagePlaceHolder
                       className='w-28 h-28 rounded-full border-4 border-white shadow-md z-0'
