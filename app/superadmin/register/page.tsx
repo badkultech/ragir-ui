@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { CheckCircle2, Eye, EyeOff, XCircle } from "lucide-react";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { useSearchParams } from "next/navigation";
 import { useSetupPasswordMutation } from "@/lib/services/setup-password";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,9 +9,7 @@ import { useRouter } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
 import { getDashboardPath } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError } from "@/lib/utils/toastHelpers";
-import App from "next/app";
 import { AppHeader } from "@/components/app-header";
 import { jwtDecode } from "jwt-decode";
 import { AuthTokenPayload } from "@/hooks/useDecodedToken";
@@ -233,10 +230,6 @@ export default function AdminRegister() {
           {/* Submit Button */}
           <GradientButton  type="submit" disabled={!isFormValid || isLoading}>
             Create Admin Account
-            <LoadingOverlay
-              isLoading={isLoading}
-              message="Creating Admin Account"
-            />
           </GradientButton>
         </form>
       </div>

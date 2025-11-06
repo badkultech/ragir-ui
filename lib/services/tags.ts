@@ -11,6 +11,7 @@ export const TAGS = {
   orgs: 'org',
   trip:'trip',
   itinerary: 'itinerary',
+  itineraryDayDetails: 'itineraryDayDetails',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',

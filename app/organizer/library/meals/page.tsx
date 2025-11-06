@@ -15,6 +15,7 @@ import {
 } from "@/lib/services/organizer/trip/library/meal";
 import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { mealTypeLabels } from "@/lib/services/organizer/trip/library/meal/types";
 
 export default function MealsPage() {
   const organizationId = useOrganizationId();
@@ -98,18 +99,19 @@ export default function MealsPage() {
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
                 >
                   {/* Image */}
-                  <div className="h-32 bg-gray-100 flex items-center justify-center">
-                    {meal?.documents?.[0]?.url ? (
-                      <img
-                        src={meal.documents[0].url}
-                        alt={meal.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-400 text-sm">No Image</span>
-                    )}
+                  <div className="relative px-3 pt-3">
+                    <div className="h-32 w-full bg-gray-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center">
+                      {meal?.documents?.[0]?.url ? (
+                        <img
+                          src={meal.documents[0].url}
+                          alt={meal.name}
+                          className="w-[95%] h-[95%] object-cover rounded-lg"
+                        />
+                      ) : (
+                        <span className="text-gray-400 text-sm">No Image</span>
+                      )}
+                    </div>
                   </div>
-
                   {/* Content */}
                   <div className="p-4 flex-1 flex flex-col relative">
                     <h3 className="font-semibold text-gray-900">{meal.name}</h3>
@@ -122,9 +124,9 @@ export default function MealsPage() {
                     </p>
 
                     {/* Meal Type Tag */}
-                    {meal.mealType && (
+                    {meal.mealType !== undefined && (
                       <span className="absolute top-4 right-4 bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
-                        {meal.mealType}
+                        {mealTypeLabels[meal.mealType]}
                       </span>
                     )}
 

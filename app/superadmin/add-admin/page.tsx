@@ -23,7 +23,6 @@ import { useSelector } from "react-redux";
 import { GradientButton } from "@/components/gradient-button";
 import { CreateSuperAdminRequest } from "@/lib/services/superadmin/add-admin/types";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 
@@ -233,10 +232,6 @@ export default function AddAdmin() {
                 disabled={isSubmitting || !!emailError}
                 className="w-full justify-center py-2 text-sm"
               >
-                <LoadingOverlay
-                  isLoading={isSubmitting}
-                  message="Sending Invitation..."
-                />
                 Send Admin Invitation
               </GradientButton>
             </form>

@@ -257,7 +257,7 @@ export function AddTripLeaderForm({
         <Button
           onClick={handleSubmit}
           disabled={isLoading || !name.trim() || !bio.trim()}
-          className="rounded-full px-6 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-t text-white"
+          className="rounded-full px-6 gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]  hover:opacity-90 text-white"
         >
           {isLoading ? "Saving..." : "Save"}
         </Button>

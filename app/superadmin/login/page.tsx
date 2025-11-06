@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { getDashboardPath } from "@/lib/utils";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { AppHeader } from "@/components/app-header";
 import { jwtDecode } from "jwt-decode";
 import type { AuthTokenPayload } from "@/hooks/useDecodedToken";
@@ -162,10 +161,6 @@ export default function AdminLogin() {
                   disabled={!isFormValid || isLoading}
                   className="w-full font-semibold text-sm sm:text-base py-3 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] text-white hover:opacity-90 hover:shadow-lg"
                 >
-                  <LoadingOverlay
-                    isLoading={isLoading}
-                    message="Logging in..."
-                  />
                   <span className="relative">Login to Dashboard</span>
                 </button>
               </div>

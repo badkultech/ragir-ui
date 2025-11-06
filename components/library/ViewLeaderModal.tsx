@@ -29,8 +29,8 @@ export function ViewLeaderModal({ open, onClose, leader }: ViewLeaderModalProps)
                         src={imageUrl}
                         alt={leader.name}
                         width={60}
-                        height={60}
-                        className="rounded-full object-cover"
+                        height={130}
+                        className="rounded-lg object-cover w-[80px] h-[80px]"
                     />
                     <div>
                         <h2 className="text-lg font-semibold text-gray-900">{leader.name}</h2>

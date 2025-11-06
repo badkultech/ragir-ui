@@ -99,16 +99,18 @@ export default function StaysPage() {
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
                 >
                   {/* Image */}
-                  <div className="h-32 bg-gray-100 flex items-center justify-center">
-                    {stay.documents?.[0]?.url ? (
-                      <img
-                        src={stay.documents[0].url}
-                        alt={stay.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-400 text-sm">No Image</span>
-                    )}
+                  <div className="relative px-3 pt-3">
+                    <div className="h-36 w-full bg-gray-100 rounded-xl overflow-hidden shadow-sm flex items-center justify-center">
+                      {stay?.documents?.[0]?.url ? (
+                        <img
+                          src={stay.documents[0].url}
+                          alt={stay.name}
+                          className="w-[95%] h-[95%] object-cover rounded-lg"
+                        />
+                      ) : (
+                        <span className="text-gray-400 text-sm">No Image</span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Content */}

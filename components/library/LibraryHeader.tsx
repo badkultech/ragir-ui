@@ -65,6 +65,16 @@ export function LibraryHeader({
           placeholder=" Search your library..."
         ></input>
       </div>
+
+      {/* Add Button */}
+      <Button
+        onClick={onAddClick}
+        className="flex items-center gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]  hover:opacity-90 hover:cursor-pointer text-white"
+      >
+
+        <Plus className="w-4 h-4" />
+        {buttonLabel}
+      </Button>
     </div>
   );
 }
