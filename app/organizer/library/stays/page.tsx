@@ -100,7 +100,7 @@ export default function StaysPage() {
                 >
                   {/* Image */}
                   <div className="h-32 bg-gray-100 flex items-center justify-center">
-                    {stay.documents?.[0]?.url ? (
+                    {stay?.documents?.[0]?.url ? (
                       <img
                         src={stay.documents[0].url}
                         alt={stay.name}
@@ -110,7 +110,6 @@ export default function StaysPage() {
                       <span className="text-gray-400 text-sm">No Image</span>
                     )}
                   </div>
-
                   {/* Content */}
                   <div className="p-4 flex-1 flex flex-col">
                     <h3 className="font-semibold text-gray-900">{stay.name}</h3>
