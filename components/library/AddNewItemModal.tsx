@@ -337,7 +337,11 @@ export function AddNewItemModal({
                     fd.append("sharingType", data.sharingType || "");
                     fd.append("checkIn", data.checkIn || "");
                     fd.append("checkOut", data.checkOut || "");
-                    data.images.forEach((img: File) => fd.append("images", img));
+                    if (data.images?.length) {
+                      data.images.forEach((file: File, index: number) =>
+                        fd.append(`documents[${index}].file`, file)
+                      );
+                    }
 
                     if (updateId) {
                       // 🟢 Update existing stay
@@ -400,7 +404,11 @@ export function AddNewItemModal({
                     fd.append("description", formData.description || "");
                     fd.append("packingSuggestion", formData.packing || "");
                     fd.append("chargeable", String(formData.included === "chargeable"));
-                    formData.images.forEach((img: File) => fd.append("images", img));
+                    if (formData.images?.length) {
+                      formData.images.forEach((file: File, index: number) =>
+                        fd.append(`documents[${index}].file`, file)
+                      );
+                    }
 
                     if (updateId) {
                       // ✅ Update existing meal
