@@ -47,8 +47,9 @@ export function LibraryHeader({
       {/* Add Button */}
       <Button
         onClick={onAddClick}
-        className="flex items-center gap-2 bg-gradient-to-r from-[#FEA901] via-[#FD6E34] to-[#FE336A] hover:bg-gradient-to-tl hover:cursor-pointer text-white"
+        className="flex items-center gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]  hover:opacity-90 hover:cursor-pointer text-white"
       >
+
         <Plus className="w-4 h-4" />
         {buttonLabel}
       </Button>
