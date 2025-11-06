@@ -9,6 +9,7 @@ import RichTextEditor from "@/components/editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "@/components/ui/use-toast";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import Select, { MultiValue } from "react-select";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -18,6 +19,8 @@ type AddActivityFormProps = {
   initialData?: any; // ✅ for edit mode
 };
 
+type OptionType = { value: string; label: string };
+
 export function AddActivityForm({
   mode = "trip",
   onCancel,
@@ -26,7 +29,6 @@ export function AddActivityForm({
   initialData,
 }: AddActivityFormProps) {
   const [title, setTitle] = useState("");
-  const [moodTags, setMoodTags] = useState<string[]>([]);
   const [priceType, setPriceType] = useState<"INCLUDED" | "CHARGEABLE">(
     "INCLUDED"
   );
@@ -40,6 +42,15 @@ export function AddActivityForm({
   const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
+  const moodOptions = [
+    { value: "ADVENTURE", label: "Adventure" },
+    { value: "RELAXING", label: "Relaxing" },
+    { value: "CULTURAL", label: "Cultural" },
+    { value: "FAMILY", label: "Family" },
+  ];
+  const [moodTags, setMoodTags] = useState<readonly OptionType[]>([
+    { value: "ADVENTURE", label: "Adventure" }, // ✅ default selected
+  ]);
 
   const isTripMode = mode === "trip";
 
@@ -141,22 +152,19 @@ export function AddActivityForm({
 
       {/* Mood Tags */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">
-          Mood Tags *
-        </label>
-        <select
-          multiple
-          value={moodTags}
-          onChange={(e) =>
-            setMoodTags(Array.from(e.target.selectedOptions, (o) => o.value))
-          }
-          className="w-full border rounded-lg p-2 text-sm text-gray-700"
-        >
-          <option value="ADVENTURE">Adventure</option>
-          <option value="RELAXING">Relaxing</option>
-          <option value="CULTURAL">Cultural</option>
-          <option value="FAMILY">Family</option>
-        </select>
+        <div>
+          <label className="block text-[0.95rem] font-medium mb-2">
+            Mood Tags *
+          </label>
+
+          <Select
+            options={moodOptions}
+            value={moodTags}
+            onChange={(selected) => setMoodTags(selected)}
+            isMulti
+            className="text-[0.95rem]"
+          />
+        </div>
         {errors.moodTags && (
           <p className="text-xs text-red-500 mt-1">{errors.moodTags}</p>
         )}
@@ -168,7 +176,7 @@ export function AddActivityForm({
           Price Charge *
         </label>
         <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2 text-[0.85rem]">
+          <label className="flex items-center gap-2 text-[0.95rem]">
             <input
               type="radio"
               checked={priceType === "INCLUDED"}
