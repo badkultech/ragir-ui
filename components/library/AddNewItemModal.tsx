@@ -466,6 +466,7 @@ export function AddNewItemModal({
                 onCancel={onClose}
                 onSave={async (data: any) => {
                   try {
+                    console.log(data.moodTags);
                     const fd = new FormData();
                     fd.append("name", data.title);
                     fd.append("location", data.location || "");
@@ -473,9 +474,12 @@ export function AddNewItemModal({
                     fd.append("packingSuggestion", data.packing || "");
                     fd.append("priceCharge", data.priceType);
                     fd.append("time", data.time || "");
-                    data.moodTags.forEach((tag: string) =>
-                      fd.append("moodTags", tag.toUpperCase())
+                    const formatted = data.moodTags.map(
+                      (tag: { label: string; value: string }) => tag.value
                     );
+
+                    fd.append("moodTags", formatted.join(","));
+
                     data.images.forEach((img: File) =>
                       fd.append("images", img)
                     );

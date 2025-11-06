@@ -415,9 +415,12 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
 
             {/* Text Content */}
             <div className="">
-              <p className="text-gray-700 text-[14px] mt-4 leading-relaxed">
-                {content.description}
-              </p>
+              <p
+                className="text-gray-700 text-[14px] mt-4 leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: content.description || "",
+                }}
+              ></p>
 
               <div className="flex justify-center flex-col text-gray-600 w-full gap-y-5 text-sm mt-4  border-b-1 border-[#E4E4E4] border-t-1 py-3">
                 {returnStepContent()}
@@ -447,9 +450,12 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                     ))
                   ) : (
                     <>
-                      <p className="font-medium text-gray-600 capitalize">
-                        {content.packingSuggestion}
-                      </p>
+                      <p
+                        className="font-medium text-gray-600 capitalize"
+                        dangerouslySetInnerHTML={{
+                          __html: content.packingSuggestion || "",
+                        }}
+                      ></p>
                     </>
                   )}
                 </div>
