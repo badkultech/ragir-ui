@@ -77,7 +77,7 @@ export default function ActivitiesPage() {
           {/* Header */}
           <LibraryHeader
             title="Ragir Library"
-            buttonLabel="Add Activity"
+            buttonLabel="Add Item"
             onAddClick={() => setModalOpen(true)}
           />
 
@@ -99,10 +99,10 @@ export default function ActivitiesPage() {
               {filtered.map((activity) => (
                 <div
                   key={activity.id}
-                  className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+                  className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-4 flex flex-col"
                 >
                   {/* Image */}
-                  <div className="h-32 bg-gray-100 flex items-center justify-center">
+                  <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
                     {activity?.documents?.[0]?.url ? (
                       <img
                         src={activity.documents[0].url}
@@ -115,7 +115,7 @@ export default function ActivitiesPage() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-4 flex-1 flex flex-col">
+                  <div className="py-4 flex-1 flex flex-col">
                     <h3 className="font-semibold text-gray-900">
                       {activity.name}
                     </h3>
