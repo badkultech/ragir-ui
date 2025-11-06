@@ -24,7 +24,7 @@ interface ViewModalProps {
 export function ViewModal({
     open,
     onClose,
-    step, 
+    step,
     data,
 }: ViewModalProps) {
 
@@ -92,223 +92,236 @@ export function ViewModal({
         switch (step) {
             case "day-description":
                 return (
-                   <>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <MapPin className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Location
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
-                               </div>
-                      </div>
-                   </>
+                    <>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <MapPin className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Location
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
+                            </div>
+                        </div>
+                    </>
                 )
             case "stays":
                 return (
-                   <>   
-                   <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <MapPin className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Location
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
-                               </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <HomeIcon className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Type of Sharing
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.sharingType}</h3>
-                               </div>
-                      </div>
-                       <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Clock className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        From
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.from}</h3>
-                               </div>
-                      </div>
-                       <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Clock className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        To
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.to}</h3>
-                               </div>
-                      </div>
-                   </>
+                    <>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <MapPin className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Location
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <HomeIcon className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Type of Sharing
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.sharingType}</h3>
+                            </div>
+                        </div>
+                        {/* Check-In Time */}
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Clock className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">From</h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900">
+                                    {content.check_in_time
+                                        ? content.check_in_time.slice(0, 5)
+                                        : "—"}
+                                </h3>
+                            </div>
+                        </div>
+
+                        {/* Check-Out Time */}
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Clock className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">To</h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900">
+                                    {content.check_out_time
+                                        ? content.check_out_time.slice(0, 5)
+                                        : "—"}
+                                </h3>
+                            </div>
+                        </div>
+                    </>
                 );
-                case "transit":
+            case "transit":
                 return (
-                   <>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Car className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Vehicle
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.vehicleType}</h3>
-                               </div>
-                      </div>
-                       <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Clock className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Departure
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.endTime}</h3>
-                               </div>
-                      </div>
-                       <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Clock className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Arrival
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.startTime}</h3>
-                               </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Route className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Mode of Arrangement
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.arrangedBy}</h3>
-                               </div>
-                      </div>
-                   </>
+                    <>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Car className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Vehicle
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.vehicleType}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Clock className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Departure
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.endTime}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Clock className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Arrival
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.startTime}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Route className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Mode of Arrangement
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.arrangedBy}</h3>
+                            </div>
+                        </div>
+                    </>
                 );
-                  case "meals":
-                  return (
-                   <>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <MapPin className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Location
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
-                               </div>
-                      </div>
-                       <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <UtensilsCrossed className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Meal Type
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.mealType}</h3>
-                               </div>
-                      </div>
-                       <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Banknote className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Price Charge
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.priceChargeMeal}</h3>
-                               </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Clock className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Time
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.Mealtime}</h3>
-                               </div>
-                      </div>
-                   </>
-                ); 
-                case "activity" :
-                     return (
-                   <>
-                     <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <PersonStanding className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Moods
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.moods}</h3>
-                               </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <MapPin className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Location
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
-                               </div>
-                      </div>
-                     
-                       <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Banknote className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Price Charge
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.priceChargeActivty}</h3>
-                               </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                                 <div className="flex items-center">
-                                     <Clock className="w-6 h-5 mr-2 text-gray-900" />
-                                     <h3 className="text-base font-normal text-gray-800">
-                                        Time
-                                    </h3>
-                                </div>
-                               <div className="flex items-center">
-                                    <h3 className="font-medium text-[14px] text-gray-900"> {content.activtyTime}</h3>
-                               </div>
-                      </div>
-                   </>
-                ); 
+            case "meals":
+                return (
+                    <>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <MapPin className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Location
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <UtensilsCrossed className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Meal Type
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.mealType}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+  <div className="flex items-center">
+    <Banknote className="w-6 h-5 mr-2 text-gray-900" />
+    <h3 className="text-base font-normal text-gray-800">
+      Price Charge
+    </h3>
+  </div>
+  <div className="flex items-center">
+    <h3
+      className="font-medium text-[14px] text-gray-900"
+    >
+      {content.chargeable ? "Chargeable" : "Included"}
+    </h3>
+  </div>
+</div>
+
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Clock className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Time
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.Mealtime}</h3>
+                            </div>
+                        </div>
+                    </>
+                );
+            case "activity":
+                return (
+                    <>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <PersonStanding className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Moods
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.moods}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <MapPin className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Location
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.location}</h3>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Banknote className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Price Charge
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.priceChargeActivty}</h3>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <Clock className="w-6 h-5 mr-2 text-gray-900" />
+                                <h3 className="text-base font-normal text-gray-800">
+                                    Time
+                                </h3>
+                            </div>
+                            <div className="flex items-center">
+                                <h3 className="font-medium text-[14px] text-gray-900"> {content.activtyTime}</h3>
+                            </div>
+                        </div>
+                    </>
+                );
             default:
                 return null;
-        }}
+        }
+    }
 
 
-    
+
     return (
         <>
             <Dialog open={open} onOpenChange={onClose}>
@@ -318,11 +331,11 @@ export function ViewModal({
 
                     <div className="max-h-[90vh] overflow-y-auto px-4 py-3 font-barlow">
 
-                         <DialogHeader>
-                                <DialogTitle className="text-lg md:text-lg font-[600] text-gray-900 px-1 pb-3">
-                                    {content.name}
-                                </DialogTitle>
-                            </DialogHeader>
+                        <DialogHeader>
+                            <DialogTitle className="text-lg md:text-lg font-[600] text-gray-900 px-1 pb-3">
+                                {content.name}
+                            </DialogTitle>
+                        </DialogHeader>
 
                         {/* Hero Image */}
                         {mainImage ? (
@@ -377,24 +390,24 @@ export function ViewModal({
 
                         {/* Text Content */}
                         <div className="">
-                              <p className="text-gray-700 text-[14px] mt-4 leading-relaxed">
+                            <p className="text-gray-700 text-[14px] mt-4 leading-relaxed">
                                 {content.description}
                             </p>
 
                             <div className="flex justify-center flex-col text-gray-600 w-full gap-y-5 text-sm mt-4  border-b-1 border-[#E4E4E4] border-t-1 py-3">
-                               {/* switch (step){
+                                {/* switch (step){
                                     case "day-description":
                                         return (
                                             <div className="flex items-center">
                                } */}
 
-                               
-                             {returnStepContent()}
-                               
-                               
+
+                                {returnStepContent()}
+
+
                             </div>
 
-                         
+
 
                             {/* Packing Suggestions */}
                             {content.packingSuggestion && typeof content.packingSuggestion == "object" && (
