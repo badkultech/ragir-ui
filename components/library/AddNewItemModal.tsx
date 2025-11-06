@@ -335,10 +335,13 @@ export function AddNewItemModal({
                     fd.append("description", data.description || "");
                     fd.append("packingSuggestion", data.packing || "");
                     fd.append("sharingType", data.sharingType || "");
-                    fd.append("checkIn", data.checkIn || "");
-                    fd.append("checkOut", data.checkOut || "");
-                    data.images.forEach((img: File) => fd.append("images", img));
-
+                    fd.append("check_in_time", data.checkIn || "");
+                    fd.append("check_out_time", data.checkOut || "");
+                    if (data.images?.length) {
+                      data.images.forEach((file: File, index: number) =>
+                        fd.append(`documents[${index}].file`, file)
+                      );
+                    }
                     if (updateId) {
                       // 🟢 Update existing stay
                       await updateStay({
@@ -393,6 +396,8 @@ export function AddNewItemModal({
                 onCancel={handleBack}
                 onSave={async (formData: any) => {
                   try {
+                    console.log("🧾 Sending chargeable field:", String(formData.included === "chargeable"));
+
                     const fd = new FormData();
                     fd.append("name", formData.title);
                     fd.append("mealType", formData.mealType.toUpperCase());
@@ -400,7 +405,12 @@ export function AddNewItemModal({
                     fd.append("description", formData.description || "");
                     fd.append("packingSuggestion", formData.packing || "");
                     fd.append("chargeable", String(formData.included === "chargeable"));
-                    formData.images.forEach((img: File) => fd.append("images", img));
+                    fd.append("time", formData.mealTime || ""); 
+                    if (formData.images?.length) {
+                      formData.images.forEach((file: File, index: number) =>
+                        fd.append(`documents[${index}].file`, file)
+                      );
+                    }
 
                     if (updateId) {
                       // ✅ Update existing meal

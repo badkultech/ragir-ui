@@ -48,8 +48,8 @@ export function AddStayForm({
 
     setTitle(initialData.title || initialData.name || "");
     setSharingType(initialData.sharingType || "");
-    setCheckIn(initialData.checkIn || "");
-    setCheckOut(initialData.checkOut || "");
+    setCheckIn(initialData.check_in_time || "");
+    setCheckOut(initialData.check_out_time  || "");
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
