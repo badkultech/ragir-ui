@@ -323,7 +323,7 @@ export function AddEventForm({
         </Button>
         <Button
           onClick={() => handleSubmit(false)}
-          className="rounded-full px-6 bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+          className="rounded-full px-6 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >
           Save
         </Button>

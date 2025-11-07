@@ -218,6 +218,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
             </div>
+            {/* 💰 Included / Chargeable */}
             <div className='flex justify-between items-center'>
               <div className='flex items-center'>
                 <Banknote className='w-6 h-5 mr-2 text-gray-900' />
@@ -227,8 +228,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               </div>
               <div className='flex items-center'>
                 <h3 className='font-medium text-[14px] text-gray-900'>
-                  {' '}
-                  {content.priceChargeMeal}
+                  {content.chargeable ? 'Chargeable' : 'Included'}
                 </h3>
               </div>
             </div>
@@ -352,11 +352,11 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   width={800}
                   height={400}
                   className='w-full h-56 md:h-60 rounded-[12px] object-cover'
-                  // unoptimized // <-- stops /_next/image proxying
-                  // // optional: if it expires, hide and show fallback
-                  // onError={(e) =>
-                  //   ((e.target as HTMLImageElement).style.display = 'none')
-                  // }
+                // unoptimized // <-- stops /_next/image proxying
+                // // optional: if it expires, hide and show fallback
+                // onError={(e) =>
+                //   ((e.target as HTMLImageElement).style.display = 'none')
+                // }
                 />
               ) : (
                 <div className='w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500'>
