@@ -24,6 +24,7 @@ import {
   YouTubeIcon,
 } from '@/components/library/SvgComponents/GradientsOfMoods';
 import { GradientButton } from '@/components/gradient-button';
+import { LazyImage } from '@/components/ui/lazyImage';
 
 // fake profile toggle (replace with API data later)
 const hasProfile = true;
@@ -35,69 +36,6 @@ export default function OrganizerProfilePage() {
   const organizationId = userData?.organizationPublicId;
   const dispatch = useDispatch();
   const { logoFile, bannerFile, testimonialScreenshotFile, profile } = state;
-
-  // Local LazyImage helper: skeleton + fade-in, handles cached images
-  const LazyImage = ({
-    src,
-    alt = '',
-    className = '',
-  }: {
-    src: string;
-    alt?: string;
-    className?: string;
-  }) => {
-    const [loaded, setLoaded] = useState(false);
-    const [showSkeleton, setShowSkeleton] = useState(true);
-    const imgRef = useRef<HTMLImageElement | null>(null);
-
-    useEffect(() => {
-      let cancelled = false;
-      setLoaded(false);
-      setShowSkeleton(true);
-
-      const el = imgRef.current;
-      const finish = () => {
-        if (cancelled) return;
-        setTimeout(() => {
-          if (!cancelled) {
-            setLoaded(true);
-            setShowSkeleton(false);
-          }
-        }, 200);
-      };
-
-      if (el && el.complete) {
-        finish();
-        return () => {
-          cancelled = true;
-        };
-      }
-
-      const onLoad = () => finish();
-      el?.addEventListener('load', onLoad);
-      return () => {
-        cancelled = true;
-        el?.removeEventListener('load', onLoad);
-      };
-    }, [src]);
-
-    return (
-      <div className={`relative overflow-hidden ${className}`}>
-        {showSkeleton && (
-          <div className='absolute inset-0 bg-gray-200 animate-pulse z-0' />
-        )}
-        <img
-          ref={imgRef}
-          src={src}
-          alt={alt}
-          loading='lazy'
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-10 ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      </div>
-    );
-  };
 
   const [getOrgProfile, { isLoading: profileLoading }] =
     useLazyGetOrganizerProfileQuery();

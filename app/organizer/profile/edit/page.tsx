@@ -27,6 +27,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { UploadIcon } from 'lucide-react';
+import { LazyImage } from '@/components/ui/lazyImage';
 
 export default function OrganizerProfileEditPage() {
   const dispatch = useDispatch();
@@ -43,72 +44,6 @@ export default function OrganizerProfileEditPage() {
   // Lazy image helper: shows skeleton while loading and fades in.
   // Handles cached images by checking image.complete and enforces a short
   // minimum skeleton duration so the user perceives a loading state.
-  const LazyImage = ({
-    src,
-    alt = '',
-    className = '',
-  }: {
-    src: string;
-    alt?: string;
-    className?: string;
-  }) => {
-    const [loaded, setLoaded] = useState(false);
-    const [showSkeleton, setShowSkeleton] = useState(true);
-    const imgRef = useRef<HTMLImageElement | null>(null);
-
-    // When src changes, reset states and listen for load or check complete.
-    useEffect(() => {
-      let cancel = false;
-      setLoaded(false);
-      setShowSkeleton(true);
-
-      const imgEl = imgRef.current;
-
-      const finish = () => {
-        if (cancel) return;
-        // keep skeleton visible for at least 200ms so it's noticeable
-        setTimeout(() => {
-          if (!cancel) {
-            setLoaded(true);
-            setShowSkeleton(false);
-          }
-        }, 200);
-      };
-
-      if (imgEl && imgEl.complete) {
-        // image already cached/loaded
-        finish();
-        return () => {
-          cancel = true;
-        };
-      }
-
-      const onLoad = () => finish();
-      imgEl?.addEventListener('load', onLoad);
-
-      return () => {
-        cancel = true;
-        imgEl?.removeEventListener('load', onLoad);
-      };
-    }, [src]);
-
-    return (
-      <div className={`relative overflow-hidden ${className}`}>
-        {showSkeleton && (
-          <div className='absolute inset-0 bg-gray-200 animate-pulse z-0' />
-        )}
-        <img
-          ref={imgRef}
-          src={src}
-          alt={alt}
-          loading='lazy'
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-10 ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      </div>
-    );
-  };
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
