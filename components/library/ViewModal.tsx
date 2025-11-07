@@ -157,7 +157,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                             <div className="flex items-center">
                                 <h3 className="font-medium text-[14px] text-gray-900">
                                     {" "}
-                                    {content.from}
+                                    {content.check_in_time}
                                 </h3>
                             </div>
                         </div>
@@ -169,7 +169,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                             <div className="flex items-center">
                                 <h3 className="font-medium text-[14px] text-gray-900">
                                     {" "}
-                                    {content.to}
+                                    {content.check_out_time}
                                 </h3>
                             </div>
                         </div>
