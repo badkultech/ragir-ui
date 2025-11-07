@@ -66,6 +66,7 @@ export const LazyImage = ({
         alt={alt}
         height={height}
         width={width}
+        unoptimized 
         loading='lazy'
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-10 ${
           loaded ? 'opacity-100' : 'opacity-0'
