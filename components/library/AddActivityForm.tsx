@@ -60,7 +60,7 @@ export function AddActivityForm({
 
   // Images split
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
-  const [newImages, setNewImages] = useState<File[]>([]);
+  const [images, setImages] = useState<File[]>([]); // <-- this is the ONLY field we send out
 
   const isTripMode = mode === "trip";
 
@@ -122,18 +122,18 @@ export function AddActivityForm({
 
     const normalizedExisting = normalizeImagesFromInitial(initialData);
     setExistingImages(normalizedExisting);
-    setNewImages([]);
+    setImages([]); // new picks are always empty on load
   }, [initialData]);
 
   /** ---------- Images: previews + handlers ---------- */
-  const newImagePreviews = useMemo(
-    () => newImages.map((f) => URL.createObjectURL(f)),
-    [newImages]
+  const imagePreviews = useMemo(
+    () => images.map((f) => URL.createObjectURL(f)),
+    [images]
   );
 
   useEffect(() => {
-    return () => newImagePreviews.forEach((u) => URL.revokeObjectURL(u));
-  }, [newImagePreviews]);
+    return () => imagePreviews.forEach((u) => URL.revokeObjectURL(u));
+  }, [imagePreviews]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -153,7 +153,7 @@ export function AddActivityForm({
       });
     }
 
-    setNewImages((prev) => [...prev, ...filtered]);
+    setImages((prev) => [...prev, ...filtered]);
     e.target.value = "";
   };
 
@@ -162,7 +162,7 @@ export function AddActivityForm({
   };
 
   const removeNew = (idx: number) => {
-    setNewImages((prev) => prev.filter((_, i) => i !== idx));
+    setImages((prev) => prev.filter((_, i) => i !== idx));
   };
 
   /** ---------- Library select ---------- */
@@ -173,7 +173,7 @@ export function AddActivityForm({
     const libImgs = normalizeImagesFromInitial(item);
     if (libImgs.length) {
       setExistingImages(libImgs.slice(0, 6));
-      setNewImages([]);
+      setImages([]);
     }
     if (Array.isArray(item.moodTags)) {
       const opts = item.moodTags.map(normalizeMoodOption).filter(Boolean) as OptionType[];
@@ -196,7 +196,7 @@ export function AddActivityForm({
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    // 🔒 Sanitize moods: only non-empty strings
+    // Only non-empty mood strings
     const moods = moodTags
       .map((t) => (t?.value ?? "").toString().trim())
       .filter((v) => v.length > 0);
@@ -204,14 +204,13 @@ export function AddActivityForm({
     try {
       await onSave({
         title,
-        moodTags: moods, // ← clean strings only
-        priceType,
+        moodTags: moods,          // string[]
+        priceType,                // INCLUDED | CHARGEABLE
         location,
         time,
         description,
         packing,
-        imagesToUpload: newImages,
-        keepImages: existingImages,
+        images,                   // <-- ONLY this goes out (File[])
         mode,
       });
       showSuccess("Activity saved successfully!");
@@ -352,7 +351,7 @@ export function AddActivityForm({
           Images (Max 6)
         </label>
 
-        {(existingImages.length > 0 || newImages.length > 0) && (
+        {(existingImages.length > 0 || images.length > 0) && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
             {existingImages.map((img, idx) => (
               <div
@@ -372,26 +371,23 @@ export function AddActivityForm({
               </div>
             ))}
 
-            {newImages.map((file, idx) => {
-              const url = URL.createObjectURL(file);
-              return (
-                <div
-                  key={`new-${idx}`}
-                  className="relative group overflow-hidden rounded-xl border"
+            {imagePreviews.map((url, idx) => (
+              <div
+                key={`new-${idx}`}
+                className="relative group overflow-hidden rounded-xl border"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="New upload" className="w-full h-28 object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeNew(idx)}
+                  className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition"
+                  aria-label="Remove image"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="New upload" className="w-full h-28 object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeNew(idx)}
-                    className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition"
-                    aria-label="Remove image"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              );
-            })}
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
           </div>
         )}
 
@@ -408,9 +404,9 @@ export function AddActivityForm({
           />
         </label>
 
-        {(existingImages.length + newImages.length) > 0 && (
+        {(existingImages.length + images.length) > 0 && (
           <p className="text-sm text-gray-500 mt-2">
-            {existingImages.length + newImages.length} image(s) selected
+            {existingImages.length + images.length} image(s) selected
           </p>
         )}
       </div>
