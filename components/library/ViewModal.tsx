@@ -387,8 +387,6 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                         </DialogHeader>
 
                         {/* Hero Image */}
-                        import Image from "next/image";
-
                         {mainImage ? (
                             <Image
                                 src={mainImage}

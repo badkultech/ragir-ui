@@ -470,6 +470,13 @@ export function AddNewItemModal({
                 onSave={async (data: any) => {
                   try {
                     console.log(data.moodTags);
+                     const moods: string[] = Array.isArray(data.moodTags)
+      ? data.moodTags
+          .map((t: any) =>
+            typeof t === "string" ? t.trim() : String(t?.value ?? "").trim()
+          )
+          .filter(Boolean)
+      : [];
                     const fd = new FormData();
                     fd.append("name", data.title);
                     fd.append("location", data.location || "");
@@ -481,11 +488,13 @@ export function AddNewItemModal({
                       (tag: { label: string; value: string }) => tag.value
                     );
 
-                    fd.append("moodTags", formatted.join(","));
+                     moods.forEach((m) => fd.append("moodTags", m));
 
-                    data.images.forEach((img: File) =>
-                      fd.append("images", img)
-                    );
+                    if (data.images?.length) {
+                      data.images.forEach((file: File, index: number) =>
+                        fd.append(`documents[${index}].file`, file)
+                      );
+                    }
 
                     if (updateId) {
                       // 🟢 Update existing activity
