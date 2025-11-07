@@ -51,7 +51,16 @@ export function AddStayForm({
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
+
+    // ✅ Handle existing backend images
+    if (initialData.documents && Array.isArray(initialData.documents)) {
+      const urls = initialData.documents
+        .filter((doc: any) => doc.url)
+        .map((doc: any) => doc.url);
+      setPreviewUrls(urls);
+    }
   }, [initialData]);
+
 
   // ✅ File input with preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -219,17 +228,20 @@ export function AddStayForm({
           />
         </label>
 
-        {/* ✅ Show image previews */}
         {previewUrls.length > 0 && (
           <div className="flex flex-wrap gap-3 mt-3">
             {previewUrls.map((url, index) => (
-              <div key={index} className="relative w-20 h-20 border rounded-lg overflow-hidden">
+              <div
+                key={index}
+                className="relative w-20 h-20 border rounded-lg overflow-hidden"
+              >
                 <Image
                   src={url}
                   alt={`Preview ${index + 1}`}
                   width={80}
                   height={80}
                   className="object-cover w-full h-full"
+                  unoptimized // avoid Next.js proxy errors for external URLs
                 />
                 <button
                   type="button"
