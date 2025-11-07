@@ -91,14 +91,14 @@ export default function EventsPage() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-white">
         <AppHeader title="Events" />
 
         <main className="flex-1 p-6 md:p-4">
           {/* Header */}
           <LibraryHeader
             title="Ragir Library"
-            buttonLabel="Add Event"
+            buttonLabel="Add Item"
             onAddClick={() => {
               setUpdateId(null);
               setModalOpen(true);
@@ -115,14 +115,14 @@ export default function EventsPage() {
           </div> */}
 
           {/* Card Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-6">
             {dayDescriptions?.map((dayDescription) => (
               <div
                 key={dayDescription.id}
-                className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+                className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 overflow-hidden flex flex-col"
               >
                 {/* Image */}
-                <div className="h-32 bg-gray-100 flex items-center justify-center">
+                <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
                   {dayDescription.documents ? (
                     <img
                       src={dayDescription.documents[0].url}
@@ -135,7 +135,7 @@ export default function EventsPage() {
                 </div>
 
                 {/* Content */}
-                <div className="p-4 flex-1 flex flex-col">
+                <div className="py-4 flex-1 flex flex-col">
                   <h3 className="font-bold text-gray-900">
                     <strong> {dayDescription.name}</strong>
                   </h3>
@@ -200,8 +200,8 @@ export default function EventsPage() {
       <AddNewItemModal
         open={modalOpen}
         updateId={updateId}
-        onClose = {() => setModalOpen(false)}
-        initialStep='event' // 👈 opens AddStayForm directly
+        onClose={() => setModalOpen(false)}
+        initialStep="event" // 👈 opens AddStayForm directly
       />
       <ViewModal
         step="day-description"

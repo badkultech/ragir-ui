@@ -43,9 +43,18 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { Document } from "@/lib/services/organizer/trip/library/day-description/types";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useCreateMealMutation, useUpdateMealMutation } from "@/lib/services/organizer/trip/library/meal";
-import { useCreateStayMutation, useUpdateStayMutation } from "@/lib/services/organizer/trip/library/stay";
-import { useCreateActivityMutation, useUpdateActivityMutation } from "@/lib/services/organizer/trip/library/activity";
+import {
+  useCreateMealMutation,
+  useUpdateMealMutation,
+} from "@/lib/services/organizer/trip/library/meal";
+import {
+  useCreateStayMutation,
+  useUpdateStayMutation,
+} from "@/lib/services/organizer/trip/library/stay";
+import {
+  useCreateActivityMutation,
+  useUpdateActivityMutation,
+} from "@/lib/services/organizer/trip/library/activity";
 
 /* ===== types ===== */
 type Step =
@@ -152,7 +161,8 @@ export function AddNewItemModal({
 
     if (data.documents) {
       data.documents.forEach((document: Document, index: number) => {
-        if (document.file) formData.append(`documents[${index}].file`, document.file);
+        if (document.file)
+          formData.append(`documents[${index}].file`, document.file);
         if (document.markedForDeletion)
           formData.append(
             `documents[${index}].markedForDeletion`,
@@ -163,10 +173,10 @@ export function AddNewItemModal({
 
     const request = updateId
       ? updateOrganizerDayDescription({
-        organizationId,
-        data: formData,
-        dayDescriptionId: updateId.toString(),
-      })
+          organizationId,
+          data: formData,
+          dayDescriptionId: updateId.toString(),
+        })
       : createOrganizerDayDescription({ organizationId, data: formData });
 
     request
@@ -191,7 +201,10 @@ export function AddNewItemModal({
       Array.isArray(data.vehicle) ? data.vehicle[0] : data.vehicle || ""
     );
     formData.append("customVehicleType", data.otherVehicle || "");
-    formData.append("arrangedBy", (data.arrangement || "organizer").toUpperCase());
+    formData.append(
+      "arrangedBy",
+      (data.arrangement || "organizer").toUpperCase()
+    );
     formData.append("description", data.description || "");
     formData.append("packagingSuggestion", data.packing || "");
     formData.append("addToLibrary", "true");
@@ -205,14 +218,14 @@ export function AddNewItemModal({
 
     const request = editingId
       ? updateOrganizerTransit({
-        organizationId,
-        transitId: editingId,
-        data: formData,
-      })
+          organizationId,
+          transitId: editingId,
+          data: formData,
+        })
       : createOrganizerTransit({
-        organizationId,
-        data: formData,
-      });
+          organizationId,
+          data: formData,
+        });
 
     request
       .unwrap()
@@ -247,7 +260,7 @@ export function AddNewItemModal({
         }
       }}
     >
-      <DialogContent className="w-full max-w-3xl rounded-2xl overflow-hidden">
+      <DialogContent className="w-full lg:max-w-2xl rounded-2xl overflow-hidden">
         <div className="max-h-[90vh] overflow-y-auto">
           {/* ---------------- Step: Select ---------------- */}
           {step === "select" && (
@@ -259,13 +272,16 @@ export function AddNewItemModal({
                   <button
                     key={label}
                     onClick={() => setSelected({ label, icon: Icon, step })}
-                    className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${selected?.label === label
-                      ? "border-orange-500 shadow-md"
-                      : "border-gray-200 hover:border-orange-400"
-                      }`}
+                    className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${
+                      selected?.label === label
+                        ? "border-orange-500 shadow-md"
+                        : "border-gray-200 hover:border-orange-400"
+                    }`}
                   >
                     <Icon className="h-6 w-6 text-gray-600 mb-2" />
-                    <span className="text-sm font-medium text-gray-700">{label}</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      {label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -279,13 +295,16 @@ export function AddNewItemModal({
                       step: "faq",
                     })
                   }
-                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${selected?.label === "FAQs"
-                    ? "border-orange-500 shadow-md"
-                    : "border-gray-200 hover:border-orange-400"
-                    }`}
+                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${
+                    selected?.label === "FAQs"
+                      ? "border-orange-500 shadow-md"
+                      : "border-gray-200 hover:border-orange-400"
+                  }`}
                 >
                   <HelpCircle className="h-6 w-6 text-gray-600 mb-2" />
-                  <span className="text-sm font-medium text-gray-700">FAQs</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    FAQs
+                  </span>
                 </button>
               </div>
 
@@ -309,7 +328,11 @@ export function AddNewItemModal({
           {/* ---------------- Step: Event ---------------- */}
           {step === "event" && (
             <>
-              <StepHeader title={updateId ? "Edit Day Description" : "Add Day Description"} />
+              <StepHeader
+                title={
+                  updateId ? "Edit Day Description" : "Add Day Description"
+                }
+              />
               <AddEventForm
                 updateId={updateId}
                 mode="library"
@@ -363,7 +386,6 @@ export function AddNewItemModal({
               />
             </>
           )}
-
 
           {/* ---------------- Step: Transit ---------------- */}
           {step === "transit" && (
@@ -437,7 +459,6 @@ export function AddNewItemModal({
             </>
           )}
 
-
           {/* ---------------- Step: Activity ---------------- */}
           {step === "activity" && (
             <>
@@ -448,6 +469,14 @@ export function AddNewItemModal({
                 onCancel={onClose}
                 onSave={async (data: any) => {
                   try {
+                    console.log(data.moodTags);
+                     const moods: string[] = Array.isArray(data.moodTags)
+      ? data.moodTags
+          .map((t: any) =>
+            typeof t === "string" ? t.trim() : String(t?.value ?? "").trim()
+          )
+          .filter(Boolean)
+      : [];
                     const fd = new FormData();
                     fd.append("name", data.title);
                     fd.append("location", data.location || "");
@@ -455,8 +484,17 @@ export function AddNewItemModal({
                     fd.append("packingSuggestion", data.packing || "");
                     fd.append("priceCharge", data.priceType);
                     fd.append("time", data.time || "");
-                    data.moodTags.forEach((tag: string) => fd.append("moodTags", tag.toUpperCase()));
-                    data.images.forEach((img: File) => fd.append("images", img));
+                    const formatted = data.moodTags.map(
+                      (tag: { label: string; value: string }) => tag.value
+                    );
+
+                     moods.forEach((m) => fd.append("moodTags", m));
+
+                    if (data.images?.length) {
+                      data.images.forEach((file: File, index: number) =>
+                        fd.append(`documents[${index}].file`, file)
+                      );
+                    }
 
                     if (updateId) {
                       // 🟢 Update existing activity
@@ -467,7 +505,10 @@ export function AddNewItemModal({
                       }).unwrap();
                     } else {
                       // 🟠 Create new activity
-                      await createActivity({ organizationId, data: fd }).unwrap();
+                      await createActivity({
+                        organizationId,
+                        data: fd,
+                      }).unwrap();
                     }
 
                     onClose();
@@ -480,11 +521,12 @@ export function AddNewItemModal({
             </>
           )}
 
-
           {/* ---------------- Step: Trip Leader ---------------- */}
           {step === "trip-leader" && (
             <>
-              <StepHeader title={updateId ? "Edit Trip Leader" : "Add Trip Leader"} />
+              <StepHeader
+                title={updateId ? "Edit Trip Leader" : "Add Trip Leader"}
+              />
               <AddTripLeaderForm
                 updateId={updateId}
                 mode="library"
@@ -534,18 +576,31 @@ function TransitEditLoader({
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
-  const { data: transit, isLoading, isFetching, error } = useGetOrganizerTransitByIdQuery(
-    organizationId && updateId ? { organizationId, transitId: updateId } : skipToken
+  const {
+    data: transit,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetOrganizerTransitByIdQuery(
+    organizationId && updateId
+      ? { organizationId, transitId: updateId }
+      : skipToken
   );
 
   useEffect(() => {
-    console.log("Fetching transit data for ID:", updateId, "Org:", organizationId);
+    console.log(
+      "Fetching transit data for ID:",
+      updateId,
+      "Org:",
+      organizationId
+    );
   }, [updateId, organizationId]);
-
 
   if (isLoading)
     return (
-      <div className="text-center text-gray-500 py-10">Loading transit details...</div>
+      <div className="text-center text-gray-500 py-10">
+        Loading transit details...
+      </div>
     );
 
   if (!transit)

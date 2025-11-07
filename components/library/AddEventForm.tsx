@@ -132,7 +132,7 @@ export function AddEventForm({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between w-full">
         {header && (
-          <div className="text-lg  font-semibold text-gray-800  pb-2">
+          <div className="text-lg font-semibold text-gray-800  pb-2">
             {header}
           </div>
         )}
