@@ -3,19 +3,20 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "../ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
+import Image from "next/image";
 
 type AddStayFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any) => void;
   header?: string;
-  initialData?: any; // ✅ NEW for edit prefill
+  initialData?: any;
 };
 
 export function AddStayForm({
@@ -33,36 +34,44 @@ export function AddStayForm({
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
   const [images, setImages] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState("");
   const isTripMode = mode === "trip";
 
-  // ✅ Prefill form when editing existing stay
   useEffect(() => {
     if (!initialData) return;
-
-    console.log("Prefilling stay form with:", initialData);
 
     setTitle(initialData.title || initialData.name || "");
     setSharingType(initialData.sharingType || "");
     setCheckIn(initialData.check_in_time || "");
-    setCheckOut(initialData.check_out_time  || "");
+    setCheckOut(initialData.check_out_time || "");
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
   }, [initialData]);
 
-  // ✅ Handle file input
+  // ✅ File input with preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setImages(Array.from(e.target.files));
+      const selectedFiles = Array.from(e.target.files);
+      setImages((prev) => [...prev, ...selectedFiles]);
+      const urls = selectedFiles.map((file) => URL.createObjectURL(file));
+      setPreviewUrls((prev) => [...prev, ...urls]);
+
     }
   };
 
-  // ✅ Handle "Choose from Library"
+  // ✅ Remove individual image
+  const removeImage = (index: number) => {
+    const updatedImages = images.filter((_, i) => i !== index);
+    const updatedPreviews = previewUrls.filter((_, i) => i !== index);
+    setImages(updatedImages);
+    setPreviewUrls(updatedPreviews);
+  };
+
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
     setLocation(item.location || "");
@@ -83,7 +92,6 @@ export function AddStayForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Submit data to parent
   const handleSubmit = async () => {
     const isValid = validateForm();
     if (!isValid) return;
@@ -99,6 +107,7 @@ export function AddStayForm({
         packing,
         images,
         mode,
+        saveInLibrary,
       });
       showSuccess("Stay saved successfully!");
     } catch {
@@ -107,17 +116,10 @@ export function AddStayForm({
   };
 
   return (
-    <div
-      className="flex flex-col gap-6"
-      style={{ fontFamily: "var(--font-poppins)" }}
-    >
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
       {/* Header */}
       <div className="flex items-center justify-between w-full">
-        {header && (
-          <div className="text-lg font-semibold text-gray-800 pb-2">
-            {header}
-          </div>
-        )}
+        {header && <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>}
       </div>
 
       {/* Top-right button */}
@@ -129,22 +131,22 @@ export function AddStayForm({
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Title *
-        </label>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter title"
-          maxLength={70}
-        />
-        {errors.title && (
-          <p className="text-xs text-red-500 mt-1">{errors.title}</p>
-        )}
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {title.length}/70 Characters
-        </p>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+        <div className="relative">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter title"
+            maxLength={70}
+            className="pr-20" // 👈 space for counter text
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-orange-500">
+            {title.length}/70 Characters
+          </span>
+        </div>
+        {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
       </div>
+
 
       {/* Sharing type */}
       <div>
@@ -158,70 +160,41 @@ export function AddStayForm({
           <option value="DOUBLE">Double Occupancy</option>
           <option value="TRIPLE">Triple Occupancy</option>
         </select>
-        {errors.sharingType && (
-          <p className="text-xs text-red-500 mt-1">{errors.sharingType}</p>
-        )}
+        {errors.sharingType && <p className="text-xs text-red-500 mt-1">{errors.sharingType}</p>}
       </div>
 
-      {/* Check-in / Check-out + Location */}
+      {/* Check-in / Check-out */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Check-in Time *
-          </label>
-          <Input
-            type="time"
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-          />
-          {errors.checkIn && (
-            <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>
-          )}
+          <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Time *</label>
+          <Input type="time" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+          {errors.checkIn && <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Check-out Time *
-          </label>
-          <Input
-            type="time"
-            value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-          />
-          {errors.checkOut && (
-            <p className="text-xs text-red-500 mt-1">{errors.checkOut}</p>
-          )}
+          <label className="block text-sm font-medium text-gray-700 mb-1">Check-out Time *</label>
+          <Input type="time" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+          {errors.checkOut && <p className="text-xs text-red-500 mt-1">{errors.checkOut}</p>}
         </div>
       </div>
 
+      {/* Location */}
       <Input
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         placeholder="Location"
       />
-      {errors.location && (
-        <p className="text-xs text-red-500 mt-1">{errors.location}</p>
-      )}
+      {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description
-        </label>
-        <RichTextEditor
-          placeholder="Enter description"
-          value={description}
-          onChange={setDescription}
-        />
-        {errors.description && (
-          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
-        )}
+        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <RichTextEditor placeholder="Enter description" value={description} onChange={setDescription} />
+        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
       </div>
 
       {/* Packing Suggestions */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Packing Suggestions
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
         <RichTextEditor
           value={packing}
           onChange={setPacking}
@@ -232,9 +205,7 @@ export function AddStayForm({
 
       {/* Image Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Images (Max 6)
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 6)</label>
         <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition">
           <Upload className="w-6 h-6 text-gray-400 mb-2" />
           <span className="text-sm text-gray-600">Upload Images</span>
@@ -247,49 +218,62 @@ export function AddStayForm({
             onChange={handleFileChange}
           />
         </label>
-        {images.length > 0 && (
-          <p className="text-sm text-orange-500 mt-2">
-            {images.length} file(s) selected
-          </p>
+
+        {/* ✅ Show image previews */}
+        {previewUrls.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-3">
+            {previewUrls.map((url, index) => (
+              <div key={index} className="relative w-20 h-20 border rounded-lg overflow-hidden">
+                <Image
+                  src={url}
+                  alt={`Preview ${index + 1}`}
+                  width={80}
+                  height={80}
+                  className="object-cover w-full h-full"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-[2px]"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
+      {/* ✅ Save in Library (Custom Checkbox) */}
       {isTripMode && (
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex justify-end items-center gap-2">
-            <Input
+        <div className="flex justify-end items-center gap-2 mt-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
               type="checkbox"
               checked={saveInLibrary}
               onChange={(e) => setSaveInLibrary(e.target.checked)}
-              className="w-[22px]"
+              className="appearance-none w-5 h-5 border-2 rounded-sm checked:bg-orange-500 checked:border-orange-500 flex items-center justify-center cursor-pointer"
+              style={{
+                backgroundImage: saveInLibrary
+                  ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M6.003 10.803l-2.85-2.849L1.3 9.808l4.703 4.704L14.7 5.815l-1.854-1.854z'/%3E%3C/svg%3E\")"
+                  : "none",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
             />
-            <label className="block text-[0.95rem] font-medium">
-              Save in Library
-            </label>
-          </div>
-
-          <Input
-            type="text"
-            value={saveAsName}
-            onChange={(e) => setSaveAsName(e.target.value)}
-            placeholder="Save As"
-            className="p-4 w-[12rem]"
-          />
+            <span className="text-sm font-medium text-gray-700">Save in Library</span>
+          </label>
         </div>
       )}
 
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
-        <Button
-          variant="outline"
-          className="rounded-full px-6"
-          onClick={onCancel}
-        >
+        <Button variant="outline" className="rounded-full px-6" onClick={onCancel}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
-          className="rounded-full px-6 gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]  hover:opacity-90 text-white"
+          className="rounded-full px-6 gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >
           Save
         </Button>
