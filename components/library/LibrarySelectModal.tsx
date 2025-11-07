@@ -17,6 +17,11 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useGetOrganizerTransitsQuery } from "@/lib/services/organizer/trip/library/transit";
 import { useGetGroupLeadersQuery } from "@/lib/services/organizer/trip/library/leader";
+import { useGetStaysQuery } from "@/lib/services/organizer/trip/library/stay";
+import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
+import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
+import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
+import { useGetOrganizerDayDescriptionQuery } from "@/lib/services/organizer/trip/library/day-description";
 
 
 
@@ -59,45 +64,55 @@ export function LibrarySelectModal({
 }: Props) {
   const [selected, setSelected] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
-const { userData } = useSelector(selectAuthState);
-const organizationId = userData?.organizationPublicId;
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
 
-const shouldSkip = !organizationId;
+  const shouldSkip = !organizationId;
 
-const {
-  data: itemsData,
-  isLoading,
-  isError,
-} =
-  category === "faqs"
-    ? useGetOrganizerFaqsQuery(
+  const {
+    data: itemsData,
+    isLoading,
+    isError,
+  } =
+    category === "faqs"
+      ? useGetOrganizerFaqsQuery(
         { organizationId },
         { skip: shouldSkip, refetchOnMountOrArgChange: true }
       )
-    : category === "transit"
-    ? useGetOrganizerTransitsQuery(
-        { organizationId },
-        { skip: shouldSkip, refetchOnMountOrArgChange: true }
-      )
-    : category === "trip-leaders"
-    ? useGetGroupLeadersQuery(organizationId ?? "", {
-        skip: shouldSkip,
-        refetchOnMountOrArgChange: true,
-      })
-    : { data: [], isLoading: false, isError: false };
+      : category === "transit"
+        ? useGetOrganizerTransitsQuery(
+          { organizationId },
+          { skip: shouldSkip, refetchOnMountOrArgChange: true }
+        )
+        : category === "trip-leaders"
+          ? useGetGroupLeadersQuery(organizationId ?? "", {
+            skip: shouldSkip,
+            refetchOnMountOrArgChange: true,
+          })
 
 
-      // : category === "stays"
-      // ? useGetOrganizerStaysQuery()
-      // : category === "meals"
-      // ? useGetOrganizerMealsQuery()
-      // : category === "transit"
-      // ?
-      // : category === "activities"
-      // ? useGetOrganizerActivitiesQuery()
-      // : category === "events"
-      // ? useGetOrganizerEventsQuery()
-      // : useGetOrganizerTripLeadersQuery();
+          : category === "stays"
+            ? useGetStaysQuery(organizationId ?? "", {
+              skip: shouldSkip,
+              refetchOnMountOrArgChange: true,
+            })
+            : category === "meals"
+              ? useGetMealsQuery(organizationId ?? "", {
+                skip: shouldSkip,
+                refetchOnMountOrArgChange: true,
+              })
+              : category === "activities"
+                ? useGetActivitiesQuery(organizationId ?? "", {
+                  skip: shouldSkip,
+                  refetchOnMountOrArgChange: true,
+                })
+                : category === "events"
+                  ? useGetOrganizerDayDescriptionQuery(organizationId ?? "", {
+                    skip: shouldSkip,
+                    refetchOnMountOrArgChange: true,
+                  })
+                  : { data: [], isLoading: false, isError: false };
+
 
   const items: LibraryItem[] =
     itemsData?.map((item: any) => ({
@@ -167,11 +182,10 @@ const {
                         onSelect(item);
                         onClose();
                       }}
-                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
-                        selected === item.id
+                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${selected === item.id
                           ? "border-orange-500 shadow"
                           : "border-gray-200 hover:border-orange-400"
-                      }`}
+                        }`}
                     >
                       <img
                         src={item.image || "/default-avatar.png"}
@@ -187,7 +201,7 @@ const {
                             "{item.description}"
                           </div>
                         )}
-                         {item.answer && (
+                        {item.answer && (
                           <div className="text-sm text-gray-600">
                             "{item.answer}"
                           </div>
@@ -207,11 +221,10 @@ const {
                         onSelect(item);
                         onClose();
                       }}
-                      className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
-                        selected === item.id
+                      className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${selected === item.id
                           ? "border-orange-500 shadow"
                           : "border-gray-200 hover:border-orange-400"
-                      }`}
+                        }`}
                     >
                       <div className="font-medium text-gray-900">
                         {item.title}
@@ -226,7 +239,7 @@ const {
                           {item.description}
                         </div>
                       )}
-                       {item.answer && (
+                      {item.answer && (
                         <div className="text-sm text-gray-600">
                           {item.answer}
                         </div>
