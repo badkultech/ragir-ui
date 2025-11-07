@@ -111,10 +111,10 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                             </div>
                             <div className="flex items-center">
                                 <h3 className="font-medium text-[14px] text-gray-900">
-                                    {" "}
-                                    {content.location}
+                                    {content.location?.split(",").map((loc:string) => loc.trim()).join(" | ")}
                                 </h3>
                             </div>
+
                         </div>
                     </>
                 );
@@ -337,7 +337,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                             <div className="flex items-center">
                                 <h3 className="font-medium text-[14px] text-gray-900">
                                     {" "}
-                                    {content.location}
+                                    {content.location?.split(",").map((loc:string) => loc.trim()).join(" | ")}
                                 </h3>
                             </div>
                         </div>
