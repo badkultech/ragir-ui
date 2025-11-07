@@ -119,8 +119,8 @@ export default function RegisterOrganizer() {
           onMenuClick={() => setSidebarOpen(true)}
         />
 
-        <main className="flex flex-1 items-left justify-left p-2 ">
-          <div className="bg-white rounded-lg shadow-sm border p-4 w-full max-w-3xl">
+        <main className="flex flex-1 items-start justify-start p-2 w-full overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-sm border p-4 w-full">
             <form
               onSubmit={onSubmit}
               className="space-y-6 flex flex-col items-left"
