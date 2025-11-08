@@ -146,19 +146,23 @@ export function AddEventForm({
       {/* Title */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-1">Title *</label>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter title"
-          maxLength={70}
-        />
+        <div className="relative">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter title"
+            maxLength={70}
+            className="pr-20" 
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-orange-500">
+            {title.length}/70 Characters
+          </span>
+        </div>
         {errors.title && (
           <p className="text-xs text-red-500 mt-1">{errors.title}</p>
         )}
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {title.length}/70 Characters
-        </p>
       </div>
+
 
       {/* Description */}
       <div>
@@ -180,9 +184,6 @@ export function AddEventForm({
         {errors.description && (
           <p className="text-xs text-red-500 mt-1">{errors.description}</p>
         )}
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {description.length}/800 Words
-        </p>
       </div>
 
       {/* Location + Time */}
@@ -230,9 +231,7 @@ export function AddEventForm({
           placeholder="Enter here"
           maxLength={800}
         />
-        <p className="text-xs text-right text-gray-400 mt-1">
-          {packing.length}/800 Words
-        </p>
+
       </div>
 
       {/* Image Upload */}

@@ -110,7 +110,7 @@ export default function OrganizerProfilePage() {
                 </p>
 
                 <Link href='/organizer/profile/edit'>
-                  <Button className='rounded-full px-6 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white'>
+                  <Button className='rounded-full px-6 py-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]  hover:opacity-90 text-white'>
                     Add Details +
                   </Button>
                 </Link>
