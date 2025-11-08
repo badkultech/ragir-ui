@@ -22,6 +22,7 @@ import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
 import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useGetOrganizerDayDescriptionQuery } from "@/lib/services/organizer/trip/library/day-description";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 
 
@@ -64,8 +65,8 @@ export function LibrarySelectModal({
 }: Props) {
   const [selected, setSelected] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  
+  const organizationId = useOrganizationId();
 
   const shouldSkip = !organizationId;
 
@@ -106,12 +107,13 @@ export function LibrarySelectModal({
                   skip: shouldSkip,
                   refetchOnMountOrArgChange: true,
                 })
-                : category === "events"
-                  ? useGetOrganizerDayDescriptionQuery(organizationId ?? "", {
-                    skip: shouldSkip,
-                    refetchOnMountOrArgChange: true,
-                  })
-                  : { data: [], isLoading: false, isError: false };
+                 : { data: [], isLoading: false, isError: false };
+                // : category === "events"
+                //   ? useGetOrganizerDayDescriptionQuery(organizationId ?? "", {
+                //     skip: shouldSkip,
+                //     refetchOnMountOrArgChange: true,
+                //   })
+                //   : { data: [], isLoading: false, isError: false };
 
 
   const items: LibraryItem[] =
