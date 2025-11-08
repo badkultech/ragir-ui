@@ -49,21 +49,27 @@ export function AddTripLeaderForm({
 
   // ✅ Prefill for edit mode
   useEffect(() => {
-    if (updateId && orgId) {
-      getLeaderById({ organizationId: orgId, leaderId: updateId })
-        .unwrap()
-        .then((res: any) => {
-          const data = res?.data;
-          if (data) {
-            setName(data.name || "");
-            setTagline(data.tagline || "");
-            setBio(data.bio || "");
-            if (data.documents?.[0]?.url) setPreviewUrl(data.documents[0].url);
-          }
-        })
-        .catch((err) => console.error("❌ Failed to load leader:", err));
+  const fetchLeader = async () => {
+    if (!updateId || !orgId) return;
+    try {
+      const data = await getLeaderById({
+        organizationId: orgId,
+        leaderId: updateId,
+      }).unwrap();
+      // ✅ Update states synchronously
+      setName(data.name || "");
+      setTagline(data.tagline || "");
+      setBio(data.bio || "");
+      setPreviewUrl(data.documents?.[0]?.url || null);
+    } catch (err) {
+      console.error("❌ Failed to load leader:", err);
     }
-  }, [updateId, orgId, getLeaderById]);
+  };
+
+  fetchLeader();
+}, [updateId, orgId, getLeaderById]);
+
+
 
   // ✅ File preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
