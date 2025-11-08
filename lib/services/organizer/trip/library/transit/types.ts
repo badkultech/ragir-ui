@@ -23,3 +23,19 @@ export interface TransitResponse extends LibraryResponse {
   description?: string;
   packagingSuggestion?: string;
 }
+
+
+export const TransitTypeLabels: Record<string, string> = {
+  TRAVELER_VAN: "Traveler Van",
+  CAR: "Car",
+  MOTORBIKE: "Motorbike",
+  CRUISE: "Cruise",
+  AIRPLANE: "Airplane",
+  TRAIN: "Train",
+  BUS: "Bus",
+};
+
+export const ArrangedByTypeLabels: Record<string, string> = {
+  ORGANIZER: "Arranged by the organizer",
+  SELF: "Self arranged by the traveler",
+};

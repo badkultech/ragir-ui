@@ -21,6 +21,8 @@ import {
 } from "@/lib/services/organizer/trip/library/transit";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { ViewModal } from "@/components/library/ViewModal";
+import { TransitTypeLabels } from "@/lib/services/organizer/trip/library/transit/types";
+import { formatTime } from "@/lib/utils/timeUtils";
 
 export default function TransitPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -110,23 +112,16 @@ export default function TransitPage() {
                       {t.fromLocation} → {t.toLocation}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      {t.vehicleType} ({t.arrangedBy})
+                      {TransitTypeLabels[t.vehicleType]}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
-                      {t.startTime} → {t.endTime}
+                      Departure {formatTime(t.startTime)}
+                       {' '} | Arrival {formatTime(t.endTime)}
+
                     </p>
 
                     <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                      {/* 👁 View */}
-                      <button
-                        className="hover:text-blue-500"
-                        onClick={() => {
-                          setViewOpen(true);
-                          setSelectedTransitId(t.id);
-                        }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+                     
 
                       {/* ✏ Edit */}
                       <button
@@ -138,6 +133,17 @@ export default function TransitPage() {
                         }}
                       >
                         <Pencil className="w-4 h-4" />
+                      </button>
+
+                       {/* 👁 View */}
+                      <button
+                        className="hover:text-blue-500"
+                        onClick={() => {
+                          setViewOpen(true);
+                          setSelectedTransitId(t.id);
+                        }}
+                      >
+                        <Eye className="w-4 h-4" />
                       </button>
 
                       {/* 🗑 Delete */}
@@ -313,8 +319,10 @@ export default function TransitPage() {
         step='transit'
         open={viewOpen}
         data={selectedTransit}
-        onClose={() => {setViewOpen(false)
-          setSelectedTransitId(null);}}
+        onClose={() => {
+          setViewOpen(false)
+          setSelectedTransitId(null);
+        }}
       />
     </div>
   );

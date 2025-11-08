@@ -21,9 +21,11 @@ import {
 import { useMemo, useState } from 'react';
 import { FullImageGalleryModal } from './FullImageGalleryModal';
 import Home from '@/app/prelaunch/page';
-import { MealType } from '@/lib/services/organizer/trip/library/meal/types';
+import { MealType, mealTypeLabels } from '@/lib/services/organizer/trip/library/meal/types';
 import { m } from 'framer-motion';
 import { LazyImage } from '../ui/lazyImage';
+import { ArrangedByTypeLabels, TransitTypeLabels } from '@/lib/services/organizer/trip/library/transit/types';
+import { formatTime } from '@/lib/utils/timeUtils';
 
 interface ViewModalProps {
   open: boolean;
@@ -138,7 +140,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className='flex items-center'>
                 <h3 className='font-medium text-[14px] text-gray-900'>
                   {' '}
-                  {content.vehicleType}
+                   {TransitTypeLabels[content.transitType]}
                 </h3>
               </div>
             </div>
@@ -151,8 +153,9 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               </div>
               <div className='flex items-center'>
                 <h3 className='font-medium text-[14px] text-gray-900'>
-                  {' '}
-                  {content.endTime}
+                  {content.fromLocation}
+                  {'  |  '}
+                  {formatTime(content.startTime)}
                 </h3>
               </div>
             </div>
@@ -163,8 +166,9 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               </div>
               <div className='flex items-center'>
                 <h3 className='font-medium text-[14px] text-gray-900'>
-                  {' '}
-                  {content.startTime}
+                {content.toLocation}
+                  {'  |  '}
+                 {formatTime(content.endTime)}
                 </h3>
               </div>
             </div>
@@ -178,7 +182,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className='flex items-center'>
                 <h3 className='font-medium text-[14px] text-gray-900'>
                   {' '}
-                  {content.arrangedBy}
+                  {ArrangedByTypeLabels[content.arrangedBy]}
                 </h3>
               </div>
             </div>
@@ -212,10 +216,12 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className='flex items-center'>
+                 {content.mealType !== undefined && (
                 <h3 className='font-medium text-[14px] text-gray-900'>
                   {' '}
-                  {content.mealType}
+                   {mealTypeLabels[content.mealType]}
                 </h3>
+                 )}
               </div>
             </div>
             {/* 💰 Included / Chargeable */}
