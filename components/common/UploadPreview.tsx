@@ -1,3 +1,4 @@
+// components/UploadPreview.tsx
 "use client";
 
 import React from "react";
@@ -9,12 +10,12 @@ import {
 
 type UploadPreviewProps = {
   documentsManager?: ReturnType<typeof useDocumentsManager>;
-  maxFiles?: number;
+  maxFiles?: number; // total available slots (default 6)
   label?: string;
   accept?: string;
   maxFileSizeMB?: number;
   helperText?: string;
-  single?: boolean;
+  single?: boolean; // true => single-file UX but manager still keeps maxFiles slots
 };
 
 export function UploadPreview({
@@ -29,69 +30,21 @@ export function UploadPreview({
   const localManager = useDocumentsManager([], maxFiles);
   const manager = documentsManager ?? localManager;
 
-  const { documents, setDocuments, handleAddFiles, handleMarkForDeletion } = manager;
-
+  const documents = manager.documents;
   const availableSlots = manager.availableIndexes.length;
-  const totalUsed = documents.filter(
-    (d) => d.file || (d.id && !d.markedForDeletion),
-  ).length;
+  const totalUsed = documents.filter((d) => d.file || (d.id && !d.markedForDeletion)).length;
   const isSingle = !!single || maxFiles === 1;
-
-  // --- UI-layer helpers (no hook modification needed) ---
-
-  const handleReplaceFileAtIndex = (file: File, idx: number) => {
-    // Replace logic: treat as markForDeletion+newFile assignment
-    setDocuments((prev) => {
-      const updated = [...prev];
-      const prevDoc = updated[idx];
-      if (!prevDoc) return prev;
-
-      // Revoke any blob URL before replacing
-      if (prevDoc.url?.startsWith("blob:")) {
-        try {
-          URL.revokeObjectURL(prevDoc.url);
-        } catch {}
-      }
-
-      const blobUrl = URL.createObjectURL(file);
-
-      updated[idx] = {
-        ...prevDoc,
-        id: prevDoc.id ?? null,
-        type: file.type,
-        url: blobUrl,
-        file,
-        markedForDeletion: !!prevDoc.id, // if existing -> backend knows it's a replace
-      };
-
-      return updated;
-    });
-  };
-
-  const handleRemoveAtIndex = (idx: number) => {
-    const doc = documents[idx];
-    handleMarkForDeletion(doc?.id ?? null, idx);
-  };
-
-  const handleUnmarkDeletion = (idx: number) => {
-    setDocuments((prev) => {
-      const updated = [...prev];
-      const current = updated[idx];
-      if (!current) return prev;
-      updated[idx] = { ...current, markedForDeletion: false };
-      return updated;
-    });
-  };
 
   const onFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     if (isSingle) {
+      // pick the first available index; if none available, replace index 0
       const idx = manager.availableIndexes[0] ?? 0;
-      handleReplaceFileAtIndex(files[0], idx);
+      manager.handleReplaceFileAtIndex(files[0], idx);
     } else {
-      handleAddFiles(files);
+      manager.handleAddFiles(files);
     }
 
     e.currentTarget.value = "";
@@ -99,22 +52,15 @@ export function UploadPreview({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label} {`(Max ${maxFiles})`}
-      </label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">{label} {`(Max ${maxFiles})`}</label>
 
       <label
-        className={`flex flex-col items-center justify-center w-full h-28 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition ${
-          availableSlots === 0 && !isSingle ? "opacity-60 cursor-not-allowed" : ""
-        }`}
+        className={`flex flex-col items-center justify-center w-full h-28 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition ${availableSlots === 0 && !isSingle ? "opacity-60 cursor-not-allowed" : ""
+          }`}
       >
         <Upload className="w-6 h-6 text-gray-400 mb-2" />
-        <span className="text-sm text-gray-600">
-          Click to upload{isSingle ? "" : " (multiple allowed)"}
-        </span>
-        <span className="text-xs text-gray-400">
-          {accept.split(",").join(", ")} up to {maxFileSizeMB}MB
-        </span>
+        <span className="text-sm text-gray-600">Click to upload{isSingle ? "" : " (multiple allowed)"}</span>
+        <span className="text-xs text-gray-400">{accept.split(",").join(", ")} up to {maxFileSizeMB}MB</span>
 
         <input
           type="file"
@@ -135,19 +81,13 @@ export function UploadPreview({
             const hasUrl = !!doc.url;
             const isMarked = !!doc.markedForDeletion;
 
+            // show only non-empty slots (either url/file or server id)
             if (!hasFile && !hasUrl && !doc.id) return null;
 
             return (
-              <div
-                key={idx}
-                className="relative w-24 h-24 border rounded-lg overflow-hidden"
-              >
+              <div key={idx} className="relative w-24 h-24 border rounded-lg overflow-hidden">
                 {hasUrl || hasFile ? (
-                  <img
-                    src={String(doc.url)}
-                    alt={`preview-${idx}`}
-                    className="object-cover w-full h-full"
-                  />
+                  <img src={String(doc.url)} alt={`preview-${idx}`} className="object-cover w-full h-full" />
                 ) : (
                   <div className="flex items-center justify-center w-full h-full bg-gray-100 text-xs text-gray-400">
                     No preview
@@ -164,7 +104,7 @@ export function UploadPreview({
                   {isMarked ? (
                     <button
                       type="button"
-                      onClick={() => handleUnmarkDeletion(idx)}
+                      onClick={() => manager.handleUnmarkDeletion(idx)}
                       className="bg-white/80 text-sm px-2 rounded text-gray-700"
                       title="Undo delete"
                     >
@@ -172,18 +112,15 @@ export function UploadPreview({
                     </button>
                   ) : (
                     <>
-                      <label
-                        title="Replace"
-                        className="bg-white/80 rounded p-1 cursor-pointer"
-                      >
+                      <label title="Replace" className="bg-white/80 rounded p-1 cursor-pointer">
                         <input
                           type="file"
                           accept={accept}
                           className="hidden"
                           onChange={(e) => {
                             const f = e.target.files?.[0];
-                            if (f) handleReplaceFileAtIndex(f, idx);
-                            e.currentTarget.value = "";
+                            if (f) manager.handleReplaceFileAtIndex(f, idx);
+                            if (e.currentTarget) e.currentTarget.value = "";
                           }}
                         />
                         <Pencil size={14} className="text-gray-700" />
@@ -191,7 +128,7 @@ export function UploadPreview({
 
                       <button
                         type="button"
-                        onClick={() => handleRemoveAtIndex(idx)}
+                        onClick={() => manager.handleRemoveAtIndex(idx)}
                         className="bg-black/60 text-white rounded-full p-[2px]"
                         title="Remove"
                       >

@@ -3,7 +3,7 @@
 // - honors the Document shape you provided
 // - supports mark-for-deletion for existing docs
 // - enforces a MAX_DOCS cap (6 by default)
-import { Document } from "@/hooks/useDocumentsManager";
+
 export interface DocumentItem {
   id: number | null;
   type: string | null;
@@ -56,43 +56,57 @@ export function appendDocuments(
   }[] | null,
   maxDocs: number = MAX_DOCS
 ) {
-  const docsArray = Array.from({ length: maxDocs }).map(
-    (_, i) => (documents && documents[i]) || {
-      id: null,
-      type: null,
-      url: null,
-      file: null,
-      markedForDeletion: false,
-    }
+  if (!documents || documents.length === 0) {
+    // still set count 0 (optional)
+    fd.append("documentsCount", "0");
+    return fd;
+  }
+
+  // Ensure stable iteration 0..maxDocs-1
+  const docsArray = Array.from({ length: maxDocs }).map((_, i) =>
+    documents[i] ? documents[i] : null
   );
 
-  // Always tell server we’re sending full 6
-  fd.append("documentsCount", String(maxDocs));
+  // compute actual highest index used (helpful for server)
+  let highestIndex = -1;
+  for (let i = 0; i < docsArray.length; i++) {
+    if (docsArray[i]) highestIndex = i;
+  }
+
+  // tell server how many positions we considered
+  fd.append("documentsCount", String(Math.max(0, highestIndex + 1)));
 
   for (let i = 0; i < docsArray.length; i++) {
     const doc = docsArray[i];
     const base = `documents[${i}]`;
 
-    // Always include basic fields, even if empty
-    fd.append(`${base}.id`, doc.id !== null ? String(doc.id) : "");
-    fd.append(`${base}.markedForDeletion`, String(!!doc.markedForDeletion));
+    if (!doc) {
+      // keep index stable but don't append empty url/id/file
+      continue;
+    }
 
-    // If a new file exists, include it
+    // 1) Always include existing id (server will map to storage record)
+    if (doc.id !== null && doc.id !== undefined) {
+      fd.append(`${base}.id`, String(doc.id));
+    }
+
+    // 2) If user uploaded a new file in this slot, send it as file
     if (doc.file instanceof File) {
       const filename = doc.file.name || `document_${i}`;
       fd.append(`${base}.file`, doc.file, filename);
 
-      if (doc.type) {
-        fd.append(`${base}.fileType`, doc.type);
-      }
-    } else {
-      // Append empty file to keep form structure predictable
-      // fd.append(`${base}.file`, "");
+      // optional: include mime/type
+      if (doc.type) fd.append(`${base}.fileType`, doc.type);
     }
 
-    // Optional: include type and url placeholders for consistency
-    fd.append(`${base}.type`, doc.type ?? "");
-    // fd.append(`${base}.url`, doc.url ?? "");
+    // 3) If user marked it for deletion, send the flag
+    if (doc.markedForDeletion) {
+      fd.append(`${base}.markedForDeletion`, "true");
+    }
+
+    // NOTE: intentionally do NOT append url for existing docs because:
+    //  - urls are presigned and can expire (403)
+    //  - backend should rely on id to reference existing stored assets
   }
 
   return fd;
@@ -125,6 +139,7 @@ export function mapStayToFormData(data: any, documents?: DocumentItem[]) {
 
   // stay-specific fields
   if (data.sharingType !== undefined) fd.append("sharingType", String(data.sharingType));
+  // use camelCase checkInTime/checkOutTime in formdata (normalize across project)
   if (data.checkIn !== undefined) fd.append("checkInTime", data.checkIn);
   if (data.checkOut !== undefined) fd.append("checkOutTime", data.checkOut);
 
@@ -212,16 +227,4 @@ export function mapDayDescriptionToFormData(data: any, documents?: DocumentItem[
   // prefer explicit passed documents (from your useDocumentsManager). If none passed, try data.documents
   appendDocuments(fd, documents ?? data.documents ?? null);
   return fd;
-}
-
-export function mapDocumentsForBackend(docs: Document[]) {
-  return docs.map((doc) => ({
-    id: doc.id,
-    markedForDeletion: doc.markedForDeletion,
-    // For new uploads, send file reference or null if none
-    file: doc.file ?? null,
-    // You can include URL or type if backend needs
-    type: doc.type,
-    url: doc.url,
-  }));
 }

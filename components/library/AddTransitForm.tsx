@@ -9,16 +9,11 @@ import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "@/components/ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
-import { MultiUploader } from "../common/UploadFieldShortcuts";
-import {
-  useDocumentsManager,
-  Document as DocShape,
-} from "@/hooks/useDocumentsManager";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
-  onSave: (data: any, documents?: DocShape[]) => void;
+  onSave: (data: any) => void;
   header?: string;
   initialData?: any; // ✅ NEW
 };
@@ -40,7 +35,6 @@ export function AddTransitForm({
   header,
   initialData,
 }: AddTransitFormProps) {
-  const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
   const [title, setTitle] = useState("Mumbai To Goa Transit");
   const [from, setFrom] = useState("Mumbai");
   const [to, setTo] = useState("Goa");
@@ -60,9 +54,8 @@ export function AddTransitForm({
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [existingImages, setExistingImages] = useState<
-    { id: number; url: string }[]
-  >([]);
+  const [existingImages, setExistingImages] = useState<{ id: number; url: string }[]>([]);
+
 
   useEffect(() => {
     if (!initialData) return;
@@ -84,11 +77,10 @@ export function AddTransitForm({
         .filter((doc: any) => doc.url)
         .map((doc: any) => ({ id: doc.id, url: doc.url }));
       setExistingImages(existing);
-      setPreviewUrls(
-        existing.map((img: { id: number; url: string }) => img.url)
-      );
+      setPreviewUrls(existing.map((img: { id: number; url: string }) => img.url));
     }
   }, [initialData]);
+
 
   const toggleVehicle = (v: string) => {
     setVehicle((prev) =>
@@ -101,12 +93,11 @@ export function AddTransitForm({
     if (existing) {
       setExistingImages((prev) => prev.filter((img) => img.url !== url));
     } else {
-      setImages((prev) =>
-        prev.filter((_, i) => URL.createObjectURL(prev[i]) !== url)
-      );
+      setImages((prev) => prev.filter((_, i) => URL.createObjectURL(prev[i]) !== url));
     }
     setPreviewUrls((prev) => prev.filter((item) => item !== url));
   };
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -116,6 +107,7 @@ export function AddTransitForm({
       setPreviewUrls((prev) => [...prev, ...newUrls]);
     }
   };
+
 
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
@@ -142,25 +134,24 @@ export function AddTransitForm({
   };
 
   const handleSubmit = async () => {
+    // Run validation
     const isValid = validateForm();
     if (!isValid) return;
 
     try {
-      onSave(
-        {
-          title,
-          from,
-          to,
-          departure,
-          arrival,
-          vehicle: vehicle.length ? vehicle : otherVehicle,
-          arrangement,
-          description,
-          packing,
-          mode,
-        },
-        docsManager.documents
-      );
+      onSave({
+        title,
+        from,
+        to,
+        departure,
+        arrival,
+        vehicle: vehicle.length ? vehicle : otherVehicle,
+        arrangement,
+        description,
+        packing,
+        images,
+        mode,
+      });
       showSuccess("Transit saved successfully!");
     } catch {
       showApiError("Failed to save Transit");
@@ -260,11 +251,10 @@ export function AddTransitForm({
               type="button"
               key={v.value}
               onClick={() => toggleVehicle(v.value)}
-              className={`px-4 py-2 rounded-lg border text-sm ${
-                vehicle.includes(v.value)
+              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
                   ? "bg-orange-500 text-white border-orange-500"
                   : "border-gray-300 hover:border-orange-400"
-              }`}
+                }`}
             >
               {v.label}
             </button>
@@ -340,16 +330,67 @@ export function AddTransitForm({
       </div>
 
       {/* Image Upload */}
-      {/* Upload area: uses MultiUploader and shares docsManager */}
       <div>
-        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
-        <MultiUploader documentsManager={docsManager} label="Images" />
-
-        {/* Show any manager-level error */}
-        {docsManager.error && (
-          <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Images (Max 6)
+        </label>
+        <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition">
+          <Upload className="w-6 h-6 text-gray-400 mb-2" />
+          <span className="text-sm text-gray-600">Upload Images</span>
+          <span className="text-xs text-gray-400">PNG, JPG up to 10MB</span>
+          <input
+            type="file"
+            accept="image/png,image/jpeg"
+            multiple
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </label>
+        {images.length > 0 && (
+          <p className="text-sm text-orange-500 mt-2">
+            {images.length} file(s) selected
+          </p>
         )}
       </div>
+
+      {/* ✅ Show image previews (existing + new) */}
+      {previewUrls.length > 0 && (
+        <div className="flex flex-wrap gap-3 mt-3">
+          {previewUrls.map((url, index) => (
+            <div
+              key={index}
+              className="relative w-20 h-20 border rounded-lg overflow-hidden"
+            >
+              <img
+                src={url}
+                alt={`Preview ${index + 1}`}
+                className="object-cover w-full h-full rounded-md"
+              />
+
+              {/* ❌ Delete button (top-right corner) */}
+              <button
+                type="button"
+                onClick={() => removeImage(url)}
+                className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-[2px] hover:bg-black transition"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-3.5 h-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Save in Library (Trip Mode Only) */}
 
       {isTripMode && (
