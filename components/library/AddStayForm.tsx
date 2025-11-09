@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
@@ -11,10 +10,18 @@ import { useToast } from "../ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 import Image from "next/image";
 
+import {
+  useDocumentsManager,
+  Document as DocShape,
+} from "@/hooks/useDocumentsManager";
+import { MultiUploader } from "../common/UploadFieldShortcuts";
+
+
 type AddStayFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
-  onSave: (data: any) => void;
+  // onSave receives form data as first arg; optionally second arg is documents array
+  onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
   initialData?: any;
 };
@@ -26,6 +33,10 @@ export function AddStayForm({
   header,
   initialData,
 }: AddStayFormProps) {
+  const isTripMode = mode === "trip";
+  const { toast } = useToast();
+
+  // form fields
   const [title, setTitle] = useState("");
   const [sharingType, setSharingType] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -33,93 +44,87 @@ export function AddStayForm({
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
-  const [images, setImages] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [libraryOpen, setLibraryOpen] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const isTripMode = mode === "trip";
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Documents manager: use external if provided else create local
+  const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
+
+  // initialize form values when the record identity changes (initialData?.id)
   useEffect(() => {
     if (!initialData) return;
 
     setTitle(initialData.title || initialData.name || "");
     setSharingType(initialData.sharingType || "");
-    setCheckIn(initialData.check_in_time || "");
-    setCheckOut(initialData.check_out_time || "");
+    setCheckIn(initialData.checkInTime || "");
+    setCheckOut(initialData.checkOutTime || "");
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
+    setSaveInLibrary(!!initialData.saveInLibrary);
 
-    // ✅ Handle existing backend images
-    if (initialData.documents && Array.isArray(initialData.documents)) {
-      const urls = initialData.documents
-        .filter((doc: any) => doc.url)
-        .map((doc: any) => doc.url);
-      setPreviewUrls(urls);
+    // reset documents in the manager to reflect the incoming record
+    try {
+      docsManager.resetDocuments(initialData.documents ?? []);
+    } catch (e) {
+      // older manager may not have resetDocuments - ignore
     }
-  }, [initialData]);
+    // only run when identity changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData?.id]);
 
+  // keep a derived set of values for UI
+  const documents = docsManager.documents;
+  const totalUsed = useMemo(
+    () => documents.filter((d) => d.file || (d.id && !d.markedForDeletion)).length,
+    [documents],
+  );
+  const availableSlots = docsManager.availableIndexes.length;
 
-  // ✅ File input with preview
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
-      setImages((prev) => [...prev, ...selectedFiles]);
-      const urls = selectedFiles.map((file) => URL.createObjectURL(file));
-      setPreviewUrls((prev) => [...prev, ...urls]);
+  // validation
+  const validateForm = () => {
+    const nextErrors: Record<string, string> = {};
+    if (!title.trim()) nextErrors.title = "Title is required";
+    if (!sharingType.trim()) nextErrors.sharingType = "Sharing Type is required";
+    if (!checkIn.trim()) nextErrors.checkIn = "Check In Time is required";
+    if (!checkOut.trim()) nextErrors.checkOut = "Check Out Time is required";
+    if (!location.trim()) nextErrors.location = "Location is required";
+    if (!description.trim()) nextErrors.description = "Description is required";
 
-    }
-  };
-
-  // ✅ Remove individual image
-  const removeImage = (index: number) => {
-    const updatedImages = images.filter((_, i) => i !== index);
-    const updatedPreviews = previewUrls.filter((_, i) => i !== index);
-    setImages(updatedImages);
-    setPreviewUrls(updatedPreviews);
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
     setLocation(item.location || "");
     setDescription(item.description || "");
-  };
-
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!sharingType.trim()) newErrors.sharingType = "Sharing Type is required";
-    if (!checkIn.trim()) newErrors.checkIn = "Check In Time is required";
-    if (!checkOut.trim()) newErrors.checkOut = "Check Out Time is required";
-    if (!description.trim()) newErrors.description = "Description is required";
-    if (!location.trim()) newErrors.location = "Location is required";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setLibraryOpen(false);
   };
 
   const handleSubmit = async () => {
-    const isValid = validateForm();
-    if (!isValid) return;
+    if (!validateForm()) {
+      return;
+    }
+
+    const payload = {
+      title,
+      sharingType,
+      checkIn,
+      checkOut,
+      location,
+      description,
+      packing,
+      mode,
+      saveInLibrary,
+    };
 
     try {
-      onSave({
-        title,
-        sharingType,
-        checkIn,
-        checkOut,
-        location,
-        description,
-        packing,
-        images,
-        mode,
-        saveInLibrary,
-      });
+      onSave(payload, documents);
       showSuccess("Stay saved successfully!");
-    } catch {
+    } catch (err) {
+      console.error("Save stay failed", err);
       showApiError("Failed to save Stay");
     }
   };
@@ -131,11 +136,13 @@ export function AddStayForm({
         {header && <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>}
       </div>
 
-      {/* Top-right button */}
+      {/* Library chooser (only in trip mode) */}
       {isTripMode ? (
-        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+        <div className="flex justify-end">
+          <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+        </div>
       ) : (
-        <div className="mt-2" />
+        <div />
       )}
 
       {/* Title */}
@@ -147,7 +154,7 @@ export function AddStayForm({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter title"
             maxLength={70}
-            className="pr-20" // 👈 space for counter text
+            className="pr-20"
           />
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-orange-500">
             {title.length}/70 Characters
@@ -156,8 +163,7 @@ export function AddStayForm({
         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
       </div>
 
-
-      {/* Sharing type */}
+      {/* Sharing */}
       <div>
         <select
           value={sharingType}
@@ -187,12 +193,10 @@ export function AddStayForm({
       </div>
 
       {/* Location */}
-      <Input
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        placeholder="Location"
-      />
-      {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+      <div>
+        <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" />
+        {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+      </div>
 
       {/* Description */}
       <div>
@@ -204,59 +208,20 @@ export function AddStayForm({
       {/* Packing Suggestions */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
-        <RichTextEditor
-          value={packing}
-          onChange={setPacking}
-          placeholder="Enter here"
-          maxLength={800}
-        />
+        <RichTextEditor value={packing} onChange={setPacking} placeholder="Enter here" maxLength={800} />
       </div>
 
-      {/* Image Upload */}
+      {/* Upload area: uses MultiUploader and shares docsManager */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 6)</label>
-        <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition">
-          <Upload className="w-6 h-6 text-gray-400 mb-2" />
-          <span className="text-sm text-gray-600">Upload Images</span>
-          <span className="text-xs text-gray-400">PNG, JPG up to 10MB</span>
-          <input
-            type="file"
-            accept="image/png,image/jpeg"
-            multiple
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </label>
 
-        {previewUrls.length > 0 && (
-          <div className="flex flex-wrap gap-3 mt-3">
-            {previewUrls.map((url, index) => (
-              <div
-                key={index}
-                className="relative w-20 h-20 border rounded-lg overflow-hidden"
-              >
-                <Image
-                  src={url}
-                  alt={`Preview ${index + 1}`}
-                  width={80}
-                  height={80}
-                  className="object-cover w-full h-full"
-                  unoptimized // avoid Next.js proxy errors for external URLs
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-[2px]"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
+        <MultiUploader documentsManager={docsManager} label="Images" />
+
+        {/* Show any manager-level error */}
+        {docsManager.error && <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>}
       </div>
 
-      {/* ✅ Save in Library (Custom Checkbox) */}
+      {/* Save in Library */}
       {isTripMode && (
         <div className="flex justify-end items-center gap-2 mt-2">
           <label className="flex items-center gap-2 cursor-pointer">
