@@ -123,7 +123,7 @@ export default function EventsPage() {
               >
                 {/* Image */}
                 <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
-                  {dayDescription.documents ? (
+                  {dayDescription.documents?.[0]?.url ? (
                     <img
                       src={dayDescription.documents[0].url}
                       alt={dayDescription.name}
