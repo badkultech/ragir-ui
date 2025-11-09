@@ -20,7 +20,10 @@ export default function StaysPage() {
 
   // ✅ Local state
   const [modalOpen, setModalOpen] = useState(false);
-  const [editStay, setEditStay] = useState<any>(null);
+
+  // NEW: id of stay to edit (modal will fetch full record by this id)
+  const [editStayId, setEditStayId] = useState<number | null>(null);
+
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -75,7 +78,11 @@ export default function StaysPage() {
           {/* Header */}
           <LibraryHeader
             buttonLabel="Add stay"
-            onAddClick={() => setModalOpen(true)}
+            onAddClick={() => {
+              // opening create modal -> clear edit id
+              setEditStayId(null);
+              setModalOpen(true);
+            }}
             title="Ragir Library"
           />
 
@@ -138,7 +145,9 @@ export default function StaysPage() {
                       <button
                         className="hover:text-orange-500"
                         onClick={() => {
-                          setEditStay(stay);
+                          console.log("StaysPage -> open edit modal id:", stay.id);
+                          // set the id to edit (modal will fetch full record by id)
+                          setEditStayId(stay.id);
                           setModalOpen(true);
                         }}
                       >
@@ -170,12 +179,11 @@ export default function StaysPage() {
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
-          setEditStay(null);
+          setEditStayId(null); // reset edit id when modal closes
           refetch();
         }}
         initialStep="stay"
-        updateId={editStay?.id}
-        editData={editStay}
+        updateId={editStayId} // pass only id; modal should fetch full stay by id
       />
       <ViewModal
         step="stays"

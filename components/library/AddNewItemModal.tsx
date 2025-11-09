@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,11 +25,12 @@ import { AddMealForm } from "@/components/library/AddMealForm";
 import { AddActivityForm } from "./AddActivityForm";
 import { AddTripLeaderForm } from "./AddTripLeaderForm";
 import { AddEventForm } from "@/components/library/AddEventForm";
-import { AddTransitForm } from "./AddTransitForm";
+import { AddTransitForm } from "@/components/library/AddTransitForm";
 import { AddFAQForm } from "@/components/library/AddFAQForm";
 
 import {
   useCreateOrganizerDayDescriptionMutation,
+  useGetOrganizerDayDescriptionByIdQuery,
   useUpdateOrganizerDayDescriptionMutation,
 } from "@/lib/services/organizer/trip/library/day-description";
 
@@ -41,20 +42,29 @@ import {
 
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { Document } from "@/lib/services/organizer/trip/library/day-description/types";
 import { skipToken } from "@reduxjs/toolkit/query";
+
 import {
   useCreateMealMutation,
   useUpdateMealMutation,
 } from "@/lib/services/organizer/trip/library/meal";
 import {
   useCreateStayMutation,
+  useGetStayByIdQuery,
   useUpdateStayMutation,
 } from "@/lib/services/organizer/trip/library/stay";
 import {
   useCreateActivityMutation,
   useUpdateActivityMutation,
 } from "@/lib/services/organizer/trip/library/activity";
+
+import {
+  mapMealToFormData,
+  mapStayToFormData,
+  mapTransitToFormData,
+  mapActivityToFormData,
+  mapDayDescriptionToFormData,
+} from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
 /* ===== types ===== */
 type Step =
@@ -75,7 +85,6 @@ interface CategoryItem {
   step: Step;
 }
 
-/* ===== categories (typed) ===== */
 const categories: CategoryItem[] = [
   { label: "Events", icon: Calendar, step: "event" },
   { label: "Stays", icon: Hotel, step: "stay" },
@@ -86,7 +95,6 @@ const categories: CategoryItem[] = [
   { label: "FAQs", icon: HelpCircle, step: "faq" },
 ];
 
-/* small helper header */
 function StepHeader({ title }: { title: string }) {
   return (
     <DialogHeader>
@@ -95,13 +103,12 @@ function StepHeader({ title }: { title: string }) {
   );
 }
 
-/* ===== main component ===== */
 type AddNewItemModalProps = {
   open: boolean;
   onClose: () => void;
   updateId?: number | null;
   initialStep?: Step;
-  editData?: any; // ✅ NEW: existing meal data for edit
+  editData?: any;
 };
 
 export function AddNewItemModal({
@@ -117,13 +124,12 @@ export function AddNewItemModal({
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
-  // Day description (events) mutations
+  // RTK hooks
   const [createOrganizerDayDescription] =
     useCreateOrganizerDayDescriptionMutation();
   const [updateOrganizerDayDescription] =
     useUpdateOrganizerDayDescriptionMutation();
 
-  // Transit create/update mutations
   const [createOrganizerTransit] = useCreateOrganizerTransitMutation();
   const [updateOrganizerTransit] = useUpdateOrganizerTransitMutation();
 
@@ -136,110 +142,125 @@ export function AddNewItemModal({
   const [createActivity] = useCreateActivityMutation();
   const [updateActivity] = useUpdateActivityMutation();
 
-  // Set step when modal opens (respects initialStep always)
   useEffect(() => {
     if (!open) return;
     setStep(initialStep);
     setSelected(null);
   }, [open, initialStep]);
 
-  /* ---------- Handlers ---------- */
+  /* Unified save used by child forms:
+     Note: child forms pass documents array as second arg to onSave,
+     but modal-level mappers expect FormData and documents array.
+     We accept both forms:
+       - If child already created FormData and handled upload, it can call modal onSave to just close.
+       - Here we support child calling onSave(payload, documents) where we map accordingly.
+  */
+  async function handleSave(stepKey: Step, data: any, documents?: any[]) {
+    try {
+      let fd: FormData | null = null;
+      let requestPromise: Promise<any> | null = null;
+
+      switch (stepKey) {
+        case "event":
+          fd = mapDayDescriptionToFormData(data, documents);
+          if (updateId) {
+            requestPromise = updateOrganizerDayDescription({
+              organizationId,
+              dayDescriptionId: String(updateId),
+              data: fd,
+            }).unwrap();
+          } else {
+            requestPromise = createOrganizerDayDescription({
+              organizationId,
+              data: fd,
+            }).unwrap();
+          }
+          break;
+
+        case "stay":
+          fd = mapStayToFormData(data, documents);
+          if (updateId) {
+            requestPromise = updateStay({
+              organizationId,
+              stayId: updateId,
+              data: fd,
+            }).unwrap();
+          } else {
+            requestPromise = createStay({
+              organizationId,
+              data: fd,
+            }).unwrap();
+          }
+          break;
+
+        case "transit":
+          fd = mapTransitToFormData(data, documents);
+          if (updateId) {
+            requestPromise = updateOrganizerTransit({
+              organizationId,
+              transitId: updateId,
+              data: fd,
+            }).unwrap();
+          } else {
+            requestPromise = createOrganizerTransit({
+              organizationId,
+              data: fd,
+            }).unwrap();
+          }
+          break;
+
+        case "meal":
+          fd = mapMealToFormData(data, documents);
+          if (updateId) {
+            requestPromise = updateMeal({
+              organizationId,
+              mealId: updateId,
+              data: fd,
+            }).unwrap();
+          } else {
+            requestPromise = createMeal({
+              organizationId,
+              data: fd,
+            }).unwrap();
+          }
+          break;
+
+        case "activity":
+          fd = mapActivityToFormData(data, documents);
+          if (updateId) {
+            requestPromise = updateActivity({
+              organizationId,
+              activityId: updateId,
+              data: fd,
+            }).unwrap();
+          } else {
+            requestPromise = createActivity({
+              organizationId,
+              data: fd,
+            }).unwrap();
+          }
+          break;
+
+        default:
+          console.warn("Unhandled save step:", stepKey);
+          return;
+      }
+
+      if (requestPromise) {
+        await requestPromise;
+        onClose();
+      }
+    } catch (err) {
+      console.error("Failed to save", stepKey, err);
+      alert("Failed to save. See console for details.");
+    }
+  }
 
   const handleNext = () => {
     if (selected) setStep(selected.step);
   };
 
-  // Save handler for day description / event-like items (you had this before)
-  const handleSaveEvent = (data: any) => {
-    const formData = new FormData();
-    formData.append("name", data.title);
-    formData.append("description", data.description);
-    formData.append("location", data.location);
-    formData.append("time", data.time);
-    formData.append("packingSuggestion", data.packing);
-    formData.append("addToLibrary", "true");
-
-    if (data.documents) {
-      data.documents.forEach((document: Document, index: number) => {
-        if (document.file)
-          formData.append(`documents[${index}].file`, document.file);
-        if (document.markedForDeletion)
-          formData.append(
-            `documents[${index}].markedForDeletion`,
-            document.markedForDeletion.toString()
-          );
-      });
-    }
-
-    const request = updateId
-      ? updateOrganizerDayDescription({
-          organizationId,
-          data: formData,
-          dayDescriptionId: updateId.toString(),
-        })
-      : createOrganizerDayDescription({ organizationId, data: formData });
-
-    request
-      .unwrap()
-      .then(() => {
-        onClose();
-      })
-      .catch((err) => {
-        console.error("Failed to save event/day description:", err);
-      });
-  };
-
-  // Save handler for transit (used for both add & edit)
-  const handleSaveTransit = (data: any, editingId?: number | null) => {
-    const formData = new FormData();
-    formData.append("fromLocation", data.from);
-    formData.append("toLocation", data.to);
-    formData.append("startTime", data.departure);
-    formData.append("endTime", data.arrival);
-    formData.append(
-      "vehicleType",
-      Array.isArray(data.vehicle) ? data.vehicle[0] : data.vehicle || ""
-    );
-    formData.append("customVehicleType", data.otherVehicle || "");
-    formData.append(
-      "arrangedBy",
-      (data.arrangement || "organizer").toUpperCase()
-    );
-    formData.append("description", data.description || "");
-    formData.append("packagingSuggestion", data.packing || "");
-    formData.append("addToLibrary", "true");
-    formData.append("name", data.title || "");
-
-    if (data.images?.length) {
-      data.images.forEach((file: File, index: number) =>
-        formData.append(`documents[${index}].file`, file)
-      );
-    }
-
-    const request = editingId
-      ? updateOrganizerTransit({
-          organizationId,
-          transitId: editingId,
-          data: formData,
-        })
-      : createOrganizerTransit({
-          organizationId,
-          data: formData,
-        });
-
-    request
-      .unwrap()
-      .then(() => {
-        // close modal on success
-        onClose();
-      })
-      .catch((err) => {
-        console.error("Failed to save transit:", err);
-      });
-  };
-
   const handleBack = () => {
-    // If modal opened directly to a specific step (not 'select'), close on back
     if (initialStep !== "select") {
       onClose();
       return;
@@ -248,7 +269,6 @@ export function AddNewItemModal({
     setSelected(null);
   };
 
-  /* ====================== RENDER ====================== */
   return (
     <Dialog
       open={open}
@@ -261,12 +281,11 @@ export function AddNewItemModal({
       }}
     >
       <DialogContent className="w-full lg:max-w-2xl rounded-2xl overflow-hidden">
+        <DialogTitle className="sr-only">Add New Item</DialogTitle>
         <div className="max-h-[90vh] overflow-y-auto">
-          {/* ---------------- Step: Select ---------------- */}
           {step === "select" && (
             <>
               <StepHeader title="Add New Item" />
-
               <div className="grid grid-cols-2 gap-4 mt-4">
                 {categories.slice(0, 6).map(({ label, icon: Icon, step }) => (
                   <button
@@ -325,7 +344,6 @@ export function AddNewItemModal({
             </>
           )}
 
-          {/* ---------------- Step: Event ---------------- */}
           {step === "event" && (
             <>
               <StepHeader
@@ -333,61 +351,52 @@ export function AddNewItemModal({
                   updateId ? "Edit Day Description" : "Add Day Description"
                 }
               />
-              <AddEventForm
-                updateId={updateId}
-                mode="library"
-                onCancel={handleBack}
-                onSave={handleSaveEvent}
-              />
+              {updateId ? (
+                <EventEditLoader
+                  updateId={updateId}
+                  onCancel={handleBack}
+                  onClose={onClose}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("event", data, documents)
+                  }
+                />
+              ) : (
+                <AddEventForm
+                  mode="library"
+                  onCancel={handleBack}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("event", data, documents)
+                  }
+                />
+              )}
             </>
           )}
 
-          {/* ---------------- Step: Stay ---------------- */}
           {step === "stay" && (
             <>
               <StepHeader title={updateId ? "Edit Stay" : "Add Stay"} />
-              <AddStayForm
-                mode="library"
-                initialData={editData}
-                onCancel={onClose}
-                onSave={async (data: any) => {
-                  try {
-                    const fd = new FormData();
-                    fd.append("name", data.title);
-                    fd.append("location", data.location);
-                    fd.append("description", data.description || "");
-                    fd.append("packingSuggestion", data.packing || "");
-                    fd.append("sharingType", data.sharingType || "");
-                    fd.append("check_in_time", data.checkIn || "");
-                    fd.append("check_out_time", data.checkOut || "");
-                    if (data.images?.length) {
-                      data.images.forEach((file: File, index: number) =>
-                        fd.append(`documents[${index}].file`, file)
-                      );
-                    }
-                    if (updateId) {
-                      // 🟢 Update existing stay
-                      await updateStay({
-                        organizationId,
-                        stayId: updateId,
-                        data: fd,
-                      }).unwrap();
-                    } else {
-                      // 🟠 Create new stay
-                      await createStay({ organizationId, data: fd }).unwrap();
-                    }
-
-                    onClose();
-                  } catch (error) {
-                    console.error("Error saving stay:", error);
-                    alert("Failed to save stay");
+              {updateId ? (
+                <StayEditLoader
+                  updateId={updateId}
+                  onCancel={handleBack}
+                  onClose={onClose}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("stay", data, documents)
                   }
-                }}
-              />
+                />
+              ) : (
+                <AddStayForm
+                  mode="library"
+                  initialData={editData}
+                  onCancel={handleBack}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("stay", data, documents)
+                  }
+                />
+              )}
             </>
           )}
 
-          {/* ---------------- Step: Transit ---------------- */}
           {step === "transit" && (
             <>
               <StepHeader title={updateId ? "Edit Transit" : "Add Transit"} />
@@ -396,70 +405,36 @@ export function AddNewItemModal({
                   updateId={updateId}
                   onCancel={handleBack}
                   onClose={onClose}
-                  onSave={(data: any) => handleSaveTransit(data, updateId)}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("transit", data, documents)
+                  }
                 />
               ) : (
                 <AddTransitForm
                   mode="library"
                   onCancel={handleBack}
-                  onSave={(data: any) => handleSaveTransit(data)}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("transit", data, documents)
+                  }
                 />
               )}
             </>
           )}
 
-          {/* ---------------- Step: Meal ---------------- */}
           {step === "meal" && (
             <>
               <StepHeader title={updateId ? "Edit Meal" : "Add Meal"} />
               <AddMealForm
                 mode="library"
-                initialData={editData} // ✅ NEW: Pass existing meal for edit
+                initialData={editData}
                 onCancel={handleBack}
-                onSave={async (formData: any) => {
-                  try {
-                    console.log("🧾 Sending chargeable field:", String(formData.included === "chargeable"));
-
-                    const fd = new FormData();
-                    fd.append("name", formData.title);
-                    fd.append("mealType", formData.mealType.toUpperCase());
-                    fd.append("location", formData.location);
-                    fd.append("description", formData.description || "");
-                    fd.append("packingSuggestion", formData.packing || "");
-                    fd.append("chargeable", String(formData.included === "chargeable"));
-                    fd.append("time", formData.mealTime || ""); 
-                    if (formData.images?.length) {
-                      formData.images.forEach((file: File, index: number) =>
-                        fd.append(`documents[${index}].file`, file)
-                      );
-                    }
-
-                    if (updateId) {
-                      // ✅ Update existing meal
-                      await updateMeal({
-                        organizationId,
-                        mealId: updateId,
-                        data: fd,
-                      }).unwrap();
-                    } else {
-                      // ✅ Create new meal
-                      await createMeal({
-                        organizationId,
-                        data: fd,
-                      }).unwrap();
-                    }
-
-                    onClose();
-                  } catch (err) {
-                    console.error("Error saving meal:", err);
-                    alert("Failed to save meal.");
-                  }
-                }}
+                onSave={(data: any, documents?: any[]) =>
+                  handleSave("meal", data, documents)
+                }
               />
             </>
           )}
 
-          {/* ---------------- Step: Activity ---------------- */}
           {step === "activity" && (
             <>
               <StepHeader title={updateId ? "Edit Activity" : "Add Activity"} />
@@ -467,61 +442,13 @@ export function AddNewItemModal({
                 mode="library"
                 initialData={editData}
                 onCancel={onClose}
-                onSave={async (data: any) => {
-                  try {
-                    console.log(data.moodTags);
-                     const moods: string[] = Array.isArray(data.moodTags)
-      ? data.moodTags
-          .map((t: any) =>
-            typeof t === "string" ? t.trim() : String(t?.value ?? "").trim()
-          )
-          .filter(Boolean)
-      : [];
-                    const fd = new FormData();
-                    fd.append("name", data.title);
-                    fd.append("location", data.location || "");
-                    fd.append("description", data.description || "");
-                    fd.append("packingSuggestion", data.packing || "");
-                    fd.append("priceCharge", data.priceType);
-                    fd.append("time", data.time || "");
-                    const formatted = data.moodTags.map(
-                      (tag: { label: string; value: string }) => tag.value
-                    );
-
-                     moods.forEach((m) => fd.append("moodTags", m));
-
-                    if (data.images?.length) {
-                      data.images.forEach((file: File, index: number) =>
-                        fd.append(`documents[${index}].file`, file)
-                      );
-                    }
-
-                    if (updateId) {
-                      // 🟢 Update existing activity
-                      await updateActivity({
-                        organizationId,
-                        activityId: updateId,
-                        data: fd,
-                      }).unwrap();
-                    } else {
-                      // 🟠 Create new activity
-                      await createActivity({
-                        organizationId,
-                        data: fd,
-                      }).unwrap();
-                    }
-
-                    onClose();
-                  } catch (error) {
-                    console.error("Error saving activity:", error);
-                    alert("Failed to save activity");
-                  }
-                }}
+                onSave={(data: any, documents?: any[]) =>
+                  handleSave("activity", data, documents)
+                }
               />
             </>
           )}
 
-          {/* ---------------- Step: Trip Leader ---------------- */}
           {step === "trip-leader" && (
             <>
               <StepHeader
@@ -532,6 +459,7 @@ export function AddNewItemModal({
                 mode="library"
                 onCancel={handleBack}
                 onSave={(data: any) => {
+                  // trip leader currently doesn't use documents
                   console.log("Trip Leader saved:", data);
                   onClose();
                 }}
@@ -539,7 +467,6 @@ export function AddNewItemModal({
             </>
           )}
 
-          {/* ---------------- Step: FAQ ---------------- */}
           {step === "faq" && (
             <>
               <StepHeader title={updateId ? "Edit FAQ" : "Add FAQ"} />
@@ -557,11 +484,7 @@ export function AddNewItemModal({
   );
 }
 
-/* ----------------------------------
-   TransitEditLoader component (separate)
-   - Uses RTK query to fetch transit by ID
-   - Prefills AddTransitForm when data is ready
----------------------------------- */
+/* TransitEditLoader remains unchanged except it passes initialData into AddTransitForm */
 function TransitEditLoader({
   updateId,
   onCancel,
@@ -571,30 +494,16 @@ function TransitEditLoader({
   updateId: number;
   onCancel: () => void;
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: (data: any, documents?: any[]) => void;
 }) {
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
-  const {
-    data: transit,
-    isLoading,
-    isFetching,
-    error,
-  } = useGetOrganizerTransitByIdQuery(
+  const { data: transit, isLoading } = useGetOrganizerTransitByIdQuery(
     organizationId && updateId
       ? { organizationId, transitId: updateId }
       : skipToken
   );
-
-  useEffect(() => {
-    console.log(
-      "Fetching transit data for ID:",
-      updateId,
-      "Org:",
-      organizationId
-    );
-  }, [updateId, organizationId]);
 
   if (isLoading)
     return (
@@ -614,6 +523,150 @@ function TransitEditLoader({
     <AddTransitForm
       mode="library"
       initialData={transit}
+      onCancel={onCancel}
+      onSave={onSave}
+    />
+  );
+}
+
+/**
+ * StayEditLoader
+ * - fetches stay by id
+ * - normalizes documents into the `Document` shape the form expects
+ * - waits (shows loader) until fetching finishes
+ */
+function StayEditLoader({
+  updateId,
+  onCancel,
+  onClose,
+  onSave,
+}: {
+  updateId: number;
+  onCancel: () => void;
+  onClose: () => void;
+  onSave: (data: any, documents?: any[]) => void;
+}) {
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  const {
+    data: stay,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetStayByIdQuery(
+    organizationId && updateId
+      ? { organizationId, stayId: updateId }
+      : skipToken
+  );
+
+  console.log("StayEditLoader state:", {
+    updateId,
+    isLoading,
+    isFetching,
+    error,
+    stay,
+  });
+
+  if (isLoading || isFetching) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Loading stay details...
+      </div>
+    );
+  }
+
+  if (!stay) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Unable to load stay data.
+      </div>
+    );
+  }
+
+  // ---- Normalization: ensure documents is always an array in the shape AddStayForm expects ----
+  const normalizedDocs = (
+    Array.isArray(stay.documents) ? stay.documents : []
+  ).map((d: any) => {
+    // adapt the mapping to match actual backend keys if different
+    const url = d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null;
+    return {
+      id: d.id ?? null,
+      url,
+      type: d.type ?? null,
+      file: null,
+      markedForDeletion: false,
+    };
+  });
+
+  const normalizedStay = {
+    ...stay,
+    documents: normalizedDocs,
+  };
+
+  console.log("StayEditLoader -> normalizedStay.documents:", normalizedDocs);
+
+  return (
+    <AddStayForm
+      mode="library"
+      initialData={normalizedStay}
+      onCancel={onCancel}
+      onSave={onSave}
+    />
+  );
+}
+
+function EventEditLoader({
+  updateId,
+  onCancel,
+  onClose,
+  onSave,
+}: {
+  updateId: number;
+  onCancel: () => void;
+  onClose: () => void;
+  onSave: (data: any, documents?: any[]) => void;
+}) {
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  const {
+    data: eventData,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetOrganizerDayDescriptionByIdQuery(
+    organizationId && updateId
+      ? { organizationId, dayDescriptionId: updateId }
+      : skipToken
+  );
+
+  // ...
+  if (isLoading || isFetching) return <div>Loading...</div>;
+  if (error || !eventData?.data) return <div>Unable to load event data.</div>;
+
+  const event = eventData.data; // ✅ unwrap actual DayDescription
+
+  // ✅ Normalize documents
+  const normalizedDocs = (
+    Array.isArray(event.documents) ? event.documents : []
+  ).map((d: any) => ({
+    id: d.id ?? null,
+    url: d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null,
+    type: d.type ?? null,
+    file: null,
+    markedForDeletion: false,
+  }));
+
+  const normalizedEvent = {
+    ...event,
+    documents: normalizedDocs,
+  };
+
+  return (
+    <AddEventForm
+      mode="library"
+      initialData={normalizedEvent}
       onCancel={onCancel}
       onSave={onSave}
     />

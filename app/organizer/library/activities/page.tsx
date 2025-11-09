@@ -18,17 +18,13 @@ import { skipToken } from "@reduxjs/toolkit/query";
 export default function ActivitiesPage() {
   const organizationId = useOrganizationId();
 
-  // ✅ Local UI state
   const [modalOpen, setModalOpen] = useState(false);
-  const [editActivity, setEditActivity] = useState<any>(null);
+  const [updateId, setUpdateId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(
-    null
-  );
+  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(null);
 
-  // ✅ API hooks
   const {
     data: activities = [],
     isLoading,
@@ -36,20 +32,18 @@ export default function ActivitiesPage() {
     refetch,
   } = useGetActivitiesQuery(organizationId);
 
-  const { data: selectedActivity, isFetching: isTransitLoading } =
-    useGetActivityByIdQuery(
-      selectedActivityId && organizationId
-        ? { organizationId, activityId: selectedActivityId }
-        : skipToken
-    );
+  const { data: selectedActivity, isFetching } = useGetActivityByIdQuery(
+    selectedActivityId && organizationId
+      ? { organizationId, activityId: selectedActivityId }
+      : skipToken
+  );
+
   const [deleteActivity] = useDeleteActivityMutation();
 
-  // ✅ Filtering
   const filtered = activities.filter((a) =>
     a.name?.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ Delete logic
   const handleDelete = async (activityId: string | number) => {
     if (!confirm("Are you sure you want to delete this activity?")) return;
     try {
@@ -63,29 +57,27 @@ export default function ActivitiesPage() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      {/* Sidebar */}
       <OrganizerSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <AppHeader title="Activities" />
 
         <main className="flex-1 p-6 md:p-8">
-          {/* Header */}
           <LibraryHeader
             title="Ragir Library"
             buttonLabel="Add Item"
-            onAddClick={() => setModalOpen(true)}
+            onAddClick={() => {
+              setUpdateId(null);
+              setModalOpen(true);
+            }}
           />
 
-          {/* Loading / Error / Empty states */}
           {isLoading ? (
             <div className="flex justify-center items-center h-40 text-gray-500">
-              <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading
-              activities...
+              <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading activities...
             </div>
           ) : isError ? (
             <div className="text-center text-red-500 py-10">
@@ -101,7 +93,6 @@ export default function ActivitiesPage() {
                   key={activity.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-4 flex flex-col"
                 >
-                  {/* Image */}
                   <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
                     {activity?.documents?.[0]?.url ? (
                       <img
@@ -114,7 +105,6 @@ export default function ActivitiesPage() {
                     )}
                   </div>
 
-                  {/* Content */}
                   <div className="py-4 flex-1 flex flex-col">
                     <h3 className="font-semibold text-gray-900">
                       {activity.name}
@@ -127,7 +117,6 @@ export default function ActivitiesPage() {
                       {activity.description || "No description available."}
                     </p>
 
-                    {/* Actions */}
                     <div className="mt-4 flex justify-end gap-3 text-gray-500">
                       <button
                         className="hover:text-orange-500"
@@ -141,7 +130,7 @@ export default function ActivitiesPage() {
                       <button
                         className="hover:text-orange-500"
                         onClick={() => {
-                          setEditActivity(activity);
+                          setUpdateId(activity.id);
                           setModalOpen(true);
                         }}
                       >
@@ -168,25 +157,25 @@ export default function ActivitiesPage() {
         </main>
       </div>
 
-      {/* Add / Edit Modal */}
+      {/* ✅ Add / Edit Modal */}
       <AddNewItemModal
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
-          setEditActivity(null);
-          refetch();
+          setTimeout(() => refetch(), 400);
         }}
+        updateId={updateId}
         initialStep="activity"
-        updateId={editActivity?.id}
-        editData={editActivity}
       />
+
+      {/* ✅ View Modal */}
       <ViewModal
         step="activity"
         open={viewModalOpen}
         data={selectedActivity}
         onClose={() => {
           setViewModalOpen(false);
-          setSelectedActivityId(null); // Reset selected activity ID when closing modal
+          setSelectedActivityId(null);
         }}
       />
     </div>
