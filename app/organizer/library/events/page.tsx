@@ -16,15 +16,13 @@ import {
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import Link from "next/link";
-import {
-  useDeleteOrganizerDayDescriptionMutation,
-  useGetOrganizerDayDescriptionQuery,
-  useGetOrganizerDayDescriptionByIdQuery,
-} from "@/lib/services/organizer/trip/library/day-description";
+
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useDeleteDayDescriptionMutation, useGetDayDescriptionByIdQuery, useGetDayDescriptionsQuery } from "@/lib/services/organizer/trip/library/day-description";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 const mockEvents = [
   {
@@ -57,25 +55,25 @@ export default function EventsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [updateId, setUpdateId] = useState<number | null>(null);
 
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  
+  const organizationId = useOrganizationId();
 
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedDayId, setSelectedDayId] = useState<any>(null);
 
-  const { data: dayDescriptions } = useGetOrganizerDayDescriptionQuery({
-    organizationId,
-  });
+  const { data: dayDescriptions } = useGetDayDescriptionsQuery(
+    organizationId || skipToken
+  );
 
   const { data: selectedDay, isFetching: isTransitLoading } =
-    useGetOrganizerDayDescriptionByIdQuery(
+    useGetDayDescriptionByIdQuery(
       selectedDayId && organizationId
         ? { organizationId, dayDescriptionId: selectedDayId }
         : skipToken
     );
 
   const [deleteOrganizerDayDescription] =
-    useDeleteOrganizerDayDescriptionMutation();
+    useDeleteDayDescriptionMutation();
   console.log(organizationId, dayDescriptions);
 
   const filtered = mockEvents.filter((event) =>

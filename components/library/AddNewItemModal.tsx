@@ -29,9 +29,9 @@ import { AddTransitForm } from "@/components/library/AddTransitForm";
 import { AddFAQForm } from "@/components/library/AddFAQForm";
 
 import {
-  useCreateOrganizerDayDescriptionMutation,
-  useGetOrganizerDayDescriptionByIdQuery,
-  useUpdateOrganizerDayDescriptionMutation,
+  useCreateDayDescriptionMutation,
+  useGetDayDescriptionByIdQuery,
+  useUpdateDayDescriptionMutation,
 } from "@/lib/services/organizer/trip/library/day-description";
 
 import {
@@ -126,9 +126,9 @@ export function AddNewItemModal({
 
   // RTK hooks
   const [createOrganizerDayDescription] =
-    useCreateOrganizerDayDescriptionMutation();
+    useCreateDayDescriptionMutation();
   const [updateOrganizerDayDescription] =
-    useUpdateOrganizerDayDescriptionMutation();
+    useUpdateDayDescriptionMutation();
 
   const [createOrganizerTransit] = useCreateOrganizerTransitMutation();
   const [updateOrganizerTransit] = useUpdateOrganizerTransitMutation();
@@ -631,37 +631,52 @@ function EventEditLoader({
   const organizationId = userData?.organizationPublicId;
 
   const {
-    data: eventData,
+    data: event,
     isLoading,
     isFetching,
     error,
-  } = useGetOrganizerDayDescriptionByIdQuery(
+  } = useGetDayDescriptionByIdQuery(
     organizationId && updateId
       ? { organizationId, dayDescriptionId: updateId }
       : skipToken
   );
 
-  // ...
-  if (isLoading || isFetching) return <div>Loading...</div>;
-  if (error || !eventData?.data) return <div>Unable to load event data.</div>;
+  console.log("EventEditLoader state:", { updateId, isLoading, isFetching, error, event });
 
-  const event = eventData.data; // ✅ unwrap actual DayDescription
+  if (isLoading || isFetching) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Loading event details...
+      </div>
+    );
+  }
 
-  // ✅ Normalize documents
-  const normalizedDocs = (
-    Array.isArray(event.documents) ? event.documents : []
-  ).map((d: any) => ({
-    id: d.id ?? null,
-    url: d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null,
-    type: d.type ?? null,
-    file: null,
-    markedForDeletion: false,
-  }));
+  if (!event) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Unable to load event data.
+      </div>
+    );
+  }
+
+  // Normalize documents to Document shape
+  const normalizedDocs = (Array.isArray(event.documents) ? event.documents : []).map((d: any) => {
+    const url = d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null;
+    return {
+      id: d.id ?? null,
+      url,
+      type: d.type ?? null,
+      file: null,
+      markedForDeletion: false,
+    };
+  });
 
   const normalizedEvent = {
     ...event,
     documents: normalizedDocs,
   };
+
+  console.log("EventEditLoader -> normalizedEvent.documents:", normalizedDocs);
 
   return (
     <AddEventForm

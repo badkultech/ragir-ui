@@ -21,7 +21,6 @@ import { useGetStaysQuery } from "@/lib/services/organizer/trip/library/stay";
 import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
 import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
-import { useGetOrganizerDayDescriptionQuery } from "@/lib/services/organizer/trip/library/day-description";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 
