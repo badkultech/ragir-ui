@@ -181,7 +181,6 @@ export default function MealsPage() {
         }}
         updateId={editMeal?.id}
         initialStep="meal"
-        editData={editMeal}
       />
       <ViewModal
         step="meals"

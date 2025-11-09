@@ -8,11 +8,16 @@ import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
+import { MultiUploader } from "../common/UploadFieldShortcuts";
+import {
+  useDocumentsManager,
+  Document as DocShape,
+} from "@/hooks/useDocumentsManager";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
-  onSave: (data: any) => void;
+  onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
   initialData?: any;
 };
@@ -24,10 +29,13 @@ export function AddMealForm({
   header,
   initialData,
 }: AddMealFormProps) {
+  const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
   const [title, setTitle] = useState("My Meal");
   const [mealType, setMealType] = useState("LUNCH");
   const [mealTime, setMealTime] = useState("12:00");
-  const [included, setIncluded] = useState<"included" | "chargeable">("included");
+  const [included, setIncluded] = useState<"included" | "chargeable">(
+    "included"
+  );
   const [location, setLocation] = useState("Mumbai, India");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
@@ -35,7 +43,9 @@ export function AddMealForm({
   // ✅ Image handling states
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [existingImages, setExistingImages] = useState<{ id: number; url: string }[]>([]);
+  const [existingImages, setExistingImages] = useState<
+    { id: number; url: string }[]
+  >([]);
   const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
 
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -66,9 +76,10 @@ export function AddMealForm({
         .filter((doc: any) => doc.url)
         .map((doc: any) => ({ id: doc.id, url: doc.url }));
       setExistingImages(existing);
-      setPreviewUrls(existing.map((img: { id: number; url: string }) => img.url));
+      setPreviewUrls(
+        existing.map((img: { id: number; url: string }) => img.url)
+      );
     }
-
   }, [initialData]);
 
   // ✅ File upload handler (new uploads)
@@ -88,7 +99,9 @@ export function AddMealForm({
       setDeletedImageIds((prev) => [...prev, existing.id]);
       setExistingImages((prev) => prev.filter((img) => img.url !== url));
     } else {
-      setImages((prev) => prev.filter((_, i) => URL.createObjectURL(prev[i]) !== url));
+      setImages((prev) =>
+        prev.filter((_, i) => URL.createObjectURL(prev[i]) !== url)
+      );
     }
     setPreviewUrls((prev) => prev.filter((item) => item !== url));
   };
@@ -117,18 +130,21 @@ export function AddMealForm({
     if (!isValid) return;
 
     try {
-      await onSave({
-        title,
-        mealType,
-        mealTime,
-        included,
-        location,
-        description,
-        packing,
-        images, 
-        deletedImageIds, 
-        mode,
-      });
+      await onSave(
+        {
+          title,
+          mealType,
+          mealTime,
+          included,
+          location,
+          description,
+          packing,
+
+          deletedImageIds,
+          mode,
+        },
+        docsManager.documents
+      );
       showSuccess("Meal saved successfully!");
     } catch {
       showApiError("Failed to save Meal");
@@ -136,27 +152,49 @@ export function AddMealForm({
   };
 
   return (
-    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+    <div
+      className="flex flex-col gap-6"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between w-full">
-        {header && <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>}
+        {header && (
+          <div className="text-lg font-semibold text-gray-800 pb-2">
+            {header}
+          </div>
+        )}
       </div>
 
       {/* Top-right button */}
-      {isTripMode ? <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} /> : <div className="mt-2" />}
+      {isTripMode ? (
+        <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
+      ) : (
+        <div className="mt-2" />
+      )}
 
       {/* Title */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter title" maxLength={70} />
-        {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
-        <p className="text-xs text-right text-orange-500 mt-1">{title.length}/70 Characters</p>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter title"
+          maxLength={70}
+        />
+        {errors.title && (
+          <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+        )}
+        <p className="text-xs text-right text-orange-500 mt-1">
+          {title.length}/70 Characters
+        </p>
       </div>
 
       {/* Meal Type & Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-[0.95rem] font-medium mb-2">Meal Type *</label>
+          <label className="block text-[0.95rem] font-medium mb-2">
+            Meal Type *
+          </label>
           <select
             value={mealType}
             onChange={(e) => setMealType(e.target.value)}
@@ -170,16 +208,28 @@ export function AddMealForm({
           </select>
 
           <label className="flex items-center gap-2 my-4">
-            <input type="radio" checked={included === "included"} onChange={() => setIncluded("included")} />
+            <input
+              type="radio"
+              checked={included === "included"}
+              onChange={() => setIncluded("included")}
+            />
             Included
           </label>
         </div>
 
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">Time</label>
-          <Input type="time" value={mealTime} onChange={(e) => setMealTime(e.target.value)} />
+          <Input
+            type="time"
+            value={mealTime}
+            onChange={(e) => setMealTime(e.target.value)}
+          />
           <label className="flex items-center gap-2 my-4">
-            <input type="radio" checked={included === "chargeable"} onChange={() => setIncluded("chargeable")} />
+            <input
+              type="radio"
+              checked={included === "chargeable"}
+              onChange={() => setIncluded("chargeable")}
+            />
             Chargeable
           </label>
         </div>
@@ -187,50 +237,55 @@ export function AddMealForm({
 
       {/* Location */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">Location</label>
-        <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Enter location" />
-        {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+        <label className="block text-[0.95rem] font-medium mb-1">
+          Location
+        </label>
+        <Input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Enter location"
+        />
+        {errors.location && (
+          <p className="text-xs text-red-500 mt-1">{errors.location}</p>
+        )}
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <RichTextEditor placeholder="Enter description" value={description} onChange={setDescription} />
-        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Description
+        </label>
+        <RichTextEditor
+          placeholder="Enter description"
+          value={description}
+          onChange={setDescription}
+        />
+        {errors.description && (
+          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
+        )}
       </div>
 
       {/* Packing Suggestions */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
-        <RichTextEditor value={packing} onChange={setPacking} placeholder="Enter packing suggestions" maxLength={800} />
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Packing Suggestions
+        </label>
+        <RichTextEditor
+          value={packing}
+          onChange={setPacking}
+          placeholder="Enter packing suggestions"
+          maxLength={800}
+        />
       </div>
 
       {/* Image Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 6)</label>
-        <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition">
-          <Upload className="w-6 h-6 text-gray-400 mb-2" />
-          <span className="text-sm text-gray-600">Upload Images</span>
-          <span className="text-xs text-gray-400">PNG, JPG up to 10MB</span>
-          <input type="file" accept="image/png,image/jpeg" multiple className="hidden" onChange={handleFileChange} />
-        </label>
+        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
+        <MultiUploader documentsManager={docsManager} label="Images" />
 
-        {/* ✅ Image previews (both backend + new uploads) */}
-        {previewUrls.length > 0 && (
-          <div className="flex flex-wrap gap-3 mt-3">
-            {previewUrls.map((url, index) => (
-              <div key={index} className="relative w-20 h-20 border rounded-lg overflow-hidden">
-                <img src={url} alt={`Preview ${index + 1}`} className="object-cover w-full h-full" />
-                <button
-                  type="button"
-                  onClick={() => removeImage(url)}
-                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-[2px]"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
+        {/* Show any manager-level error */}
+        {docsManager.error && (
+          <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>
         )}
       </div>
 
@@ -244,7 +299,9 @@ export function AddMealForm({
               onChange={(e) => setSaveInLibrary(e.target.checked)}
               className="w-[22px]"
             />
-            <label className="block text-[0.95rem] font-medium">Save in Library</label>
+            <label className="block text-[0.95rem] font-medium">
+              Save in Library
+            </label>
           </div>
 
           <Input

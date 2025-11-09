@@ -2,30 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import { update } from "lodash";
 import { useLazyGetOrganizerDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
 
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import {
-  DayDescriptionByIdResponse,
-  Document,
-} from "@/lib/services/organizer/trip/library/day-description/types";
+import { Document } from "@/lib/services/organizer/trip/library/day-description/types";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "@/components/ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
+import { MultiUploader } from "../common/UploadFieldShortcuts";
+import {
+  useDocumentsManager,
+  Document as DocShape,
+} from "@/hooks/useDocumentsManager";
 
 type AddEventFormProps = {
   mode?: "library" | "trip";
   updateId?: number | null;
   onCancel: () => void;
-  onSave: (data: any, replace?: boolean) => void;
+  onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
+  initialData?: any;
 };
 
 export function AddEventForm({
@@ -34,64 +34,29 @@ export function AddEventForm({
   updateId,
   onSave,
   header,
+  initialData,
 }: AddEventFormProps) {
+  const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [packing, setPacking] = useState("");
-  const [images, setImages] = useState<File[]>([]);
-  const [documents, setDocuments] = useState<Array<Document>>([]);
-  const [imagesPreview, setImagesPreview] = useState<string[]>([]);
-  const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { toast } = useToast();
-
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
+  const [libraryOpen, setLibraryOpen] = useState(false);
 
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setDocuments([
-        ...documents,
-        ...Array.from(e.target.files).map((file) => ({
-          name: file.name,
-          url: URL.createObjectURL(file),
-          file: file,
-          markedForDeletion: false,
-        })),
-      ]);
-    }
-  };
-  const [getDayDescription] = useLazyGetOrganizerDayDescriptionByIdQuery();
-
-  console.log("imagesPreview", documents);
+  // ✅ Prefill when editing
   useEffect(() => {
-    if (updateId) {
-      getDayDescription({ organizationId, dayDescriptionId: updateId })
-        .then((res: any) => {
-          // RTK Query lazy trigger returns a union; narrow before using
-          if ("data" in res && res.data) {
-            const data = res.data as any;
-            setTitle(data.name);
-            setDescription(data.description);
-            setLocation(data.location);
-            setTime(data.time);
-            setPacking(data.packingSuggestion);
-            setDocuments(data.documents || []);
-          } else {
-            console.warn("Failed to load response", res);
-          }
-        })
-        .catch((error: any) => {
-          console.warn("Error to load dayDescription", error);
-        });
-    }
-  }, [updateId]);
-
+    if (!initialData) return;
+    setTitle(initialData.name || initialData.title || "");
+    setDescription(initialData.description || "");
+    setLocation(initialData.location || "");
+    setTime(initialData.time || "");
+    setPacking(initialData.packingSuggestion || initialData.packing || "");
+  }, [initialData]);
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
     setLocation(item.location || "");
@@ -117,8 +82,8 @@ export function AddEventForm({
     //  Trigger save
     try {
       await onSave(
-        { title, description, location, time, packing, documents, mode },
-        replace
+        { title, description, location, time, packing, mode },
+        docsManager.documents
       );
       showSuccess("Event saved successfully!");
     } catch {
@@ -152,7 +117,7 @@ export function AddEventForm({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter title"
             maxLength={70}
-            className="pr-20" 
+            className="pr-20"
           />
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-orange-500">
             {title.length}/70 Characters
@@ -163,19 +128,11 @@ export function AddEventForm({
         )}
       </div>
 
-
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Description *
         </label>
-        {/* <Textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder='Enter here'
-          rows={5}
-          maxLength={800}
-        /> */}
         <RichTextEditor
           value={description}
           onChange={setDescription}
@@ -231,63 +188,17 @@ export function AddEventForm({
           placeholder="Enter here"
           maxLength={800}
         />
-
       </div>
 
       {/* Image Upload */}
+      {/* Upload area: uses MultiUploader and shares docsManager */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Images (Max 6)
-        </label>
-        <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 cursor-pointer hover:border-orange-400 transition">
-          <Upload className="w-6 h-6 text-gray-400 mb-2" />
-          <span className="text-sm text-gray-600">Upload Images</span>
-          <span className="text-xs text-gray-400">PNG, JPG up to 10MB</span>
-          <input
-            type="file"
-            accept="image/png,image/jpeg"
-            multiple
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </label>
-        {documents && documents.length > 0 && (
-          <div className="flex gap-2 flex-wrap mt-2">
-            {documents
-              .filter((document) => !document.markedForDeletion)
-              .map((document, i) => (
-                <div
-                  key={i}
-                  className="relative w-16 h-16 rounded overflow-hidden"
-                >
-                  <span
-                    key={i}
-                    className="absolute text-gray-500 top-0 right-0 cursor-pointer hover:text-white"
-                    onClick={() => {
-                      if (!document.file) {
-                        setDocuments(
-                          documents.map((document, index) => ({
-                            ...document,
-                            markedForDeletion: true,
-                          }))
-                        );
-                      } else {
-                        setDocuments(
-                          documents.filter((_, index) => index !== i)
-                        );
-                      }
-                    }}
-                  >
-                    <X className="w-4 h-4" />
-                  </span>
-                  <img
-                    src={document.url}
-                    alt="preview"
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              ))}
-          </div>
+        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
+        <MultiUploader documentsManager={docsManager} label="Images" />
+
+        {/* Show any manager-level error */}
+        {docsManager.error && (
+          <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>
         )}
       </div>
 
