@@ -135,7 +135,7 @@ export default function EventsPage() {
                 </div>
 
                 {/* Content */}
-                <div className="py-4 flex-1 flex flex-col">
+                <div className="pt-4 flex-1 flex flex-col">
                   <h3 className="font-bold text-gray-900">
                     <strong> {dayDescription.name}</strong>
                   </h3>
@@ -144,14 +144,14 @@ export default function EventsPage() {
                     {dayDescription.location}
                   </div>
                   <p
-                    className="text-sm text-gray-500 mt-2 line-clamp-2"
+                    className="text-sm text-gray-500 mt-4 line-clamp-2"
                     dangerouslySetInnerHTML={{
                       __html: dayDescription.description || "",
                     }}
                   ></p>
 
                   {/* Actions */}
-                  <div className="mt-4 flex justify-end gap-3 text-gray-500">
+                  <div className=" flex justify-end gap-3 text-gray-500">
                     <button
                       className="hover:text-orange-500"
                       onClick={() => {
