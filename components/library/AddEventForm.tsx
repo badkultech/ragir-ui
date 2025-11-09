@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import { useLazyGetOrganizerDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
+import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
 
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
