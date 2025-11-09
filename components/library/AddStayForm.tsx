@@ -66,7 +66,7 @@ export function AddStayForm({
 
     // reset documents in the manager to reflect the incoming record
     try {
-      docsManager.resetDocuments(initialData.documents ?? []);
+      docsManager.resetDocuments();
     } catch (e) {
       // older manager may not have resetDocuments - ignore
     }

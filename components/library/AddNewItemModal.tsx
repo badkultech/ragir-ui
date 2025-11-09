@@ -30,6 +30,7 @@ import { AddFAQForm } from "@/components/library/AddFAQForm";
 
 import {
   useCreateOrganizerDayDescriptionMutation,
+  useGetOrganizerDayDescriptionByIdQuery,
   useUpdateOrganizerDayDescriptionMutation,
 } from "@/lib/services/organizer/trip/library/day-description";
 
@@ -280,6 +281,7 @@ export function AddNewItemModal({
       }}
     >
       <DialogContent className="w-full lg:max-w-2xl rounded-2xl overflow-hidden">
+        <DialogTitle className="sr-only">Add New Item</DialogTitle>
         <div className="max-h-[90vh] overflow-y-auto">
           {step === "select" && (
             <>
@@ -289,10 +291,11 @@ export function AddNewItemModal({
                   <button
                     key={label}
                     onClick={() => setSelected({ label, icon: Icon, step })}
-                    className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${selected?.label === label
-                      ? "border-orange-500 shadow-md"
-                      : "border-gray-200 hover:border-orange-400"
-                      }`}
+                    className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${
+                      selected?.label === label
+                        ? "border-orange-500 shadow-md"
+                        : "border-gray-200 hover:border-orange-400"
+                    }`}
                   >
                     <Icon className="h-6 w-6 text-gray-600 mb-2" />
                     <span className="text-sm font-medium text-gray-700">
@@ -305,12 +308,17 @@ export function AddNewItemModal({
               <div className="mt-4">
                 <button
                   onClick={() =>
-                    setSelected({ label: "FAQs", icon: HelpCircle, step: "faq" })
+                    setSelected({
+                      label: "FAQs",
+                      icon: HelpCircle,
+                      step: "faq",
+                    })
                   }
-                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${selected?.label === "FAQs"
-                    ? "border-orange-500 shadow-md"
-                    : "border-gray-200 hover:border-orange-400"
-                    }`}
+                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${
+                    selected?.label === "FAQs"
+                      ? "border-orange-500 shadow-md"
+                      : "border-gray-200 hover:border-orange-400"
+                  }`}
                 >
                   <HelpCircle className="h-6 w-6 text-gray-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">
@@ -336,18 +344,33 @@ export function AddNewItemModal({
             </>
           )}
 
-          {/* {step === "event" && (
+          {step === "event" && (
             <>
-              <StepHeader title={updateId ? "Edit Day Description" : "Add Day Description"} />
-              <AddEventForm
-                updateId={updateId}
-                mode="library"
-                onCancel={handleBack}
-                // onSave={(data: any, documents?: any[]) => handleSave("event", data, documents)}
-                // initialData={editData}
+              <StepHeader
+                title={
+                  updateId ? "Edit Day Description" : "Add Day Description"
+                }
               />
+              {updateId ? (
+                <EventEditLoader
+                  updateId={updateId}
+                  onCancel={handleBack}
+                  onClose={onClose}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("event", data, documents)
+                  }
+                />
+              ) : (
+                <AddEventForm
+                  mode="library"
+                  onCancel={handleBack}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("event", data, documents)
+                  }
+                />
+              )}
             </>
-          )} */}
+          )}
 
           {step === "stay" && (
             <>
@@ -357,14 +380,18 @@ export function AddNewItemModal({
                   updateId={updateId}
                   onCancel={handleBack}
                   onClose={onClose}
-                  onSave={(data: any, documents?: any[]) => handleSave("stay", data, documents)}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("stay", data, documents)
+                  }
                 />
               ) : (
                 <AddStayForm
                   mode="library"
                   initialData={editData}
                   onCancel={handleBack}
-                  onSave={(data: any, documents?: any[]) => handleSave("stay", data, documents)}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("stay", data, documents)
+                  }
                 />
               )}
             </>
@@ -378,13 +405,17 @@ export function AddNewItemModal({
                   updateId={updateId}
                   onCancel={handleBack}
                   onClose={onClose}
-                  onSave={(data: any, documents?: any[]) => handleSave("transit", data, documents)}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("transit", data, documents)
+                  }
                 />
               ) : (
                 <AddTransitForm
                   mode="library"
                   onCancel={handleBack}
-                  onSave={(data: any, documents?: any[]) => handleSave("transit", data, documents)}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("transit", data, documents)
+                  }
                 />
               )}
             </>
@@ -397,7 +428,9 @@ export function AddNewItemModal({
                 mode="library"
                 initialData={editData}
                 onCancel={handleBack}
-                onSave={(data: any, documents?: any[]) => handleSave("meal", data, documents)}
+                onSave={(data: any, documents?: any[]) =>
+                  handleSave("meal", data, documents)
+                }
               />
             </>
           )}
@@ -409,14 +442,18 @@ export function AddNewItemModal({
                 mode="library"
                 initialData={editData}
                 onCancel={onClose}
-                onSave={(data: any, documents?: any[]) => handleSave("activity", data, documents)}
+                onSave={(data: any, documents?: any[]) =>
+                  handleSave("activity", data, documents)
+                }
               />
             </>
           )}
 
           {step === "trip-leader" && (
             <>
-              <StepHeader title={updateId ? "Edit Trip Leader" : "Add Trip Leader"} />
+              <StepHeader
+                title={updateId ? "Edit Trip Leader" : "Add Trip Leader"}
+              />
               <AddTripLeaderForm
                 updateId={updateId}
                 mode="library"
@@ -462,10 +499,7 @@ function TransitEditLoader({
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
-  const {
-    data: transit,
-    isLoading,
-  } = useGetOrganizerTransitByIdQuery(
+  const { data: transit, isLoading } = useGetOrganizerTransitByIdQuery(
     organizationId && updateId
       ? { organizationId, transitId: updateId }
       : skipToken
@@ -521,14 +555,24 @@ function StayEditLoader({
     isFetching,
     error,
   } = useGetStayByIdQuery(
-    organizationId && updateId ? { organizationId, stayId: updateId } : skipToken
+    organizationId && updateId
+      ? { organizationId, stayId: updateId }
+      : skipToken
   );
 
-  console.log("StayEditLoader state:", { updateId, isLoading, isFetching, error, stay });
+  console.log("StayEditLoader state:", {
+    updateId,
+    isLoading,
+    isFetching,
+    error,
+    stay,
+  });
 
   if (isLoading || isFetching) {
     return (
-      <div className="text-center text-gray-500 py-10">Loading stay details...</div>
+      <div className="text-center text-gray-500 py-10">
+        Loading stay details...
+      </div>
     );
   }
 
@@ -541,18 +585,19 @@ function StayEditLoader({
   }
 
   // ---- Normalization: ensure documents is always an array in the shape AddStayForm expects ----
-  const normalizedDocs = (Array.isArray(stay.documents) ? stay.documents : [])
-    .map((d: any) => {
-      // adapt the mapping to match actual backend keys if different
-      const url = d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null;
-      return {
-        id: d.id ?? null,
-        url,
-        type: d.type ?? null,
-        file: null,
-        markedForDeletion: false,
-      };
-    });
+  const normalizedDocs = (
+    Array.isArray(stay.documents) ? stay.documents : []
+  ).map((d: any) => {
+    // adapt the mapping to match actual backend keys if different
+    const url = d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null;
+    return {
+      id: d.id ?? null,
+      url,
+      type: d.type ?? null,
+      file: null,
+      markedForDeletion: false,
+    };
+  });
 
   const normalizedStay = {
     ...stay,
@@ -565,6 +610,63 @@ function StayEditLoader({
     <AddStayForm
       mode="library"
       initialData={normalizedStay}
+      onCancel={onCancel}
+      onSave={onSave}
+    />
+  );
+}
+
+function EventEditLoader({
+  updateId,
+  onCancel,
+  onClose,
+  onSave,
+}: {
+  updateId: number;
+  onCancel: () => void;
+  onClose: () => void;
+  onSave: (data: any, documents?: any[]) => void;
+}) {
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  const {
+    data: eventData,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetOrganizerDayDescriptionByIdQuery(
+    organizationId && updateId
+      ? { organizationId, dayDescriptionId: updateId }
+      : skipToken
+  );
+
+  // ...
+  if (isLoading || isFetching) return <div>Loading...</div>;
+  if (error || !eventData?.data) return <div>Unable to load event data.</div>;
+
+  const event = eventData.data; // ✅ unwrap actual DayDescription
+
+  // ✅ Normalize documents
+  const normalizedDocs = (
+    Array.isArray(event.documents) ? event.documents : []
+  ).map((d: any) => ({
+    id: d.id ?? null,
+    url: d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null,
+    type: d.type ?? null,
+    file: null,
+    markedForDeletion: false,
+  }));
+
+  const normalizedEvent = {
+    ...event,
+    documents: normalizedDocs,
+  };
+
+  return (
+    <AddEventForm
+      mode="library"
+      initialData={normalizedEvent}
       onCancel={onCancel}
       onSave={onSave}
     />
