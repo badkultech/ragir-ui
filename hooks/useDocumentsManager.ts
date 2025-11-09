@@ -1,7 +1,4 @@
-// hooks/useDocumentsManager.ts
-"use client";
-
-import { useState } from "react";
+import { useState, useMemo, useCallback } from 'react';
 
 export interface Document {
   id: number | null;
@@ -9,6 +6,17 @@ export interface Document {
   url: string | null;
   file: File | null;
   markedForDeletion: boolean;
+}
+
+interface UseDocumentsManagerReturn {
+  documents: Document[];
+  availableIndexes: number[];
+  error: string | null;
+  handleAddFiles: (files: FileList | File[]) => void;
+  handleMarkForDeletion: (id: number | null, idx: number) => void;
+  resetError: () => void;
+  resetDocuments: () => void;
+  setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
 }
 
 export const EMPTY_DOCUMENT: Document = {
@@ -19,141 +27,143 @@ export const EMPTY_DOCUMENT: Document = {
   markedForDeletion: false,
 };
 
-export type UseDocumentsManagerReturn = {
-  documents: Document[];
-  availableIndexes: number[];
-  error: string | null;
-  handleAddFiles: (files: FileList | File[]) => void;
-  handleReplaceFileAtIndex: (file: File, idx: number) => void;
-  handleRemoveAtIndex: (idx: number) => void;
-  handleUnmarkDeletion: (idx: number) => void;
-  handleMarkForDeletion: (id: number | null, idx: number) => void;
-  resetError: () => void;
-  resetDocuments: (initialDocuments?: Document[]) => void;
-  setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
-};
-
 export function useDocumentsManager(
   initialDocuments: Document[] = [],
   maxAllowedDocs: number = 6,
 ): UseDocumentsManagerReturn {
-  const initializeDocuments = (seed: Document[] = initialDocuments): Document[] => {
-    const docs = [...seed];
+  // --- Initialization helper ---
+  const initializeDocuments = useCallback((): Document[] => {
+    const docs = [...initialDocuments];
+    if (
+      process.env.NODE_ENV === 'development' &&
+      initialDocuments.length > maxAllowedDocs
+    ) {
+      console.warn(
+        `[useDocumentsManager] initialDocuments (${initialDocuments.length}) exceed maxAllowedDocs (${maxAllowedDocs}). Truncating.`,
+      );
+    }
     while (docs.length < maxAllowedDocs) docs.push({ ...EMPTY_DOCUMENT });
     return docs.slice(0, maxAllowedDocs);
-  };
+  }, [initialDocuments, maxAllowedDocs]);
 
-  const [documents, setDocuments] = useState<Document[]>(() => initializeDocuments());
+  const [documents, setDocuments] = useState<Document[]>(initializeDocuments);
   const [error, setError] = useState<string | null>(null);
 
+  // --- Derived: available indexes ---
   const getAvailableIndexes = (docs: Document[]): number[] =>
     docs
       .map((doc, idx) =>
-        !doc.file && (!doc.id || doc.markedForDeletion) ? idx : null,
+        (!doc.file && (!doc.id || doc.markedForDeletion)) ? idx : null,
       )
       .filter((v): v is number => v !== null);
 
-  const [availableIndexes, setAvailableIndexes] = useState<number[]>(
-    () => getAvailableIndexes(initializeDocuments()),
+  const availableIndexes = useMemo(
+    () => getAvailableIndexes(documents),
+    [documents],
   );
 
-  const resetError = () => setError(null);
-
-  const resetDocuments = (seed: Document[] = []) => {
-    const init = initializeDocuments(seed);
-    setDocuments(init);
-    setAvailableIndexes(getAvailableIndexes(init));
-    setError(null);
+  // --- Utility: revoke blob URLs safely ---
+  const revokeIfBlob = (url?: string | null) => {
+    if (url && url.startsWith('blob:')) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        /* ignore */
+      }
+    }
   };
 
+  // --- Error management ---
+  const resetError = () => setError(null);
+
+  // --- Reset everything to initial state ---
+  const resetDocuments = () => {
+    setDocuments(initializeDocuments());
+    resetError();
+  };
+
+  // --- Mark slot for deletion or clear ---
   const handleMarkForDeletion = (id: number | null, idx: number) => {
     setDocuments((prev) => {
-      const updated = prev.map((doc, i) => {
-        if (i !== idx) return doc;
-        if (doc.id && doc.id === id) {
-          // existing server-backed item: mark for deletion, clear file/preview
-          return { ...doc, markedForDeletion: true, file: null, url: null };
-        }
-        // no id -> empty slot
-        return { ...EMPTY_DOCUMENT };
-      });
-      setAvailableIndexes(getAvailableIndexes(updated));
+      const updated = [...prev];
+      const current = updated[idx];
+      if (!current) return prev;
+
+      revokeIfBlob(current.url);
+
+      if (current.id && current.id === id) {
+        updated[idx] = {
+          ...current,
+          markedForDeletion: true,
+          file: null,
+          url: null,
+        };
+      } else {
+        updated[idx] = { ...EMPTY_DOCUMENT };
+      }
+
       return updated;
     });
   };
 
+  // --- Add files intelligently ---
   const handleAddFiles = (files: FileList | File[]) => {
     resetError();
     const newFiles = Array.from(files);
+    if (!newFiles.length) return;
+
     setDocuments((prevDocs) => {
       const updated = [...prevDocs];
-      const available = getAvailableIndexes(prevDocs);
+      const replaceIndexes: number[] = [];
+      const emptyIndexes: number[] = [];
 
-      if (newFiles.length > available.length) {
-        setError(`No available space for new documents (max ${maxAllowedDocs}).`);
+      updated.forEach((doc, idx) => {
+        const isReplaceCandidate = !!doc.id && doc.markedForDeletion && !doc.file;
+        const isEmpty = !doc.id && !doc.file;
+        if (isReplaceCandidate) replaceIndexes.push(idx);
+        else if (isEmpty) emptyIndexes.push(idx);
+      });
+
+      const capacity = replaceIndexes.length + emptyIndexes.length;
+      if (newFiles.length > capacity) {
+        setError(
+          `Only ${capacity} slot(s) available. You tried to add ${newFiles.length}. Max allowed: ${maxAllowedDocs}.`,
+        );
         return prevDocs;
       }
 
-      available.forEach((index, i) => {
-        const file = newFiles[i];
-        if (!file) return;
-        updated[index] = {
+      const assignFileToIndex = (file: File, idx: number, isReplace: boolean) => {
+        const prev = updated[idx];
+        revokeIfBlob(prev?.url);
+
+        const blobUrl = URL.createObjectURL(file);
+        updated[idx] = {
           ...EMPTY_DOCUMENT,
+          id: isReplace ? prev.id : null,
           type: file.type,
-          url: URL.createObjectURL(file),
+          url: blobUrl,
           file,
-          markedForDeletion: false,
+          // keep markedForDeletion=true for replacements (per backend contract)
+          markedForDeletion: isReplace ? true : false,
         };
-      });
-
-      setAvailableIndexes(getAvailableIndexes(updated));
-      return updated;
-    });
-  };
-
-  const handleReplaceFileAtIndex = (file: File, idx: number) => {
-    resetError();
-    setDocuments((prev) => {
-      const updated = [...prev];
-      const existing = updated[idx];
-
-      // preserve id if present — this indicates "replace" to backend
-      updated[idx] = {
-        id: existing?.id ?? null,
-        type: file.type,
-        url: URL.createObjectURL(file),
-        file,
-        markedForDeletion: false,
       };
-      setAvailableIndexes(getAvailableIndexes(updated));
-      return updated;
-    });
-  };
 
-  const handleRemoveAtIndex = (idx: number) => {
-    setDocuments((prev) => {
-      const updated = [...prev];
-      const doc = updated[idx];
-      if (doc.id) {
-        // existing item -> mark for deletion, backend will see id + markedForDeletion
-        updated[idx] = { ...doc, markedForDeletion: true, file: null, url: null };
-      } else {
-        // local-only slot -> simply clear it
-        updated[idx] = { ...EMPTY_DOCUMENT };
+      let filePtr = 0;
+
+      // Fill replacement slots first
+      for (const idx of replaceIndexes) {
+        const f = newFiles[filePtr++];
+        if (!f) break;
+        assignFileToIndex(f, idx, true);
       }
-      setAvailableIndexes(getAvailableIndexes(updated));
-      return updated;
-    });
-  };
 
-  const handleUnmarkDeletion = (idx: number) => {
-    setDocuments((prev) => {
-      const updated = [...prev];
-      const doc = updated[idx];
-      if (!doc) return prev;
-      // If previously marked, unmark it. If it had been cleared, it's still safe.
-      updated[idx] = { ...doc, markedForDeletion: false };
-      setAvailableIndexes(getAvailableIndexes(updated));
+      // Fill empty slots next
+      for (const idx of emptyIndexes) {
+        const f = newFiles[filePtr++];
+        if (!f) break;
+        assignFileToIndex(f, idx, false);
+      }
+
       return updated;
     });
   };
@@ -163,9 +173,6 @@ export function useDocumentsManager(
     availableIndexes,
     error,
     handleAddFiles,
-    handleReplaceFileAtIndex,
-    handleRemoveAtIndex,
-    handleUnmarkDeletion,
     handleMarkForDeletion,
     resetError,
     resetDocuments,
