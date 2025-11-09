@@ -93,6 +93,7 @@ export function FullImageGalleryModal({
               width={1600}
               height={900}
               className="object-contain max-h-[85vh] w-auto"
+              unoptimized
             />
           </motion.div>
         </AnimatePresence>
