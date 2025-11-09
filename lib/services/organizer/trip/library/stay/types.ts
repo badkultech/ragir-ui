@@ -2,8 +2,8 @@ import { LibraryRequest, LibraryResponse } from "../types";
 
 export interface StayRequest extends LibraryRequest {
     sharingType: SharingType;
-    check_in_time: string;
-    check_out_time: string;
+    checkInTime: string;
+    checkOutTime: string;
     location: string;
 
     description?: string;
@@ -18,8 +18,8 @@ export enum SharingType {
 
 export interface StayResponse extends LibraryResponse {
     sharingType: SharingType;
-    check_in_time: string;
-    check_out_time: string;
+    checkInTime: string;
+    checkOutTime: string;
     location: string;
 
     description?: string;
