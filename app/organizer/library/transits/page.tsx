@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { Bus, Pencil, Eye, Trash2, Car, MapPin, User } from "lucide-react";
-import { AddNewItemModal } from "@/components/library/AddNewItemModal";
+import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { skipToken } from "@reduxjs/toolkit/query";
 import {

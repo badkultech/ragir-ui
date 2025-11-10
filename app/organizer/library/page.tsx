@@ -14,7 +14,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { useState } from "react";
-import { AddNewItemModal } from "@/components/library/AddNewItemModal";
+import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 
 const categories = [

@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { Pencil, Trash2, Eye } from "lucide-react";
-import { AddNewItemModal } from "@/components/library/AddNewItemModal";
+import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
