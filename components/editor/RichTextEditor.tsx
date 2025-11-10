@@ -63,10 +63,10 @@ export default function RichTextEditor({
       blockTag.includes("h1")
         ? "h1"
         : blockTag.includes("h2")
-        ? "h2"
-        : blockTag.includes("h3")
-        ? "h3"
-        : "p"
+          ? "h2"
+          : blockTag.includes("h3")
+            ? "h3"
+            : "p"
     );
 
     setActiveFormats({
@@ -199,8 +199,8 @@ export default function RichTextEditor({
       align === "left"
         ? "justifyLeft"
         : align === "center"
-        ? "justifyCenter"
-        : "justifyRight";
+          ? "justifyCenter"
+          : "justifyRight";
     document.execCommand(cmd, false);
     setTimeout(() => handleInput(), 0);
   };
@@ -220,12 +220,36 @@ export default function RichTextEditor({
   // Paste event
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
+
     const el = editorRef.current;
     if (!el) return;
+
     const paste = e.clipboardData?.getData("text/plain") || "";
+    const currentText = el.innerText || "";
+
+    const sel = document.getSelection();
+    const selectedText = sel?.toString() || "";
+
+    // Calculate new text length after paste
+    const newLength = currentText.length - selectedText.length + paste.length;
+
+    // ✅ Block paste if it exceeds limit
+    if (newLength > maxLength) {
+      const allowedChars = maxLength - (currentText.length - selectedText.length);
+      if (allowedChars > 0) {
+        const partialPaste = paste.slice(0, allowedChars);
+        document.execCommand("insertText", false, partialPaste);
+      }
+      return;
+    }
+
+    // ✅ Otherwise, allow paste normally
     document.execCommand("insertText", false, paste);
+
+    // Trigger your normal input handler to update state
     setTimeout(() => handleInput(), 0);
   };
+
 
   // Attach listeners
   useEffect(() => {
@@ -422,11 +446,10 @@ function ToolbarButton({
     <button
       type="button"
       onClick={onClick}
-      className={`p-1.5 rounded-md transition-colors ${
-        active
+      className={`p-1.5 rounded-md transition-colors ${active
           ? "bg-orange-100 text-orange-600"
           : "hover:bg-gray-100 active:bg-gray-200 text-gray-600"
-      }`}
+        }`}
     >
       {icon}
     </button>
