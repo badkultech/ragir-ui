@@ -1,11 +1,18 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, Hotel, Bus, Utensils, Activity, Users, HelpCircle } from "lucide-react";
+import {
+  Calendar,
+  Hotel,
+  Bus,
+  Utensils,
+  Activity,
+  Users,
+  HelpCircle,
+} from "lucide-react";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { CategorySelectStep } from "./components/CategorySelectStep";
 import { StepRenderer } from "./components/StepRenderer";
-import { useSaveHandler } from "./hooks/useSaveHandler";
 import {
   mapMealToFormData,
   mapStayToFormData,
@@ -26,11 +33,59 @@ import {
   useCreateOrganizerTransitMutation,
   useUpdateOrganizerTransitMutation,
 } from "@/lib/services/organizer/trip/library/transit";
-import { useCreateMealMutation, useUpdateMealMutation } from "@/lib/services/organizer/trip/library/meal";
-import { useCreateStayMutation, useUpdateStayMutation } from "@/lib/services/organizer/trip/library/stay";
-import { useCreateActivityMutation, useUpdateActivityMutation } from "@/lib/services/organizer/trip/library/activity";
-import { useSaveGroupLeaderMutation, useUpdateGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
+import {
+  useCreateMealMutation,
+  useUpdateMealMutation,
+} from "@/lib/services/organizer/trip/library/meal";
+import {
+  useCreateStayMutation,
+  useUpdateStayMutation,
+} from "@/lib/services/organizer/trip/library/stay";
+import {
+  useCreateActivityMutation,
+  useUpdateActivityMutation,
+} from "@/lib/services/organizer/trip/library/activity";
+import {
+  useSaveGroupLeaderMutation,
+  useUpdateGroupLeaderMutation,
+} from "@/lib/services/organizer/trip/library/leader";
 
+/* ------------------------------------------------
+   Small helper component: non-intrusive save bar
+-------------------------------------------------- */
+function SaveStatusBar({
+  status,
+}: {
+  status: "idle" | "saving" | "success" | "error";
+}) {
+  if (status === "idle") return null;
+
+  const text =
+    status === "saving"
+      ? "Saving..."
+      : status === "success"
+      ? "Saved ✓"
+      : "Failed to save";
+
+  const color =
+    status === "saving"
+      ? "bg-blue-50 text-blue-600 border-blue-200"
+      : status === "success"
+      ? "bg-green-50 text-green-600 border-green-200"
+      : "bg-red-50 text-red-600 border-red-200";
+
+  return (
+    <div
+      className={`text-sm text-center py-2 border-t ${color} transition-all duration-300`}
+    >
+      {text}
+    </div>
+  );
+}
+
+/* ------------------------------------------------
+   Main Modal Component
+-------------------------------------------------- */
 type Step =
   | "select"
   | "event"
@@ -54,10 +109,13 @@ export function AddNewItemModal({
 }) {
   const [step, setStep] = useState<Step>("select");
   const [selected, setSelected] = useState<any>(null);
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "saving" | "success" | "error"
+  >("idle");
+
   const organizationId = useOrganizationId();
 
-  const { saving, handleSave } = useSaveHandler(onClose);
-
+  // RTK mutations
   const [createEvent] = useCreateDayDescriptionMutation();
   const [updateEvent] = useUpdateDayDescriptionMutation();
   const [createTransit] = useCreateOrganizerTransitMutation();
@@ -77,7 +135,14 @@ export function AddNewItemModal({
     setSelected(null);
   }, [open, initialStep]);
 
-  async function onSave(stepKey: Step, data: FormDataShape, documents?: DocumentItem[]) {
+  /* ------------------------------------------------
+     Unified onSave logic with SaveStatusBar updates
+  -------------------------------------------------- */
+  async function onSave(
+    stepKey: Step,
+    data: FormDataShape,
+    documents?: DocumentItem[]
+  ) {
     const fdMappers: Record<Step, any> = {
       event: mapDayDescriptionToFormData,
       stay: mapStayToFormData,
@@ -94,28 +159,60 @@ export function AddNewItemModal({
 
     const actions: Record<Step, any> = {
       event: updateId
-        ? () => updateEvent({ organizationId, dayDescriptionId: String(updateId), data: fd }).unwrap()
+        ? () =>
+            updateEvent({
+              organizationId,
+              dayDescriptionId: String(updateId),
+              data: fd,
+            }).unwrap()
         : () => createEvent({ organizationId, data: fd }).unwrap(),
       stay: updateId
-        ? () => updateStay({ organizationId, stayId: updateId, data: fd }).unwrap()
+        ? () =>
+            updateStay({ organizationId, stayId: updateId, data: fd }).unwrap()
         : () => createStay({ organizationId, data: fd }).unwrap(),
       transit: updateId
-        ? () => updateTransit({ organizationId, transitId: updateId, data: fd }).unwrap()
+        ? () =>
+            updateTransit({
+              organizationId,
+              transitId: updateId,
+              data: fd,
+            }).unwrap()
         : () => createTransit({ organizationId, data: fd }).unwrap(),
       meal: updateId
-        ? () => updateMeal({ organizationId, mealId: updateId, data: fd }).unwrap()
+        ? () =>
+            updateMeal({ organizationId, mealId: updateId, data: fd }).unwrap()
         : () => createMeal({ organizationId, data: fd }).unwrap(),
       activity: updateId
-        ? () => updateActivity({ organizationId, activityId: updateId, data: fd }).unwrap()
+        ? () =>
+            updateActivity({
+              organizationId,
+              activityId: updateId,
+              data: fd,
+            }).unwrap()
         : () => createActivity({ organizationId, data: fd }).unwrap(),
       "trip-leader": updateId
-        ? () => updateLeader({ organizationId, LeaderId: updateId, data: fd }).unwrap()
+        ? () =>
+            updateLeader({
+              organizationId,
+              LeaderId: updateId,
+              data: fd,
+            }).unwrap()
         : () => createLeader({ organizationId, data: fd }).unwrap(),
       faq: () => Promise.resolve(),
       select: () => Promise.resolve(),
     };
 
-    await handleSave(stepKey, actions[stepKey]);
+    try {
+      setSaveStatus("saving");
+      await actions[stepKey]();
+      setSaveStatus("success");
+      setTimeout(() => setSaveStatus("idle"), 2000);
+      onClose();
+    } catch (err) {
+      console.error("Failed to save", stepKey, err);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 2500);
+    }
   }
 
   const handleNext = () => selected && setStep(selected.step);
@@ -125,6 +222,9 @@ export function AddNewItemModal({
     setSelected(null);
   };
 
+  /* ------------------------------------------------
+     Render
+  -------------------------------------------------- */
   return (
     <Dialog
       open={open}
@@ -166,11 +266,8 @@ export function AddNewItemModal({
           )}
         </div>
 
-        {saving && (
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center">
-            <div className="text-sm text-gray-500">Saving...</div>
-          </div>
-        )}
+        {/* Inline non-intrusive feedback bar */}
+        <SaveStatusBar status={saveStatus} />
       </DialogContent>
     </Dialog>
   );
