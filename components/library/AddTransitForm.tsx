@@ -52,70 +52,74 @@ export function AddTransitForm({
     "ORGANIZER"
   );
   const [description, setDescription] = useState("sdfsdf");
-  const [packing, setPacking] = useState("sdfdsfds");
-  const [images, setImages] = useState<File[]>([]);
+  const [packingSuggestion, setPackingSuggestion] = useState("sdfdsfds");
   const [libraryOpen, setLibraryOpen] = useState(false);
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [existingImages, setExistingImages] = useState<
-    { id: number; url: string }[]
-  >([]);
 
+
+  // replace your current useEffect([initialData]) with this
   useEffect(() => {
     if (!initialData) return;
-    setTitle(initialData.name || "");
-    setFrom(initialData.fromLocation || "");
-    setTo(initialData.toLocation || "");
-    setDeparture(initialData.startTime || "");
-    setArrival(initialData.endTime || "");
-    setDescription(initialData.description || "");
-    setPacking(initialData.packagingSuggestion || "");
+
+    // primitives (cover both name/title possibilities)
+    setTitle(initialData.name ?? initialData.title ?? "");
+    setFrom(initialData.fromLocation ?? initialData.from ?? "");
+    setTo(initialData.toLocation ?? initialData.to ?? "");
+
+    // normalize time: backend sometimes returns "HH:mm:ss", input[type=time] wants "HH:mm"
+    const normalizeTime = (t: string | null | undefined) =>
+      typeof t === "string" && t.length >= 5 ? t.slice(0, 5) : t ?? "";
+
+    setDeparture(normalizeTime(initialData.startTime ?? initialData.departure ?? ""));
+    setArrival(normalizeTime(initialData.endTime ?? initialData.arrival ?? ""));
+
+    setDescription(initialData.description ?? "");
+    setPackingSuggestion(initialData.packingSuggestion ?? "");
     setVehicle(initialData.vehicleType ? [initialData.vehicleType] : []);
     setArrangement(
-      initialData.arrangedBy?.toUpperCase() === "SELF" ? "SELF" : "ORGANIZER"
+      (initialData.arrangedBy ?? "").toString().toUpperCase() === "SELF"
+        ? "SELF"
+        : "ORGANIZER"
     );
 
-    // ✅ Load existing backend images
-    if (initialData.documents && Array.isArray(initialData.documents)) {
-      const existing = initialData.documents
-        .filter((doc: any) => doc.url)
-        .map((doc: any) => ({ id: doc.id, url: doc.url }));
-      setExistingImages(existing);
-      setPreviewUrls(
-        existing.map((img: { id: number; url: string }) => img.url)
-      );
+    // reset save-related UI if backend provides
+    setSaveInLibrary(!!initialData.addedToLibrary);
+    setSaveAsName(initialData.name ?? initialData.title ?? "");
+
+    // ---- Documents: normalize and reset docsManager so uploader shows correct preview ----
+    const mappedDocs = (Array.isArray(initialData.documents) ? initialData.documents : []).map(
+      (d: any) => ({
+        id: d.id ?? null,
+        url: d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null,
+        type: d.type ?? "IMAGE",
+        file: null,
+        markedForDeletion: !!d.markedForDeletion,
+      })
+    );
+
+    // prefer resetDocuments API, otherwise setDocuments, otherwise mutate
+    if (typeof docsManager.resetDocuments === "function") {
+      docsManager.resetDocuments();
+    } else if (typeof docsManager.setDocuments === "function") {
+      docsManager.setDocuments(mappedDocs);
+    } else {
+      // fallback (not ideal) – mutate directly
+      // @ts-ignore
+      docsManager.documents = mappedDocs;
     }
-  }, [initialData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData?.id, initialData]);
+
 
   const toggleVehicle = (v: string) => {
     setVehicle((prev) =>
       prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]
     );
   };
-  // ✅ Remove an image (backend or new)
-  const removeImage = (url: string) => {
-    const existing = existingImages.find((img) => img.url === url);
-    if (existing) {
-      setExistingImages((prev) => prev.filter((img) => img.url !== url));
-    } else {
-      setImages((prev) =>
-        prev.filter((_, i) => URL.createObjectURL(prev[i]) !== url)
-      );
-    }
-    setPreviewUrls((prev) => prev.filter((item) => item !== url));
-  };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
-      setImages((prev) => [...prev, ...selectedFiles]);
-      const newUrls = selectedFiles.map((file) => URL.createObjectURL(file));
-      setPreviewUrls((prev) => [...prev, ...newUrls]);
-    }
-  };
 
   const handleLibrarySelect = (item: any) => {
     setTitle(item.title || "");
@@ -156,7 +160,7 @@ export function AddTransitForm({
           vehicle: vehicle.length ? vehicle : otherVehicle,
           arrangement,
           description,
-          packing,
+          packingSuggestion,
           mode,
         },
         docsManager.documents
@@ -260,11 +264,10 @@ export function AddTransitForm({
               type="button"
               key={v.value}
               onClick={() => toggleVehicle(v.value)}
-              className={`px-4 py-2 rounded-lg border text-sm ${
-                vehicle.includes(v.value)
+              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
                   ? "bg-orange-500 text-white border-orange-500"
                   : "border-gray-300 hover:border-orange-400"
-              }`}
+                }`}
             >
               {v.label}
             </button>
@@ -332,14 +335,13 @@ export function AddTransitForm({
           Packing Suggestions
         </label>
         <RichTextEditor
-          value={packing}
-          onChange={setPacking}
+          value={packingSuggestion}
+          onChange={setPackingSuggestion}
           placeholder="Enter here"
           maxLength={800}
         />
       </div>
 
-      {/* Image Upload */}
       {/* Upload area: uses MultiUploader and shares docsManager */}
       <div>
         {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}

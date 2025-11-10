@@ -86,7 +86,8 @@ export default function TransitPage() {
             }}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {/* Grid: 1 col on xs, 2 cols on sm+ */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
             {isLoading ? (
               <div className="col-span-full text-center text-gray-500 py-10">
                 Loading transits...
@@ -101,61 +102,71 @@ export default function TransitPage() {
                   key={t.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
                 >
-                  <div className="h-20 flex px-5 py-2 mb-3">
-                    <div className="w-20 h-20 bg-gray-100 flex items-center justify-center rounded-xl">
-                      <Car className="w-10 h-10 text-gray-400" />
+                  {/* Top strip with icon (kept minimal to match screenshot) */}
+                  <div className="px-4 pt-4 pb-0">
+                    <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-lg">
+                      <Car className="w-6 h-6 text-gray-400" />
                     </div>
                   </div>
 
+                  {/* Body */}
                   <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-semibold text-gray-900">
-                      {t.fromLocation} → {t.toLocation}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {TransitTypeLabels[t.vehicleType]}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Departure {formatTime(t.startTime)}
-                       {' '} | Arrival {formatTime(t.endTime)}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 truncate">
+                          {t.fromLocation} → {t.toLocation}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1 truncate">
+                          {TransitTypeLabels[t.vehicleType]}
+                        </p>
+                      </div>
+                    </div>
 
-                    </p>
+                    {/* Meta row: times on the left, actions on the right */}
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium text-gray-700">Departure</span>{" "}
+                        {formatTime(t.startTime)}{" "}
+                        <span className="mx-2">|</span>{" "}
+                        <span className="font-medium text-gray-700">Arrival</span>{" "}
+                        {formatTime(t.endTime)}
+                      </p>
 
-                    <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                     
+                      <div className="flex items-center gap-3 text-gray-500">
+                        <button
+                          className="hover:text-orange-500"
+                          aria-label={`edit-${t.id}`}
+                          onClick={() => {
+                            setSelectedTransitId(t.id);
+                            setUpdateId(t.id);
+                            setModalOpen(true);
+                          }}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
 
-                      {/* ✏ Edit */}
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
-                          setSelectedTransitId(t.id);
-                          setUpdateId(t.id);
-                          setModalOpen(true);
-                        }}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
+                        <button
+                          className="hover:text-blue-500"
+                          aria-label={`view-${t.id}`}
+                          onClick={() => {
+                            setViewOpen(true);
+                            setSelectedTransitId(t.id);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
 
-                       {/* 👁 View */}
-                      <button
-                        className="hover:text-blue-500"
-                        onClick={() => {
-                          setViewOpen(true);
-                          setSelectedTransitId(t.id);
-                        }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-
-                      {/* 🗑 Delete */}
-                      <button
-                        className="hover:text-red-500"
-                        onClick={() => {
-                          setSelectedTransitId(t.id);
-                          setConfirmOpen(true);
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        <button
+                          className="hover:text-red-500"
+                          aria-label={`delete-${t.id}`}
+                          onClick={() => {
+                            setSelectedTransitId(t.id);
+                            setConfirmOpen(true);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -204,123 +215,12 @@ export default function TransitPage() {
         </DialogContent>
       </Dialog>
 
-      {/* <Dialog open={viewOpen} onOpenChange={(open) => {
-        setViewOpen(open);
-        if (!open) setSelectedTransitId(null);
-      }}>
-        <DialogContent className="max-w-2xl w-[90vw] rounded-2xl p-0 overflow-hidden">
-          {isTransitLoading ? (
-            <div className="p-10 text-center text-gray-500">
-              Loading transit details...
-            </div>
-          ) : (
-            <>
-             
-              <div className="w-full h-48 bg-gray-100">
-                <img
-                  src={selectedTransit?.documents?.[0]?.url || "/placeholder-image.jpg"}
-                  alt="Transit"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-6">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center justify-between">
-                    {selectedTransit?.fromLocation} → {selectedTransit?.toLocation}
-                  </DialogTitle>
-                </DialogHeader>
-
-                
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                  {selectedTransit?.description ||
-                    "Travel comfortably on this route where your journey is as relaxing as your destination."}
-                </p>
-
-             
-                <div className="border-t my-4" />
-
-            
-                <div className="space-y-3 text-sm text-gray-700">
-                
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Car className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium">Vehicle</span>
-                    </div>
-                    <span className="text-gray-800">
-                      {Array.isArray(selectedTransit?.vehicleType)
-                        ? selectedTransit.vehicleType.join(" | ")
-                        : selectedTransit?.vehicleType || "—"}
-                    </span>
-                  </div>
-
-                
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium">Departure</span>
-                    </div>
-                    <span className="text-gray-800">
-                      {selectedTransit?.fromLocation || "—"} &nbsp; | &nbsp;
-                      {selectedTransit?.startTime || "—"}
-                    </span>
-                  </div>
-
-                
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium">Arrival</span>
-                    </div>
-                    <span className="text-gray-800">
-                      {selectedTransit?.toLocation || "—"} &nbsp; | &nbsp;
-                      {selectedTransit?.endTime || "—"}
-                    </span>
-                  </div>
-
-            
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium">Mode of Arrangements</span>
-                    </div>
-                    <span className="text-gray-800 text-right">
-                      {selectedTransit?.arrangedBy
-                        ? `Self Arranged by the ${selectedTransit.arrangedBy.toLowerCase()}`
-                        : "—"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="border-t my-5" />
-
-                {selectedTransit?.packagingSuggestion && (
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      Packing Suggestions
-                    </h3>
-                    <div
-                      className="prose prose-sm max-w-none text-gray-700"
-                      dangerouslySetInnerHTML={{
-                        __html: selectedTransit.packagingSuggestion,
-                      }}
-                    />
-                  </div>
-                )}
-
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>  */}
-
       <ViewModal
-        step='transit'
+        step="transit"
         open={viewOpen}
         data={selectedTransit}
         onClose={() => {
-          setViewOpen(false)
+          setViewOpen(false);
           setSelectedTransitId(null);
         }}
       />

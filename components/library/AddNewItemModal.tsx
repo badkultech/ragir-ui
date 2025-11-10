@@ -789,7 +789,7 @@ export function TripLeaderEditLoader({
       updateId={updateId}
       mode="library"
       initialData={normalizedLeader}
-      onCancel={onCancel}
+      onCancel={onCancel} 
       onSave={onSave}
     />
   );

@@ -1,3 +1,5 @@
+import { LibraryResponse } from "../types";
+
 export interface Document {
   id?: number;
   type?: string | null;
@@ -41,6 +43,14 @@ export interface DayDescriptionsResponse {
 }
 
 export interface DayDescriptionByIdResponse {
+  status: string;
+  message: string;
+  data: DayDescription;
+  error: null;
+  timestamp: string;
+}
+
+export interface libraryDayDescriptionResponse extends LibraryResponse {
   status: string;
   message: string;
   data: DayDescription;
