@@ -46,6 +46,7 @@ import { skipToken } from "@reduxjs/toolkit/query";
 
 import {
   useCreateMealMutation,
+  useGetMealByIdQuery,
   useUpdateMealMutation,
 } from "@/lib/services/organizer/trip/library/meal";
 import {
@@ -55,6 +56,7 @@ import {
 } from "@/lib/services/organizer/trip/library/stay";
 import {
   useCreateActivityMutation,
+  useGetActivityByIdQuery,
   useUpdateActivityMutation,
 } from "@/lib/services/organizer/trip/library/activity";
 
@@ -67,6 +69,7 @@ import {
   mapTripLeaderToFormData,
 } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 import { useGetGroupLeaderByIdQuery, useSaveGroupLeaderMutation, useUpdateGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 /* ===== types ===== */
 type Step =
@@ -123,8 +126,7 @@ export function AddNewItemModal({
   const [step, setStep] = useState<Step>("select");
   const [selected, setSelected] = useState<CategoryItem | null>(null);
 
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   // RTK hooks
   const [createOrganizerDayDescription] =
@@ -443,30 +445,51 @@ export function AddNewItemModal({
           {step === "meal" && (
             <>
               <StepHeader title={updateId ? "Edit Meal" : "Add Meal"} />
-              <AddMealForm
-                mode="library"
-                initialData={editData}
-                onCancel={handleBack}
-                onSave={(data: any, documents?: any[]) =>
-                  handleSave("meal", data, documents)
-                }
-              />
+              {updateId ? (
+                <MealEditLoader
+                  updateId={updateId}
+                  onCancel={handleBack}
+                  onClose={onClose}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("meal", data, documents)
+                  }
+                />
+              ) : (
+                <AddMealForm
+                  mode="library"
+                  onCancel={handleBack}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("meal", data, documents)
+                  }
+                />
+              )}
             </>
           )}
 
           {step === "activity" && (
             <>
               <StepHeader title={updateId ? "Edit Activity" : "Add Activity"} />
-              <AddActivityForm
-                mode="library"
-                initialData={editData}
-                onCancel={onClose}
-                onSave={(data: any, documents?: any[]) =>
-                  handleSave("activity", data, documents)
-                }
-              />
+              {updateId ? (
+                <ActivityEditLoader
+                  updateId={updateId}
+                  onCancel={onClose}
+                  onClose={onClose}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("activity", data, documents)
+                  }
+                />
+              ) : (
+                <AddActivityForm
+                  mode="library"
+                  onCancel={onClose}
+                  onSave={(data: any, documents?: any[]) =>
+                    handleSave("activity", data, documents)
+                  }
+                />
+              )}
             </>
           )}
+
 
           {step === "trip-leader" && (
             <>
@@ -519,8 +542,7 @@ function TransitEditLoader({
   onClose: () => void;
   onSave: (data: any, documents?: any[]) => void;
 }) {
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   const { data: transit, isLoading } = useGetOrganizerTransitByIdQuery(
     organizationId && updateId
@@ -569,8 +591,7 @@ function StayEditLoader({
   onClose: () => void;
   onSave: (data: any, documents?: any[]) => void;
 }) {
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   const {
     data: stay,
@@ -650,8 +671,7 @@ function EventEditLoader({
   onClose: () => void;
   onSave: (data: any, documents?: any[]) => void;
 }) {
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   const {
     data: event,
@@ -728,8 +748,7 @@ export function TripLeaderEditLoader({
   onClose: () => void;
   onSave: (data: any, documents?: any[]) => void;
 }) {
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   const {
     data: leader,
@@ -789,7 +808,153 @@ export function TripLeaderEditLoader({
       updateId={updateId}
       mode="library"
       initialData={normalizedLeader}
-      onCancel={onCancel} 
+      onCancel={onCancel}
+      onSave={onSave}
+    />
+  );
+}
+function MealEditLoader({
+  updateId,
+  onCancel,
+  onClose,
+  onSave,
+}: {
+  updateId: number;
+  onCancel: () => void;
+  onClose: () => void;
+  onSave: (data: any, documents?: any[]) => void;
+}) {
+  const organizationId = useOrganizationId();
+
+  const {
+    data: meal,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetMealByIdQuery(
+    organizationId && updateId
+      ? { organizationId, mealId: updateId }
+      : skipToken
+  );
+
+  console.log("MealEditLoader state:", {
+    updateId,
+    isLoading,
+    isFetching,
+    error,
+    meal,
+  });
+
+  if (isLoading || isFetching)
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Loading meal details...
+      </div>
+    );
+
+  if (!meal)
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Unable to load meal data.
+      </div>
+    );
+
+  const normalizedDocs = (Array.isArray(meal.documents) ? meal.documents : []).map((d: any) => {
+    const url = d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null;
+    return {
+      id: d.id ?? null,
+      url,
+      type: d.type ?? "IMAGE",
+      file: null,
+      markedForDeletion: !!d.markedForDeletion,
+    };
+  });
+
+  const normalizedMeal = {
+    ...meal,
+    documents: normalizedDocs,
+  };
+
+  console.log("MealEditLoader -> normalizedMeal.documents:", normalizedDocs);
+
+  return (
+    <AddMealForm
+      mode="library"
+      initialData={normalizedMeal}
+      onCancel={onCancel}
+      onSave={onSave}
+    />
+  );
+}
+function ActivityEditLoader({
+  updateId,
+  onCancel,
+  onClose,
+  onSave,
+}: {
+  updateId: number;
+  onCancel: () => void;
+  onClose: () => void;
+  onSave: (data: any, documents?: any[]) => void;
+}) {
+  const organizationId = useOrganizationId();
+
+  const {
+    data: activity,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetActivityByIdQuery(
+    organizationId && updateId
+      ? { organizationId, activityId: updateId }
+      : skipToken
+  );
+
+  console.log("ActivityEditLoader state:", {
+    updateId,
+    isLoading,
+    isFetching,
+    error,
+    activity,
+  });
+
+  if (isLoading || isFetching)
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Loading activity details...
+      </div>
+    );
+
+  if (!activity)
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Unable to load activity data.
+      </div>
+    );
+
+  const normalizedDocs = (Array.isArray(activity.documents) ? activity.documents : []).map((d: any) => {
+    const url = d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null;
+    return {
+      id: d.id ?? null,
+      url,
+      type: d.type ?? "IMAGE",
+      file: null,
+      markedForDeletion: !!d.markedForDeletion,
+    };
+  });
+
+  const normalizedActivity = {
+    ...activity,
+    documents: normalizedDocs,
+  };
+
+  console.log("ActivityEditLoader -> normalizedActivity.documents:", normalizedDocs);
+
+  return (
+    <AddActivityForm
+      mode="library"
+      initialData={normalizedActivity}
+      onCancel={onCancel}
       onSave={onSave}
     />
   );
