@@ -30,6 +30,7 @@ export function ViewLeaderModal({ open, onClose, leader }: ViewLeaderModalProps)
                         alt={leader.name}
                         width={60}
                         height={130}
+                        unoptimized
                         className="rounded-lg object-cover w-[80px] h-[80px]"
                     />
                     <div>
@@ -45,9 +46,11 @@ export function ViewLeaderModal({ open, onClose, leader }: ViewLeaderModalProps)
                     <h3 className="text-sm font-semibold text-gray-700 uppercase">
                         Full Biography
                     </h3>
-                    <p className="text-sm text-gray-600 mt-2 leading-relaxed whitespace-pre-line">
-                        {leader.bio}
-                    </p>
+                    <div
+                        className="text-xs text-gray-500 mt-1 max-w-xl prose prose-sm clamp-3"
+                        dangerouslySetInnerHTML={{ __html: leader.bio || "" }}
+                    />
+
                 </div>
             </DialogContent>
         </Dialog>

@@ -119,12 +119,11 @@ export default function TripLeadersPage() {
                           {leader.tagline}
                         </p>
                       )}
-                      <p className="text-xs text-gray-500 mt-1 max-w-xl">
-                        <div
-                          className="text-xs text-gray-500 mt-1 max-w-xl prose prose-sm"
-                          dangerouslySetInnerHTML={{ __html: leader.bio || "" }}
-                        />
-                      </p>
+                      <div
+                        className="text-xs text-gray-500 mt-1 max-w-xl prose prose-sm clamp-3"
+                        dangerouslySetInnerHTML={{ __html: leader.bio || "" }}
+                      />
+
                     </div>
                   </div>
 
