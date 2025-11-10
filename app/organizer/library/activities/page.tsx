@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { MapPin, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
@@ -14,6 +14,7 @@ import {
 } from "@/lib/services/organizer/trip/library/activity";
 import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function ActivitiesPage() {
   const organizationId = useOrganizationId();
@@ -30,7 +31,7 @@ export default function ActivitiesPage() {
     isLoading,
     isError,
     refetch,
-  } = useGetActivitiesQuery(organizationId);
+  } = useGetActivitiesQuery(organizationId ?? skipToken);
 
   const { data: selectedActivity, isFetching } = useGetActivityByIdQuery(
     selectedActivityId && organizationId
@@ -40,9 +41,22 @@ export default function ActivitiesPage() {
 
   const [deleteActivity] = useDeleteActivityMutation();
 
-  const filtered = activities.filter((a) =>
-    a.name?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Debounce search (300ms)
+  const debouncedSearch = useDebounce(search, 300);
+
+  // Filtered activities — only apply when debounced search length >= 3
+  const filtered = useMemo(() => {
+    const q = (debouncedSearch || "").trim().toLowerCase();
+    if (q.length < 3) return activities || [];
+    return (activities || []).filter((a) => {
+      const name = (a.name || "").toString().toLowerCase();
+      const loc = (a.location || "").toString().toLowerCase();
+      const desc = (a.description || "").toString().toLowerCase();
+      return name.includes(q) || loc.includes(q) || desc.includes(q);
+    });
+  }, [activities, debouncedSearch]);
+
+  const qLen = (debouncedSearch || "").trim().length;
 
   const handleDelete = async (activityId: string | number) => {
     if (!confirm("Are you sure you want to delete this activity?")) return;
@@ -73,6 +87,9 @@ export default function ActivitiesPage() {
               setUpdateId(null);
               setModalOpen(true);
             }}
+            // controlled search props
+            searchValue={search}
+            onSearchChange={(v) => setSearch(v)}
           />
 
           {isLoading ? (
@@ -149,7 +166,13 @@ export default function ActivitiesPage() {
 
               {filtered.length === 0 && (
                 <div className="col-span-full text-center text-gray-500 py-10">
-                  No activities found.
+                  {qLen === 0 && activities.length === 0
+                    ? "No activities found."
+                    : qLen === 0 && activities.length > 0
+                    ? "Showing all activities. Type at least 3 characters to search."
+                    : qLen > 0 && qLen < 3
+                    ? "Type at least 3 characters to search."
+                    : "No activities found."}
                 </div>
               )}
             </div>

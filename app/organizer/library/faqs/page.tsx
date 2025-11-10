@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Pencil, Trash2, HelpCircle, Eye, MessageCircle, MessageCircleQuestion } from "lucide-react";
+import { Pencil, Trash2, Eye, MessageCircleQuestion } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useSelector } from "react-redux";
@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function FAQsPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -32,6 +33,10 @@ export default function FAQsPage() {
   const organizationId = userData?.organizationPublicId;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Search state (controlled)
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
+
   const { data: faqs = [], isLoading, refetch } = useGetOrganizerFaqsQuery(
     organizationId ? { organizationId } : skipToken
   );
@@ -39,10 +44,22 @@ export default function FAQsPage() {
   const [deleteFaq, { isLoading: isDeleting }] =
     useDeleteOrganizerFaqMutation();
 
+  // Filter when debounced search >= 3 chars, otherwise return all
+  const filtered = useMemo(() => {
+    const q = (debouncedSearch || "").trim().toLowerCase();
+    if (q.length < 3) return faqs || [];
+    return (faqs || []).filter((f) => {
+      const name = (f.name || "").toString().toLowerCase();
+      const answer = (f.answer || "").toString().toLowerCase();
+      return name.includes(q) || answer.includes(q);
+    });
+  }, [faqs, debouncedSearch]);
+
+  const qLen = (debouncedSearch || "").trim().length;
+
   const handleDelete = async () => {
     if (!selectedFaq) return;
     try {
-      debugger
       await deleteFaq({
         organizationId,
         faqId: selectedFaq.id,
@@ -52,6 +69,7 @@ export default function FAQsPage() {
       refetch();
     } catch (err) {
       console.error("Failed to delete FAQ", err);
+      // optionally show toast / alert
     }
   };
 
@@ -73,6 +91,9 @@ export default function FAQsPage() {
               setUpdateId(null);
               setModalOpen(true);
             }}
+            // controlled search props
+            searchValue={search}
+            onSearchChange={(v) => setSearch(v)}
           />
 
           {/* FAQ List */}
@@ -85,8 +106,16 @@ export default function FAQsPage() {
               <div className="text-center text-gray-500 py-10">
                 No FAQs found.
               </div>
+            ) : filtered.length === 0 ? (
+              <div className="text-center text-gray-500 py-10">
+                {qLen === 0 && faqs.length > 0
+                  ? "Showing all FAQs. Type at least 3 characters to search."
+                  : qLen > 0 && qLen < 3
+                  ? "Type at least 3 characters to search."
+                  : "No FAQs found."}
+              </div>
             ) : (
-              faqs.map((faq) => (
+              filtered.map((faq) => (
                 <div
                   key={faq.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex items-start gap-4"
@@ -98,7 +127,9 @@ export default function FAQsPage() {
 
                   {/* Content */}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900"><strong>{faq.name}</strong></h3>
+                    <h3 className="font-semibold text-gray-900">
+                      <strong>{faq.name}</strong>
+                    </h3>
                     <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                       {faq.answer}
                     </p>
@@ -149,7 +180,11 @@ export default function FAQsPage() {
       {/* ➕ Add / ✏ Edit FAQ Modal */}
       <AddNewItemModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setUpdateId(null);
+          refetch();
+        }}
         updateId={updateId}
         initialStep="faq"
       />
@@ -180,7 +215,7 @@ export default function FAQsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 👁 View FAQ Modal (your original design kept) */}
+      {/* 👁 View FAQ Modal (keeps your original design) */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
         <DialogContent className="sm:max-w-2xl rounded-2xl p-6">
           <DialogHeader className="border-b pb-4">

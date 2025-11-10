@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { MapPin, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
@@ -14,28 +14,27 @@ import {
 } from "@/lib/services/organizer/trip/library/stay";
 import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function StaysPage() {
   const organizationId = useOrganizationId();
 
-  // ✅ Local state
+  // Local UI state
   const [modalOpen, setModalOpen] = useState(false);
-
-  // NEW: id of stay to edit (modal will fetch full record by this id)
   const [editStayId, setEditStayId] = useState<number | null>(null);
-
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedStayId, setSelectedStayId] = useState<number | null>(null);
 
-  // ✅ API integration
+  // API
   const {
     data: stays = [],
     isLoading,
     isError,
     refetch,
-  } = useGetStaysQuery(organizationId);
+  } = useGetStaysQuery(organizationId ?? skipToken);
+
   const { data: selectedStay, isFetching: isTransitLoading } =
     useGetStayByIdQuery(
       selectedStayId && organizationId
@@ -45,12 +44,21 @@ export default function StaysPage() {
 
   const [deleteStay] = useDeleteStayMutation();
 
-  // ✅ Filtered data
-  const filtered = stays.filter((stay) =>
-    stay.name?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Debounce search (300ms)
+  const debouncedSearch = useDebounce(search, 300);
 
-  // ✅ Delete logic
+  // Filtered stays — only apply when debounced search has >= 3 chars
+  const filtered = useMemo(() => {
+    const q = (debouncedSearch || "").trim().toLowerCase();
+    if (q.length < 3) return stays;
+    return (stays || []).filter((stay) => {
+      const name = (stay.name || "").toString().toLowerCase();
+      const loc = (stay.location || "").toString().toLowerCase();
+      const desc = (stay.description || "").toString().toLowerCase();
+      return name.includes(q) || loc.includes(q) || desc.includes(q);
+    });
+  }, [stays, debouncedSearch]);
+
   const handleDelete = async (stayId: string | number) => {
     if (!confirm("Are you sure you want to delete this stay?")) return;
     try {
@@ -61,6 +69,8 @@ export default function StaysPage() {
       alert("Failed to delete stay");
     }
   };
+
+  const qLen = (debouncedSearch || "").trim().length;
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -75,18 +85,19 @@ export default function StaysPage() {
         <AppHeader title="Stays" />
 
         <main className="flex-1 p-6 md:p-8">
-          {/* Header */}
+          {/* Header (controlled search passed down) */}
           <LibraryHeader
             buttonLabel="Add stay"
             onAddClick={() => {
-              // opening create modal -> clear edit id
               setEditStayId(null);
               setModalOpen(true);
             }}
             title="Ragir Library"
+            searchValue={search}
+            onSearchChange={(v) => setSearch(v)}
           />
 
-          {/* Loading / Error States */}
+          {/* Loading / Error / Grid */}
           {isLoading ? (
             <div className="flex justify-center items-center h-40 text-gray-500">
               <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading stays...
@@ -145,8 +156,6 @@ export default function StaysPage() {
                       <button
                         className="hover:text-orange-500"
                         onClick={() => {
-                          console.log("StaysPage -> open edit modal id:", stay.id);
-                          // set the id to edit (modal will fetch full record by id)
                           setEditStayId(stay.id);
                           setModalOpen(true);
                         }}
@@ -166,7 +175,13 @@ export default function StaysPage() {
 
               {filtered.length === 0 && (
                 <div className="col-span-full text-center text-gray-500 py-10">
-                  No stays found.
+                  {qLen === 0 && stays.length === 0
+                    ? "No stays found."
+                    : qLen === 0 && stays.length > 0
+                    ? "Showing all stays. Type at least 3 characters to search."
+                    : qLen > 0 && qLen < 3
+                    ? "Type at least 3 characters to search."
+                    : "No stays found."}
                 </div>
               )}
             </div>
@@ -179,19 +194,20 @@ export default function StaysPage() {
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
-          setEditStayId(null); // reset edit id when modal closes
+          setEditStayId(null);
           refetch();
         }}
         initialStep="stay"
-        updateId={editStayId} // pass only id; modal should fetch full stay by id
+        updateId={editStayId}
       />
+
       <ViewModal
         step="stays"
         open={viewModalOpen}
         data={selectedStay}
         onClose={() => {
           setViewModalOpen(false);
-          setSelectedStayId(null); // Reset selected stay ID when closing modal
+          setSelectedStayId(null);
         }}
       />
     </div>

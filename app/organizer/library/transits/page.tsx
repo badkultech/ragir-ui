@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { Bus, Pencil, Eye, Trash2, Car, MapPin, User } from "lucide-react";
@@ -23,6 +23,7 @@ import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { ViewModal } from "@/components/library/ViewModal";
 import { TransitTypeLabels } from "@/lib/services/organizer/trip/library/transit/types";
 import { formatTime } from "@/lib/utils/timeUtils";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function TransitPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -32,6 +33,9 @@ export default function TransitPage() {
   const [updateId, setUpdateId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Controlled search state
+  const [search, setSearch] = useState("");
+
   const organizationId = useOrganizationId();
 
   const { data: transits = [], isLoading, refetch } = useGetOrganizerTransitsQuery(
@@ -40,13 +44,11 @@ export default function TransitPage() {
 
   const {
     data: selectedTransit,
-    isFetching: isTransitLoading,
   } = useGetOrganizerTransitByIdQuery(
     selectedTransitId && organizationId
       ? { organizationId, transitId: selectedTransitId }
       : skipToken
   );
-
 
   const [deleteTransit, { isLoading: isDeleting }] =
     useDeleteOrganizerTransitMutation();
@@ -60,11 +62,32 @@ export default function TransitPage() {
       }).unwrap();
       setConfirmOpen(false);
       setSelectedTransitId(null);
+      // refresh list after delete
       refetch();
     } catch (err) {
       console.error("Failed to delete Transit", err);
     }
   };
+
+  // Debounce the search input (300ms)
+  const debouncedSearch = useDebounce(search, 300);
+
+  // Filter transits only when debouncedSearch has >= 3 chars
+  const filtered = useMemo(() => {
+    const q = (debouncedSearch || "").trim().toLowerCase();
+    if (q.length < 3) return transits;
+    return transits.filter((t) => {
+      const from = (t.fromLocation || "").toString().toLowerCase();
+      const to = (t.toLocation || "").toString().toLowerCase();
+      const vehicle = (TransitTypeLabels[t.vehicleType] || "").toLowerCase();
+      const times = `${formatTime(t.startTime)} ${formatTime(t.endTime)}`.toLowerCase();
+      const combined = `${from} ${to} ${vehicle} ${times}`;
+      return combined.includes(q);
+    });
+  }, [transits, debouncedSearch]);
+
+  // Helper messages
+  const qLen = (debouncedSearch || "").trim().length;
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -84,6 +107,9 @@ export default function TransitPage() {
               setUpdateId(null);
               setModalOpen(true);
             }}
+            // Controlled search props
+            searchValue={search}
+            onSearchChange={(v) => setSearch(v)}
           />
 
           {/* Grid: 1 col on xs, 2 cols on sm+ */}
@@ -92,17 +118,23 @@ export default function TransitPage() {
               <div className="col-span-full text-center text-gray-500 py-10">
                 Loading transits...
               </div>
-            ) : transits.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="col-span-full text-center text-gray-500 py-10">
-                No transits found.
+                {qLen === 0 && transits.length === 0
+                  ? "No transits found."
+                  : qLen === 0 && transits.length > 0
+                  ? "Showing all transits. Type at least 3 characters to search."
+                  : qLen > 0 && qLen < 3
+                  ? "Type at least 3 characters to search."
+                  : "No transits found."}
               </div>
             ) : (
-              transits.map((t) => (
+              filtered.map((t) => (
                 <div
                   key={t.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
                 >
-                  {/* Top strip with icon (kept minimal to match screenshot) */}
+                  {/* Top strip with icon */}
                   <div className="px-4 pt-4 pb-0">
                     <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-lg">
                       <Car className="w-6 h-6 text-gray-400" />
