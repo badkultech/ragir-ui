@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -15,17 +14,11 @@ import {
   Route,
   UtensilsCrossed,
   PersonStanding,
-  DollarSign,
   Banknote,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FullImageGalleryModal } from "./FullImageGalleryModal";
-import Home from "@/app/prelaunch/page";
-import {
-  MealType,
-  mealTypeLabels,
-} from "@/lib/services/organizer/trip/library/meal/types";
-import { m } from "framer-motion";
+import { mealTypeLabels } from "@/lib/services/organizer/trip/library/meal/types";
 import { LazyImage } from "../ui/lazyImage";
 import {
   ArrangedByTypeLabels,
@@ -378,7 +371,13 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
 
               {/* Small Images Row */}
               {smallImages.length > 0 && (
-                <div className="flex gap-2 mt-2 mb-2">
+                <div
+                  onClick={() => {
+                    onClose(); // 👈 close outer modal
+                    setTimeout(() => setGalleryOpen(true), 200); // open inner after a short delay
+                  }}
+                  className="flex gap-2 mt-2 mb-2"
+                >
                   {smallImages.slice(0, 4).map((img: any, idx: number) => (
                     <div
                       key={idx}
