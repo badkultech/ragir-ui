@@ -64,7 +64,9 @@ import {
   mapTransitToFormData,
   mapActivityToFormData,
   mapDayDescriptionToFormData,
+  mapTripLeaderToFormData,
 } from "@/lib/services/organizer/trip/library/common/formDataMappers";
+import { useGetGroupLeaderByIdQuery, useSaveGroupLeaderMutation, useUpdateGroupLeaderMutation } from "@/lib/services/organizer/trip/library/leader";
 
 /* ===== types ===== */
 type Step =
@@ -141,6 +143,9 @@ export function AddNewItemModal({
 
   const [createActivity] = useCreateActivityMutation();
   const [updateActivity] = useUpdateActivityMutation();
+
+  const [createTripLeader] = useSaveGroupLeaderMutation();
+  const [updateTripLeader] = useUpdateGroupLeaderMutation();
 
   useEffect(() => {
     if (!open) return;
@@ -240,6 +245,22 @@ export function AddNewItemModal({
             }).unwrap();
           }
           break;
+        case "trip-leader": {
+          fd = mapTripLeaderToFormData(data, documents ?? []);
+          if (updateId) {
+            requestPromise = updateTripLeader({
+              organizationId,
+              LeaderId: updateId,
+              data: fd,
+            }).unwrap();
+          } else {
+            requestPromise = createTripLeader({
+              organizationId,
+              data: fd,
+            }).unwrap();
+          }
+          break;
+        }
 
         default:
           console.warn("Unhandled save step:", stepKey);
@@ -291,11 +312,10 @@ export function AddNewItemModal({
                   <button
                     key={label}
                     onClick={() => setSelected({ label, icon: Icon, step })}
-                    className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${
-                      selected?.label === label
-                        ? "border-orange-500 shadow-md"
-                        : "border-gray-200 hover:border-orange-400"
-                    }`}
+                    className={`flex flex-col justify-center items-center p-6 h-24 rounded-xl border transition ${selected?.label === label
+                      ? "border-orange-500 shadow-md"
+                      : "border-gray-200 hover:border-orange-400"
+                      }`}
                   >
                     <Icon className="h-6 w-6 text-gray-600 mb-2" />
                     <span className="text-sm font-medium text-gray-700">
@@ -314,11 +334,10 @@ export function AddNewItemModal({
                       step: "faq",
                     })
                   }
-                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${
-                    selected?.label === "FAQs"
-                      ? "border-orange-500 shadow-md"
-                      : "border-gray-200 hover:border-orange-400"
-                  }`}
+                  className={`flex flex-col justify-center items-center w-full p-6 h-20 rounded-xl border transition ${selected?.label === "FAQs"
+                    ? "border-orange-500 shadow-md"
+                    : "border-gray-200 hover:border-orange-400"
+                    }`}
                 >
                   <HelpCircle className="h-6 w-6 text-gray-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">
@@ -451,21 +470,25 @@ export function AddNewItemModal({
 
           {step === "trip-leader" && (
             <>
-              <StepHeader
-                title={updateId ? "Edit Trip Leader" : "Add Trip Leader"}
-              />
-              <AddTripLeaderForm
-                updateId={updateId}
-                mode="library"
-                onCancel={handleBack}
-                onSave={(data: any) => {
-                  // trip leader currently doesn't use documents
-                  console.log("Trip Leader saved:", data);
-                  onClose();
-                }}
-              />
+              <StepHeader title={updateId ? "Edit Trip Leader" : "Add Trip Leader"} />
+              {updateId ? (
+                <TripLeaderEditLoader
+                  updateId={updateId}
+                  onCancel={handleBack}
+                  onClose={onClose}
+                  onSave={(data: any, documents?: any[]) => handleSave("trip-leader", data, documents)}
+                />
+              ) : (
+                <AddTripLeaderForm
+                  mode="library"
+                  onCancel={handleBack}
+                  onSave={(data: any, documents?: any[]) => handleSave("trip-leader", data, documents)}
+                />
+              )}
             </>
           )}
+
+
 
           {step === "faq" && (
             <>
@@ -682,6 +705,90 @@ function EventEditLoader({
     <AddEventForm
       mode="library"
       initialData={normalizedEvent}
+      onCancel={onCancel}
+      onSave={onSave}
+    />
+  );
+}
+
+
+/**
+ * TripLeaderEditLoader
+ *
+ * Fetches a leader by id, normalizes docs to Document shape and renders AddTripLeaderForm.
+ */
+export function TripLeaderEditLoader({
+  updateId,
+  onCancel,
+  onClose,
+  onSave,
+}: {
+  updateId: number;
+  onCancel: () => void;
+  onClose: () => void;
+  onSave: (data: any, documents?: any[]) => void;
+}) {
+  const { userData } = useSelector(selectAuthState);
+  const organizationId = userData?.organizationPublicId;
+
+  const {
+    data: leader,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetGroupLeaderByIdQuery(
+    organizationId && updateId
+      ? { organizationId, leaderId: updateId }
+      : skipToken
+  );
+
+  console.log("TripLeaderEditLoader state:", {
+    updateId,
+    isLoading,
+    isFetching,
+    error,
+    leader,
+  });
+
+  if (isLoading || isFetching) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Loading leader details...
+      </div>
+    );
+  }
+
+  if (!leader) {
+    return (
+      <div className="text-center text-gray-500 py-10">
+        Unable to load leader data.
+      </div>
+    );
+  }
+
+  const normalizedDocs = (Array.isArray(leader.documents) ? leader.documents : []).map((d: any) => {
+    const url = d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null;
+    return {
+      id: d.id ?? null,
+      url,
+      type: d.type ?? "IMAGE",
+      file: null,
+      markedForDeletion: !!d.markedForDeletion,
+    };
+  });
+
+  const normalizedLeader = {
+    ...leader,
+    documents: normalizedDocs,
+  };
+
+  console.log("TripLeaderEditLoader -> normalizedLeader.documents:", normalizedDocs);
+
+  return (
+    <AddTripLeaderForm
+      updateId={updateId}
+      mode="library"
+      initialData={normalizedLeader}
       onCancel={onCancel}
       onSave={onSave}
     />

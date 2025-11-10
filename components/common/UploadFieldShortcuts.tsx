@@ -14,7 +14,7 @@ export function SingleUploader({
 }) {
   // NOTE: Single uploader still expects the manager to handle max 6 slots;
   // the single prop only limits UI/input to one file.
-  return <UploadPreview documentsManager={documentsManager} maxFiles={6} label={label} single />;
+  return <UploadPreview documentsManager={documentsManager} maxFiles={1} label={label} single />;
 }
 
 export function MultiUploader({

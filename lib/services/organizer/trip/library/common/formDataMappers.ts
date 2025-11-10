@@ -225,3 +225,51 @@ export function mapDocumentsForBackend(docs: Document[]) {
     url: doc.url,
   }));
 }
+
+/**
+ * mapTripLeaderToFormData
+ * -----------------------
+ * Converts Trip Leader DTO + documents[] into multipart/form-data for backend.
+ *
+ * @param data       Plain form values (name, tagline, bio, addToLibrary, etc.)
+ * @param documents  Array from useDocumentsManager
+ */
+export function mapTripLeaderToFormData(data: any, documents: any[] = []): FormData {
+  const fd = new FormData();
+
+  if (data.name) fd.append("name", data.name.trim());
+  if (data.tagline) fd.append("tagline", data.tagline.trim());
+  if (data.bio) fd.append("bio", data.bio.trim());
+  fd.append("addToLibrary", data.mode === "library" ? "true" : "false");
+
+  documents.forEach((doc, i) => {
+    // If marked for deletion and no new file => signal deletion
+    if (doc.markedForDeletion && !doc.file) {
+      if (doc.id) fd.append(`documents[${i}].id`, String(doc.id));
+      fd.append(`documents[${i}].markedForDeletion`, "true");
+      return;
+    }
+
+    // If file present => append file (replace or add)
+    if (doc.file) {
+      if (doc.id) {
+        // keep id to indicate replacement for that existing doc
+        fd.append(`documents[${i}].id`, String(doc.id));
+      }
+      fd.append(`documents[${i}].file`, doc.file, doc.file.name);
+      fd.append(`documents[${i}].name`, doc.file.name);
+      fd.append(`documents[${i}].type`, doc.type ?? "IMAGE");
+      fd.append(`documents[${i}].markedForDeletion`, "true");
+      return;
+    }
+
+    // If no file and has id (keep existing reference)
+    if (doc.id) {
+      fd.append(`documents[${i}].id`, String(doc.id));
+      if (doc.type) fd.append(`documents[${i}].type`, doc.type);
+      if (doc.url) fd.append(`documents[${i}].url`, doc.url);
+    }
+  });
+
+  return fd;
+}
