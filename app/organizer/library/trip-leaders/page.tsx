@@ -120,7 +120,10 @@ export default function TripLeadersPage() {
                         </p>
                       )}
                       <p className="text-xs text-gray-500 mt-1 max-w-xl">
-                        {leader.bio}
+                        <div
+                          className="text-xs text-gray-500 mt-1 max-w-xl prose prose-sm"
+                          dangerouslySetInnerHTML={{ __html: leader.bio || "" }}
+                        />
                       </p>
                     </div>
                   </div>
@@ -130,7 +133,7 @@ export default function TripLeadersPage() {
                     <button
                       title="Edit"
                       className="hover:text-orange-500 transition"
-                      onClick={()=>{
+                      onClick={() => {
                         setSelectedLeaderId(leader.id);
                         setModalOpen(true);
                       }}
@@ -150,7 +153,7 @@ export default function TripLeadersPage() {
                     <button
                       title="Delete"
                       className="hover:text-red-500 transition"
-                      onClick={()=>handleDelete(leader.id)}
+                      onClick={() => handleDelete(leader.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

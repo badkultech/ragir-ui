@@ -255,11 +255,12 @@ export function mapTripLeaderToFormData(data: any, documents: any[] = []): FormD
       if (doc.id) {
         // keep id to indicate replacement for that existing doc
         fd.append(`documents[${i}].id`, String(doc.id));
+        fd.append(`documents[${i}].markedForDeletion`, "true");
       }
       fd.append(`documents[${i}].file`, doc.file, doc.file.name);
       fd.append(`documents[${i}].name`, doc.file.name);
       fd.append(`documents[${i}].type`, doc.type ?? "IMAGE");
-      fd.append(`documents[${i}].markedForDeletion`, "true");
+      
       return;
     }
 

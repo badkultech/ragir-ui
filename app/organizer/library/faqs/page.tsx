@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Pencil, Trash2, HelpCircle, Eye } from "lucide-react";
+import { Pencil, Trash2, HelpCircle, Eye, MessageCircle, MessageCircleQuestion } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useSelector } from "react-redux";
@@ -93,7 +93,7 @@ export default function FAQsPage() {
                 >
                   {/* Icon */}
                   <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <HelpCircle className="w-5 h-5 text-gray-500" />
+                    <MessageCircleQuestion className="w-5 h-5 text-gray-500" />
                   </div>
 
                   {/* Content */}
