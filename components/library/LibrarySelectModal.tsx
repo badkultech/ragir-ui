@@ -23,9 +23,6 @@ import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/act
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 
-
-
-
 export type LibraryItem = {
   id: string;
   title: string;
@@ -189,7 +186,7 @@ export function LibrarySelectModal({
                         }`}
                     >
                       <img
-                        src={item.image || "/default-avatar.png"}
+                        src={item.imageUrl || "/default-avatar.png"}
                         alt={item.title}
                         className="w-10 h-10 rounded-full object-cover"
                       />

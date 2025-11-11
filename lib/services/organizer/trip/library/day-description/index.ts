@@ -1,13 +1,13 @@
 // organizerDayDescriptionAPI.ts
-import { ENDPOINTS } from "@/lib/utils";
-import { baseAPI } from "@/lib/services";
-import { TAGS } from "@/lib/services/tags";
-import { LibraryApiResponse } from "../types"; // same used by activityAPI
+import { ENDPOINTS } from '@/lib/utils';
+import { baseAPI } from '@/lib/services';
+import { TAGS } from '@/lib/services/tags';
+import { LibraryApiResponse } from '../types'; // same used by activityAPI
 import {
   DayDescription,
   DayDescriptionRequest,
   DayDescriptionByIdResponse, // (optional) you may not need wrapper type anymore
-} from "./types";
+} from './types';
 
 export const organizerDayDescriptionAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -15,9 +15,10 @@ export const organizerDayDescriptionAPI = baseAPI.injectEndpoints({
     getDayDescriptions: builder.query<DayDescription[], string>({
       query: (organizationId) => ({
         url: ENDPOINTS.ORGANIZER.LIBRARY.DAY_DESCRIPTION(organizationId),
-        method: "GET",
+        method: 'GET',
       }),
-      transformResponse: (res: LibraryApiResponse<DayDescription[]>) => res.data,
+      transformResponse: (res: LibraryApiResponse<DayDescription[]>) =>
+        res.data,
       providesTags: [{ type: TAGS.dayDescriptions }],
     }),
 
@@ -30,7 +31,7 @@ export const organizerDayDescriptionAPI = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.LIBRARY.DAY_DESCRIPTION(
           organizationId,
         )}/${dayDescriptionId}`,
-        method: "GET",
+        method: 'GET',
       }),
       transformResponse: (res: LibraryApiResponse<DayDescription>) => res.data,
       providesTags: [{ type: TAGS.dayDescriptions }],
@@ -39,28 +40,31 @@ export const organizerDayDescriptionAPI = baseAPI.injectEndpoints({
     // Create day description (FormData)
     createDayDescription: builder.mutation<
       DayDescription,
-      { organizationId: string; data: FormData }
+      DayDescriptionRequest
     >({
-      query: ({ organizationId, data }) => ({
-        url: ENDPOINTS.ORGANIZER.LIBRARY.DAY_DESCRIPTION(organizationId),
-        method: "POST",
+      query: ({ organizationId, ...data }) => ({
+        url: ENDPOINTS.ORGANIZER.LIBRARY.DAY_DESCRIPTION(organizationId ?? ''),
+        method: 'POST',
         body: data,
       }),
-      transformResponse: (res: LibraryApiResponse<DayDescription>) =>
-        res.data,
+      transformResponse: (res: LibraryApiResponse<DayDescription>) => res.data,
       invalidatesTags: [{ type: TAGS.dayDescriptions }],
     }),
 
     // Update day description
     updateDayDescription: builder.mutation<
       DayDescription,
-      { organizationId: string; dayDescriptionId: string | number; data: FormData }
+      {
+        organizationId: string;
+        dayDescriptionId: string | number;
+        data: FormData;
+      }
     >({
       query: ({ organizationId, dayDescriptionId, data }) => ({
         url: `${ENDPOINTS.ORGANIZER.LIBRARY.DAY_DESCRIPTION(
           organizationId,
         )}/${dayDescriptionId}`,
-        method: "PUT",
+        method: 'PUT',
         body: data,
       }),
       transformResponse: (res: LibraryApiResponse<DayDescription>) => res.data,
@@ -76,7 +80,7 @@ export const organizerDayDescriptionAPI = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.LIBRARY.DAY_DESCRIPTION(
           organizationId,
         )}/${dayDescriptionId}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
       transformResponse: (res: LibraryApiResponse<{ success: boolean }>) =>
         res.data,
