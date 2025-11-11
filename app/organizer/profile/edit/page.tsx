@@ -11,7 +11,7 @@ import {
 } from '@/lib/services/organizer';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
-import { Trash2, X } from 'lucide-react';
+import { FileText, Trash2, X } from 'lucide-react';
 import {
   Document,
   EMPTY_DOCUMENT,
@@ -41,6 +41,18 @@ export default function OrganizerProfileEditPage() {
   const [bannerUploadFile, setBannerUploadFile] = useState<File | null>(null);
   const [testimonialUploadFile, setTestimonialUploadFile] =
     useState<File | null>(null);
+  // Helper to get a readable name for uploaded documents (Document type may not include name)
+  const getDocName = (c: Document) => {
+    // try common fields, otherwise derive from url
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyC = c as any;
+    return (
+      anyC.name ||
+      anyC.filename ||
+      c.url?.split('/').pop()?.split('?')[0] ||
+      'Document'
+    );
+  };
   // Lazy image helper: shows skeleton while loading and fades in.
   // Handles cached images by checking image.complete and enforces a short
   // minimum skeleton duration so the user perceives a loading state.
@@ -57,6 +69,8 @@ export default function OrganizerProfileEditPage() {
     handleMarkForDeletion: handleCertificationsMarkForDeletion,
     setDocuments: setCertificationsDocuments,
   } = useDocumentsManager();
+
+  console.log('certificationsDocuments', certificationsDocuments);
 
   const [getOrgProfile, { isLoading: profileLoading }] =
     useLazyGetOrganizerProfileQuery();
@@ -573,7 +587,8 @@ export default function OrganizerProfileEditPage() {
                   type='file'
                   onChange={onFileChange}
                   multiple
-                  accept='image/*'
+                  // accept images, PDFs and common document types for certifications
+                  accept='image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                   className='absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer'
                 />
               </div>
@@ -585,24 +600,28 @@ export default function OrganizerProfileEditPage() {
               </p>
             </div>
 
-            <div className='flex flex-wrap gap-5 mt-4'>
+            <div className='flex gap-5 h-[5rem] overflow-y-auto'>
               {certificationsDocuments.map(
                 (cert, idx) =>
                   cert.url && (
                     <div
                       key={idx}
-                      className='relative group w-20 h-auto rounded-lg overflow-hidden border'
+                      className='relative group w-34 h-20 rounded-lg overflow-hidden border'
                     >
-                      <LazyImage
-                        src={cert.url}
-                        alt='Certification'
-                        className='w-full h-full'
-                      />
+                      {cert.type === 'application/pdf' ? (
+                        <FileText className='w-full h-full text-gray-400' />
+                      ) : (
+                        <LazyImage
+                          src={cert.url}
+                          alt={getDocName(cert)}
+                          className='w-full h-full'
+                        />
+                      )}
 
                       {/* ❌ Delete icon (visible only on hover) */}
                       <button
                         type='button'
-                        className='absolute top-1 right-1 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50'
+                        className='absolute top-1 right-1 z-100 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50'
                         onClick={() =>
                           handleCertificationsMarkForDeletion(cert.id, idx)
                         }

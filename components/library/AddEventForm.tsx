@@ -4,14 +4,8 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
-
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
-import { Document } from "@/lib/services/organizer/trip/library/day-description/types";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
-import { useToast } from "@/components/ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 import { MultiUploader } from "../common/UploadFieldShortcuts";
 import {
