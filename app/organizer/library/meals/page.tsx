@@ -115,7 +115,7 @@ export default function MealsPage() {
         <main className="flex-1 p-6 md:p-8">
           {/* Header (controlled search passed down) */}
           <LibraryHeader
-            buttonLabel="Add meal"
+            buttonLabel="Add Meal"
             onAddClick={() => {
               setEditMeal(null);
               setModalOpen(true);

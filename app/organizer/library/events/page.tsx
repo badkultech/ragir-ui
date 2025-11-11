@@ -102,7 +102,7 @@ export default function EventsPage() {
           {/* Header (controlled search) */}
           <LibraryHeader
             title="Ragir Library"
-            buttonLabel="Add Item"
+            buttonLabel="Add Day Description"
             onAddClick={() => {
               setUpdateId(null);
               setModalOpen(true);

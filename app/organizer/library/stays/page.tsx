@@ -109,7 +109,7 @@ export default function StaysPage() {
         <main className="flex-1 p-6 md:p-8">
           {/* Header (controlled search passed down) */}
           <LibraryHeader
-            buttonLabel="Add stay"
+            buttonLabel="Add Stay"
             onAddClick={() => {
               setEditStayId(null);
               setModalOpen(true);
