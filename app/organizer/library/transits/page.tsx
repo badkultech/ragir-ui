@@ -3,17 +3,10 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Bus, Pencil, Eye, Trash2, Car, MapPin, User } from "lucide-react";
+import { Car, Pencil, Eye, Trash2, MapPin, Loader2 } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { skipToken } from "@reduxjs/toolkit/query";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import {
   useDeleteOrganizerTransitMutation,
   useGetOrganizerTransitsQuery,
@@ -24,6 +17,9 @@ import { ViewModal } from "@/components/library/ViewModal";
 import { TransitTypeLabels } from "@/lib/services/organizer/trip/library/transit/types";
 import { formatTime } from "@/lib/utils/timeUtils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ActionButtons } from "@/components/library/ActionButtons";
+import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 
 export default function TransitPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -42,32 +38,21 @@ export default function TransitPage() {
     organizationId ? { organizationId } : skipToken
   );
 
-  const {
-    data: selectedTransit,
-  } = useGetOrganizerTransitByIdQuery(
+  const { data: selectedTransit } = useGetOrganizerTransitByIdQuery(
     selectedTransitId && organizationId
       ? { organizationId, transitId: selectedTransitId }
       : skipToken
   );
 
-  const [deleteTransit, { isLoading: isDeleting }] =
+  // delete mutation
+  const [deleteTransit, { isLoading: isDeletingGlobal }] =
     useDeleteOrganizerTransitMutation();
 
-  const handleDelete = async () => {
-    if (!selectedTransit) return;
-    try {
-      await deleteTransit({
-        organizationId,
-        transitId: selectedTransit.id,
-      }).unwrap();
-      setConfirmOpen(false);
-      setSelectedTransitId(null);
-      // refresh list after delete
-      refetch();
-    } catch (err) {
-      console.error("Failed to delete Transit", err);
-    }
-  };
+  // per-card deleting id (so only that card shows spinner)
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
+
+  // We keep a small deleteTarget (id + label) to show in dialog without waiting for fetch
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number | string; label?: string } | null>(null);
 
   // Debounce the search input (300ms)
   const debouncedSearch = useDebounce(search, 300);
@@ -76,7 +61,7 @@ export default function TransitPage() {
   const filtered = useMemo(() => {
     const q = (debouncedSearch || "").trim().toLowerCase();
     if (q.length < 3) return transits;
-    return transits.filter((t) => {
+    return (transits || []).filter((t: any) => {
       const from = (t.fromLocation || "").toString().toLowerCase();
       const to = (t.toLocation || "").toString().toLowerCase();
       const vehicle = (TransitTypeLabels[t.vehicleType] || "").toLowerCase();
@@ -88,6 +73,37 @@ export default function TransitPage() {
 
   // Helper messages
   const qLen = (debouncedSearch || "").trim().length;
+
+  // open confirm dialog for a specific transit (uses precomputed label)
+  const openDeleteConfirm = (t: any) => {
+    setDeleteTarget({ id: t.id, label: `${t.fromLocation} → ${t.toLocation}` });
+    setConfirmOpen(true);
+  };
+
+  // handle confirmed delete
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget.id;
+    setDeletingId(id);
+    try {
+      await deleteTransit({
+        organizationId,
+        transitId: Number(id),
+      }).unwrap();
+
+      showSuccess("Transit deleted successfully");
+      await refetch(); // keep existing behaviour; remove if you use RTK invalidation
+    } catch (err) {
+      console.error("Failed to delete Transit", err);
+      showApiError("Failed to delete transit");
+    } finally {
+      setDeletingId(null);
+      setConfirmOpen(false);
+      setDeleteTarget(null);
+      // clear selectedTransitId if it was the one being deleted
+      if (selectedTransitId === id) setSelectedTransitId(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -123,13 +139,13 @@ export default function TransitPage() {
                 {qLen === 0 && transits.length === 0
                   ? "No transits found."
                   : qLen === 0 && transits.length > 0
-                  ? "Showing all transits. Type at least 3 characters to search."
-                  : qLen > 0 && qLen < 3
-                  ? "Type at least 3 characters to search."
-                  : "No transits found."}
+                    ? "Showing all transits. Type at least 3 characters to search."
+                    : qLen > 0 && qLen < 3
+                      ? "Type at least 3 characters to search."
+                      : "No transits found."}
               </div>
             ) : (
-              filtered.map((t) => (
+              filtered.map((t: any) => (
                 <div
                   key={t.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
@@ -165,6 +181,7 @@ export default function TransitPage() {
                       </p>
 
                       <div className="flex items-center gap-3 text-gray-500">
+                        {/* Edit */}
                         <button
                           className="hover:text-orange-500"
                           aria-label={`edit-${t.id}`}
@@ -177,27 +194,31 @@ export default function TransitPage() {
                           <Pencil className="w-4 h-4" />
                         </button>
 
+                        {/* View */}
                         <button
                           className="hover:text-blue-500"
                           aria-label={`view-${t.id}`}
                           onClick={() => {
-                            setViewOpen(true);
                             setSelectedTransitId(t.id);
+                            setViewOpen(true);
                           }}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
 
-                        <button
-                          className="hover:text-red-500"
-                          aria-label={`delete-${t.id}`}
-                          onClick={() => {
+                        {/* Delete (uses ActionButtons-style spinner) */}
+                        <ActionButtons
+                          onView={() => {
                             setSelectedTransitId(t.id);
-                            setConfirmOpen(true);
+                            setViewOpen(true);
                           }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                          onEdit={() => {
+                            setSelectedTransitId(t.id);
+                            setUpdateId(t.id);
+                            setModalOpen(true);
+                          }}
+                          onDelete={() => openDeleteConfirm(t)}
+                        />
                       </div>
                     </div>
                   </div>
@@ -206,46 +227,33 @@ export default function TransitPage() {
             )}
           </div>
         </main>
-      </div>
+      </div >
 
       {/* ➕ Add / ✏ Edit Modal */}
-      <AddNewItemModal
+      < AddNewItemModal
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
           setUpdateId(null);
-        }}
+          refetch();
+        }
+        }
         updateId={updateId}
         initialStep="transit"
       />
 
       {/* ❌ Confirm Delete Modal */}
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Delete Transit</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 mb-4 text-center">
-            Are you sure you want to delete{" "}
-            <strong>
-              {selectedTransit?.fromLocation} → {selectedTransit?.toLocation}
-            </strong>
-            ? This action cannot be undone.
-          </p>
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      < DeleteConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Delete Transit"
+        itemName={deleteTarget?.label}
+        isDeleting={Boolean(deletingId) || isDeletingGlobal}
+        onConfirm={handleDeleteConfirm}
+      />
 
       <ViewModal
         step="transit"
@@ -256,6 +264,6 @@ export default function TransitPage() {
           setSelectedTransitId(null);
         }}
       />
-    </div>
+    </div >
   );
 }

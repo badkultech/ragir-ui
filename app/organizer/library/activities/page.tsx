@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { MapPin, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -15,6 +15,9 @@ import {
 import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useDebounce } from "@/hooks/useDebounce";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import { ActionButtons } from "@/components/library/ActionButtons";
+import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 
 export default function ActivitiesPage() {
   const organizationId = useOrganizationId();
@@ -25,6 +28,11 @@ export default function ActivitiesPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedActivityId, setSelectedActivityId] = useState<number | null>(null);
+
+  // for delete flow
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; name?: string } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   const {
     data: activities = [],
@@ -39,7 +47,7 @@ export default function ActivitiesPage() {
       : skipToken
   );
 
-  const [deleteActivity] = useDeleteActivityMutation();
+  const [deleteActivity, { isLoading: isDeletingGlobal }] = useDeleteActivityMutation();
 
   // Debounce search (300ms)
   const debouncedSearch = useDebounce(search, 300);
@@ -58,14 +66,28 @@ export default function ActivitiesPage() {
 
   const qLen = (debouncedSearch || "").trim().length;
 
-  const handleDelete = async (activityId: string | number) => {
-    if (!confirm("Are you sure you want to delete this activity?")) return;
+  // open confirm dialog for a specific activity
+  const openDeleteConfirm = (activity: any) => {
+    setDeleteTarget({ id: activity.id, name: activity.name });
+    setConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget.id;
+    setDeletingId(id);
     try {
-      await deleteActivity({ organizationId, activityId }).unwrap();
-      refetch();
+      await deleteActivity({ organizationId, activityId: id }).unwrap();
+      showSuccess("Activity deleted successfully");
+      // refetch list (you may prefer RTK invalidation)
+      await refetch();
     } catch (error) {
       console.error("Error deleting activity:", error);
-      alert("Failed to delete activity");
+      showApiError("Failed to delete activity");
+    } finally {
+      setDeletingId(null);
+      setConfirmOpen(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -134,31 +156,18 @@ export default function ActivitiesPage() {
                       {activity.description || "No description available."}
                     </p>
 
-                    <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                    <div className="mt-4">
+                      <ActionButtons
+                        onView={() => {
                           setSelectedActivityId(activity.id);
                           setViewModalOpen(true);
                         }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                        onEdit={() => {
                           setUpdateId(activity.id);
                           setModalOpen(true);
                         }}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="hover:text-red-500"
-                        onClick={() => handleDelete(activity.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        onDelete={() => openDeleteConfirm(activity)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -200,6 +209,19 @@ export default function ActivitiesPage() {
           setViewModalOpen(false);
           setSelectedActivityId(null);
         }}
+      />
+
+      {/* DELETE DIALOG */}
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Delete Activity"
+        itemName={deleteTarget?.name}
+        isDeleting={Boolean(deletingId)}
+        onConfirm={handleDeleteConfirm}
       />
     </div>
   );

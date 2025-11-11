@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { MapPin, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -15,6 +15,9 @@ import {
 import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ActionButtons } from "@/components/library/ActionButtons";
+import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 
 export default function StaysPage() {
   const organizationId = useOrganizationId();
@@ -26,6 +29,11 @@ export default function StaysPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedStayId, setSelectedStayId] = useState<number | null>(null);
+
+  // Delete state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; name?: string } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   // API
   const {
@@ -59,14 +67,28 @@ export default function StaysPage() {
     });
   }, [stays, debouncedSearch]);
 
-  const handleDelete = async (stayId: string | number) => {
-    if (!confirm("Are you sure you want to delete this stay?")) return;
+  // open delete confirm for a specific stay
+  const openDeleteConfirm = (stay: any) => {
+    setDeleteTarget({ id: stay.id, name: stay.name });
+    setConfirmOpen(true);
+  };
+
+  // handle confirmed delete
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget.id;
+    setDeletingId(id);
     try {
-      await deleteStay({ organizationId, stayId }).unwrap();
-      refetch();
+      await deleteStay({ organizationId, stayId: id }).unwrap();
+      showSuccess("Stay deleted successfully");
+      await refetch(); // keep your current behavior (remove if you use RTK invalidation)
     } catch (error) {
       console.error("Error deleting stay:", error);
-      alert("Failed to delete stay");
+      showApiError("Failed to delete stay");
+    } finally {
+      setDeletingId(null);
+      setConfirmOpen(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -143,31 +165,18 @@ export default function StaysPage() {
                     </p>
 
                     {/* Actions */}
-                    <div className="mt-4 flex justify-end gap-3 text-gray-500">
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                    <div className="mt-4">
+                      <ActionButtons
+                        onView={() => {
                           setSelectedStayId(stay.id);
                           setViewModalOpen(true);
                         }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                        onEdit={() => {
                           setEditStayId(stay.id);
                           setModalOpen(true);
                         }}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="hover:text-red-500"
-                        onClick={() => handleDelete(stay.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        onDelete={() => openDeleteConfirm(stay)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -209,6 +218,19 @@ export default function StaysPage() {
           setViewModalOpen(false);
           setSelectedStayId(null);
         }}
+      />
+
+      {/* Delete confirmation dialog */}
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Delete Stay"
+        itemName={deleteTarget?.name}
+        isDeleting={Boolean(deletingId)}
+        onConfirm={handleDeleteConfirm}
       />
     </div>
   );

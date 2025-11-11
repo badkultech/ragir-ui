@@ -15,6 +15,9 @@ import {
 } from "@/lib/services/organizer/trip/library/day-description";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useDebounce } from "@/hooks/useDebounce";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
+import { ActionButtons } from "@/components/library/ActionButtons";
 
 export default function EventsPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -23,6 +26,11 @@ export default function EventsPage() {
   const [updateId, setUpdateId] = useState<number | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedDayId, setSelectedDayId] = useState<any>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // NEW: holds the item we intend to delete (id + name)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name?: string } | null>(null);
 
   const organizationId = useOrganizationId();
 
@@ -37,6 +45,28 @@ export default function EventsPage() {
   );
 
   const [deleteOrganizerDayDescription] = useDeleteDayDescriptionMutation();
+
+  // UPDATED: uses deleteTarget (set when user clicks trash) to perform deletion
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteOrganizerDayDescription({
+        organizationId,
+        dayDescriptionId: deleteTarget.id,
+      }).unwrap();
+
+      showSuccess("Day Description deleted successfully");
+      // optionally clear local selection
+      setDeleteTarget(null);
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      showApiError("Failed to delete activity");
+    } finally {
+      setIsDeleting(false);
+      setConfirmOpen(false);
+    }
+  };
 
   // ✅ Debounced search value (wait 300ms after typing stops)
   const debouncedSearch = useDebounce(search, 300);
@@ -118,36 +148,20 @@ export default function EventsPage() {
                     />
 
                     <div className="flex justify-end gap-3 text-gray-500 mt-3">
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                      <ActionButtons
+                        onView={() => {
                           setSelectedDayId(dayDescription.id);
                           setViewModalOpen(true);
                         }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                        onEdit={() => {
                           setUpdateId(dayDescription.id);
                           setModalOpen(true);
                         }}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="hover:text-red-500"
-                        onClick={() => {
-                          deleteOrganizerDayDescription({
-                            dayDescriptionId: dayDescription.id,
-                            organizationId,
-                          }).unwrap();
+                        onDelete={() => {
+                          setDeleteTarget({ id: dayDescription.id, name: dayDescription.name });
+                          setConfirmOpen(true);
                         }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      />
                     </div>
                   </div>
                 </div>
@@ -169,6 +183,19 @@ export default function EventsPage() {
         updateId={updateId}
         onClose={() => setModalOpen(false)}
         initialStep="event"
+      />
+
+      {/* DELETE DIALOG: show deleteTarget?.name for correct label */}
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) setDeleteTarget(null); // clear when dialog closed
+        }}
+        title="Delete Day Description"
+        itemName={deleteTarget?.name}
+        isDeleting={isDeleting}
+        onConfirm={handleDeleteConfirm}
       />
 
       <ViewModal

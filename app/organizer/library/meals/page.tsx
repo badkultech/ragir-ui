@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { MapPin, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -16,6 +16,9 @@ import { ViewModal } from "@/components/library/ViewModal";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { mealTypeLabels } from "@/lib/services/organizer/trip/library/meal/types";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ActionButtons } from "@/components/library/ActionButtons";
+import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
+import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 
 export default function MealsPage() {
   const organizationId = useOrganizationId();
@@ -27,6 +30,11 @@ export default function MealsPage() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedMealId, setSelectedMealId] = useState<number | null>(null);
   const [editMeal, setEditMeal] = useState<any>(null);
+
+  // Delete state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; name?: string } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   // API calls
   const {
@@ -65,15 +73,28 @@ export default function MealsPage() {
     });
   }, [meals, debouncedSearch]);
 
-  // Delete handler
-  const handleDelete = async (mealId: string | number) => {
-    if (!confirm("Are you sure you want to delete this meal?")) return;
+  // open delete confirm for a specific meal
+  const openDeleteConfirm = (meal: any) => {
+    setDeleteTarget({ id: meal.id, name: meal.name });
+    setConfirmOpen(true);
+  };
+
+  // handle confirmed delete
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget.id;
+    setDeletingId(id);
     try {
-      await deleteMeal({ organizationId, mealId }).unwrap();
-      refetch();
+      await deleteMeal({ organizationId, mealId: id }).unwrap();
+      showSuccess("Meal deleted successfully");
+      await refetch(); // keep existing behavior; remove if you use RTK invalidation
     } catch (error) {
       console.error("Error deleting meal:", error);
-      alert("Failed to delete meal");
+      showApiError("Failed to delete meal");
+    } finally {
+      setDeletingId(null);
+      setConfirmOpen(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -156,31 +177,18 @@ export default function MealsPage() {
                     )}
 
                     {/* Actions */}
-                    <div className="mt-6 flex justify-end gap-3 text-gray-500">
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                    <div className="mt-6">
+                      <ActionButtons
+                        onView={() => {
                           setViewModalOpen(true);
                           setSelectedMealId(meal.id);
                         }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="hover:text-orange-500"
-                        onClick={() => {
+                        onEdit={() => {
                           setEditMeal(meal);
                           setModalOpen(true);
                         }}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="hover:text-red-500"
-                        onClick={() => handleDelete(meal.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        onDelete={() => openDeleteConfirm(meal)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -222,6 +230,19 @@ export default function MealsPage() {
           setSelectedMealId(null);
         }}
         data={selectedMeal}
+      />
+
+      {/* Delete confirmation dialog */}
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Delete Meal"
+        itemName={deleteTarget?.name}
+        isDeleting={Boolean(deletingId)}
+        onConfirm={handleDeleteConfirm}
       />
     </div>
   );

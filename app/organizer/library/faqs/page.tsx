@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Pencil, Trash2, Eye, MessageCircleQuestion } from "lucide-react";
+import { Pencil, MessageCircleQuestion } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { useSelector } from "react-redux";
@@ -13,14 +13,10 @@ import {
   useDeleteOrganizerFaqMutation,
 } from "@/lib/services/organizer/trip/library/faq";
 import { skipToken } from "@reduxjs/toolkit/query";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ActionButtons } from "@/components/library/ActionButtons";
+import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function FAQsPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -57,7 +53,7 @@ export default function FAQsPage() {
 
   const qLen = (debouncedSearch || "").trim().length;
 
-  const handleDelete = async () => {
+  const handleDeleteConfirm = async () => {
     if (!selectedFaq) return;
     try {
       await deleteFaq({
@@ -135,41 +131,21 @@ export default function FAQsPage() {
                     </p>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-3 text-gray-500">
-                    {/* 👁 View FAQ */}
-                    <button
-                      className="hover:text-blue-500"
-                      onClick={() => {
-                        setSelectedFaq(faq);
-                        setViewOpen(true);
-                      }}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-
-                    {/* ✏ Edit FAQ */}
-                    <button
-                      className="hover:text-orange-500"
-                      onClick={() => {
-                        setUpdateId(faq.id);
-                        setModalOpen(true);
-                      }}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-
-                    {/* 🗑 Delete FAQ */}
-                    <button
-                      className="hover:text-red-500"
-                      onClick={() => {
-                        setSelectedFaq(faq);
-                        setConfirmOpen(true);
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  {/* Actions (reusable) */}
+                  <ActionButtons
+                    onView={() => {
+                      setSelectedFaq(faq);
+                      setViewOpen(true);
+                    }}
+                    onEdit={() => {
+                      setUpdateId(faq.id);
+                      setModalOpen(true);
+                    }}
+                    onDelete={() => {
+                      setSelectedFaq(faq);
+                      setConfirmOpen(true);
+                    }}
+                  />
                 </div>
               ))
             )}
@@ -189,31 +165,18 @@ export default function FAQsPage() {
         initialStep="faq"
       />
 
-      {/* ❌ Confirm Delete Modal */}
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Delete FAQ</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 mb-4 text-center">
-            Are you sure you want to delete <br />
-            <strong>“{selectedFaq?.name}”</strong>? <br />
-            This action cannot be undone.
-          </p>
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* ❌ Confirm Delete Modal (reusable) */}
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) setSelectedFaq(null);
+        }}
+        title="Delete FAQ"
+        itemName={selectedFaq?.name}
+        isDeleting={isDeleting}
+        onConfirm={handleDeleteConfirm}
+      />
 
       {/* 👁 View FAQ Modal (keeps your original design) */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>

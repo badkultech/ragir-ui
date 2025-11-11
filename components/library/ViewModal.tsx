@@ -50,23 +50,36 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
       case "day-description":
         return (
           <>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center">
-                <MapPin className="w-6 h-5 mr-2 text-gray-900" />
-                <h3 className="text-base font-normal text-gray-800">
-                  Location
-                </h3>
-              </div>
-              <div className="flex items-center">
-                <h3 className="font-semibold text-[14px] text-gray-900">
+            <div className="w-full space-y-2">
+              {/* Row 1: Location */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-6 h-5 text-gray-900" />
+                  <h3 className="text-base font-normal text-gray-800">Location</h3>
+                </div>
+
+                <h3 className="font-semibold text-sm text-gray-900 text-right truncate max-w-[60%] sm:max-w-none">
                   {content.location
                     ?.split(",")
                     .map((loc: string) => loc.trim())
                     .join(" | ")}
                 </h3>
               </div>
+
+              {/* Row 2: Time */}
+              <div className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-6 h-5 text-gray-900" />
+                  <h3 className="text-base font-normal text-gray-800">From</h3>
+                </div>
+
+                <h3 className="font-medium text-sm text-gray-900">
+                  {formatTime(content.time)}
+                </h3>
+              </div>
             </div>
           </>
+
         );
       case "stays":
         return (
@@ -110,7 +123,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className="flex items-center">
                 <h3 className="font-medium text-[14px] text-gray-900">
                   {" "}
-                  {content.checkInTime}
+                  {formatTime(content.checkInTime)}
                 </h3>
               </div>
             </div>
@@ -122,7 +135,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className="flex items-center">
                 <h3 className="font-medium text-[14px] text-gray-900">
                   {" "}
-                  {content.checkOutTime}
+                  {formatTime(content.checkOutTime)}
                 </h3>
               </div>
             </div>
@@ -245,7 +258,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className="flex items-center">
                 <h3 className="font-medium text-[14px] text-gray-900">
                   {" "}
-                  {content.Mealtime}
+                  {formatTime(content.Mealtime)}
                 </h3>
               </div>
             </div>
@@ -326,7 +339,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className="flex items-center">
                 <h3 className="font-medium text-[14px] text-gray-900">
                   {" "}
-                  {content.time}
+                  {formatTime(content.time)}
                 </h3>
               </div>
             </div>
@@ -357,11 +370,11 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   width={800}
                   height={400}
                   className="w-full h-56 md:h-60 rounded-[12px] object-cover"
-                  // unoptimized // <-- stops /_next/image proxying
-                  // // optional: if it expires, hide and show fallback
-                  // onError={(e) =>
-                  //   ((e.target as HTMLImageElement).style.display = 'none')
-                  // }
+                // unoptimized // <-- stops /_next/image proxying
+                // // optional: if it expires, hide and show fallback
+                // onError={(e) =>
+                //   ((e.target as HTMLImageElement).style.display = 'none')
+                // }
                 />
               ) : (
                 <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">

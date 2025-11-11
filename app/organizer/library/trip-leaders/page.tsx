@@ -16,6 +16,8 @@ import {
 import { ViewLeaderModal } from "@/components/library/ViewLeaderModal";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ActionButtons } from "@/components/library/ActionButtons";
+import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 
 export default function TripLeadersPage() {
   const { userData } = useSelector(selectAuthState);
@@ -28,6 +30,10 @@ export default function TripLeadersPage() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedLeaderId, setSelectedLeaderId] = useState<number | null>(null);
   const [updateId, setUpdateId] = useState<number | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; name?: string } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
+
 
   // Data fetching
   const { data: leaders = [], isLoading, refetch } =
@@ -59,16 +65,23 @@ export default function TripLeadersPage() {
   const qLen = (debouncedSearch || "").trim().length;
 
   // Delete handler — preserves the original payload shape (uses LeaderId)
-  const handleDelete = async (LeaderId: string | number) => {
-    if (!confirm("Are you sure you want to delete this leader?")) return;
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget.id;
+    setDeletingId(id);
     try {
-      await deleteLeader({ organizationId, LeaderId }).unwrap();
+      await deleteLeader({ organizationId, LeaderId: id }).unwrap();
       refetch();
     } catch (error) {
       console.error("Error deleting leader:", error);
       alert("Failed to delete leader");
+    } finally {
+      setDeletingId(null);
+      setConfirmOpen(false);
+      setDeleteTarget(null);
     }
   };
+
 
   const handleModalClose = (shouldRefresh?: boolean) => {
     setModalOpen(false);
@@ -147,38 +160,22 @@ export default function TripLeadersPage() {
                       />
                     </div>
                   </div>
-
-                  {/* Right section: Actions */}
                   <div className="flex items-end gap-3 ml-4 self-end text-gray-400">
-                    <button
-                      title="Edit"
-                      className="hover:text-orange-500 transition"
-                      onClick={() => {
+                    <ActionButtons
+                      onView={() => {
+                        setSelectedLeaderId(leader.id);
+                        setViewModalOpen(true);
+                      }}
+                      onEdit={() => {
                         setSelectedLeaderId(leader.id);
                         setUpdateId(leader.id);
                         setModalOpen(true);
                       }}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      className="hover:text-orange-500"
-                      onClick={() => {
-                        setSelectedLeaderId(leader.id);
-                        setViewModalOpen(true);
+                      onDelete={() => {
+                        setDeleteTarget({ id: leader.id, name: leader.name });
+                        setConfirmOpen(true);
                       }}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-
-                    <button
-                      title="Delete"
-                      className="hover:text-red-500 transition"
-                      onClick={() => handleDelete(leader.id)}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    />
                   </div>
                 </div>
               ))
@@ -204,6 +201,18 @@ export default function TripLeadersPage() {
           setSelectedLeaderId(null);
         }}
         leader={selectedLeader ?? null}
+      />
+
+      <DeleteConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Delete Group Leader"
+        itemName={deleteTarget?.name}
+        isDeleting={Boolean(deletingId)}
+        onConfirm={handleDeleteConfirm}
       />
 
       <AddNewItemModal
