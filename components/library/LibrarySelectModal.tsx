@@ -22,6 +22,7 @@ import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
 import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { useGetDayDescriptionsQuery } from '@/lib/services/organizer/trip/library/day-description';
 import { LazyImage } from '../ui/lazyImage';
 
 export type LibraryItem = {
@@ -104,13 +105,14 @@ export function LibrarySelectModal({
                   skip: shouldSkip,
                   refetchOnMountOrArgChange: true,
                 })
-                 : { data: [], isLoading: false, isError: false };
-                // : category === "events"
-                //   ? useGetOrganizerDayDescriptionQuery(organizationId ?? "", {
-                //     skip: shouldSkip,
-                //     refetchOnMountOrArgChange: true,
-                //   })
-                //   : { data: [], isLoading: false, isError: false };
+              : category === 'events'
+              ? useGetDayDescriptionsQuery(organizationId ?? '', {
+                  skip: shouldSkip,
+                  refetchOnMountOrArgChange: true,
+                })
+              : { data: [], isLoading: false, isError: false };
+
+
 
 
   const items: LibraryItem[] =
@@ -120,7 +122,7 @@ export function LibrarySelectModal({
       answer: item.answer,
       location: item.location || item.city || "",
       description: item.description || item.details || "",
-      image: item.documents[0].url || "",
+      image: item?.documents[0]?.url || item.photo || "",
     })) ?? [];
 
   // 🔍 Search filter

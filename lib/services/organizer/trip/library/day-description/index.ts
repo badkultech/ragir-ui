@@ -3,11 +3,7 @@ import { ENDPOINTS } from '@/lib/utils';
 import { baseAPI } from '@/lib/services';
 import { TAGS } from '@/lib/services/tags';
 import { LibraryApiResponse } from '../types'; // same used by activityAPI
-import {
-  DayDescription,
-  DayDescriptionRequest,
-  DayDescriptionByIdResponse, // (optional) you may not need wrapper type anymore
-} from './types';
+import { DayDescription } from './types';
 
 export const organizerDayDescriptionAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
