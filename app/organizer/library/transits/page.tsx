@@ -181,31 +181,6 @@ export default function TransitPage() {
                       </p>
 
                       <div className="flex items-center gap-3 text-gray-500">
-                        {/* Edit */}
-                        <button
-                          className="hover:text-orange-500"
-                          aria-label={`edit-${t.id}`}
-                          onClick={() => {
-                            setSelectedTransitId(t.id);
-                            setUpdateId(t.id);
-                            setModalOpen(true);
-                          }}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-
-                        {/* View */}
-                        <button
-                          className="hover:text-blue-500"
-                          aria-label={`view-${t.id}`}
-                          onClick={() => {
-                            setSelectedTransitId(t.id);
-                            setViewOpen(true);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-
                         {/* Delete (uses ActionButtons-style spinner) */}
                         <ActionButtons
                           onView={() => {
