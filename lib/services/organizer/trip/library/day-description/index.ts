@@ -40,9 +40,9 @@ export const organizerDayDescriptionAPI = baseAPI.injectEndpoints({
     // Create day description (FormData)
     createDayDescription: builder.mutation<
       DayDescription,
-      DayDescriptionRequest
+      { organizationId: string; data: FormData }
     >({
-      query: ({ organizationId, ...data }) => ({
+      query: ({ organizationId, data }) => ({
         url: ENDPOINTS.ORGANIZER.LIBRARY.DAY_DESCRIPTION(organizationId ?? ''),
         method: 'POST',
         body: data,
