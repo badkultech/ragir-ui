@@ -81,18 +81,19 @@ export default function ItineraryPage() {
           tripPublicId,
         }).unwrap();
 
-        if (response && Array.isArray(response)) {
+        if (response?.data && Array.isArray(response.data)) {
           const idsMap: Record<number, string> = {};
-          response.forEach((detail: any) => {
-            if (detail.dayNumber && detail.publicId) {
-              idsMap[detail.dayNumber] = detail.publicId;
+          response.data.forEach((detail: any) => {
+            if (detail.dayNumber && detail.id) {
+              idsMap[detail.dayNumber] = String(detail.id);
             }
           });
           setDayDetailIds(idsMap);
-          console.log("🧩 Day detail IDs mapped:", idsMap);
+          console.log("🧩 Day detail IDs mapped (fixed):", idsMap);
         } else {
-          console.warn("⚠️ No day details found in response");
+          console.warn("⚠️ No valid day details found in response");
         }
+
       } catch (err) {
         console.error("❌ Failed to fetch all day details:", err);
       }
@@ -146,40 +147,41 @@ export default function ItineraryPage() {
 
   // ✅ Add Details button → first get all, then get single by id
   const handleAddDetails = async (idx: number) => {
-    setShowDetails((prev) => prev.map((val, i) => (i === idx ? true : val)));
-
-    const organizationId = userData?.organizationPublicId;
+    const organizationId = userData?.organizationPublicId ?? "";
     const tripPublicId =
       id ||
       searchParams.get("tripPublicId") ||
-      localStorage.getItem("createdTripPublicId");
+      localStorage.getItem("createdTripPublicId") ||
+      "";
 
     const dayNumber = idx + 1;
-    const existingDayDetailId = dayDetailIds[dayNumber];
 
-    if (!organizationId || !tripPublicId) {
-      console.warn("⚠️ Missing organizationId or tripPublicId");
-      return;
-    }
+    // Show Details section immediately
+    setShowDetails((prev) => prev.map((v, i) => (i === idx ? true : v)));
 
-    if (!existingDayDetailId) {
-      console.warn(`⚠️ No dayDetailId stored for Day ${dayNumber}`);
-      return;
-    }
+    if (!organizationId || !tripPublicId) return;
 
     try {
-      console.log(`🔍 Fetching single day detail by ID for Day ${dayNumber}...`);
-      const singleDetail = await triggerGetDayDetailById({
+      const res = await triggerGetAllDayDetails({
         organizationId,
         tripPublicId: Array.isArray(tripPublicId) ? tripPublicId[0] : tripPublicId,
-        dayDetailId: existingDayDetailId,
       }).unwrap();
+      const list = Array.isArray(res) ? res : [];
 
-      console.log("✅ Single Day Detail fetched successfully:", singleDetail);
-    } catch (err) {
-      console.error("❌ Failed to fetch day detail by ID:", err);
+      const found = list.find((item: any) => item.dayNumber === dayNumber);
+      if (!found?.id) {
+        return;
+      }
+
+      console.log(`✅ Day ${dayNumber} id =`, found.id);
+      setDayDetailIds((prev) => ({ ...prev, [dayNumber]: String(found.id) }));
+    } catch (e) {
+      console.error("❌ handleAddDetails error:", e);
     }
   };
+
+
+
 
   // ✅ Update itinerary data
   const handleUpdateItinerary = async () => {
@@ -306,6 +308,7 @@ export default function ItineraryPage() {
                 )}
 
                 {!showDetails[dayIdx] ? (
+                  // ✅ Default button
                   <button
                     className="rounded-full px-5 py-1.5 mt-2 text-white bg-gradient-to-r from-orange-400 to-pink-500 font-medium shadow"
                     onClick={() => handleAddDetails(dayIdx)}
@@ -313,8 +316,35 @@ export default function ItineraryPage() {
                     + Add Details
                   </button>
                 ) : (
-                  <DetailsOptions />
+                  // ✅ Show loader or details after ID fetch
+                  <>
+                    {!dayDetailIds[d.day] ? (
+                      <p className="text-gray-400 text-sm italic mt-2">
+                        ⏳ Loading day details for Day {d.day}...
+                      </p>
+                    ) : (
+                      <DetailsOptions
+                        key={dayDetailIds[d.day]} // important for re-render
+                        organizationId={
+                          userData?.organizationPublicId ||
+                          localStorage.getItem("organizationId") ||
+                          "00000000-0000-0000-0000-000000000000"
+                        }
+                        tripPublicId={
+                          Array.isArray(id)
+                            ? id[0]
+                            : id ||
+                            searchParams.get("tripPublicId") ||
+                            localStorage.getItem("createdTripPublicId") ||
+                            ""
+                        }
+                        dayDetailId={dayDetailIds[d.day]}
+                      />
+                    )}
+                  </>
                 )}
+
+
               </div>
             ))}
 

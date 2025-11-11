@@ -19,6 +19,9 @@ import { AddStayForm } from "../library/AddStayForm";
 import { AddMealForm } from "../library/AddMealForm";
 import { AddActivityForm } from "../library/AddActivityForm";
 
+// 🧩 Import your mutation hook
+import { useCreateDayDescriptionMutation } from "@/lib/services/organizer/trip/itinerary/day-details/day-description";
+
 type DetailItem = {
   id: number;
   type: string;
@@ -32,9 +35,21 @@ type DetailItem = {
   departure?: string;
   arrival?: string;
   images?: File[] | string[];
+  description?: string;
+  packingSuggestion?: string;
 };
 
-export function DetailsOptions() {
+interface DetailsOptionsProps {
+  organizationId: string;
+  tripPublicId: string;
+  dayDetailId: string;
+}
+
+export function DetailsOptions({
+  organizationId,
+  tripPublicId,
+  dayDetailId,
+}: DetailsOptionsProps) {
   const [showDayDescription, setShowDayDescription] = useState(false);
   const [showTransit, setShowTransit] = useState(false);
   const [showStay, setShowStay] = useState(false);
@@ -43,7 +58,11 @@ export function DetailsOptions() {
   const [details, setDetails] = useState<DetailItem[]>([]);
   const [editingItem, setEditingItem] = useState<DetailItem | null>(null);
 
-  // ✅ Save or Edit
+  // ✅ RTK mutation hook
+  const [createDayDescription, { isLoading: isCreating }] =
+    useCreateDayDescriptionMutation();
+
+  // ✅ Save or Edit (for local state)
   const handleSave = (type: string, data: any) => {
     if (editingItem) {
       setDetails((prev) =>
@@ -93,49 +112,47 @@ export function DetailsOptions() {
   return (
     <div className="flex flex-col gap-6 mt-4">
       {/* ---- BUTTONS ---- */}
-      {/* ---- BUTTONS ---- */}
-<div className="flex w-full gap-4">
-  <Button
-    onClick={() => setShowDayDescription(true)}
-    className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-orange-50 to-white text-black font-medium"
-  >
-    <Calendar size={16} />
-    <span className="text-xs mt-1">Day Description</span>
-  </Button>
+      <div className="flex w-full gap-4">
+        <Button
+          onClick={() => setShowDayDescription(true)}
+          className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-orange-50 to-white text-black font-medium"
+        >
+          <Calendar size={16} />
+          <span className="text-xs mt-1">Day Description</span>
+        </Button>
 
-  <Button
-    onClick={() => setShowTransit(true)}
-    className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-blue-50 to-white text-black font-medium"
-  >
-    <Car size={16} />
-    <span className="text-xs mt-1">Transit</span>
-  </Button>
+        <Button
+          onClick={() => setShowTransit(true)}
+          className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-blue-50 to-white text-black font-medium"
+        >
+          <Car size={16} />
+          <span className="text-xs mt-1">Transit</span>
+        </Button>
 
-  <Button
-    onClick={() => setShowStay(true)}
-    className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-green-50 to-white text-black font-medium"
-  >
-    <Home size={16} />
-    <span className="text-xs mt-1">Stay</span>
-  </Button>
+        <Button
+          onClick={() => setShowStay(true)}
+          className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-green-50 to-white text-black font-medium"
+        >
+          <Home size={16} />
+          <span className="text-xs mt-1">Stay</span>
+        </Button>
 
-  <Button
-    onClick={() => setShowMeal(true)}
-    className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-rose-50 to-white text-black font-medium"
-  >
-    <Utensils size={16} />
-    <span className="text-xs mt-1">Meal</span>
-  </Button>
+        <Button
+          onClick={() => setShowMeal(true)}
+          className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-rose-50 to-white text-black font-medium"
+        >
+          <Utensils size={16} />
+          <span className="text-xs mt-1">Meal</span>
+        </Button>
 
-  <Button
-    onClick={() => setShowActivity(true)}
-    className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-yellow-50 to-white text-black font-medium"
-  >
-    <Activity size={16} />
-    <span className="text-xs mt-1">Activity</span>
-  </Button>
-</div>
-
+        <Button
+          onClick={() => setShowActivity(true)}
+          className="flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-yellow-50 to-white text-black font-medium"
+        >
+          <Activity size={16} />
+          <span className="text-xs mt-1">Activity</span>
+        </Button>
+      </div>
 
       {/* ---- DISPLAY SAVED ITEMS ---- */}
       <div className="mt-6 space-y-3">
@@ -148,7 +165,6 @@ export function DetailsOptions() {
               <div className="flex items-start gap-3">
                 <div>{getIcon(item.type)}</div>
                 <div>
-                  {/* Title */}
                   <h3 className="font-semibold text-gray-800">
                     {item.title ||
                       item.activityName ||
@@ -156,27 +172,27 @@ export function DetailsOptions() {
                       "Untitled"}
                   </h3>
 
-                  {/* Location / Route */}
                   <p className="text-sm text-gray-600">
                     {item.type === "transit"
                       ? `${item.from || ""} ${item.to ? `→ ${item.to}` : ""}`
                       : item.location || ""}
                   </p>
 
-                  {/* Time */}
-                  {item.type === "transit" && (item.departure || item.arrival) && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {item.departure ? `Departure: ${item.departure}` : ""}{" "}
-                      {item.arrival ? `→ Arrival: ${item.arrival}` : ""}
-                    </p>
-                  )}
+                  {item.type === "transit" &&
+                    (item.departure || item.arrival) && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {item.departure ? `Departure: ${item.departure}` : ""}{" "}
+                        {item.arrival ? `→ Arrival: ${item.arrival}` : ""}
+                      </p>
+                    )}
+
                   {item.type !== "transit" && item.time && (
                     <p className="text-xs text-gray-500 mt-1">{item.time}</p>
                   )}
                 </div>
               </div>
 
-              {/* Edit/Delete Buttons */}
+              {/* Edit/Delete */}
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -198,14 +214,15 @@ export function DetailsOptions() {
               </div>
             </div>
 
-            {/* Images (show for all except transit if needed) */}
             {item.type !== "transit" && item.images && item.images.length > 0 && (
               <div className="flex gap-2 mt-3">
                 {item.images.map((img, idx) => (
                   <img
                     key={idx}
                     src={
-                      typeof img === "string" ? img : URL.createObjectURL(img as File)
+                      typeof img === "string"
+                        ? img
+                        : URL.createObjectURL(img as File)
                     }
                     alt="uploaded"
                     className="w-20 h-20 object-cover rounded-lg border"
@@ -218,23 +235,64 @@ export function DetailsOptions() {
       </div>
 
       {/* ---- MODALS ---- */}
+      {/* ✅ DAY DESCRIPTION POST API CALL */}
       {showDayDescription && (
         <ModalWrapper onClose={() => setShowDayDescription(false)}>
           <AddEventForm
-          header="Add Day Description"
+            header="Add Day Description"
             onCancel={() => setShowDayDescription(false)}
-            onSave={(data) => {
-              handleSave("event", data);
-              setShowDayDescription(false);
+            onSave={async (data) => {
+              try {
+                // ✅ Validate inputs before API call
+                if (!data.title?.trim() || !data.description?.trim()) {
+                  alert("⚠️ Please fill in both Name and Description before saving!");
+                  return;
+                }
+
+                const payload = {
+                  requestId: crypto.randomUUID(),
+                  currentTimestamp: new Date().toISOString(),
+                  organizationId,
+                  name: data.title.trim(),
+                  description: data.description.trim(),
+                  saveToLibrary: true,
+                  documents: [],
+                  location: data.location?.trim() || "",
+                  time: {
+                    hour: data.time ? Number(data.time.split(":")[0]) : 0,
+                    minute: data.time ? Number(data.time.split(":")[1]) : 0,
+                    second: 0,
+                    nano: 0,
+                  },
+                  packingSuggestion: data.packingSuggestion?.trim() || "",
+                };
+
+                console.log("📤 Creating Day Description:", payload);
+
+                const response = await createDayDescription({
+                  organizationId,
+                  tripPublicId,
+                  dayDetailId,
+                  data: payload,
+                }).unwrap();
+
+                console.log("✅ Created Day Description:", response);
+                handleSave("event", { ...data, id: response.tripItemId });
+                setShowDayDescription(false);
+              } catch (error) {
+                console.error("❌ Error creating Day Description:", error);
+              }
             }}
+
           />
         </ModalWrapper>
       )}
 
+      {/* Other modals */}
       {showTransit && (
         <ModalWrapper onClose={() => setShowTransit(false)}>
           <AddTransitForm
-          header="Add Transit"
+            header="Add Transit"
             onCancel={() => setShowTransit(false)}
             onSave={(data) => {
               handleSave("transit", data);
@@ -247,7 +305,7 @@ export function DetailsOptions() {
       {showStay && (
         <ModalWrapper onClose={() => setShowStay(false)}>
           <AddStayForm
-          header="Add Stay"
+            header="Add Stay"
             onCancel={() => setShowStay(false)}
             onSave={(data) => {
               handleSave("stay", data);
@@ -260,7 +318,7 @@ export function DetailsOptions() {
       {showMeal && (
         <ModalWrapper onClose={() => setShowMeal(false)}>
           <AddMealForm
-          header="Add Meal"
+            header="Add Meal"
             onCancel={() => setShowMeal(false)}
             onSave={(data) => {
               handleSave("meal", data);
@@ -273,7 +331,7 @@ export function DetailsOptions() {
       {showActivity && (
         <ModalWrapper onClose={() => setShowActivity(false)}>
           <AddActivityForm
-          header="Add Activity"
+            header="Add Activity"
             onCancel={() => setShowActivity(false)}
             onSave={(data) => {
               handleSave("activity", data);
