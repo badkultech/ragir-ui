@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Calendar,
   Pencil,
@@ -19,8 +19,15 @@ import { AddStayForm } from "../library/AddStayForm";
 import { AddMealForm } from "../library/AddMealForm";
 import { AddActivityForm } from "../library/AddActivityForm";
 
-// 🧩 Import your mutation hook
-import { useCreateDayDescriptionMutation } from "@/lib/services/organizer/trip/itinerary/day-details/day-description";
+// ✅ Import API mutation/query hooks
+import {
+  useCreateDayDescriptionMutation,
+  useLazyGetDayDescriptionsQuery,
+  useUpdateDayDescriptionMutation,
+  useDeleteDayDescriptionMutation,
+} from "@/lib/services/organizer/trip/itinerary/day-details/day-description";
+
+import { useCreateTransitMutation } from "@/lib/services/organizer/trip/itinerary/day-details/transit";
 
 type DetailItem = {
   id: number;
@@ -28,13 +35,10 @@ type DetailItem = {
   title?: string;
   location?: string;
   time?: string;
-  activityName?: string;
-  transportName?: string;
   from?: string;
   to?: string;
   departure?: string;
   arrival?: string;
-  images?: File[] | string[];
   description?: string;
   packingSuggestion?: string;
 };
@@ -58,11 +62,100 @@ export function DetailsOptions({
   const [details, setDetails] = useState<DetailItem[]>([]);
   const [editingItem, setEditingItem] = useState<DetailItem | null>(null);
 
-  // ✅ RTK mutation hook
-  const [createDayDescription, { isLoading: isCreating }] =
-    useCreateDayDescriptionMutation();
+  // ✅ API hooks
+  const [createDayDescription] = useCreateDayDescriptionMutation();
+  const [getDayDescriptions] = useLazyGetDayDescriptionsQuery();
+  const [updateDayDescription] = useUpdateDayDescriptionMutation();
+  const [deleteDayDescription] = useDeleteDayDescriptionMutation();
+  const [createTransit] = useCreateTransitMutation();
 
-  // ✅ Save or Edit (for local state)
+  // ✅ Fetch all Day Descriptions
+  const fetchDayDescriptions = async () => {
+    try {
+      const response = await getDayDescriptions({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+      }).unwrap();
+
+      if (response?.data?.length) {
+        setDetails(
+          response.data.map((item) => ({
+            id: item.tripItemId,
+            type: "event",
+            title: item.name,
+            description: item.description,
+            location: item.location,
+            time: `${item.time.hour}:${item.time.minute}`,
+            packingSuggestion: item.packingSuggestion,
+          }))
+        );
+      } else {
+        setDetails([]);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching day descriptions:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (dayDetailId) fetchDayDescriptions();
+  }, [dayDetailId]);
+
+  // ✅ Update existing day description
+  const handleUpdateDayDescription = async (itemId: number, data: any) => {
+    try {
+      const payload = {
+        requestId: crypto.randomUUID(),
+        currentTimestamp: new Date().toISOString(),
+        organizationId,
+        name: data.title.trim(),
+        description: data.description.trim(),
+        saveToLibrary: true,
+        documents: [],
+        location: data.location || "",
+        time: {
+          hour: data.time ? Number(data.time.split(":")[0]) : 0,
+          minute: data.time ? Number(data.time.split(":")[1]) : 0,
+          second: 0,
+          nano: 0,
+        },
+        packingSuggestion: data.packingSuggestion || "",
+      };
+
+      await updateDayDescription({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        itemId: String(itemId),
+        data: payload,
+      }).unwrap();
+
+      console.log("✅ Day Description Updated");
+      fetchDayDescriptions();
+    } catch (error) {
+      console.error("❌ Error updating Day Description:", error);
+    }
+  };
+
+  // ✅ Delete day description
+  const handleDeleteDayDescription = async (itemId: number) => {
+    try {
+      await deleteDayDescription({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        itemId: String(itemId),
+      }).unwrap();
+
+      console.log("Deleted day description:", itemId);
+      setDetails((prev) => prev.filter((i) => i.id !== itemId));
+    } catch (error) {
+      console.error("❌ Error deleting day description:", error);
+    }
+  };
+
+  // ✅ Local add/edit/delete
   const handleSave = (type: string, data: any) => {
     if (editingItem) {
       setDetails((prev) =>
@@ -76,12 +169,6 @@ export function DetailsOptions({
     }
   };
 
-  // ✅ Delete
-  const handleDelete = (id: number) => {
-    setDetails((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  // ✅ Edit
   const handleEdit = (item: DetailItem) => {
     setEditingItem(item);
     if (item.type === "event") setShowDayDescription(true);
@@ -91,7 +178,6 @@ export function DetailsOptions({
     if (item.type === "activity") setShowActivity(true);
   };
 
-  // ✅ Icon selector
   const getIcon = (type: string) => {
     switch (type) {
       case "event":
@@ -156,152 +242,179 @@ export function DetailsOptions({
 
       {/* ---- DISPLAY SAVED ITEMS ---- */}
       <div className="mt-6 space-y-3">
-        {details.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-3">
-                <div>{getIcon(item.type)}</div>
-                <div>
-                  <h3 className="font-semibold text-gray-800">
-                    {item.title ||
-                      item.activityName ||
-                      item.transportName ||
-                      "Untitled"}
-                  </h3>
-
-                  <p className="text-sm text-gray-600">
-                    {item.type === "transit"
-                      ? `${item.from || ""} ${item.to ? `→ ${item.to}` : ""}`
-                      : item.location || ""}
-                  </p>
-
-                  {item.type === "transit" &&
-                    (item.departure || item.arrival) && (
+        {details.length === 0 ? (
+          <p className="text-gray-500 text-sm text-center">
+            No details added yet.
+          </p>
+        ) : (
+          details.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3">
+                  <div>{getIcon(item.type)}</div>
+                  <div>
+                    <h3 className="font-semibold text-gray-800">
+                      {item.title || "Untitled"}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {item.location ||
+                        `${item.from || ""} ${
+                          item.to ? `→ ${item.to}` : ""
+                        }`}
+                    </p>
+                    {item.time && (
                       <p className="text-xs text-gray-500 mt-1">
-                        {item.departure ? `Departure: ${item.departure}` : ""}{" "}
-                        {item.arrival ? `→ Arrival: ${item.arrival}` : ""}
+                        {item.time}
                       </p>
                     )}
+                  </div>
+                </div>
 
-                  {item.type !== "transit" && item.time && (
-                    <p className="text-xs text-gray-500 mt-1">{item.time}</p>
-                  )}
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full hover:bg-gray-100"
+                    onClick={() => handleEdit(item)}
+                  >
+                    <Pencil size={14} className="text-gray-600" />
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full text-red-500 hover:bg-red-100"
+                    onClick={() => handleDeleteDayDescription(item.id)}
+                  >
+                    <Trash2 size={14} />
+                  </Button>
                 </div>
               </div>
-
-              {/* Edit/Delete */}
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="rounded-full hover:bg-gray-100"
-                  onClick={() => handleEdit(item)}
-                >
-                  <Pencil size={14} className="text-gray-600" />
-                </Button>
-
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="rounded-full text-red-500 hover:bg-red-100"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  <Trash2 size={14} />
-                </Button>
-              </div>
             </div>
-
-            {item.type !== "transit" && item.images && item.images.length > 0 && (
-              <div className="flex gap-2 mt-3">
-                {item.images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={
-                      typeof img === "string"
-                        ? img
-                        : URL.createObjectURL(img as File)
-                    }
-                    alt="uploaded"
-                    className="w-20 h-20 object-cover rounded-lg border"
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* ---- MODALS ---- */}
-      {/* ✅ DAY DESCRIPTION POST API CALL */}
+
+      {/* ✅ DAY DESCRIPTION */}
       {showDayDescription && (
         <ModalWrapper onClose={() => setShowDayDescription(false)}>
           <AddEventForm
-            header="Add Day Description"
+            header={editingItem ? "Edit Day Description" : "Add Day Description"}
             onCancel={() => setShowDayDescription(false)}
             onSave={async (data) => {
-              try {
-                // ✅ Validate inputs before API call
-                if (!data.title?.trim() || !data.description?.trim()) {
-                  alert("⚠️ Please fill in both Name and Description before saving!");
-                  return;
-                }
+              if (!data.title?.trim() || !data.description?.trim()) {
+                return;
+              }
 
+              if (editingItem) {
+                await handleUpdateDayDescription(editingItem.id, data);
+                setEditingItem(null);
+              } else {
+                const response = await createDayDescription({
+                  organizationId,
+                  tripPublicId,
+                  dayDetailId,
+                  data: {
+                    requestId: crypto.randomUUID(),
+                    currentTimestamp: new Date().toISOString(),
+                    organizationId,
+                    name: data.title.trim(),
+                    description: data.description.trim(),
+                    saveToLibrary: true,
+                    documents: [],
+                    location: data.location?.trim() || "",
+                    time: {
+                      hour: data.time
+                        ? Number(data.time.split(":")[0])
+                        : 0,
+                      minute: data.time
+                        ? Number(data.time.split(":")[1])
+                        : 0,
+                      second: 0,
+                      nano: 0,
+                    },
+                    packingSuggestion:
+                      data.packingSuggestion?.trim() || "",
+                  },
+                }).unwrap();
+
+                handleSave("event", { ...data, id: response.tripItemId });
+              }
+
+              setShowDayDescription(false);
+              fetchDayDescriptions();
+            }}
+          />
+        </ModalWrapper>
+      )}
+
+      {/* ✅ TRANSIT */}
+      {showTransit && (
+        <ModalWrapper onClose={() => setShowTransit(false)}>
+          <AddTransitForm
+            header="Add Transit"
+            onCancel={() => setShowTransit(false)}
+            onSave={async (data) => {
+              try {
                 const payload = {
                   requestId: crypto.randomUUID(),
                   currentTimestamp: new Date().toISOString(),
                   organizationId,
-                  name: data.title.trim(),
-                  description: data.description.trim(),
+                  name: data.name || "Untitled Transit",
                   saveToLibrary: true,
                   documents: [],
-                  location: data.location?.trim() || "",
-                  time: {
-                    hour: data.time ? Number(data.time.split(":")[0]) : 0,
-                    minute: data.time ? Number(data.time.split(":")[1]) : 0,
+                  fromLocation: data.fromLocation,
+                  toLocation: data.toLocation,
+                  startTime: {
+                    hour: data.startTime
+                      ? Number(data.startTime.split(":")[0])
+                      : 0,
+                    minute: data.startTime
+                      ? Number(data.startTime.split(":")[1])
+                      : 0,
                     second: 0,
                     nano: 0,
                   },
-                  packingSuggestion: data.packingSuggestion?.trim() || "",
+                  endTime: {
+                    hour: data.endTime
+                      ? Number(data.endTime.split(":")[0])
+                      : 0,
+                    minute: data.endTime
+                      ? Number(data.endTime.split(":")[1])
+                      : 0,
+                    second: 0,
+                    nano: 0,
+                  },
+                  vehicleType: data.vehicleType || "TRAVELER_VAN",
+                  customVehicleType: data.customVehicleType || "",
+                  arrangedBy: data.arrangedBy || "ORGANIZER",
+                  description: data.description || "",
+                  packingSuggestion: data.packingSuggestion || "",
                 };
 
-                console.log("📤 Creating Day Description:", payload);
-
-                const response = await createDayDescription({
+                const response = await createTransit({
                   organizationId,
                   tripPublicId,
                   dayDetailId,
                   data: payload,
                 }).unwrap();
 
-                console.log("✅ Created Day Description:", response);
-                handleSave("event", { ...data, id: response.tripItemId });
-                setShowDayDescription(false);
+                handleSave("transit", { ...data, id: response.tripItemId });
+                setShowTransit(false);
               } catch (error) {
-                console.error("❌ Error creating Day Description:", error);
+                console.error("❌ Error creating transit:", error);
               }
             }}
-
           />
         </ModalWrapper>
       )}
 
-      {/* Other modals */}
-      {showTransit && (
-        <ModalWrapper onClose={() => setShowTransit(false)}>
-          <AddTransitForm
-            header="Add Transit"
-            onCancel={() => setShowTransit(false)}
-            onSave={(data) => {
-              handleSave("transit", data);
-              setShowTransit(false);
-            }}
-          />
-        </ModalWrapper>
-      )}
-
+      {/* ✅ STAY */}
       {showStay && (
         <ModalWrapper onClose={() => setShowStay(false)}>
           <AddStayForm
@@ -315,6 +428,7 @@ export function DetailsOptions({
         </ModalWrapper>
       )}
 
+      {/* ✅ MEAL */}
       {showMeal && (
         <ModalWrapper onClose={() => setShowMeal(false)}>
           <AddMealForm
@@ -328,6 +442,7 @@ export function DetailsOptions({
         </ModalWrapper>
       )}
 
+      {/* ✅ ACTIVITY */}
       {showActivity && (
         <ModalWrapper onClose={() => setShowActivity(false)}>
           <AddActivityForm

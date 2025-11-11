@@ -13,6 +13,7 @@ export const TAGS = {
   itinerary: 'itinerary',
   itineraryDayDetails: 'itineraryDayDetails',
   dayDescription: 'dayDescription',
+  transit: 'transit',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',
