@@ -45,7 +45,7 @@ export const GradientIconButton = ({
       {/* Icon and Label */}
       <div className='relative z-10 flex items-center gap-2'>
         <Icon fill={iconColor} />
-        <span style={{ color: labelColor }}>{label}</span>
+        <span style={{ color: labelColor, fontWeight: 400 }}>{label}</span>
       </div>
     </button>
   );
