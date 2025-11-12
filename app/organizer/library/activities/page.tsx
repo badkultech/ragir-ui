@@ -27,11 +27,16 @@ export default function ActivitiesPage() {
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(
+    null
+  );
 
   // for delete flow
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; name?: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string | number;
+    name?: string;
+  } | null>(null);
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   const {
@@ -47,7 +52,8 @@ export default function ActivitiesPage() {
       : skipToken
   );
 
-  const [deleteActivity, { isLoading: isDeletingGlobal }] = useDeleteActivityMutation();
+  const [deleteActivity, { isLoading: isDeletingGlobal }] =
+    useDeleteActivityMutation();
 
   // Debounce search (300ms)
   const debouncedSearch = useDebounce(search, 300);
@@ -116,7 +122,8 @@ export default function ActivitiesPage() {
 
           {isLoading ? (
             <div className="flex justify-center items-center h-40 text-gray-500">
-              <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading activities...
+              <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading
+              activities...
             </div>
           ) : isError ? (
             <div className="text-center text-red-500 py-10">
@@ -126,13 +133,13 @@ export default function ActivitiesPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filtered.map((activity) => (
                 <div
                   key={activity.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden p-4 flex flex-col"
                 >
-                  <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <div className="h-40 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                     {activity?.documents?.[0]?.url ? (
                       <img
                         src={activity.documents[0].url}
@@ -144,7 +151,7 @@ export default function ActivitiesPage() {
                     )}
                   </div>
 
-                  <div className="py-4 flex-1 flex flex-col">
+                  <div className="flex flex-col flex-1 mt-4">
                     <h3 className="font-semibold text-gray-900">
                       {activity.name}
                     </h3>
@@ -152,11 +159,16 @@ export default function ActivitiesPage() {
                       <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                       {activity.location || "—"}
                     </div>
-                    <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                      {activity.description || "No description available."}
-                    </p>
 
-                    <div className="mt-4">
+                    <p
+                      className="text-sm text-gray-500 mt-2 line-clamp-2"
+                      dangerouslySetInnerHTML={{
+                        __html: activity.description || "",
+                      }}
+                    />
+
+                    {/* ✅ Buttons stay bottom-right */}
+                    <div className="mt-auto pt-4 flex justify-end">
                       <ActionButtons
                         onView={() => {
                           setSelectedActivityId(activity.id);

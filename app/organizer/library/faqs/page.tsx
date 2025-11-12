@@ -126,9 +126,11 @@ export default function FAQsPage() {
                     <h3 className="font-semibold text-gray-900">
                       <strong>{faq.name}</strong>
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                      {faq.answer}
-                    </p>
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2"
+                      dangerouslySetInnerHTML={{
+                        __html: faq.answer || "",
+                      }}
+                    />
                   </div>
 
                   {/* Actions (reusable) */}
