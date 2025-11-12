@@ -274,7 +274,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className="flex items-center">
                 <h3 className="font-medium text-[14px] text-gray-900">
                   {" "}
-                  {formatTime(content.Mealtime)}
+                  {formatTime(content.time)}
                 </h3>
               </div>
             </div>

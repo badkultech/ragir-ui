@@ -183,7 +183,7 @@ export function mapMealToFormData(data: any, documents?: DocumentItem[]) {
     location: data.location ?? "",
     description: data.description ?? "",
     packing: data.packing ?? "",
-    time: data.mealTime ?? "",
+    time: data.time ?? "",
     addToLibrary: data.addToLibrary ?? true,
   });
 
