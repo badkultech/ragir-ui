@@ -50,7 +50,7 @@ export const transitAPI = baseAPI.injectEndpoints({
         organizationId: string;
         tripPublicId: string;
         dayDetailId: string;
-        data: CreateTransitRequest;
+        data: CreateTransitRequest | FormData;
       }
     >({
       query: ({ organizationId, tripPublicId, dayDetailId, data }) => ({
@@ -73,7 +73,7 @@ export const transitAPI = baseAPI.injectEndpoints({
         tripPublicId: string;
         dayDetailId: string;
         itemId: string;
-        data: UpdateTransitRequest;
+        data: UpdateTransitRequest | FormData;
       }
     >({
       query: ({ organizationId, tripPublicId, dayDetailId, itemId, data }) => ({

@@ -22,43 +22,55 @@ export const dayDescriptionAPI = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/day-details/${dayDetailId}/day-description`,
         method: "GET",
       }),
-      transformResponse: (response: ApiResponse<DayDescriptionListResponse>) => response.data,
+      transformResponse: (response: ApiResponse<DayDescriptionListResponse>) =>
+        response.data,
       providesTags: [TAGS.dayDescription],
     }),
 
     // ✅ GET single day description by ID
     getDayDescriptionById: builder.query<
       DayDescriptionResponse,
-      { organizationId: string; tripPublicId: string; dayDetailId: string; itemId: string }
+      {
+        organizationId: string;
+        tripPublicId: string;
+        dayDetailId: string;
+        itemId: string;
+      }
     >({
       query: ({ organizationId, tripPublicId, dayDetailId, itemId }) => ({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/day-details/${dayDetailId}/day-description/${itemId}`,
         method: "GET",
       }),
-      transformResponse: (response: ApiResponse<DayDescriptionResponse>) => response.data,
+      transformResponse: (response: ApiResponse<DayDescriptionResponse>) =>
+        response.data,
       providesTags: [TAGS.dayDescription],
     }),
 
-    // ✅ CREATE day description
+    // ✅ CREATE day description (supports both JSON & FormData)
     createDayDescription: builder.mutation<
       DayDescription,
       {
         organizationId: string;
         tripPublicId: string;
         dayDetailId: string;
-        data: CreateDayDescriptionRequest;
+        data: CreateDayDescriptionRequest | FormData; // 👈 allow FormData
       }
     >({
       query: ({ organizationId, tripPublicId, dayDetailId, data }) => ({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/day-details/${dayDetailId}/day-description`,
         method: "POST",
-        body: data,
+        body: data instanceof FormData ? data : JSON.stringify(data),
+        headers:
+          data instanceof FormData
+            ? undefined
+            : { "Content-Type": "application/json" },
       }),
-      transformResponse: (response: ApiResponse<DayDescription>) => response.data,
+      transformResponse: (response: ApiResponse<DayDescription>) =>
+        response.data,
       invalidatesTags: [TAGS.dayDescription],
     }),
 
-    // ✅ UPDATE day description
+    // ✅ UPDATE day description (supports both JSON & FormData)
     updateDayDescription: builder.mutation<
       DayDescription,
       {
@@ -66,28 +78,39 @@ export const dayDescriptionAPI = baseAPI.injectEndpoints({
         tripPublicId: string;
         dayDetailId: string;
         itemId: string;
-        data: UpdateDayDescriptionRequest;
+        data: UpdateDayDescriptionRequest | FormData; // 👈 allow FormData
       }
     >({
       query: ({ organizationId, tripPublicId, dayDetailId, itemId, data }) => ({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/day-details/${dayDetailId}/day-description/${itemId}`,
         method: "PUT",
-        body: data,
+        body: data instanceof FormData ? data : JSON.stringify(data),
+        headers:
+          data instanceof FormData
+            ? undefined
+            : { "Content-Type": "application/json" },
       }),
-      transformResponse: (response: ApiResponse<DayDescription>) => response.data,
+      transformResponse: (response: ApiResponse<DayDescription>) =>
+        response.data,
       invalidatesTags: [TAGS.dayDescription],
     }),
 
     // ✅ DELETE day description
     deleteDayDescription: builder.mutation<
       DeleteDayDescriptionResponse,
-      { organizationId: string; tripPublicId: string; dayDetailId: string; itemId: string }
+      {
+        organizationId: string;
+        tripPublicId: string;
+        dayDetailId: string;
+        itemId: string;
+      }
     >({
       query: ({ organizationId, tripPublicId, dayDetailId, itemId }) => ({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/day-details/${dayDetailId}/day-description/${itemId}`,
         method: "DELETE",
       }),
-      transformResponse: (response: ApiResponse<DeleteDayDescriptionResponse>) => response.data,
+      transformResponse: (response: ApiResponse<DeleteDayDescriptionResponse>) =>
+        response.data,
       invalidatesTags: [TAGS.dayDescription],
     }),
   }),
