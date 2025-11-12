@@ -107,8 +107,8 @@ export default function FAQsPage() {
                 {qLen === 0 && faqs.length > 0
                   ? "Showing all FAQs. Type at least 3 characters to search."
                   : qLen > 0 && qLen < 3
-                  ? "Type at least 3 characters to search."
-                  : "No FAQs found."}
+                    ? "Type at least 3 characters to search."
+                    : "No FAQs found."}
               </div>
             ) : (
               filtered.map((faq) => (
@@ -191,9 +191,11 @@ export default function FAQsPage() {
             <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
               Full Answer
             </h4>
-            <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-line">
-              {selectedFaq?.answer}
-            </p>
+            <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-line"
+              dangerouslySetInnerHTML={{
+                __html: selectedFaq?.answer || "",
+              }}
+            />
           </div>
         </DialogContent>
       </Dialog>
