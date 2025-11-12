@@ -78,11 +78,22 @@ export default function RichTextEditor({
     });
   }, []);
 
-  useEffect(() => {
-    const handler = () => updateActiveFormats();
-    document.addEventListener("selectionchange", handler);
-    return () => document.removeEventListener("selectionchange", handler);
-  }, [updateActiveFormats]);
+ useEffect(() => {
+  const handler = () => {
+    const el = editorRef.current;
+    if (!el) return;
+
+    // ✅ Only update toolbar if THIS editor is focused or selection is inside it
+    const selection = document.getSelection();
+    if (!selection || !el.contains(selection.anchorNode)) return;
+
+    updateActiveFormats();
+  };
+
+  document.addEventListener("selectionchange", handler);
+  return () => document.removeEventListener("selectionchange", handler);
+}, [updateActiveFormats]);
+
 
   // Handle input
   const handleInput = useCallback(() => {
