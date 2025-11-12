@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader";
 import { AppHeader } from "@/components/app-header";
-import { DetailsOptions } from "@/components/create-trip/addDetails";
+import { DetailsOptions } from "@/components/create-trip/detailsOption/addDetails";
 import { WizardFooter } from "@/components/create-trip/wizard-footer";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { FileUploadCard } from "@/components/create-trip/file-upload-card";

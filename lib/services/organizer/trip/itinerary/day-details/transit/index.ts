@@ -57,9 +57,6 @@ export const transitAPI = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/day-details/${dayDetailId}/transit`,
         method: "POST",
         body: data,
-        headers: {
-          "Content-Type": "application/json",
-        },
       }),
       transformResponse: (response: ApiResponse<TransitItem>) => response.data,
       invalidatesTags: [TAGS.transit],
@@ -80,9 +77,6 @@ export const transitAPI = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/day-details/${dayDetailId}/transit/${itemId}`,
         method: "PUT",
         body: data,
-        headers: {
-          "Content-Type": "application/json",
-        },
       }),
       transformResponse: (response: ApiResponse<TransitItem>) => response.data,
       invalidatesTags: [TAGS.transit],
