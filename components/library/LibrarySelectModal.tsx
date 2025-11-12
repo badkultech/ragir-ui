@@ -22,6 +22,7 @@ import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
 import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import {useGetDayDescriptionsQuery } from "@/lib/services/organizer/trip/library/day-description";
 
 
 
@@ -106,13 +107,13 @@ export function LibrarySelectModal({
                   skip: shouldSkip,
                   refetchOnMountOrArgChange: true,
                 })
-                 : { data: [], isLoading: false, isError: false };
-                // : category === "events"
-                //   ? useGetOrganizerDayDescriptionQuery(organizationId ?? "", {
-                //     skip: shouldSkip,
-                //     refetchOnMountOrArgChange: true,
-                //   })
-                //   : { data: [], isLoading: false, isError: false };
+                 
+                : category === "events"
+                  ? useGetDayDescriptionsQuery(organizationId ?? "", {
+                    skip: shouldSkip,
+                    refetchOnMountOrArgChange: true,
+                  })
+                  : { data: [], isLoading: false, isError: false };
 
 
   const items: LibraryItem[] =

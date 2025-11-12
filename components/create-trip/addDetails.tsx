@@ -21,11 +21,11 @@ import { AddActivityForm } from "../library/AddActivityForm";
 
 // ✅ API imports
 import {
-  useCreateDayDescriptionMutation,
-  useLazyGetDayDescriptionsQuery,
-  useLazyGetDayDescriptionByIdQuery,
-  useUpdateDayDescriptionMutation,
-  useDeleteDayDescriptionMutation,
+  useCreateTripDayDescriptionMutation,
+  useLazyGetTripDayDescriptionsQuery,
+  useLazyGetTripDayDescriptionByIdQuery,
+  useUpdateTripDayDescriptionMutation,
+  useDeleteTripDayDescriptionMutation,
 } from "@/lib/services/organizer/trip/itinerary/day-details/day-description";
 
 import { useCreateTransitMutation } from "@/lib/services/organizer/trip/itinerary/day-details/transit";
@@ -35,6 +35,7 @@ import {
   mapDayDescriptionToFormData,
   mapTransitToFormData,
 } from "@/lib/services/organizer/trip/library/common/formDataMappers";
+import { useCreateDayDescriptionMutation } from "@/lib/services/organizer/trip/library/day-description";
 
 type DetailItem = {
   id: number;
@@ -68,12 +69,14 @@ export function DetailsOptions({
   const [initialData, setInitialData] = useState<any>(null);
 
   // ✅ API hooks
-  const [createDayDescription] = useCreateDayDescriptionMutation();
-  const [getDayDescriptions] = useLazyGetDayDescriptionsQuery();
-  const [getDayDescriptionById] = useLazyGetDayDescriptionByIdQuery();
-  const [updateDayDescription] = useUpdateDayDescriptionMutation();
-  const [deleteDayDescription] = useDeleteDayDescriptionMutation();
+  const [createDayDescription] = useCreateTripDayDescriptionMutation();
+  const [getDayDescriptions] = useLazyGetTripDayDescriptionsQuery();
+  const [getDayDescriptionById] = useLazyGetTripDayDescriptionByIdQuery();
+  const [updateDayDescription] = useUpdateTripDayDescriptionMutation();
+  const [deleteDayDescription] = useDeleteTripDayDescriptionMutation();
   const [createTransit] = useCreateTransitMutation();
+  const [createLibraryDayDescription] = useCreateDayDescriptionMutation();
+
 
   // ✅ Fetch all Day Descriptions
   const fetchDayDescriptions = async () => {
@@ -173,40 +176,66 @@ export function DetailsOptions({
 
   // ✅ Save API (Create / Update)
   const handleSave = async (data: any) => {
-    if (!data.title?.trim() || !data.description?.trim()) return;
-    const formData = mapDayDescriptionToFormData(data, data.documents);
+  if (!data.title?.trim() || !data.description?.trim()) return;
 
-    try {
-      if (editingItem) {
-        // PUT (Update)
-        await updateDayDescription({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          itemId: String(editingItem.id),
-          data: formData,
-        }).unwrap();
-        console.log("✏️ Updated Day Description:", editingItem.id);
-      } else {
-        // POST (Create)
-        await createDayDescription({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          data: formData,
-        }).unwrap();
-        console.log("🆕 Created Day Description");
-      }
+  // 🧱 Step 1: Always save to Trip
+  const tripFormData = mapDayDescriptionToFormData(
+    { ...data, addToLibrary: false },
+    data.documents
+  );
 
-      await fetchDayDescriptions();
-    } catch (error) {
-      console.error("❌ Error saving Day Description:", error);
-    } finally {
-      setShowDayDescription(false);
-      setEditingItem(null);
-      setInitialData(null);
+  try {
+    if (editingItem) {
+      // ✏️ Update existing Day Description in Trip
+      await updateDayDescription({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        itemId: String(editingItem.id),
+        data: tripFormData,
+      }).unwrap();
+      console.log("✏️ Updated Day Description:", editingItem.id);
+    } else {
+      // 🆕 Create new Day Description in Trip
+      await createDayDescription({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        data: tripFormData,
+      }).unwrap();
+      console.log("🆕 Created Day Description");
     }
-  };
+
+    // 🧱 Step 2: Also save to Library if checkbox is checked
+    if (data.saveInLibrary) {
+      try {
+        const libraryFormData = mapDayDescriptionToFormData(
+          { ...data, addToLibrary: true },
+          data.documents
+        );
+
+        // 👇 Ye tumhare library API slice se call karni hai
+        const res = await createLibraryDayDescription({
+          organizationId,
+          data: libraryFormData,
+        }).unwrap();
+
+        console.log("📚 Saved in Library:", res);
+      } catch (libErr) {
+        console.error("⚠️ Failed to save in Library:", libErr);
+      }
+    }
+
+    await fetchDayDescriptions();
+  } catch (error) {
+    console.error("❌ Error saving Day Description:", error);
+  } finally {
+    setShowDayDescription(false);
+    setEditingItem(null);
+    setInitialData(null);
+  }
+};
+
 
   // ✅ Icon helper
   const getIcon = (type: string) => {
@@ -262,19 +291,41 @@ export function DetailsOptions({
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div>{getIcon(item.type)}</div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800">
-                      {item.title || "Untitled"}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {item.location || ""}
-                    </p>
-                    {item.time && (
-                      <p className="text-xs text-gray-500 mt-1">{item.time}</p>
-                    )}
-                  </div>
-                </div>
+  <div>{getIcon(item.type)}</div>
+  <div>
+    <h3 className="font-semibold text-gray-800">
+      {item.title || "Untitled"}
+    </h3>
+    <p className="text-sm text-gray-600">{item.location || ""}</p>
+    {item.time && (
+      <p className="text-xs text-gray-500 mt-1">{item.time}</p>
+    )}
+
+    {/* 🖼️ Show images here */}
+    {item.documents && item.documents.length > 0 && (
+  <div className="flex gap-2 mt-3 flex-wrap">
+    {item.documents.map((doc, idx) => {
+      const src =
+        typeof doc === "string"
+          ? doc
+          : doc instanceof File
+          ? URL.createObjectURL(doc)
+          : (doc as any).url || ""; // fallback
+      return (
+        <img
+          key={idx}
+          src={src}
+          alt={`doc-${idx}`}
+          className="w-20 h-20 object-cover rounded-lg border"
+        />
+      );
+    })}
+  </div>
+)}
+
+  </div>
+</div>
+
 
                 <div className="flex gap-2">
                   <Button

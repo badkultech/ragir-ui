@@ -14,7 +14,7 @@ import {
 export const dayDescriptionAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
     // ✅ GET all day descriptions
-    getDayDescriptions: builder.query<
+    getTripDayDescriptions: builder.query<
       DayDescriptionListResponse,
       { organizationId: string; tripPublicId: string; dayDetailId: string }
     >({
@@ -28,7 +28,7 @@ export const dayDescriptionAPI = baseAPI.injectEndpoints({
     }),
 
     // ✅ GET single day description by ID
-    getDayDescriptionById: builder.query<
+    getTripDayDescriptionById: builder.query<
       DayDescriptionResponse,
       {
         organizationId: string;
@@ -47,7 +47,7 @@ export const dayDescriptionAPI = baseAPI.injectEndpoints({
     }),
 
     // ✅ CREATE day description (supports both JSON & FormData)
-    createDayDescription: builder.mutation<
+    createTripDayDescription: builder.mutation<
       DayDescription,
       {
         organizationId: string;
@@ -71,7 +71,7 @@ export const dayDescriptionAPI = baseAPI.injectEndpoints({
     }),
 
     // ✅ UPDATE day description (supports both JSON & FormData)
-    updateDayDescription: builder.mutation<
+    updateTripDayDescription: builder.mutation<
       DayDescription,
       {
         organizationId: string;
@@ -96,7 +96,7 @@ export const dayDescriptionAPI = baseAPI.injectEndpoints({
     }),
 
     // ✅ DELETE day description
-    deleteDayDescription: builder.mutation<
+    deleteTripDayDescription: builder.mutation<
       DeleteDayDescriptionResponse,
       {
         organizationId: string;
@@ -117,11 +117,11 @@ export const dayDescriptionAPI = baseAPI.injectEndpoints({
 });
 
 export const {
-  useGetDayDescriptionsQuery,
-  useLazyGetDayDescriptionsQuery,
-  useGetDayDescriptionByIdQuery,
-  useLazyGetDayDescriptionByIdQuery,
-  useCreateDayDescriptionMutation,
-  useUpdateDayDescriptionMutation,
-  useDeleteDayDescriptionMutation,
+  useGetTripDayDescriptionsQuery,
+  useLazyGetTripDayDescriptionsQuery,
+  useGetTripDayDescriptionByIdQuery,
+  useLazyGetTripDayDescriptionByIdQuery,
+  useCreateTripDayDescriptionMutation,
+  useUpdateTripDayDescriptionMutation,
+  useDeleteTripDayDescriptionMutation,
 } = dayDescriptionAPI;

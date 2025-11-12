@@ -204,8 +204,12 @@ export function mapDayDescriptionToFormData(data: any, documents?: DocumentItem[
     location: data.location ?? "",
     packing: data.packing ?? "",
     time: data.time ?? "",
-    addToLibrary: true,
+   addToLibrary: data.addToLibrary ?? false,
+
   });
+   if (data.saveInLibrary) {
+    fd.append("addToLibrary", "true");
+  }
 
   // some dayDescriptions might include extra fields like packingSuggestion already handled above
   // handle attached documents (the `documents` param), as well as possibly pre-existing `data.documents`

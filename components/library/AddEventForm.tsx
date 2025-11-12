@@ -82,10 +82,12 @@ export function AddEventForm({
     //  Trigger save
     try {
       await onSave(
-        { title, description, location, time, packing, mode },
+        { title, description, location, time, packing,saveInLibrary, mode },
         docsManager.documents
       );
       showSuccess("Event saved successfully!");
+      console.log("📸 Uploaded documents:", docsManager.documents);
+
     } catch {
       showApiError("Failed to save event");
     }
@@ -215,14 +217,6 @@ export function AddEventForm({
               Save in Library
             </label>
           </div>
-
-          <Input
-            type="text"
-            value={saveAsName}
-            onChange={(e) => setSaveAsName(e.target.value)}
-            placeholder="Save As"
-            className="p-4 w-[12rem]"
-          />
         </div>
       )}
 
