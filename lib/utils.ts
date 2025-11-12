@@ -96,6 +96,10 @@ export const ENDPOINTS = {
     },
     TRIP_LEADS: (organizationId: string, tripPublicId: string) =>
       `/org/${organizationId}/trip/${tripPublicId}/leads`,
+    TRIP_QUERIES: (organizationId: string, tripPublicId: string) =>
+      `/org/${organizationId}/trip/${tripPublicId}/queries`,
+    TRIP_ORG_QUERIES: (organizationId: string) =>
+      `/org/${organizationId}/org-trip-queries`,
     TRIP_ORG_LEADS: (organizationId: string) =>
       `/org/${organizationId}/org-trip-leads`,
     TICKETS: (userId: string) => `/organizer/${userId}/ticket`,

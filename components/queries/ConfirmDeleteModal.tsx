@@ -13,10 +13,12 @@ export default function ConfirmDeleteModal({
   open,
   onClose,
   onConfirm,
+  loading,
 }: {
   open: boolean;
   onClose: () => void;
   onConfirm?: () => void;
+  loading: boolean;
 }) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
