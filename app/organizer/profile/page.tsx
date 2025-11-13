@@ -265,24 +265,27 @@ export default function OrganizerProfilePage() {
                         Certifications
                       </h2>
 
-                      {state.certificationsDocuments?.length ? (
+                      {state.certificationsDocuments.filter((doc) => doc.id)
+                        ?.length ? (
                         <div className='space-y-3'>
-                          {state.certificationsDocuments.map((doc, idx) => (
-                            <div
-                              key={idx}
-                              className='border border-gray-100 rounded-md p-3 bg-gray-50 hover:bg-gray-100 transition'
-                            >
-                              <Button className='bg-[#FF804C]'>
-                                <Certificate />
-                              </Button>
-                              <p className='font-medium text-gray-800'>
-                                {'Certificate'}
-                              </p>
-                              <p className='text-sm text-gray-500'>
-                                Uploaded on {'N/A'}
-                              </p>
-                            </div>
-                          ))}
+                          {state.certificationsDocuments
+                            .filter((doc) => doc.id)
+                            .map((doc, idx) => (
+                              <div
+                                key={idx}
+                                className='border border-gray-100 rounded-md p-3 bg-gray-50 hover:bg-gray-100 transition'
+                              >
+                                <Button className='bg-[#FF804C]'>
+                                  <Certificate />
+                                </Button>
+                                <p className='font-medium text-gray-800'>
+                                  {'Certificate'}
+                                </p>
+                                <p className='text-sm text-gray-500'>
+                                  Uploaded on {'N/A'}
+                                </p>
+                              </div>
+                            ))}
                         </div>
                       ) : (
                         <p className='text-gray-500'>
