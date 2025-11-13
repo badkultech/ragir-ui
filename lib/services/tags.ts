@@ -18,6 +18,8 @@ export const TAGS = {
   stay: 'stay',
   meal: 'meal',
   activity: 'activity',
+  exclusion: 'exclusion',
+  faq: 'faq',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',
