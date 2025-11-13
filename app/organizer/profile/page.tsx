@@ -29,29 +29,13 @@ import { Check } from 'lucide-react';
 
 const hasProfile = true;
 
-const testimonials = [
-  {
-    feedback:
-      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using , making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text',
-    name: 'name',
-    designation: 'designation',
-  },
-  {
-    feedback: 'feedback',
-    name: 'name',
-    designation: 'designation',
-  },
-  {
-    feedback: 'feedback',
-    name: 'name',
-    designation: 'designation',
-  },
-  {
-    feedback: 'feedback',
-    name: 'name',
-    designation: 'designation',
-  },
-];
+// const testimonials = [
+//   {
+//     feedback: 'feedback',
+//     name: 'name',
+//     designation: 'designation',
+//   },
+// ];
 
 export default function OrganizerProfilePage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -66,7 +50,7 @@ export default function OrganizerProfilePage() {
     profile,
     certificationsDocuments,
   } = state;
-  console.log('profile', profile, certificationsDocuments);
+  console.log('profile', profile, testimonialScreenshotFile);
 
   const [getOrgProfile, { isLoading: profileLoading }] =
     useLazyGetOrganizerProfileQuery();
@@ -229,18 +213,29 @@ export default function OrganizerProfilePage() {
                         What Our Attendees Say
                       </h2>
 
-                      {testimonials.length > 0 ? (
-                        testimonials.map((t: any, i: number) => (
-                          <div
-                            key={i}
-                            className='border-l-4 bg-white rounded-lg border-orange-400 p-4 mb-6'
-                          >
-                            <p className=' text-gray-700'>“{t.feedback}”</p>
-                            <p className='font-semibold mt-2'>
-                              — {t.name}, {t.designation}
-                            </p>
-                          </div>
-                        ))
+                      {testimonialScreenshotFile ? (
+                        <div className='border-l-4 bg-white rounded-lg border-orange-400 p-4 mb-6'>
+                          <img
+                            src={testimonialScreenshotFile.url ?? ''}
+                            alt='Cover'
+                            className='w-full h-20 rounded-xl object-cover'
+                          />
+                        </div>
+                      ) : (
+                        <p className='text-gray-500'>
+                          No testimonials added yet.
+                        </p>
+                      )}
+
+                      {profile.testimonials ? (
+                        <div className='border-l-4 bg-white rounded-lg border-orange-400 p-4 mb-6'>
+                          <p className=' text-gray-700'>
+                            “{profile.testimonials}”
+                          </p>
+                          <p className='font-semibold mt-2'>
+                            — {profile.organizerName}, {'designation'}
+                          </p>
+                        </div>
                       ) : (
                         <p className='text-gray-500'>
                           No testimonials added yet.
