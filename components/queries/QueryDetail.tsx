@@ -50,7 +50,7 @@ export default function QueryDetail({ query, onBack, onReport }: any) {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="font-semibold text-lg">{query.name}</h3>
-            <p className="text-sm text-gray-500">Trip: {query.trip}</p>
+            <p className="text-sm text-gray-500">Trip: {query.tripName}</p>
           </div>
 
           <div className="flex items-center gap-3">

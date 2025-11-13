@@ -14,34 +14,45 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
+/**
+ * Notes:
+ * - Backend statuses are exact strings: "OPEN" | "RESPONDED"
+ * - statusFilter uses "all" | "OPEN" | "RESPONDED"
+ * - tab uses same shape: "all" | "OPEN" | "RESPONDED"
+ */
+
 export default function QueryList({ queries = [], onViewQuery, onDelete }: any) {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "responded">("all");
-  const [tab, setTab] = useState<"all" | "open" | "responded">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "OPEN" | "RESPONDED">("all");
+  const [tab, setTab] = useState<"all" | "OPEN" | "RESPONDED">("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   const filtered = useMemo(() => {
-    let out = queries.slice();
+    let out = (queries || []).slice();
 
+    // Search: check question, userName, tripName (use fields that come from backend)
     if (search.trim()) {
       const q = search.toLowerCase();
-      out = out.filter(
-        (it: any) =>
-          it.name?.toLowerCase().includes(q) ||
-          it.question?.toLowerCase().includes(q) ||
-          it.trip?.toLowerCase().includes(q)
-      );
+      out = out.filter((it: any) => {
+        return (
+          String(it.question ?? "").toLowerCase().includes(q) ||
+          String(it.userName ?? "").toLowerCase().includes(q) ||
+          String(it.tripName ?? "").toLowerCase().includes(q)
+        );
+      });
     }
 
+    // Filtering: tab takes precedence (if not "all"), otherwise use statusFilter (if not "all")
     if (tab !== "all") {
-      out = out.filter((it: any) => it.status === tab);
+      out = out.filter((it: any) => String(it.status) === String(tab));
     } else if (statusFilter !== "all") {
-      out = out.filter((it: any) => it.status === statusFilter);
+      out = out.filter((it: any) => String(it.status) === String(statusFilter));
     }
 
+    // Sorting by date fallback fields - normalize to ISO parseable
     out.sort((a: any, b: any) => {
-      const da = new Date(a.sortDate || a.date).getTime();
-      const db = new Date(b.sortDate || b.date).getTime();
+      const da = new Date(a.sortDate ?? a.createdDate ?? a.date).getTime();
+      const db = new Date(b.sortDate ?? b.createdDate ?? b.date).getTime();
       return sortOrder === "newest" ? db - da : da - db;
     });
 
@@ -69,28 +80,24 @@ export default function QueryList({ queries = [], onViewQuery, onDelete }: any) 
                 variant="outline"
                 className="flex items-center justify-between gap-2 border rounded-lg px-4 py-2 w-[150px]"
               >
-                {statusFilter === "all"
-                  ? "All Status"
-                  : statusFilter === "open"
-                  ? "Open"
-                  : "Responded"}
+                {statusFilter === "all" ? "All Status" : statusFilter === "OPEN" ? "Open" : "Responded"}
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[150px]">
               <DropdownMenuLabel>Filter Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {["all", "open", "responded"].map((opt) => (
+              {[
+                { key: "all", label: "All Status" },
+                { key: "OPEN", label: "Open" },
+                { key: "RESPONDED", label: "Responded" },
+              ].map((opt) => (
                 <DropdownMenuItem
-                  key={opt}
-                  onClick={() => setStatusFilter(opt as any)}
-                  className={`${
-                    statusFilter === opt ? "bg-orange-50 text-orange-600" : ""
-                  } cursor-pointer`}
+                  key={opt.key}
+                  onClick={() => setStatusFilter(opt.key as any)}
+                  className={`${String(statusFilter) === String(opt.key) ? "bg-orange-50 text-orange-600" : ""} cursor-pointer`}
                 >
-                  {opt === "all"
-                    ? "All Status"
-                    : opt.charAt(0).toUpperCase() + opt.slice(1)}
+                  {opt.label}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -112,17 +119,13 @@ export default function QueryList({ queries = [], onViewQuery, onDelete }: any) 
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => setSortOrder("newest")}
-                className={`${
-                  sortOrder === "newest" ? "bg-orange-50 text-orange-600" : ""
-                } cursor-pointer`}
+                className={`${sortOrder === "newest" ? "bg-orange-50 text-orange-600" : ""} cursor-pointer`}
               >
                 Newest to Oldest
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setSortOrder("oldest")}
-                className={`${
-                  sortOrder === "oldest" ? "bg-orange-50 text-orange-600" : ""
-                } cursor-pointer`}
+                className={`${sortOrder === "oldest" ? "bg-orange-50 text-orange-600" : ""} cursor-pointer`}
               >
                 Oldest to Newest
               </DropdownMenuItem>
@@ -133,22 +136,23 @@ export default function QueryList({ queries = [], onViewQuery, onDelete }: any) 
 
       {/* Tabs: All / Open / Responded */}
       <div className="flex gap-3 mt-4">
-        {(["all", "open", "responded"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => {
-              setTab(t);
-              setStatusFilter("all");
-            }}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${
-              tab === t
-                ? "bg-transparent border border-[#F97316] text-[#F97316]"
-                : "bg-white border text-gray-600"
-            }`}
-          >
-            {t === "all" ? "All" : t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
+        {(["all", "OPEN", "RESPONDED"] as const).map((t) => {
+          const isActive = String(tab) === String(t);
+          return (
+            <button
+              key={t}
+              onClick={() => {
+                setTab(t as any);
+                setStatusFilter("all"); // reset dropdown when tab is used
+              }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                isActive ? "bg-transparent border border-[#F97316] text-[#F97316]" : "bg-white border text-gray-600"
+              }`}
+            >
+              {t === "all" ? "All" : t.charAt(0).toUpperCase() + t.slice(1).toLowerCase()}
+            </button>
+          );
+        })}
       </div>
 
       {/* List */}
