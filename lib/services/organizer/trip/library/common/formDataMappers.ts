@@ -169,7 +169,7 @@ export function mapTransitToFormData(data: any, documents?: DocumentItem[]) {
     (data.arrangement ?? "organizer").toString().toUpperCase()
   );
   fd.append("description", data.description ?? "");
-  fd.append("packingSuggestion", data.packing ?? "");
+  fd.append("packingSuggestion", data.packingSuggestion ?? "");
   fd.append("addToLibrary", boolToString(true));
   fd.append("name", data.title ?? "");
   appendDocuments(fd, documents);
