@@ -367,14 +367,6 @@ export function AddTransitForm({
               Save in Library
             </label>
           </div>
-
-          <Input
-            type="text"
-            value={saveAsName}
-            onChange={(e) => setSaveAsName(e.target.value)}
-            placeholder="Save As"
-            className="p-4 w-[12rem]"
-          />
         </div>
       )}
 

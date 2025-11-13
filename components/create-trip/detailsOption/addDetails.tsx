@@ -25,6 +25,9 @@ import { AddActivityForm } from "@/components/library/AddActivityForm";
 import { useDayDescription } from "./useDayDescription";
 import { useTransit } from "./useTransit";
 import { useStay } from "./useStay";
+import { useMeal } from "./useMeal";
+import { useActivity } from "./useActivity";
+
 
 // ✅ Props Interface
 interface DetailsOptionsProps {
@@ -72,6 +75,32 @@ export function DetailsOptions({
     handleStayEdit,
     handleStayDelete,
   } = useStay({ organizationId, tripPublicId, dayDetailId });
+
+  // ✅ Meal hook
+const {
+  meals,
+  editingMeal,
+  initialMealData,
+  setEditingMeal,
+  setInitialMealData,
+  handleMealSave,
+  handleMealEdit,
+  handleMealDelete,
+} = useMeal({ organizationId, tripPublicId, dayDetailId });
+
+// ✅ Activity hook
+const {
+  activities,
+  editingActivity,
+  initialActivityData,
+  setEditingActivity,
+  setInitialActivityData,
+  handleActivitySave,
+  handleActivityEdit,
+  handleActivityDelete,
+} = useActivity({ organizationId, tripPublicId, dayDetailId });
+
+
 
   // ✅ Local modal states
   const [showDayDescription, setShowDayDescription] = useState(false);
@@ -158,27 +187,44 @@ export function DetailsOptions({
       onSave: handleStaySave,
     },
     {
-      key: "meal",
-      label: "Meal",
-      color: "rose",
-      icon: <Utensils size={16} />,
-      items: [],
-      setShow: setShowMeal,
-      show: showMeal,
-      form: AddMealForm,
-      onSave: () => setShowMeal(false),
-    },
-    {
-      key: "activity",
-      label: "Activity",
-      color: "yellow",
-      icon: <Activity size={16} />,
-      items: [],
-      setShow: setShowActivity,
-      show: showActivity,
-      form: AddActivityForm,
-      onSave: () => setShowActivity(false),
-    },
+  key: "meal",
+  label: "Meal",
+  color: "rose",
+  icon: <Utensils size={16} />,
+  items: meals,
+  setShow: setShowMeal,
+  show: showMeal,
+  editHandler: handleMealEdit,
+  deleteHandler: handleMealDelete,
+  form: AddMealForm,
+  editing: editingMeal,
+  initial: initialMealData,
+  resetEditing: () => {
+    setEditingMeal(null);
+    setInitialMealData(null);
+  },
+  onSave: handleMealSave,
+},
+ {
+  key: "activity",
+  label: "Activity",
+  color: "yellow",
+  icon: <Activity size={16} />,
+  items: activities,
+  setShow: setShowActivity,
+  show: showActivity,
+  editHandler: handleActivityEdit,
+  deleteHandler: handleActivityDelete,
+  form: AddActivityForm,
+  editing: editingActivity,
+  initial: initialActivityData,
+  resetEditing: () => {
+    setEditingActivity(null);
+    setInitialActivityData(null);
+  },
+  onSave: handleActivitySave,
+},
+
   ];
 
   return (

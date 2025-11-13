@@ -8,6 +8,9 @@ import {
   useUpdateTransitMutation,
   useDeleteTransitMutation,
 } from "@/lib/services/organizer/trip/itinerary/day-details/transit";
+
+import { useCreateOrganizerTransitMutation } from "@/lib/services/organizer/trip/library/transit/index";
+
 import { mapTransitToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
 export interface TransitItem {
@@ -35,14 +38,17 @@ export function useTransit({
   const [editingTransit, setEditingTransit] = useState<TransitItem | null>(null);
   const [initialTransitData, setInitialTransitData] = useState<any>(null);
 
-  // ✅ API hooks
+  // Trip APIs
   const [getTransits] = useLazyGetAllTransitsQuery();
   const [getTransitById] = useLazyGetTransitByIdQuery();
   const [createTransit] = useCreateTransitMutation();
   const [updateTransit] = useUpdateTransitMutation();
   const [deleteTransit] = useDeleteTransitMutation();
 
-  // ✅ Fetch all transits
+  // Library API
+  const [createLibraryTransit] = useCreateOrganizerTransitMutation();
+
+  // Fetch all transit items
   const fetchTransits = async () => {
     try {
       const response = await getTransits({
@@ -58,14 +64,14 @@ export function useTransit({
         : [];
 
       const mapped = list.map((item: any) => ({
-        id: item.tripItemId ?? Date.now(),
-        type: "transit" as const,
-        from: item.fromLocation ?? "",
-        to: item.toLocation ?? "",
-        departure: item.startTime ?? "",
-        arrival: item.endTime ?? "",
-        description: item.description ?? "",
-        documents: item.documents ?? [],
+        id: item.tripItemId ?? item.id,
+        type: "transit",
+        from: item.fromLocation || "",
+        to: item.toLocation || "",
+        departure: item.startTime || "",
+        arrival: item.endTime || "",
+        description: item.description || "",
+        documents: item.documents || [],
       }));
 
       setTransits(mapped);
@@ -78,7 +84,7 @@ export function useTransit({
     if (dayDetailId) fetchTransits();
   }, [dayDetailId]);
 
-  // ✅ Edit handler → fetch by id
+  // Edit transit — fetch by ID
   const handleTransitEdit = async (item: TransitItem) => {
     try {
       const response = await getTransitById({
@@ -90,8 +96,11 @@ export function useTransit({
 
       const data = (response as any)?.data ?? response;
 
+
       setEditingTransit(item);
+
       setInitialTransitData({
+        name: data.name || `${item.from} to ${item.to} Transit`,
         fromLocation: data.fromLocation || item.from,
         toLocation: data.toLocation || item.to,
         startTime: data.startTime || item.departure,
@@ -101,18 +110,21 @@ export function useTransit({
         description: data.description || "",
         packingSuggestion: data.packingSuggestion || "",
         addToLibrary: data.addToLibrary || false,
-        name: data.name || `${item.from} to ${item.to} Transit`,
         documents: data.documents || [],
       });
     } catch (error) {
-      console.error("❌ Error fetching single transit:", error);
+      console.error("❌ Error fetching transit:", error);
     }
   };
 
-  // ✅ Save (POST / PUT)
+  // Save transit (Trip + optional Library)
   const handleTransitSave = async (data: any) => {
-    const formData = mapTransitToFormData(data, data.documents);
     try {
+      const { saveInLibrary, saveAsName, documents, ...cleanData } = data;
+
+      // --- Trip FormData ---
+      const formData = mapTransitToFormData(cleanData, documents);
+
       if (editingTransit) {
         await updateTransit({
           organizationId,
@@ -121,7 +133,8 @@ export function useTransit({
           itemId: String(editingTransit.id),
           data: formData,
         }).unwrap();
-        console.log("✏️ Updated transit:", editingTransit.id);
+
+        console.log("✏️ Transit updated");
       } else {
         await createTransit({
           organizationId,
@@ -129,7 +142,26 @@ export function useTransit({
           dayDetailId,
           data: formData,
         }).unwrap();
-        console.log("🆕 Created transit");
+
+        console.log("🆕 Transit created");
+      }
+
+      // --- OPTIONAL: Save in library ---
+      if (saveInLibrary) {
+        const libraryFD = mapTransitToFormData(
+          {
+            ...cleanData,
+            name: saveAsName || cleanData.title,
+          },
+          documents
+        );
+
+        await createLibraryTransit({
+          organizationId,
+          data: libraryFD,
+        }).unwrap();
+
+        console.log("📚 Transit saved in library");
       }
 
       await fetchTransits();
@@ -141,7 +173,7 @@ export function useTransit({
     }
   };
 
-  // ✅ Delete handler
+  // Delete transit
   const handleTransitDelete = async (itemId: number) => {
     try {
       await deleteTransit({
@@ -151,7 +183,7 @@ export function useTransit({
         itemId: String(itemId),
       }).unwrap();
 
-      console.log("🗑️ Deleted transit:", itemId);
+      console.log("🗑️ Transit deleted");
       await fetchTransits();
     } catch (error) {
       console.error("❌ Error deleting transit:", error);
