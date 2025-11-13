@@ -1,11 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 
-export default function QueryStats() {
+export default function QueryStats({ queries = [] }: { queries: any[] }) {
+
+  // Compute statistics based on backend statuses
+  const total = queries.length;
+  const open = queries.filter((q) => String(q.status) === "OPEN").length;
+  const responded = queries.filter((q) => String(q.status) === "RESPONDED").length;
+
   const stats = [
-    { label: "Total Queries", value: 460 },
-    { label: "Open Queries", value: 460 },
-    { label: "Responded", value: 460 },
+    { label: "Total Queries", value: total },
+    { label: "Open Queries", value: open },
+    { label: "Responded", value: responded },
   ];
 
   return (
