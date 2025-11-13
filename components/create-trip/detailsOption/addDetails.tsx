@@ -24,6 +24,7 @@ import { AddActivityForm } from "@/components/library/AddActivityForm";
 // ✅ Custom Hooks
 import { useDayDescription } from "./useDayDescription";
 import { useTransit } from "./useTransit";
+import { useStay } from "./useStay";
 
 // ✅ Props Interface
 interface DetailsOptionsProps {
@@ -60,6 +61,17 @@ export function DetailsOptions({
     handleTransitEdit,
     handleTransitDelete,
   } = useTransit({ organizationId, tripPublicId, dayDetailId });
+
+  const {
+    stays,
+    editingStay,
+    initialStayData,
+    setEditingStay,
+    setInitialStayData,
+    handleStaySave,
+    handleStayEdit,
+    handleStayDelete,
+  } = useStay({ organizationId, tripPublicId, dayDetailId });
 
   // ✅ Local modal states
   const [showDayDescription, setShowDayDescription] = useState(false);
@@ -127,15 +139,23 @@ export function DetailsOptions({
       onSave: handleTransitSave,
     },
     {
-      key: "stay",
+    key: "stay",
       label: "Stay",
       color: "green",
       icon: <Home size={16} />,
-      items: [],
+      items: stays,
       setShow: setShowStay,
       show: showStay,
+      editHandler: handleStayEdit,
+      deleteHandler: handleStayDelete,
       form: AddStayForm,
-      onSave: () => setShowStay(false),
+      editing: editingStay,
+      initial: initialStayData,
+      resetEditing: () => {
+        setEditingStay(null);
+        setInitialStayData(null);
+      },
+      onSave: handleStaySave,
     },
     {
       key: "meal",
@@ -182,92 +202,94 @@ export function DetailsOptions({
         ))}
       </div>
 
-      {/* ---------- Dynamic Lists ---------- */}
-      {sections.map((section) => (
-        <div key={section.key} className="mt-6 space-y-3">
-          <h3 className="font-semibold text-gray-800 text-base border-b pb-1">
-            {section.label}
-          </h3>
+      {/* ---------- Dynamic Lists (Only show if data exists) ---------- */}
+{sections
+  .filter((section) => section.items.length > 0) // 👈 Only sections with data
+  .map((section) => (
+    <div key={section.key} className="mt-6 space-y-3">
+      <h3 className="font-semibold text-gray-800 text-base border-b pb-1">
+        {section.label}
+      </h3>
 
-          {section.items.length === 0 ? (
-            <p className="text-gray-500 text-sm text-center">
-              No {section.label.toLowerCase()} added yet.
-            </p>
-          ) : (
-            section.items.map((item: any) => (
-              <div
-                key={item.id}
-                className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-medium text-gray-800">
-                      {item.title || item.from || "Untitled"}
-                    </p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {item.description || item.location || ""}
-                    </p>
-                    {item.time && (
-                      <p className="text-xs text-gray-500 mt-1">{item.time}</p>
-                    )}
-                    {item.documents?.length > 0 && (
-                      <div className="flex gap-2 mt-3 flex-wrap">
-                        {item.documents.map(
-                          (
-                            doc: string | File | { url?: string },
-                            idx: number
-                          ) => {
-                            const src =
-                              typeof doc === "string"
-                                ? doc
-                                : doc instanceof File
-                                ? URL.createObjectURL(doc)
-                                : doc?.url || "";
-                            return (
-                              <img
-                                key={idx}
-                                src={src}
-                                alt={`doc-${idx}`}
-                                className="w-20 h-20 object-cover rounded-lg border"
-                              />
-                            );
-                          }
-                        )}
-                      </div>
-                    )}
-                  </div>
+      {section.items.map((item: any) => (
+  <div
+    key={item.id || item.tripItemId}
+    className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition"
+  >
+    <div className="flex items-start justify-between">
+      <div>
+        <p className="font-medium text-gray-800">
+          {item.title || item.name || item.from || "Untitled"}
+        </p>
+        <p className="text-sm text-gray-600 mt-1">
+          {item.description || item.location || ""}
+        </p>
 
-                  <div className="flex gap-2">
-                    {section.editHandler && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="rounded-full hover:bg-gray-100"
-                        onClick={() => {
-                          section.editHandler(item);
-                          section.setShow(true);
-                        }}
-                      >
-                        <Pencil size={14} className="text-gray-600" />
-                      </Button>
-                    )}
-                    {section.deleteHandler && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="rounded-full text-red-500 hover:bg-red-100"
-                        onClick={() => section.deleteHandler(item.id)}
-                      >
-                        <Trash2 size={14} />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      ))}
+        {item.time || item.checkInTime || item.checkOutTime ? (
+          <p className="text-xs text-gray-500 mt-1">
+            {item.time ||
+              `${item.checkInTime || ""} - ${item.checkOutTime || ""}`}
+          </p>
+        ) : null}
+
+        {item.documents?.length > 0 && (
+          <div className="flex gap-2 mt-3 flex-wrap">
+            {item.documents.map(
+              (doc: string | File | { url?: string }, idx: number) => {
+                const src =
+                  typeof doc === "string"
+                    ? doc
+                    : doc instanceof File
+                    ? URL.createObjectURL(doc)
+                    : doc?.url || "";
+                return (
+                  <img
+                    key={idx}
+                    src={src}
+                    alt={`doc-${idx}`}
+                    className="w-20 h-20 object-cover rounded-lg border"
+                  />
+                );
+              }
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        {section.editHandler && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="rounded-full hover:bg-gray-100"
+            onClick={() => {
+              section.editHandler(item);
+              section.setShow(true);
+            }}
+          >
+            <Pencil size={14} className="text-gray-600" />
+          </Button>
+        )}
+        {section.deleteHandler && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="rounded-full text-red-500 hover:bg-red-100"
+            onClick={() =>
+              section.deleteHandler(item.id || item.tripItemId)
+            }
+          >
+            <Trash2 size={14} />
+          </Button>
+        )}
+      </div>
+    </div>
+  </div>
+))}
+
+    </div>
+  ))}
+
 
       {/* ---------- Dynamic Modals ---------- */}
       {sections.map((section) => {
