@@ -1,8 +1,10 @@
 "use client";
 
 import clsx from "clsx";
+import { Plus } from "lucide-react";
+import Link from "next/link";
 
-export default function TripTabs({ activeTab, setActiveTab }: any) {
+export default function TripTabs({ activeTab, setActiveTab, onCreate }: any) {
   const tabs = [
     { key: "upcoming", label: "Upcoming (3)" },
     { key: "past", label: "Past (2)" },
@@ -12,24 +14,45 @@ export default function TripTabs({ activeTab, setActiveTab }: any) {
   ];
 
   return (
-    <div className="flex flex-wrap gap-3">
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.key;
-        return (
+    <div className="w-full">
+      {/* Row 1: tabs + create */}
+      <div className="flex items-center justify-between gap-4 mb-3">
+        <div className="flex gap-3 items-center overflow-x-auto">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={clsx(
+                  "h-12 px-5 text-sm sm:text-base font-medium rounded-lg border transition-all duration-200 flex-shrink-0",
+                  isActive
+                    ? "bg-[#FF6B00] text-white border-[#FF6B00]"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                )}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex-shrink-0">
+          <Link href="/organizer/create-trip">
           <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
             className={clsx(
-              "px-5 py-2 text-sm sm:text-base font-medium rounded-lg border transition-all duration-200",
-              isActive
+              "flex items-center gap-2 h-12 px-5 text-sm sm:text-base font-medium rounded-lg transition-all duration-200 border",
+              activeTab === "create"
                 ? "bg-[#FF6B00] text-white border-[#FF6B00]"
-                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                : "bg-[#FF6B00]/10 text-[#FF6B00] border-[#FF6B00] hover:bg-[#FF6B00] hover:text-white"
             )}
           >
-            {tab.label}
+            <Plus className="w-4 h-4" />
+            Create Trip
           </button>
-        );
-      })}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
