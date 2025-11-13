@@ -55,7 +55,9 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-6 h-5 text-gray-900" />
-                  <h3 className="text-base font-normal text-gray-800">Location</h3>
+                  <h3 className="text-base font-normal text-gray-800">
+                    Location
+                  </h3>
                 </div>
 
                 <h3 className="font-semibold text-sm text-gray-900 text-right truncate max-w-[60%] sm:max-w-none">
@@ -79,7 +81,6 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               </div>
             </div>
           </>
-
         );
       case "stays":
         return (
@@ -149,13 +150,28 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 <Car className="w-6 h-5 mr-2 text-gray-900" />
                 <h3 className="text-base font-normal text-gray-800">Vehicle</h3>
               </div>
+
               <div className="flex items-center">
                 <h3 className="font-medium text-[14px] text-gray-900">
-                  {" "}
-                  {TransitTypeLabels[content.transitType]}
+                  {[
+                    ...(Array.isArray(content.vehicleTypes)
+                      ? content.vehicleTypes.map(
+                          (v: string) => TransitTypeLabels[v] ?? v
+                        )
+                      : content.vehicleTypes
+                      ? [
+                          TransitTypeLabels[content.vehicleTypes] ??
+                            content.vehicleTypes,
+                        ]
+                      : []),
+                    content.customVehicleType,
+                  ]
+                    .filter(Boolean)
+                    .join(" | ")}
                 </h3>
               </div>
             </div>
+
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <Clock className="w-6 h-5 mr-2 text-gray-900" />
@@ -258,7 +274,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               <div className="flex items-center">
                 <h3 className="font-medium text-[14px] text-gray-900">
                   {" "}
-                  {formatTime(content.Mealtime)}
+                  {formatTime(content.time)}
                 </h3>
               </div>
             </div>
@@ -370,11 +386,11 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   width={800}
                   height={400}
                   className="w-full h-56 md:h-60 rounded-[12px] object-cover"
-                // unoptimized // <-- stops /_next/image proxying
-                // // optional: if it expires, hide and show fallback
-                // onError={(e) =>
-                //   ((e.target as HTMLImageElement).style.display = 'none')
-                // }
+                  // unoptimized // <-- stops /_next/image proxying
+                  // // optional: if it expires, hide and show fallback
+                  // onError={(e) =>
+                  //   ((e.target as HTMLImageElement).style.display = 'none')
+                  // }
                 />
               ) : (
                 <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">

@@ -49,6 +49,10 @@ import {
   useSaveGroupLeaderMutation,
   useUpdateGroupLeaderMutation,
 } from "@/lib/services/organizer/trip/library/leader";
+import {
+  useCreateOrganizerFaqMutation,
+  useUpdateOrganizerFaqMutation,
+} from "@/lib/services/organizer/trip/library/faq";
 
 /* ------------------------------------------------
    Small helper component: non-intrusive save bar
@@ -128,6 +132,8 @@ export function AddNewItemModal({
   const [updateActivity] = useUpdateActivityMutation();
   const [createLeader] = useSaveGroupLeaderMutation();
   const [updateLeader] = useUpdateGroupLeaderMutation();
+  const [createFaq] = useCreateOrganizerFaqMutation();
+  const [updateFaq] = useUpdateOrganizerFaqMutation();
 
   useEffect(() => {
     if (!open) return;
@@ -150,7 +156,12 @@ export function AddNewItemModal({
       meal: mapMealToFormData,
       activity: mapActivityToFormData,
       "trip-leader": mapTripLeaderToFormData,
-      faq: null,
+      faq: (data: { question: string; answer: string }) => {
+        const fd = new FormData();
+        fd.append("name", data.question);
+        fd.append("answer", data.answer);
+        return fd;
+      },
       select: null,
     };
 
@@ -198,7 +209,19 @@ export function AddNewItemModal({
               data: fd,
             }).unwrap()
         : () => createLeader({ organizationId, data: fd }).unwrap(),
-      faq: () => Promise.resolve(),
+      faq: updateId
+        ? () =>
+            updateFaq({
+              organizationId,
+              faqId: updateId,
+              data: fd,
+            }).unwrap()
+        : () =>
+            createFaq({
+              organizationId,
+              data: fd,
+            }).unwrap(),
+
       select: () => Promise.resolve(),
     };
 

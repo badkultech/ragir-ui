@@ -96,7 +96,7 @@ export default function EventsPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-white">
-        <AppHeader title="Events" />
+        <AppHeader title="Day Descriptions" />
 
         <main className="flex-1 p-6 md:p-4">
           {/* Header (controlled search) */}
@@ -170,7 +170,7 @@ export default function EventsPage() {
               <div className="col-span-full text-center text-gray-500 py-10">
                 {debouncedSearch.length < 3
                   ? "Type at least 3 characters to search."
-                  : "No events found."}
+                  : "No day descriptions found."}
               </div>
             )}
           </div>
