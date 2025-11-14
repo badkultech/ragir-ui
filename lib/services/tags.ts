@@ -20,6 +20,7 @@ export const TAGS = {
   activity: 'activity',
   exclusion: 'exclusion',
   faq: 'faq',
+  pricing: 'pricing',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',

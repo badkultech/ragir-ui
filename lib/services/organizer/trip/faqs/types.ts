@@ -1,9 +1,16 @@
 export interface FAQItem {
   faqId: number;
-  question: string;
+  name: string;     
   answer: string;
-  saveToLibrary: boolean;
+  addToLibrary: boolean; 
+  documents: any[];      
+  groupName: string;  
+  tripId: number;
+  organizationId: string;
+  requestId: string;
+  currentTimestamp: string;
 }
+
 
 export interface FAQListResponse {
   status: string;
@@ -20,16 +27,30 @@ export interface FAQByIdResponse {
 }
 
 export interface CreateFAQRequest {
-  question: string;
+  requestId: string;
+  currentTimestamp: string;
+  organizationId: string;
+  name: string;          
+  documents: any[];
+  tripId: number;
+  addToLibrary: boolean;
   answer: string;
-  saveToLibrary?: boolean;
+  groupName: string;
 }
 
+
 export interface UpdateFAQRequest {
-  question: string;
+  requestId: string;
+  currentTimestamp: string;
+  organizationId: string;
+  name: string;         
+  documents: any[];
+  tripId: number;
+  addToLibrary: boolean;
   answer: string;
-  saveToLibrary?: boolean;
+  groupName: string;
 }
+
 
 export interface DeleteFAQResponse {
   status: string;

@@ -69,37 +69,46 @@ export default function FAQsPage() {
   };
 
   const handleNext = async () => {
-    try {
-      for (const faq of faqs) {
-        const isLocal = faq.id.startsWith("local-");
+  try {
+    for (const faq of faqs) {
+      const isLocal = faq.id.startsWith("local-");
 
-        if (isLocal) {
-          await createFaq({
-            organizationId: "1",
-            tripPublicId: "x1",
-            data: {
-              question: faq.question,
-              answer: faq.answer,
-            },
-          });
-        } else {
-          await updateFaq({
-            organizationId: "1",
-            tripPublicId: "x1",
-            faqId: faq.id,
-            data: {
-              question: faq.question,
-              answer: faq.answer,
-            },
-          });
-        }
+      const payload = {
+        requestId: crypto.randomUUID(),
+        currentTimestamp: new Date().toISOString(),
+        organizationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        name: faq.question,        
+        documents: [],
+        tripId: 0,
+        addToLibrary: true,
+        answer: faq.answer, 
+        groupName: "PRICE",   
+      };
+
+      if (isLocal) {
+        // 🟢 POST API (new FAQ)
+        await createFaq({
+          organizationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          tripPublicId: "x1",
+          data: payload,
+        });
+      } else {
+        // 🟡 PUT API (existing FAQ)
+        await updateFaq({
+          organizationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          tripPublicId: "x1",
+          faqId: faq.id,
+          data: payload,
+        });
       }
-
-      router.push("/organizer/create-trip/pricing");
-    } catch (error) {
-      console.error("Error saving FAQs:", error);
     }
-  };
+
+    router.push("/organizer/create-trip/pricing");
+  } catch (error) {
+    console.error("Error saving FAQs:", error);
+  }
+};
+
 
   return (
     <div className="flex min-h-screen bg-gray-50">
