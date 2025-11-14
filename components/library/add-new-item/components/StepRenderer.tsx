@@ -46,8 +46,8 @@ export const StepRenderer: React.FC<Props> = ({
       return render("activity", "Activity", ActivityModule);
     case "transit":
       return render("transit", "Transit", TransitModule);
-    case "event":
-      return render("event", "Event", EventModule);
+    case "day-description":
+      return render("day-description", "day-description", EventModule);
     case "trip-leader":
       return render("trip-leader", "Trip Leader", TripLeaderModule);
     case "faq":

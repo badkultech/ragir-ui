@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { ModalWrapper } from "../ui/ModalWrapper";
-import { AddEventForm } from "../library/AddEventForm";
+import { AddDayDescriptionForm } from "../library/AddDayDescriptionForm";
 import { AddTransitForm } from "../library/AddTransitForm";
 import { AddStayForm } from "../library/AddStayForm";
 import { AddMealForm } from "../library/AddMealForm";
@@ -65,7 +65,7 @@ export function DetailsOptions() {
   // ✅ Edit
   const handleEdit = (item: DetailItem) => {
     setEditingItem(item);
-    if (item.type === "event") setShowDayDescription(true);
+    if (item.type === "day-description") setShowDayDescription(true);
     if (item.type === "transit") setShowTransit(true);
     if (item.type === "stay") setShowStay(true);
     if (item.type === "meal") setShowMeal(true);
@@ -75,7 +75,7 @@ export function DetailsOptions() {
   // ✅ Icon selector
   const getIcon = (type: string) => {
     switch (type) {
-      case "event":
+      case "day-description":
         return <Calendar size={22} className="text-orange-500" />;
       case "transit":
         return <Car size={22} className="text-blue-500" />;
@@ -220,11 +220,11 @@ export function DetailsOptions() {
       {/* ---- MODALS ---- */}
       {showDayDescription && (
         <ModalWrapper onClose={() => setShowDayDescription(false)}>
-          <AddEventForm
+          <AddDayDescriptionForm
           header="Add Day Description"
             onCancel={() => setShowDayDescription(false)}
             onSave={(data) => {
-              handleSave("event", data);
+              handleSave("day-description", data);
               setShowDayDescription(false);
             }}
           />

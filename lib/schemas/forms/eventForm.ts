@@ -7,7 +7,7 @@ import {
   packingField,
 } from "../fields";
 
-export const addEventSchema = z.object({
+export const addDayDescriptionSchema = z.object({
   title: titleField,
   description: descriptionField,
   location: locationField,
@@ -15,4 +15,4 @@ export const addEventSchema = z.object({
   packing: packingField
 });
 
-export type AddEventFormData = z.infer<typeof addEventSchema>;
+export type AddDayDescriptionData = z.infer<typeof addDayDescriptionSchema>;

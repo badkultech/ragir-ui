@@ -3,7 +3,7 @@ import { DocumentItem } from "@/lib/services/organizer/trip/library/common/formD
 // modules/types.ts
 export type Step =
   | "select"
-  | "event"
+  | "day-description"
   | "stay"
   | "transit"
   | "meal"

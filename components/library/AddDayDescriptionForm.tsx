@@ -13,7 +13,7 @@ import {
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 
-type AddEventFormProps = {
+type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
   updateId?: number | null;
   onCancel: () => void;
@@ -22,14 +22,14 @@ type AddEventFormProps = {
   initialData?: any;
 };
 
-export function AddEventForm({
+export function AddDayDescriptionForm({
   mode = "trip",
   onCancel,
   updateId,
   onSave,
   header,
   initialData,
-}: AddEventFormProps) {
+}: AddDayDescriptionFormProps) {
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
 
   const [title, setTitle] = useState("");
@@ -79,9 +79,9 @@ export function AddEventForm({
         { title, description, location, time, packing, mode },
         docsManager.documents
       );
-      showSuccess("Event saved successfully!");
+      showSuccess("day description saved successfully!");
     } catch {
-      showApiError("Failed to save event");
+      showApiError("Failed to save day description");
     }
   };
 
@@ -239,7 +239,7 @@ export function AddEventForm({
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
           onSelect={handleLibrarySelect}
-          category="events"
+          category="day-description"
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { AddEventForm } from "@/components/library/AddEventForm";
+import { AddDayDescriptionForm } from "@/components/library/AddDayDescriptionForm";
 import { useGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -24,5 +24,5 @@ export const EventModule: React.FC<ModuleProps> = ({ updateId, onCancel, onSave 
 
   const initialData = isEdit && data ? { ...data, documents: normalize(data.documents || []) } : undefined;
 
-  return <AddEventForm mode="library" initialData={initialData} onCancel={onCancel} onSave={onSave} />;
+  return <AddDayDescriptionForm mode="library" initialData={initialData} onCancel={onCancel} onSave={onSave} />;
 };
