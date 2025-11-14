@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export default function OrganizerProfileEmptyPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <OrganizerSidebar />
+      {/* <OrganizerSidebar /> */}
 
       <div className="flex-1 flex flex-col h-full">
         <AppHeader title="Organizer Profile" />
