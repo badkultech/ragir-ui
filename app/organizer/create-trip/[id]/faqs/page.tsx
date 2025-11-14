@@ -1,46 +1,62 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader";
-import { SectionCard } from "@/components/create-trip/section-card";
-import { Button } from "@/components/ui/button";
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { TripStepperHeader } from '@/components/create-trip/tripStepperHeader';
+import { SectionCard } from '@/components/create-trip/section-card';
+import { Button } from '@/components/ui/button';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { RichTextarea } from "@/components/create-trip/rich-textarea";
-import { Input } from "@/components/ui/input";
-import { WizardFooter } from "@/components/create-trip/wizard-footer";
-import { AppHeader } from "@/components/app-header";
-import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
+} from '@/components/ui/accordion';
+import { RichTextarea } from '@/components/create-trip/rich-textarea';
+import { Input } from '@/components/ui/input';
+import { WizardFooter } from '@/components/create-trip/wizard-footer';
+import { AppHeader } from '@/components/app-header';
+import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 
 import {
   useCreateFaqMutation,
   useUpdateFaqMutation,
-} from "@/lib/services/organizer/trip/faqs/index";
+} from '@/lib/services/organizer/trip/faqs/index';
 
 interface FAQ {
-  id: string; 
+  id: string;
   question: string;
   answer: string;
 }
 
 const DEFAULT_FAQS: FAQ[] = [
-  { id: "10", question: "What's included in the trip?", answer: "Add details about inclusions here..." },
-  { id: "11", question: "What should I pack?", answer: "Add packing recommendations here..." },
-  { id: "12", question: "What is the cancellation policy?", answer: "Add cancellation policy details here..." },
-  { id: "13", question: "Fitness Requirements", answer: "Add fitness requirements here..." },
+  {
+    id: '10',
+    question: "What's included in the trip?",
+    answer: 'Add details about inclusions here...',
+  },
+  {
+    id: '11',
+    question: 'What should I pack?',
+    answer: 'Add packing recommendations here...',
+  },
+  {
+    id: '12',
+    question: 'What is the cancellation policy?',
+    answer: 'Add cancellation policy details here...',
+  },
+  {
+    id: '13',
+    question: 'Fitness Requirements',
+    answer: 'Add fitness requirements here...',
+  },
 ];
 
 export default function FAQsPage() {
   const router = useRouter();
-
+  const { id: tripId } = useParams();
   const [faqs, setFaqs] = useState<FAQ[]>(DEFAULT_FAQS);
-  const [newQuestion, setNewQuestion] = useState("");
-  const [newAnswer, setNewAnswer] = useState("");
+  const [newQuestion, setNewQuestion] = useState('');
+  const [newAnswer, setNewAnswer] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [createFaq] = useCreateFaqMutation();
@@ -48,7 +64,7 @@ export default function FAQsPage() {
 
   const updateAnswer = (id: string, answer: string | undefined) => {
     setFaqs((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, answer: answer ?? "" } : f))
+      prev.map((f) => (f.id === id ? { ...f, answer: answer ?? '' } : f)),
     );
   };
 
@@ -58,86 +74,84 @@ export default function FAQsPage() {
     setFaqs((prev) => [
       ...prev,
       {
-        id: "local-" + Date.now(),
+        id: 'local-' + Date.now(),
         question: newQuestion,
         answer: newAnswer,
       },
     ]);
 
-    setNewQuestion("");
-    setNewAnswer("");
+    setNewQuestion('');
+    setNewAnswer('');
   };
 
   const handleNext = async () => {
-  try {
-    for (const faq of faqs) {
-      const isLocal = faq.id.startsWith("local-");
+    try {
+      for (const faq of faqs) {
+        const isLocal = faq.id.startsWith('local-');
 
-      const payload = {
-        requestId: crypto.randomUUID(),
-        currentTimestamp: new Date().toISOString(),
-        organizationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        name: faq.question,        
-        documents: [],
-        tripId: 0,
-        addToLibrary: true,
-        answer: faq.answer, 
-        groupName: "PRICE",   
-      };
+        const payload = {
+          requestId: crypto.randomUUID(),
+          currentTimestamp: new Date().toISOString(),
+          organizationId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          name: faq.question,
+          documents: [],
+          tripId: 0,
+          addToLibrary: true,
+          answer: faq.answer,
+          groupName: 'PRICE',
+        };
 
-      if (isLocal) {
-        // 🟢 POST API (new FAQ)
-        await createFaq({
-          organizationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-          tripPublicId: "x1",
-          data: payload,
-        });
-      } else {
-        // 🟡 PUT API (existing FAQ)
-        await updateFaq({
-          organizationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-          tripPublicId: "x1",
-          faqId: faq.id,
-          data: payload,
-        });
+        if (isLocal) {
+          // 🟢 POST API (new FAQ)
+          await createFaq({
+            organizationId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+            tripPublicId: 'x1',
+            data: payload,
+          });
+        } else {
+          // 🟡 PUT API (existing FAQ)
+          await updateFaq({
+            organizationId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+            tripPublicId: 'x1',
+            faqId: faq.id,
+            data: payload,
+          });
+        }
       }
+
+      router.push(`/organizer/create-trip/${tripId}/pricing`);
+    } catch (error) {
+      console.error('Error saving FAQs:', error);
     }
-
-    router.push("/organizer/create-trip/pricing");
-  } catch (error) {
-    console.error("Error saving FAQs:", error);
-  }
-};
-
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className='flex min-h-screen bg-gray-50'>
       <OrganizerSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="flex-1">
-        <AppHeader title="Create New Trip" />
+      <div className='flex-1'>
+        <AppHeader title='Create New Trip' />
         <TripStepperHeader activeStep={4} />
 
-        <SectionCard title="Trip Preparation & FAQs">
-          <div className="space-y-6">
-
+        <SectionCard title='Trip Preparation & FAQs'>
+          <div className='space-y-6'>
             {/* FAQ LIST */}
-            <Accordion type="single" collapsible className="w-full space-y-2">
+            <Accordion type='single' collapsible className='w-full space-y-2'>
               {faqs.map((faq) => (
                 <AccordionItem
                   key={faq.id}
                   value={faq.id}
-                  className="rounded-lg border bg-background px-2 sm:px-4"
+                  className='rounded-lg border bg-background px-2 sm:px-4'
                 >
-                  <AccordionTrigger className="text-left hover:no-underline">
+                  <AccordionTrigger className='text-left hover:no-underline'>
                     {faq.question}
                   </AccordionTrigger>
 
-                  <AccordionContent className="pt-2 pb-4">
-                    <div className="border border-gray-200 rounded-lg p-2">
+                  <AccordionContent className='pt-2 pb-4'>
+                    <div className='border border-gray-200 rounded-lg p-2'>
                       <RichTextarea
                         value={faq.answer}
                         onChange={(val) => updateAnswer(faq.id, val)}
@@ -149,33 +163,33 @@ export default function FAQsPage() {
             </Accordion>
 
             {/* ADD NEW FAQ */}
-            <div className="rounded-lg border bg-background p-3 sm:p-4">
+            <div className='rounded-lg border bg-background p-3 sm:p-4'>
               <Input
                 value={newQuestion}
                 onChange={(e) => setNewQuestion(e.target.value)}
-                placeholder="Enter your question.."
-                className="mb-3"
+                placeholder='Enter your question..'
+                className='mb-3'
               />
 
-              <div className="border border-gray-200 rounded-lg p-2">
+              <div className='border border-gray-200 rounded-lg p-2'>
                 <RichTextarea
                   value={newAnswer}
-                  onChange={(val) => setNewAnswer(val ?? "")}
+                  onChange={(val) => setNewAnswer(val ?? '')}
                 />
               </div>
             </div>
 
             {/* BUTTONS */}
-            <div className="flex gap-2">
+            <div className='flex gap-2'>
               <Button
-                variant="outline"
-                className="px-8 py-2 text-orange-500 border-orange-400"
+                variant='outline'
+                className='px-8 py-2 text-orange-500 border-orange-400'
                 onClick={handleAddFaq}
               >
                 + Add Question
               </Button>
 
-              <Button className="px-8 py-2 text-white bg-gradient-to-r from-orange-400 to-pink-500">
+              <Button className='px-8 py-2 text-white bg-gradient-to-r from-orange-400 to-pink-500'>
                 Choose from Library
               </Button>
             </div>
@@ -183,9 +197,11 @@ export default function FAQsPage() {
         </SectionCard>
 
         <WizardFooter
-          onPrev={() => router.push("/organizer/create-trip/exclusions")}
-          onDraft={() => console.log("Draft saved")}
-          onNext={handleNext} 
+          onPrev={() =>
+            router.push(`/organizer/create-trip/${tripId}/exclusions`)
+          }
+          onDraft={() => console.log('Draft saved')}
+          onNext={handleNext}
         />
       </div>
     </div>
