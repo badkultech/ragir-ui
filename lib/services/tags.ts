@@ -21,6 +21,7 @@ export const TAGS = {
   exclusion: 'exclusion',
   faq: 'faq',
   pricing: 'pricing',
+  review: 'review',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',
