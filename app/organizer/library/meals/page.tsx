@@ -115,7 +115,7 @@ export default function MealsPage() {
         <main className="flex-1 p-6 md:p-8">
           {/* Header (controlled search passed down) */}
           <LibraryHeader
-            buttonLabel="Add meal"
+            buttonLabel="Add Meal"
             onAddClick={() => {
               setEditMeal(null);
               setModalOpen(true);
@@ -137,7 +137,7 @@ export default function MealsPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
               {filtered.map((meal) => (
                 <div
                   key={meal.id}
@@ -165,9 +165,11 @@ export default function MealsPage() {
                       <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                       {meal.location || "—"}
                     </div>
-                    <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                      {meal.description || "No description available."}
-                    </p>
+                    <p className="text-sm text-gray-500 mt-2 line-clamp-2"
+                      dangerouslySetInnerHTML={{
+                        __html: meal.description || "",
+                      }}
+                    />
 
                     {/* Meal Type Tag */}
                     {meal.mealType !== undefined && (

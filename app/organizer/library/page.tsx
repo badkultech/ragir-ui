@@ -18,7 +18,7 @@ import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemMod
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 
 const categories = [
-  { label: "Day Description", href: "/organizer/library/events", icon: Calendar },
+  { label: "Day Description", href: "/organizer/library/daydescription", icon: Calendar },
   { label: "Transit", href: "/organizer/library/transits", icon: Car },
   { label: "Stays", href: "/organizer/library/stays", icon: Home },
   { label: "Meals", href: "/organizer/library/meals", icon: ForkKnife },

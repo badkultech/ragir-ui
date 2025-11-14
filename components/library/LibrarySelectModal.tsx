@@ -23,8 +23,7 @@ import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/act
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import {useGetDayDescriptionsQuery } from "@/lib/services/organizer/trip/library/day-description";
-
-
+import { LazyImage } from "../ui/lazyImage";
 
 
 export type LibraryItem = {
@@ -42,7 +41,7 @@ export type LibraryItem = {
 };
 
 type Category =
-  | "events"
+  | "day-description"
   | "stays"
   | "transit"
   | "meals"
@@ -65,7 +64,7 @@ export function LibrarySelectModal({
 }: Props) {
   const [selected, setSelected] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
-  
+
   const organizationId = useOrganizationId();
 
   const shouldSkip = !organizationId;
@@ -107,13 +106,14 @@ export function LibrarySelectModal({
                   skip: shouldSkip,
                   refetchOnMountOrArgChange: true,
                 })
-                 
-                : category === "events"
-                  ? useGetDayDescriptionsQuery(organizationId ?? "", {
-                    skip: shouldSkip,
-                    refetchOnMountOrArgChange: true,
-                  })
-                  : { data: [], isLoading: false, isError: false };
+              : category === 'day-description'
+              ? useGetDayDescriptionsQuery(organizationId ?? '', {
+                  skip: shouldSkip,
+                  refetchOnMountOrArgChange: true,
+                })
+              : { data: [], isLoading: false, isError: false };
+
+
 
 
   const items: LibraryItem[] =
@@ -123,7 +123,7 @@ export function LibrarySelectModal({
       answer: item.answer,
       location: item.location || item.city || "",
       description: item.description || item.details || "",
-      image: item.imageUrl || item.photo || "",
+      image: item?.documents[0]?.url || item.photo || "",
     })) ?? [];
 
   // 🔍 Search filter
@@ -189,7 +189,7 @@ export function LibrarySelectModal({
                           : "border-gray-200 hover:border-orange-400"
                         }`}
                     >
-                      <img
+                      <LazyImage
                         src={item.image || "/default-avatar.png"}
                         alt={item.title}
                         className="w-10 h-10 rounded-full object-cover"

@@ -49,6 +49,10 @@ import {
   useSaveGroupLeaderMutation,
   useUpdateGroupLeaderMutation,
 } from "@/lib/services/organizer/trip/library/leader";
+import {
+  useCreateOrganizerFaqMutation,
+  useUpdateOrganizerFaqMutation,
+} from "@/lib/services/organizer/trip/library/faq";
 
 /* ------------------------------------------------
    Small helper component: non-intrusive save bar
@@ -88,7 +92,7 @@ function SaveStatusBar({
 -------------------------------------------------- */
 type Step =
   | "select"
-  | "event"
+  | "day-description"
   | "stay"
   | "transit"
   | "meal"
@@ -128,6 +132,8 @@ export function AddNewItemModal({
   const [updateActivity] = useUpdateActivityMutation();
   const [createLeader] = useSaveGroupLeaderMutation();
   const [updateLeader] = useUpdateGroupLeaderMutation();
+  const [createFaq] = useCreateOrganizerFaqMutation();
+  const [updateFaq] = useUpdateOrganizerFaqMutation();
 
   useEffect(() => {
     if (!open) return;
@@ -144,13 +150,18 @@ export function AddNewItemModal({
     documents?: DocumentItem[]
   ) {
     const fdMappers: Record<Step, any> = {
-      event: mapDayDescriptionToFormData,
+      "day-description": mapDayDescriptionToFormData,
       stay: mapStayToFormData,
       transit: mapTransitToFormData,
       meal: mapMealToFormData,
       activity: mapActivityToFormData,
       "trip-leader": mapTripLeaderToFormData,
-      faq: null,
+      faq: (data: { question: string; answer: string }) => {
+        const fd = new FormData();
+        fd.append("name", data.question);
+        fd.append("answer", data.answer);
+        return fd;
+      },
       select: null,
     };
 
@@ -158,7 +169,7 @@ export function AddNewItemModal({
     if (!fd) return;
 
     const actions: Record<Step, any> = {
-      event: updateId
+      "day-description": updateId
         ? () =>
             updateEvent({
               organizationId,
@@ -198,7 +209,19 @@ export function AddNewItemModal({
               data: fd,
             }).unwrap()
         : () => createLeader({ organizationId, data: fd }).unwrap(),
-      faq: () => Promise.resolve(),
+      faq: updateId
+        ? () =>
+            updateFaq({
+              organizationId,
+              faqId: updateId,
+              data: fd,
+            }).unwrap()
+        : () =>
+            createFaq({
+              organizationId,
+              data: fd,
+            }).unwrap(),
+
       select: () => Promise.resolve(),
     };
 
@@ -243,9 +266,9 @@ export function AddNewItemModal({
           {step === "select" ? (
             <CategorySelectStep
               categories={[
-                { label: "Events", icon: Calendar, step: "event" },
+                { label: "Day Descriptions", icon: Calendar, step: "day-description" },
                 { label: "Stays", icon: Hotel, step: "stay" },
-                { label: "Transit", icon: Bus, step: "transit" },
+                { label: "Transits", icon: Bus, step: "transit" },
                 { label: "Meals", icon: Utensils, step: "meal" },
                 { label: "Activities", icon: Activity, step: "activity" },
                 { label: "Trip Leaders", icon: Users, step: "trip-leader" },

@@ -25,7 +25,9 @@ export default function TransitPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
-  const [selectedTransitId, setSelectedTransitId] = useState<number | null>(null);
+  const [selectedTransitId, setSelectedTransitId] = useState<number | null>(
+    null
+  );
   const [updateId, setUpdateId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -34,7 +36,11 @@ export default function TransitPage() {
 
   const organizationId = useOrganizationId();
 
-  const { data: transits = [], isLoading, refetch } = useGetOrganizerTransitsQuery(
+  const {
+    data: transits = [],
+    isLoading,
+    refetch,
+  } = useGetOrganizerTransitsQuery(
     organizationId ? { organizationId } : skipToken
   );
 
@@ -52,7 +58,10 @@ export default function TransitPage() {
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   // We keep a small deleteTarget (id + label) to show in dialog without waiting for fetch
-  const [deleteTarget, setDeleteTarget] = useState<{ id: number | string; label?: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: number | string;
+    label?: string;
+  } | null>(null);
 
   // Debounce the search input (300ms)
   const debouncedSearch = useDebounce(search, 300);
@@ -65,7 +74,9 @@ export default function TransitPage() {
       const from = (t.fromLocation || "").toString().toLowerCase();
       const to = (t.toLocation || "").toString().toLowerCase();
       const vehicle = (TransitTypeLabels[t.vehicleType] || "").toLowerCase();
-      const times = `${formatTime(t.startTime)} ${formatTime(t.endTime)}`.toLowerCase();
+      const times = `${formatTime(t.startTime)} ${formatTime(
+        t.endTime
+      )}`.toLowerCase();
       const combined = `${from} ${to} ${vehicle} ${times}`;
       return combined.includes(q);
     });
@@ -113,7 +124,7 @@ export default function TransitPage() {
       />
 
       <div className="flex-1 flex flex-col">
-        <AppHeader title="Transit" />
+        <AppHeader title="Transits" />
 
         <main className="flex-1 p-6 md:p-8">
           <LibraryHeader
@@ -139,10 +150,10 @@ export default function TransitPage() {
                 {qLen === 0 && transits.length === 0
                   ? "No transits found."
                   : qLen === 0 && transits.length > 0
-                    ? "Showing all transits. Type at least 3 characters to search."
-                    : qLen > 0 && qLen < 3
-                      ? "Type at least 3 characters to search."
-                      : "No transits found."}
+                  ? "Showing all transits. Type at least 3 characters to search."
+                  : qLen > 0 && qLen < 3
+                  ? "Type at least 3 characters to search."
+                  : "No transits found."}
               </div>
             ) : (
               filtered.map((t: any) => (
@@ -164,8 +175,26 @@ export default function TransitPage() {
                         <h3 className="font-semibold text-gray-900 truncate">
                           {t.fromLocation} → {t.toLocation}
                         </h3>
+
                         <p className="text-sm text-gray-600 mt-1 truncate">
-                          {TransitTypeLabels[t.vehicleType]}
+                          {[
+                            // map known vehicle types using label map
+                            ...(Array.isArray(t.vehicleTypes)
+                              ? t.vehicleTypes.map(
+                                  (v: string) => TransitTypeLabels[v] ?? v
+                                )
+                              : t.vehicleTypes
+                              ? [
+                                  TransitTypeLabels[t.vehicleTypes] ??
+                                    t.vehicleTypes,
+                                ]
+                              : []),
+
+                            // include custom type if present
+                            t.customVehicleType,
+                          ]
+                            .filter(Boolean) // remove empty/null
+                            .join(" | ")}
                         </p>
                       </div>
                     </div>
@@ -173,39 +202,18 @@ export default function TransitPage() {
                     {/* Meta row: times on the left, actions on the right */}
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <p className="text-sm text-gray-500">
-                        <span className="font-medium text-gray-700">Departure</span>{" "}
+                        <span className="font-medium text-gray-700">
+                          Departure
+                        </span>{" "}
                         {formatTime(t.startTime)}{" "}
                         <span className="mx-2">|</span>{" "}
-                        <span className="font-medium text-gray-700">Arrival</span>{" "}
+                        <span className="font-medium text-gray-700">
+                          Arrival
+                        </span>{" "}
                         {formatTime(t.endTime)}
                       </p>
 
                       <div className="flex items-center gap-3 text-gray-500">
-                        {/* Edit */}
-                        <button
-                          className="hover:text-orange-500"
-                          aria-label={`edit-${t.id}`}
-                          onClick={() => {
-                            setSelectedTransitId(t.id);
-                            setUpdateId(t.id);
-                            setModalOpen(true);
-                          }}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-
-                        {/* View */}
-                        <button
-                          className="hover:text-blue-500"
-                          aria-label={`view-${t.id}`}
-                          onClick={() => {
-                            setSelectedTransitId(t.id);
-                            setViewOpen(true);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-
                         {/* Delete (uses ActionButtons-style spinner) */}
                         <ActionButtons
                           onView={() => {
@@ -227,23 +235,22 @@ export default function TransitPage() {
             )}
           </div>
         </main>
-      </div >
+      </div>
 
       {/* ➕ Add / ✏ Edit Modal */}
-      < AddNewItemModal
+      <AddNewItemModal
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
           setUpdateId(null);
           refetch();
-        }
-        }
+        }}
         updateId={updateId}
         initialStep="transit"
       />
 
       {/* ❌ Confirm Delete Modal */}
-      < DeleteConfirmDialog
+      <DeleteConfirmDialog
         open={confirmOpen}
         onOpenChange={(open) => {
           setConfirmOpen(open);
@@ -264,6 +271,6 @@ export default function TransitPage() {
           setSelectedTransitId(null);
         }}
       />
-    </div >
+    </div>
   );
 }

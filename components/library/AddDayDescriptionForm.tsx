@@ -4,14 +4,8 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
-
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
-import { Document } from "@/lib/services/organizer/trip/library/day-description/types";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
-import { useToast } from "@/components/ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 import { MultiUploader } from "../common/UploadFieldShortcuts";
 import {
@@ -19,7 +13,7 @@ import {
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 
-type AddEventFormProps = {
+type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
   updateId?: number | null;
   onCancel: () => void;
@@ -28,14 +22,14 @@ type AddEventFormProps = {
   initialData?: any;
 };
 
-export function AddEventForm({
+export function AddDayDescriptionForm({
   mode = "trip",
   onCancel,
   updateId,
   onSave,
   header,
   initialData,
-}: AddEventFormProps) {
+}: AddDayDescriptionFormProps) {
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
 
   const [title, setTitle] = useState("");
@@ -85,11 +79,11 @@ export function AddEventForm({
         { title, description, location, time, packing,saveInLibrary, mode },
         docsManager.documents
       );
-      showSuccess("Event saved successfully!");
-      console.log("📸 Uploaded documents:", docsManager.documents);
 
+      showSuccess("day description saved successfully!");
+      console.log("📸 Uploaded documents:", docsManager.documents);
     } catch {
-      showApiError("Failed to save event");
+      showApiError("Failed to save day description");
     }
   };
 
@@ -239,7 +233,7 @@ export function AddEventForm({
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
           onSelect={handleLibrarySelect}
-          category="events"
+          category="day-description"
         />
       )}
     </div>

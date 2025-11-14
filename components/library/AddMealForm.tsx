@@ -32,7 +32,7 @@ export function AddMealForm({
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
   const [title, setTitle] = useState("My Meal");
   const [mealType, setMealType] = useState("LUNCH");
-  const [mealTime, setMealTime] = useState("12:00");
+  const [time, setTime] = useState("12:00");
   const [included, setIncluded] = useState<"included" | "chargeable">(
     "included"
   );
@@ -64,7 +64,7 @@ export function AddMealForm({
         ? initialData.mealType.toUpperCase()
         : "LUNCH"
     );
-    setMealTime(initialData.mealTime || "12:00");
+    setTime(initialData.time || "12:00");
     setIncluded(initialData.chargeable ? "chargeable" : "included");
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
@@ -116,7 +116,7 @@ export function AddMealForm({
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     if (!title.trim()) newErrors.title = "Title is required";
-    if (!mealTime.trim()) newErrors.mealTime = "Meal Time is required";
+    if (!time.trim()) newErrors.time = "Meal Time is required";
     if (!mealType.trim()) newErrors.mealType = "Meal Type is required";
     if (!description.trim()) newErrors.description = "Description is required";
     if (!location.trim()) newErrors.location = "Location is required";
@@ -134,7 +134,7 @@ export function AddMealForm({
         {
           title,
           mealType,
-          mealTime,
+          time,
           included,
           location,
           description,
@@ -221,8 +221,8 @@ export function AddMealForm({
           <label className="block text-[0.95rem] font-medium mb-2">Time</label>
           <Input
             type="time"
-            value={mealTime}
-            onChange={(e) => setMealTime(e.target.value)}
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
           />
           <label className="flex items-center gap-2 my-4">
             <input

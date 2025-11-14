@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
@@ -20,7 +19,7 @@ type AddTransitFormProps = {
   onCancel: () => void;
   onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
-  initialData?: any; // ✅ NEW
+  initialData?: any;
 };
 
 const VEHICLES = [
@@ -41,78 +40,80 @@ export function AddTransitForm({
   initialData,
 }: AddTransitFormProps) {
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
-  const [title, setTitle] = useState("Mumbai To Goa Transit");
-  const [from, setFrom] = useState("Mumbai");
-  const [to, setTo] = useState("Goa");
-  const [departure, setDeparture] = useState("13:00");
-  const [arrival, setArrival] = useState("15:00");
-  const [vehicle, setVehicle] = useState<string[]>(["CAR"]);
-  const [otherVehicle, setOtherVehicle] = useState("");
-  const [arrangement, setArrangement] = useState<"ORGANIZER" | "SELF">(
-    "ORGANIZER"
-  );
-  const [description, setDescription] = useState("sdfsdf");
-  const [packingSuggestion, setPackingSuggestion] = useState("sdfdsfds");
+  const [title, setTitle] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [departure, setDeparture] = useState("");
+  const [arrival, setArrival] = useState("");
+  const [vehicle, setVehicle] = useState<string[]>([]);
+  const [customVehicleType, setCustomVehicleType] = useState("");
+  const [arrangement, setArrangement] = useState<"ORGANIZER" | "SELF">("ORGANIZER");
+  const [description, setDescription] = useState("");
+  const [packingSuggestion, setPackingSuggestion] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
 
-
-  // replace your current useEffect([initialData]) with this
   useEffect(() => {
     if (!initialData) return;
 
-    // primitives (cover both name/title possibilities)
     setTitle(initialData.name ?? initialData.title ?? "");
     setFrom(initialData.fromLocation ?? initialData.from ?? "");
     setTo(initialData.toLocation ?? initialData.to ?? "");
 
-    // normalize time: backend sometimes returns "HH:mm:ss", input[type=time] wants "HH:mm"
     const normalizeTime = (t: string | null | undefined) =>
       typeof t === "string" && t.length >= 5 ? t.slice(0, 5) : t ?? "";
 
     setDeparture(normalizeTime(initialData.startTime ?? initialData.departure ?? ""));
     setArrival(normalizeTime(initialData.endTime ?? initialData.arrival ?? ""));
-
     setDescription(initialData.description ?? "");
     setPackingSuggestion(initialData.packingSuggestion ?? "");
-    setVehicle(initialData.vehicleType ? [initialData.vehicleType] : []);
+
+    // ✅ handle both single and multiple vehicle types
+    setVehicle(
+      Array.isArray(initialData.vehicleTypes)
+        ? initialData.vehicleTypes
+        : initialData.vehicleType
+        ? [initialData.vehicleType]
+        : []
+    );
+
+    // ✅ fix: populate custom vehicle type
+    setCustomVehicleType(initialData.customVehicleType ?? "");
+
     setArrangement(
       (initialData.arrangedBy ?? "").toString().toUpperCase() === "SELF"
         ? "SELF"
         : "ORGANIZER"
     );
 
-    // reset save-related UI if backend provides
     setSaveInLibrary(!!initialData.addedToLibrary);
     setSaveAsName(initialData.name ?? initialData.title ?? "");
 
-    // ---- Documents: normalize and reset docsManager so uploader shows correct preview ----
-    const mappedDocs = (Array.isArray(initialData.documents) ? initialData.documents : []).map(
-      (d: any) => ({
-        id: d.id ?? null,
-        url: d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null,
-        type: d.type ?? "IMAGE",
-        file: null,
-        markedForDeletion: !!d.markedForDeletion,
-      })
-    );
+    // ✅ reset documents
+    const mappedDocs = (Array.isArray(initialData.documents)
+      ? initialData.documents
+      : []
+    ).map((d: any) => ({
+      id: d.id ?? null,
+      url: d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null,
+      type: d.type ?? "IMAGE",
+      file: null,
+      markedForDeletion: !!d.markedForDeletion,
+    }));
 
-    // prefer resetDocuments API, otherwise setDocuments, otherwise mutate
     if (typeof docsManager.resetDocuments === "function") {
       docsManager.resetDocuments();
     } else if (typeof docsManager.setDocuments === "function") {
       docsManager.setDocuments(mappedDocs);
     } else {
-      // fallback (not ideal) – mutate directly
       // @ts-ignore
       docsManager.documents = mappedDocs;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData?.id, initialData]);
-
 
   const toggleVehicle = (v: string) => {
     setVehicle((prev) =>
@@ -120,34 +121,17 @@ export function AddTransitForm({
     );
   };
 
-
-  const handleLibrarySelect = (item: any) => {
-    setTitle(item.title || "");
-    setFrom(item.from || "");
-    setTo(item.to || "");
-    setDescription(item.description || "");
-  };
-
-  const validateForm = () => {
+  const handleSubmit = async () => {
     const newErrors: { [key: string]: string } = {};
-
     if (!title.trim()) newErrors.title = "Title is required";
-    if (!from.trim()) newErrors.title = "Transit Route is required";
-    if (!to.trim()) newErrors.title = "Transit Route is required";
-    if (!departure.trim()) newErrors.deaparture = "Departure is required";
-    if (!arrival.trim()) newErrors.arrival = "Arrival is required";
+    if (!from.trim()) newErrors.from = "Starting point is required";
+    if (!to.trim()) newErrors.to = "Destination is required";
+    if (!departure.trim()) newErrors.departure = "Departure time is required";
+    if (!arrival.trim()) newErrors.arrival = "Arrival time is required";
     if (!description.trim()) newErrors.description = "Description is required";
-    if (!vehicle) newErrors.vechicle = "Vehicle Description is required";
-    if (!arrangement.trim())
-      newErrors.arrangement = "Arrangement Details are required";
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async () => {
-    const isValid = validateForm();
-    if (!isValid) return;
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       onSave(
@@ -157,7 +141,8 @@ export function AddTransitForm({
           to,
           departure,
           arrival,
-          vehicle: vehicle.length ? vehicle : otherVehicle,
+          vehicle,
+          customVehicleType,
           arrangement,
           description,
           packingSuggestion,
@@ -174,100 +159,59 @@ export function AddTransitForm({
   const isTripMode = mode === "trip";
 
   return (
-    <div
-      className="flex flex-col gap-6"
-      style={{ fontFamily: "var(--font-poppins)" }}
-    >
-      <div className="flex items-center justify-between w-full">
-        {header && (
-          <div className="text-lg  font-semibold text-gray-800  pb-2">
-            {header}
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>
+      {/* Header */}
+      {header && <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>}
 
-      {/* Top-right button */}
+      {/* Choose from library button */}
       {isTripMode ? (
         <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
       ) : (
-        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+        <div className="mt-2" />
       )}
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium  mb-1">
-          Title *
-        </label>
+        <label className="block text-[0.95rem] font-medium mb-1">Title *</label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter title"
           maxLength={70}
         />
-        {errors.title && (
-          <p className="text-xs text-red-500 mt-1">{errors.title}</p>
-        )}
-        <p className="text-xs text-right text-orange-500 mt-1">
-          {title.length}/70 Characters
-        </p>
+        {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+        <p className="text-xs text-right text-orange-500 mt-1">{title.length}/70 Characters</p>
       </div>
 
-      {/* Transit Route */}
+      {/* Route */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">
-          Transit Route *
-        </label>
+        <label className="block text-[0.95rem] font-medium mb-1">Transit Route *</label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            placeholder="From (Starting Point)"
-          />
-          <Input
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            placeholder="To (Destination Point)"
-          />
+          <Input value={from} onChange={(e) => setFrom(e.target.value)} placeholder="From" />
+          <Input value={to} onChange={(e) => setTo(e.target.value)} placeholder="To" />
         </div>
-        {errors.from ||
-          (errors.to && (
-            <p className="text-xs text-red-500 mt-1">{errors.title}</p>
-          ))}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          <Input
-            type="time"
-            value={departure}
-            onChange={(e) => setDeparture(e.target.value)}
-            className=" "
-          />
-          <Input
-            type="time"
-            value={arrival}
-            onChange={(e) => setArrival(e.target.value)}
-          />
-        </div>
-        {errors.arrival ||
-          (errors.departure && (
-            <p className="text-xs text-red-500 mt-1">{errors.arrival}</p>
-          ))}
+      </div>
+
+      {/* Time */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+        <Input type="time" value={departure} onChange={(e) => setDeparture(e.target.value)} />
+        <Input type="time" value={arrival} onChange={(e) => setArrival(e.target.value)} />
       </div>
 
       {/* Vehicle */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">
-          Vehicle *
-        </label>
-
+        <label className="block text-[0.95rem] font-medium mb-2">Vehicle *</label>
         <div className="flex flex-wrap gap-2">
           {VEHICLES.map((v) => (
             <button
-              type="button"
               key={v.value}
+              type="button"
               onClick={() => toggleVehicle(v.value)}
-              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
+              className={`px-4 py-2 rounded-lg border text-sm ${
+                vehicle.includes(v.value)
                   ? "bg-orange-500 text-white border-orange-500"
                   : "border-gray-300 hover:border-orange-400"
-                }`}
+              }`}
             >
               {v.label}
             </button>
@@ -275,22 +219,16 @@ export function AddTransitForm({
         </div>
 
         <Input
-          value={otherVehicle}
-          onChange={(e) => setOtherVehicle(e.target.value)}
+          value={customVehicleType}
+          onChange={(e) => setCustomVehicleType(e.target.value)}
           placeholder="Other (Specify)"
           className="mt-2"
         />
-
-        {errors.vechicle && (
-          <p className="text-xs text-red-500 mt-1">{errors.vehicle}</p>
-        )}
       </div>
 
       {/* Arrangement */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">
-          Arrangement *
-        </label>
+        <label className="block text-[0.95rem] font-medium mb-2">Arrangement *</label>
         <div className="flex items-center justify-between gap-6">
           <label className="flex items-center gap-2 text-[0.85rem]">
             <input
@@ -309,37 +247,18 @@ export function AddTransitForm({
             Self arranged by the traveler
           </label>
         </div>
-        {errors.arrangement && (
-          <p className="text-xs text-red-500 mt-1">{errors.arrangement}</p>
-        )}
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">
-          Description
-        </label>
-        <RichTextEditor
-          value={description}
-          onChange={setDescription}
-          maxLength={800}
-        />
-        {errors.description && (
-          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
-        )}
+        <label className="block text-[0.95rem] font-medium mb-2">Description</label>
+        <RichTextEditor value={description} onChange={setDescription} maxLength={800} />
       </div>
 
-      {/* Packing Suggestions */}
+      {/* Packing Suggestion */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">
-          Packing Suggestions
-        </label>
-        <RichTextEditor
-          value={packingSuggestion}
-          onChange={setPackingSuggestion}
-          placeholder="Enter here"
-          maxLength={800}
-        />
+        <label className="block text-[0.95rem] font-medium mb-2">Packing Suggestions</label>
+        <RichTextEditor value={packingSuggestion} onChange={setPackingSuggestion} maxLength={800} />
       </div>
 
       {/* Upload area: uses MultiUploader and shares docsManager */}
@@ -384,11 +303,11 @@ export function AddTransitForm({
       </div>
 
       {/* Library Modal */}
-      {mode === "trip" && (
+      {isTripMode && (
         <LibrarySelectModal
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
-          onSelect={handleLibrarySelect}
+          onSelect={() => {}}
           category="transit"
         />
       )}

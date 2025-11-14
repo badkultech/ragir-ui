@@ -52,7 +52,7 @@ const nav: NavItem[] = [
     children: [
       {
         label: 'Day Description',
-        href: '/organizer/library/events',
+        href: '/organizer/library/daydescription',
         icon: Calendar,
       },
       { label: 'Transit', href: '/organizer/library/transits', icon: Car },

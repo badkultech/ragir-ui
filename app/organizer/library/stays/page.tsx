@@ -32,7 +32,10 @@ export default function StaysPage() {
 
   // Delete state
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string | number; name?: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string | number;
+    name?: string;
+  } | null>(null);
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   // API
@@ -109,7 +112,7 @@ export default function StaysPage() {
         <main className="flex-1 p-6 md:p-8">
           {/* Header (controlled search passed down) */}
           <LibraryHeader
-            buttonLabel="Add stay"
+            buttonLabel="Add Stay"
             onAddClick={() => {
               setEditStayId(null);
               setModalOpen(true);
@@ -132,7 +135,7 @@ export default function StaysPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
               {filtered.map((stay) => (
                 <div
                   key={stay.id}
@@ -160,9 +163,12 @@ export default function StaysPage() {
                       <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                       {stay.location || "—"}
                     </div>
-                    <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                      {stay.description || "No description available."}
-                    </p>
+                    <p
+                      className="text-sm text-gray-500 mt-2 line-clamp-2"
+                      dangerouslySetInnerHTML={{
+                        __html: stay.description || "",
+                      }}
+                    />
 
                     {/* Actions */}
                     <div className="mt-4">
