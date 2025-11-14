@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ModalWrapper } from "@/components/ui/ModalWrapper";
 
 // ✅ Forms
-import { AddEventForm } from "@/components/library/AddEventForm";
+import { AddDayDescriptionForm } from "@/components/library/AddDayDescriptionForm";
 import { AddTransitForm } from "@/components/library/AddTransitForm";
 import { AddStayForm } from "@/components/library/AddStayForm";
 import { AddMealForm } from "@/components/library/AddMealForm";
@@ -139,7 +139,7 @@ const {
       show: showDayDescription,
       editHandler: handleEdit,
       deleteHandler: handleDelete,
-      form: AddEventForm,
+      form: AddDayDescriptionForm,
       editing: editingItem,
       initial: initialData,
       resetEditing: () => {
