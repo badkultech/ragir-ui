@@ -39,7 +39,7 @@ export default function Page() {
       <div className='flex-1'>
         <AppHeader title='Organizers' />
         <TripStepperHeader activeStep={1} />
-        <CreateTrip />
+        <CreateTrip tripId={id as string} />
       </div>
     </div>
   );
