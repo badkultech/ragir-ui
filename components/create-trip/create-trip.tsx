@@ -185,16 +185,84 @@ export function CreateTrip({ tripId }: Props) {
       gradient: SpiritualGradient,
     },
   ];
-  const today = new Date();
-  // const formattedDateISO = today.toISOString().slice(0, 16);
-
+ 
   const [createTrip, { isLoading: createTripLoading }] =
     useCreateTripMutation();
   const [updateTrip, { isLoading: updateTripLoading }] =
     useUpdateTripMutation();
 
-  // const [triggerGetTrip, { data: tripData, isFetching }] =
-  //   useLazyGetTripByIdQuery();
+  const [triggerGetTrip, { data: tripData, isFetching }] =
+    useLazyGetTripByIdQuery();
+    useEffect(() => {
+  if (!tripId || !organizationId) return;
+  
+  console.log("🔄 Fetching Trip...");
+  triggerGetTrip({
+    organizationId,
+    tripId,
+  });
+}, [tripId, organizationId]);
+
+
+  useEffect(() => {
+  if (!tripData?.data) return;
+
+  const trip = tripData.data;
+const safeParseTags = (arr: any): string[] => {
+  if (!arr) return [];
+  if (Array.isArray(arr) && typeof arr[0] === "string" && !arr[0].includes(`[`)) {
+    return arr;
+  }
+  try {
+    const fixedString = arr.join("");
+    const parsed = JSON.parse(fixedString);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {}
+  try {
+    return JSON.parse(arr);
+  } catch (e) {}
+
+  return [];
+};
+const parsedMoods = safeParseTags(trip.moodTags);
+const parsedCities = safeParseTags(trip.cityTags);
+
+  dispatch(
+    setFormData({
+      ...formData,
+      tripTitle: trip.name ?? "",
+      startDate: `${trip.startDate} ${trip.startTime}`,
+      endDate: `${trip.endDate} ${trip.endTime}`,
+      totalDays: trip.totalDays ?? 1,
+      minGroupSize: trip.minGroupSize,
+      maxGroupSize: trip.maxGroupSize,
+      minAge: trip.minAge,
+      maxAge: trip.maxAge,
+      tripHighlights: trip.highlights,
+    })
+  );
+
+  dispatch(setSelectedTags(parsedMoods));
+  dispatch(setCityTags(parsedCities));
+
+  if (trip.groupLeader) {
+    const leader = trip.groupLeader;
+
+    const mappedLeader = {
+      id: String(leader.id),
+      name: leader.name,
+      title: leader.name,
+      tagline: leader.tagline,
+      description: leader.tagline || leader.bio || "",
+      imageUrl: leader.documents?.[0]?.url || "",
+    };
+
+    dispatch(setLeaders([mappedLeader]));
+    dispatch(setSelectedGroupLeaderId(mappedLeader.id));
+  }
+
+}, [tripData]);
+
 
   const handleSaveTrip = async () => {
     try {
@@ -257,9 +325,6 @@ export function CreateTrip({ tripId }: Props) {
         }
       }
 
-      // console.log('✅ Trip created:', response);
-
-      // ✅ Capture tripId from backend response
     } catch (error) {
       console.error('❌ Trip creation failed:', error);
       alert('Failed to create trip. Please try again.');
