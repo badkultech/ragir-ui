@@ -5,7 +5,7 @@ import { StayModule } from "../modules/StayModule";
 import { MealModule } from "../modules/MealModule";
 import { ActivityModule } from "../modules/ActivityModule";
 import { TransitModule } from "../modules/TransitModule";
-import { EventModule } from "../modules/EventModule";
+import { EventModule } from "../modules/DayDescriptionModule";
 import { TripLeaderModule } from "../modules/TripLeaderModule";
 import { FAQModule } from "../modules/FAQModule";
 
