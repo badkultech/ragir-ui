@@ -63,10 +63,10 @@ export default function RichTextEditor({
       blockTag.includes("h1")
         ? "h1"
         : blockTag.includes("h2")
-          ? "h2"
-          : blockTag.includes("h3")
-            ? "h3"
-            : "p"
+        ? "h2"
+        : blockTag.includes("h3")
+        ? "h3"
+        : "p"
     );
 
     setActiveFormats({
@@ -78,22 +78,34 @@ export default function RichTextEditor({
     });
   }, []);
 
- useEffect(() => {
-  const handler = () => {
-    const el = editorRef.current;
-    if (!el) return;
+  useEffect(() => {
+    const handler = () => {
+      const el = editorRef.current;
+      if (!el) return;
 
-    // ✅ Only update toolbar if THIS editor is focused or selection is inside it
-    const selection = document.getSelection();
-    if (!selection || !el.contains(selection.anchorNode)) return;
+      // ✅ Only update toolbar if THIS editor is focused or selection is inside it
+      const selection = document.getSelection();
+      if (!selection || !el.contains(selection.anchorNode)) return;
 
-    updateActiveFormats();
+      updateActiveFormats();
+    };
+
+    document.addEventListener("selectionchange", handler);
+    return () => document.removeEventListener("selectionchange", handler);
+  }, [updateActiveFormats]);
+
+  const normalizeHTML = (html: string) => {
+    if (!html) return "";
+
+    return html
+      .replace(/<p><br\s*\/?><\/p>/gi, "")
+      .replace(/<br\s*\/?>/gi, "")
+      .replace(/&nbsp;/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .trim()
+      ? html
+      : "";
   };
-
-  document.addEventListener("selectionchange", handler);
-  return () => document.removeEventListener("selectionchange", handler);
-}, [updateActiveFormats]);
-
 
   // Handle input
   const handleInput = useCallback(() => {
@@ -102,7 +114,8 @@ export default function RichTextEditor({
     const html = el.innerHTML.trim();
     const text = el.innerText || "";
     setCharCount(text.length);
-    onChange(html);
+    const normalized = normalizeHTML(html);
+    onChange(normalized);
 
     // Log HTML for backend debug
     console.clear();
@@ -210,8 +223,8 @@ export default function RichTextEditor({
       align === "left"
         ? "justifyLeft"
         : align === "center"
-          ? "justifyCenter"
-          : "justifyRight";
+        ? "justifyCenter"
+        : "justifyRight";
     document.execCommand(cmd, false);
     setTimeout(() => handleInput(), 0);
   };
@@ -246,7 +259,8 @@ export default function RichTextEditor({
 
     // ✅ Block paste if it exceeds limit
     if (newLength > maxLength) {
-      const allowedChars = maxLength - (currentText.length - selectedText.length);
+      const allowedChars =
+        maxLength - (currentText.length - selectedText.length);
       if (allowedChars > 0) {
         const partialPaste = paste.slice(0, allowedChars);
         document.execCommand("insertText", false, partialPaste);
@@ -260,7 +274,6 @@ export default function RichTextEditor({
     // Trigger your normal input handler to update state
     setTimeout(() => handleInput(), 0);
   };
-
 
   // Attach listeners
   useEffect(() => {
@@ -363,7 +376,11 @@ export default function RichTextEditor({
           onBlur={() => {
             setIsFocused(false);
             const el = editorRef.current;
-            if (el) onChange(el.innerHTML);
+            if (el) {
+              const normalized = normalizeHTML(el.innerHTML);
+              onChange(normalized);
+            }
+
             updateActiveFormats();
           }}
           className="w-full px-3 py-3 text-sm text-gray-800 focus:outline-none min-h-[120px] max-h-[250px] overflow-y-auto prose prose-sm max-w-none"
@@ -457,10 +474,11 @@ function ToolbarButton({
     <button
       type="button"
       onClick={onClick}
-      className={`p-1.5 rounded-md transition-colors ${active
+      className={`p-1.5 rounded-md transition-colors ${
+        active
           ? "bg-orange-100 text-orange-600"
           : "hover:bg-gray-100 active:bg-gray-200 text-gray-600"
-        }`}
+      }`}
     >
       {icon}
     </button>
