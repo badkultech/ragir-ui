@@ -18,7 +18,7 @@ export enum PreferredCommunication {
 }
 
 export enum TripLeadsStatus {
-  NEW = "NEW",
+  OPEN = "OPEN",
   IN_PROGRESS = "IN_PROGRESS",
   CLOSED = "CLOSED",
   CANCELLED = "CANCELLED",

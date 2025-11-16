@@ -137,7 +137,7 @@ export default function LeadsPage() {
           </div>
 
           {/* Filters */}
-          <LeadFilters onStatusChange={(val) => setStatus(val)} />;
+          <LeadFilters onStatusChange={(val) => setStatus(val)} />
           {/* Leads List */}
           <div className="space-y-4">
             {isLoading ? (
@@ -157,7 +157,7 @@ export default function LeadsPage() {
                         <h2 className="font-semibold text-gray-800">
                           {lead.tripTitle || "Unnamed Lead"}
                         </h2>
-                        {lead.tripLeadsStatus === "NEW" ? (
+                        {lead.tripLeadsStatus === "OPEN" ? (
                           <Badge className="bg-yellow-100 text-yellow-700">
                             Open
                           </Badge>
