@@ -120,8 +120,8 @@ export function AddNewItemModal({
   const organizationId = useOrganizationId();
 
   // RTK mutations
-  const [createEvent] = useCreateDayDescriptionMutation();
-  const [updateEvent] = useUpdateDayDescriptionMutation();
+  const [createDayDescription] = useCreateDayDescriptionMutation();
+  const [updateDayDescription] = useUpdateDayDescriptionMutation();
   const [createTransit] = useCreateOrganizerTransitMutation();
   const [updateTransit] = useUpdateOrganizerTransitMutation();
   const [createMeal] = useCreateMealMutation();
@@ -171,12 +171,12 @@ export function AddNewItemModal({
     const actions: Record<Step, any> = {
       "day-description": updateId
         ? () =>
-            updateEvent({
+            updateDayDescription({
               organizationId,
               dayDescriptionId: String(updateId),
               data: fd,
             }).unwrap()
-        : () => createEvent({ organizationId, data: fd }).unwrap(),
+        : () => createDayDescription({ organizationId, data: fd }).unwrap(),
       stay: updateId
         ? () =>
             updateStay({ organizationId, stayId: updateId, data: fd }).unwrap()
