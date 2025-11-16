@@ -19,6 +19,7 @@ import {
   useGetAllExclusionsQuery,
 } from '@/lib/services/organizer/trip/exclusion';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
+import { useLazyGetItineraryByTripIdQuery } from '@/lib/services/organizer/trip/itinerary';
 
 const DEFAULT_OPTIONS = [
   'Personal Expenses',
@@ -41,6 +42,8 @@ export default function ExclusionsPage() {
 
   const [createExclusion] = useCreateExclusionMutation();
   const [updateExclusion] = useUpdateExclusionMutation();
+  const [triggerGetItineraryByTripId] = useLazyGetItineraryByTripIdQuery();
+
 
   const [options, setOptions] = useState<string[]>(DEFAULT_OPTIONS);
   const [selected, setSelected] = useState<string[]>([]);
@@ -140,6 +143,29 @@ export default function ExclusionsPage() {
     }
   };
 
+  const handlePrev = async () => {
+  try {
+    const orgId = organizationId;
+
+    if (!orgId || !tripId) return;
+
+    console.log("🔄 Fetching itinerary before going back...");
+
+    await triggerGetItineraryByTripId({
+      organizationId: orgId,
+      tripPublicId: tripId as string,
+    }).unwrap();
+
+    // Now navigate back
+    router.push(`/organizer/create-trip/${tripId}/Itinerary`);
+
+  } catch (error) {
+    console.error("❌ Failed fetching itinerary:", error);
+    router.push(`/organizer/create-trip/${tripId}/Itinerary`);
+  }
+};
+
+
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <OrganizerSidebar
@@ -185,9 +211,7 @@ export default function ExclusionsPage() {
           </SectionCard>
 
           <WizardFooter
-            onPrev={() =>
-              router.push(`/organizer/create-trip/${tripId}/Itinerary`)
-            }
+            onPrev={handlePrev}
             onDraft={() => console.log('Draft exclusions:', selected)}
             onNext={handleSave}
           />

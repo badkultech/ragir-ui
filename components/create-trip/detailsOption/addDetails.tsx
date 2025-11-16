@@ -9,360 +9,274 @@ import {
   Home,
   Utensils,
   Activity,
-  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModalWrapper } from "@/components/ui/ModalWrapper";
 
-// ✅ Forms
 import { AddDayDescriptionForm } from "@/components/library/AddDayDescriptionForm";
 import { AddTransitForm } from "@/components/library/AddTransitForm";
 import { AddStayForm } from "@/components/library/AddStayForm";
 import { AddMealForm } from "@/components/library/AddMealForm";
 import { AddActivityForm } from "@/components/library/AddActivityForm";
 
-// ✅ Custom Hooks
 import { useDayDescription } from "./useDayDescription";
 import { useTransit } from "./useTransit";
 import { useStay } from "./useStay";
 import { useMeal } from "./useMeal";
 import { useActivity } from "./useActivity";
 
-
-// ✅ Props Interface
 interface DetailsOptionsProps {
   organizationId: string;
   tripPublicId: string;
   dayDetailId: string;
+  items: any[];
+  onLocalChange: (op: "create" | "update" | "delete", item: any) => void;
 }
 
-// ✅ Main Component
 export function DetailsOptions({
   organizationId,
   tripPublicId,
   dayDetailId,
+  items = [],
+  onLocalChange,
 }: DetailsOptionsProps) {
-  // ✅ Hooks for different sections
-  const {
-    details,
-    editingItem,
-    initialData,
-    setEditingItem,
-    setInitialData,
-    handleSave,
-    handleEdit,
-    handleDelete,
-  } = useDayDescription({ organizationId, tripPublicId, dayDetailId });
+  // -------------- Local modal controls --------------
+  const [modalType, setModalType] = useState<
+    "event" | "transit" | "stay" | "meal" | "activity" | null
+  >(null);
 
-  const {
-    transits,
-    editingTransit,
-    initialTransitData,
-    setEditingTransit,
-    setInitialTransitData,
-    handleTransitSave,
-    handleTransitEdit,
-    handleTransitDelete,
-  } = useTransit({ organizationId, tripPublicId, dayDetailId });
+  const [initialData, setInitialData] = useState<any>(null);
 
-  const {
-    stays,
-    editingStay,
-    initialStayData,
-    setEditingStay,
-    setInitialStayData,
-    handleStaySave,
-    handleStayEdit,
-    handleStayDelete,
-  } = useStay({ organizationId, tripPublicId, dayDetailId });
+  // ---------------- Hooks (API only) ----------------
+  const dayDesc = useDayDescription({ organizationId, tripPublicId, dayDetailId });
+  const transit = useTransit({ organizationId, tripPublicId, dayDetailId });
+  const stay = useStay({ organizationId, tripPublicId, dayDetailId });
+  const meal = useMeal({ organizationId, tripPublicId, dayDetailId });
+  const activity = useActivity({ organizationId, tripPublicId, dayDetailId });
 
-  // ✅ Meal hook
-const {
-  meals,
-  editingMeal,
-  initialMealData,
-  setEditingMeal,
-  setInitialMealData,
-  handleMealSave,
-  handleMealEdit,
-  handleMealDelete,
-} = useMeal({ organizationId, tripPublicId, dayDetailId });
+  // ---------------- Create / Update ----------------
+  const handleSave = async (formData: any) => {
+    let apiResult = null;
 
-// ✅ Activity hook
-const {
-  activities,
-  editingActivity,
-  initialActivityData,
-  setEditingActivity,
-  setInitialActivityData,
-  handleActivitySave,
-  handleActivityEdit,
-  handleActivityDelete,
-} = useActivity({ organizationId, tripPublicId, dayDetailId });
+    const isEdit = Boolean(initialData?.id || initialData?.tripItemId);
+
+    try {
+      switch (modalType) {
+        case "event":
+          apiResult = await dayDesc.handleSave(formData);
+          break;
+
+        case "transit":
+          apiResult = await transit.handleTransitSave(formData);
+          break;
+
+        case "stay":
+          apiResult = await stay.handleStaySave(formData);
+          break;
+
+        case "meal":
+          apiResult = await meal.handleMealSave(formData);
+          break;
+
+        case "activity":
+          apiResult = await activity.handleActivitySave(formData);
+          break;
+      }
 
 
+      onLocalChange(isEdit ? "update" : "create", apiResult);
+    } catch (err) {
+      console.error("❌ Save failed:", err);
+    }
 
-  // ✅ Local modal states
-  const [showDayDescription, setShowDayDescription] = useState(false);
-  const [showTransit, setShowTransit] = useState(false);
-  const [showStay, setShowStay] = useState(false);
-  const [showMeal, setShowMeal] = useState(false);
-  const [showActivity, setShowActivity] = useState(false);
+    setModalType(null);
+    setInitialData(null);
+  };
 
-  // ✅ Icon helper
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "event":
-        return <Calendar size={22} className="text-orange-500" />;
-      case "transit":
-        return <Car size={22} className="text-blue-500" />;
-      case "stay":
-        return <Home size={22} className="text-green-500" />;
-      case "meal":
-        return <Utensils size={22} className="text-rose-500" />;
-      case "activity":
-        return <Activity size={22} className="text-yellow-500" />;
-      default:
-        return <ImageIcon size={22} />;
+  // ---------------- Delete ----------------
+  const handleDelete = async (item: any) => {
+    try {
+      switch (item.tripType) {
+        case "DAY_DESCRIPTION":
+          await dayDesc.handleDelete(item.id);
+          break;
+
+        case "TRANSIT":
+          await transit.handleTransitDelete(item.id);
+          break;
+
+        case "STAY":
+          await stay.handleStayDelete(item.id);
+          break;
+
+        case "MEAL":
+          await meal.handleMealDelete(item.id);
+          break;
+
+        case "ACTIVITY":
+          await activity.handleActivityDelete(item.id);
+          break;
+      }
+
+
+      onLocalChange("delete", item);
+    } catch (err) {
+      console.error("❌ Delete failed:", err);
     }
   };
 
-  // ✅ Config-driven sections (Dynamic setup)
-  const sections = [
-    {
-      key: "event",
-      label: "Day Description",
-      color: "orange",
-      icon: <Calendar size={16} />,
-      items: details,
-      setShow: setShowDayDescription,
-      show: showDayDescription,
-      editHandler: handleEdit,
-      deleteHandler: handleDelete,
-      form: AddDayDescriptionForm,
-      editing: editingItem,
-      initial: initialData,
-      resetEditing: () => {
-        setEditingItem(null);
-        setInitialData(null);
-      },
-      onSave: handleSave,
-    },
-    {
-      key: "transit",
-      label: "Transit",
-      color: "blue",
-      icon: <Car size={16} />,
-      items: transits,
-      setShow: setShowTransit,
-      show: showTransit,
-      editHandler: handleTransitEdit,
-      deleteHandler: handleTransitDelete,
-      form: AddTransitForm,
-      editing: editingTransit,
-      initial: initialTransitData,
-      resetEditing: () => {
-        setEditingTransit(null);
-        setInitialTransitData(null);
-      },
-      onSave: handleTransitSave,
-    },
-    {
-    key: "stay",
-      label: "Stay",
-      color: "green",
-      icon: <Home size={16} />,
-      items: stays,
-      setShow: setShowStay,
-      show: showStay,
-      editHandler: handleStayEdit,
-      deleteHandler: handleStayDelete,
-      form: AddStayForm,
-      editing: editingStay,
-      initial: initialStayData,
-      resetEditing: () => {
-        setEditingStay(null);
-        setInitialStayData(null);
-      },
-      onSave: handleStaySave,
-    },
-    {
-  key: "meal",
-  label: "Meal",
-  color: "rose",
-  icon: <Utensils size={16} />,
-  items: meals,
-  setShow: setShowMeal,
-  show: showMeal,
-  editHandler: handleMealEdit,
-  deleteHandler: handleMealDelete,
-  form: AddMealForm,
-  editing: editingMeal,
-  initial: initialMealData,
-  resetEditing: () => {
-    setEditingMeal(null);
-    setInitialMealData(null);
-  },
-  onSave: handleMealSave,
-},
- {
-  key: "activity",
-  label: "Activity",
-  color: "yellow",
-  icon: <Activity size={16} />,
-  items: activities,
-  setShow: setShowActivity,
-  show: showActivity,
-  editHandler: handleActivityEdit,
-  deleteHandler: handleActivityDelete,
-  form: AddActivityForm,
-  editing: editingActivity,
-  initial: initialActivityData,
-  resetEditing: () => {
-    setEditingActivity(null);
-    setInitialActivityData(null);
-  },
-  onSave: handleActivitySave,
-},
+  // ---------------- Edit ----------------
+  const handleEditClick = async (item: any) => {
+    setInitialData(item);
 
-  ];
+    switch (item.tripType) {
+      case "DAY_DESCRIPTION":
+        dayDesc.handleEdit(item);
+        setInitialData(dayDesc.initialData);
+        setModalType("event");
+        break;
 
+      case "TRANSIT":
+        await transit.handleTransitEdit(item); // async
+        setInitialData(transit.initialTransitData);
+        setModalType("transit");
+        break;
+
+      case "STAY":
+        stay.handleStayEdit(item);
+        setInitialData(stay.initialStayData);
+        setModalType("stay");
+        break;
+
+      case "MEAL":
+        meal.handleMealEdit(item);
+        setInitialData(meal.initialMealData);
+        setModalType("meal");
+        break;
+
+      case "ACTIVITY":
+        activity.handleActivityEdit(item);
+        setInitialData(activity.initialActivityData);
+        setModalType("activity");
+        break;
+    }
+
+  };
+
+  // ---------------- UI Render ----------------
   return (
     <div className="flex flex-col gap-6 mt-4">
-      {/* ---------- Buttons ---------- */}
+      {/* Buttons */}
       <div className="flex w-full gap-4">
-        {sections.map((section) => (
-          <Button
-            key={section.key}
-            onClick={() => section.setShow(true)}
-            disabled={section.items.length > 0} // disable if already added
-            className={`flex-1 border-2 rounded-xl px-6 h-auto flex flex-col items-center justify-center shadow bg-gradient-to-r from-${section.color}-50 to-white text-black font-medium ${
-              section.items.length > 0
-                ? "opacity-60 cursor-not-allowed border-green-500"
-                : ""
-            }`}
-          >
-            {section.icon}
-            <span className="text-xs mt-1">{section.label}</span>
-          </Button>
-        ))}
+        <Button className="flex-1" onClick={() => setModalType("event")}>
+          Day Description
+        </Button>
+
+        <Button className="flex-1" onClick={() => setModalType("transit")}>
+          Transit
+        </Button>
+
+        <Button className="flex-1" onClick={() => setModalType("stay")}>
+          Stay
+        </Button>
+
+        <Button className="flex-1" onClick={() => setModalType("meal")}>
+          Meal
+        </Button>
+
+        <Button className="flex-1" onClick={() => setModalType("activity")}>
+          Activity
+        </Button>
       </div>
 
-      {/* ---------- Dynamic Lists (Only show if data exists) ---------- */}
-{sections
-  .filter((section) => section.items.length > 0) // 👈 Only sections with data
-  .map((section) => (
-    <div key={section.key} className="mt-6 space-y-3">
-      <h3 className="font-semibold text-gray-800 text-base border-b pb-1">
-        {section.label}
-      </h3>
+      {/* List items */}
+      {items.length === 0 ? (
+        <p className="text-sm text-gray-500 italic">No items added yet.</p>
+      ) : (
+        items.map((item) => (
+          <div
+            key={item.id || item.tripItemId || `${item.tripType}`}
+            className="bg-white border rounded-xl p-4 shadow-sm flex justify-between mb-3"
+          >
+            <div>
+              <p className="font-medium">{item.title || item.name}</p>
+              <p className="text-sm text-gray-600">{item.description}</p>
+            </div>
 
-      {section.items.map((item: any) => (
-  <div
-    key={item.id || item.tripItemId}
-    className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition"
-  >
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="font-medium text-gray-800">
-          {item.title || item.name || item.from || "Untitled"}
-        </p>
-        <p className="text-sm text-gray-600 mt-1">
-          {item.description || item.location || ""}
-        </p>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => handleEditClick(item)}>
+                <Pencil size={14} />
+              </Button>
 
-        {item.time || item.checkInTime || item.checkOutTime ? (
-          <p className="text-xs text-gray-500 mt-1">
-            {item.time ||
-              `${item.checkInTime || ""} - ${item.checkOutTime || ""}`}
-          </p>
-        ) : null}
-
-        {item.documents?.length > 0 && (
-          <div className="flex gap-2 mt-3 flex-wrap">
-            {item.documents.map(
-              (doc: string | File | { url?: string }, idx: number) => {
-                const src =
-                  typeof doc === "string"
-                    ? doc
-                    : doc instanceof File
-                    ? URL.createObjectURL(doc)
-                    : doc?.url || "";
-                return (
-                  <img
-                    key={idx}
-                    src={src}
-                    alt={`doc-${idx}`}
-                    className="w-20 h-20 object-cover rounded-lg border"
-                  />
-                );
-              }
-            )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-red-500"
+                onClick={() => handleDelete(item)}
+              >
+                <Trash2 size={14} />
+              </Button>
+            </div>
           </div>
-        )}
-      </div>
+        ))
+      )}
 
-      <div className="flex gap-2">
-        {section.editHandler && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="rounded-full hover:bg-gray-100"
-            onClick={() => {
-              section.editHandler(item);
-              section.setShow(true);
-            }}
-          >
-            <Pencil size={14} className="text-gray-600" />
-          </Button>
-        )}
-        {section.deleteHandler && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="rounded-full text-red-500 hover:bg-red-100"
-            onClick={() =>
-              section.deleteHandler(item.id || item.tripItemId)
-            }
-          >
-            <Trash2 size={14} />
-          </Button>
-        )}
-      </div>
-    </div>
-  </div>
-))}
+      {/* --------- MODALS --------- */}
 
-    </div>
-  ))}
+      {modalType === "event" && (
+        <ModalWrapper onClose={() => setModalType(null)}>
+          <AddDayDescriptionForm
+            header={initialData ? "Edit Day Description" : "Add Day Description"}
+            initialData={initialData}
+            onCancel={() => setModalType(null)}
+            onSave={handleSave}
+          />
+        </ModalWrapper>
+      )}
 
+      {modalType === "transit" && (
+        <ModalWrapper onClose={() => setModalType(null)}>
+          <AddTransitForm
+            header={initialData ? "Edit Transit" : "Add Transit"}
+            initialData={initialData}
+            onCancel={() => setModalType(null)}
+            onSave={handleSave}
+          />
+        </ModalWrapper>
+      )}
 
-      {/* ---------- Dynamic Modals ---------- */}
-      {sections.map((section) => {
-        if (!section.show) return null;
-        const Form = section.form;
+      {modalType === "stay" && (
+        <ModalWrapper onClose={() => setModalType(null)}>
+          <AddStayForm
+            header={initialData ? "Edit Stay" : "Add Stay"}
+            initialData={initialData}
+            onCancel={() => setModalType(null)}
+            onSave={handleSave}
+          />
+        </ModalWrapper>
+      )}
 
-        return (
-          <ModalWrapper key={section.key} onClose={() => section.setShow(false)}>
-            <Form
-              header={
-                section.editing
-                  ? `Edit ${section.label}`
-                  : `Add ${section.label}`
-              }
-              initialData={section.initial || undefined}
-              onCancel={() => {
-                section.setShow(false);
-                section.resetEditing?.();
-              }}
-              onSave={async (data: any) => {
-                await section.onSave(data);
-                section.setShow(false);
-              }}
-            />
-          </ModalWrapper>
-        );
-      })}
+      {modalType === "meal" && (
+        <ModalWrapper onClose={() => setModalType(null)}>
+          <AddMealForm
+            header={initialData ? "Edit Meal" : "Add Meal"}
+            initialData={initialData}
+            onCancel={() => setModalType(null)}
+            onSave={handleSave}
+          />
+        </ModalWrapper>
+      )}
+
+      {modalType === "activity" && (
+        <ModalWrapper onClose={() => setModalType(null)}>
+          <AddActivityForm
+            header={initialData ? "Edit Activity" : "Add Activity"}
+            initialData={initialData}
+            onCancel={() => setModalType(null)}
+            onSave={handleSave}
+          />
+        </ModalWrapper>
+      )}
     </div>
   );
 }

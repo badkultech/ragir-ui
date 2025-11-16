@@ -1,108 +1,62 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  useLazyGetAllTripStaysQuery,
   useCreateTripStayMutation,
   useUpdateTripStayMutation,
   useDeleteTripStayMutation,
 } from "@/lib/services/organizer/trip/itinerary/day-details/stay";
-import { StayItem } from "@/lib/services/organizer/trip/itinerary/day-details/stay/types";
 import { mapStayToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
-interface UseStayProps {
-  organizationId: string;
-  tripPublicId: string;
-  dayDetailId: string;
-}
-
-export function useStay({ organizationId, tripPublicId, dayDetailId }: UseStayProps) {
-  const [stays, setStays] = useState<StayItem[]>([]);
-  const [editingStay, setEditingStay] = useState<StayItem | null>(null);
+export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
+  const [editingStay, setEditingStay] = useState<any>(null);
   const [initialStayData, setInitialStayData] = useState<any>(null);
 
-  const [getAllStays] = useLazyGetAllTripStaysQuery();
   const [createStay] = useCreateTripStayMutation();
   const [updateStay] = useUpdateTripStayMutation();
   const [deleteStay] = useDeleteTripStayMutation();
 
-  // ✅ Fetch all stays
-  const fetchStays = async () => {
-    try {
-      const response = await getAllStays({
-        organizationId,
-        tripPublicId,
-        dayDetailId,
-      }).unwrap();
-
-      console.log("🚀 Raw stay response:", response);
-
-      // Handle both shapes (array or {data: []})
-      const staysData = Array.isArray(response)
-        ? response
-        : (response as any)?.data || [];
-
-      const mapped = staysData.map((item: any) => ({
-        id: item.tripItemId || item.id,
-        title: item.name || "Untitled",
-        location: item.location || "",
-        description: item.description || "",
-        checkInTime: item.checkInTime || "",
-        checkOutTime: item.checkOutTime || "",
-        packingSuggestion: item.packingSuggestion || "",
-        documents: item.documents || [],
-        type: item.tripType || "stay",
-      }));
-
-      setStays(mapped);
-    } catch (error) {
-      console.error("❌ Error fetching stays:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (dayDetailId) fetchStays();
-  }, [dayDetailId]);
-
-  // ✅ Save (Create / Update)
   const handleStaySave = async (data: any) => {
-    try {
-      const formData = mapStayToFormData(data);
+    const formData = mapStayToFormData(data);
 
+    try {
       if (editingStay) {
-        await updateStay({
+        const res = await updateStay({
           organizationId,
           tripPublicId,
           dayDetailId,
           itemId: String(editingStay.id),
           data: formData,
         }).unwrap();
-        console.log("✏️ Stay updated successfully");
+
+        setEditingStay(null);
+        setInitialStayData(null);
+
+        return (res as any)?.data ?? res ?? { ...data, id: editingStay.id };
       } else {
-        await createStay({
+        const res = await createStay({
           organizationId,
           tripPublicId,
           dayDetailId,
           data: formData,
         }).unwrap();
-        console.log("🆕 Stay created successfully");
-      }
 
-      await fetchStays();
-      setEditingStay(null);
-      setInitialStayData(null);
-    } catch (error) {
-      console.error("❌ Error saving stay:", error);
+        return (res as any)?.data ?? res ?? {
+          ...data,
+          id: Math.floor(Math.random() * 100000),
+        };
+      }
+    } catch (err) {
+      console.error("Stay save error:", err);
+      throw err;
     }
   };
 
-  // ✅ Edit (local only)
-  const handleStayEdit = (item: StayItem) => {
+  const handleStayEdit = (item: any) => {
     setEditingStay(item);
     setInitialStayData(item);
   };
 
-  // ✅ Delete
   const handleStayDelete = async (id: number) => {
     try {
       await deleteStay({
@@ -111,15 +65,15 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: UseStayPr
         dayDetailId,
         itemId: String(id),
       }).unwrap();
-      setStays((prev) => prev.filter((stay) => stay.id !== id));
-      console.log("🗑️ Stay deleted successfully");
-    } catch (error) {
-      console.error("❌ Error deleting stay:", error);
+
+      return { id };
+    } catch (err) {
+      console.error("Stay delete error:", err);
+      throw err;
     }
   };
 
   return {
-    stays,
     editingStay,
     initialStayData,
     setEditingStay,

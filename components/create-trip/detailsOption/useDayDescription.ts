@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   useCreateTripDayDescriptionMutation,
-  useLazyGetTripDayDescriptionsQuery,
-  useLazyGetTripDayDescriptionByIdQuery,
   useUpdateTripDayDescriptionMutation,
   useDeleteTripDayDescriptionMutation,
 } from "@/lib/services/organizer/trip/itinerary/day-details/day-description";
@@ -24,143 +22,74 @@ export function useDayDescription({
   const [editingItem, setEditingItem] = useState<any | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
 
-  // ✅ API hooks
   const [createTripDayDescription] = useCreateTripDayDescriptionMutation();
-  const [getTripDayDescriptions] = useLazyGetTripDayDescriptionsQuery();
-  const [getTripDayDescriptionById] = useLazyGetTripDayDescriptionByIdQuery();
   const [updateTripDayDescription] = useUpdateTripDayDescriptionMutation();
   const [deleteTripDayDescription] = useDeleteTripDayDescriptionMutation();
   const [createLibraryDayDescription] = useCreateDayDescriptionMutation();
 
-  // ✅ Fetch All Day Descriptions
-  const fetchDayDescriptions = async () => {
-    try {
-      const response = await getTripDayDescriptions({
-        organizationId,
-        tripPublicId,
-        dayDetailId,
-      }).unwrap();
-
-      const list = Array.isArray(response?.data)
-        ? response.data
-        : Array.isArray(response)
-        ? response
-        : [];
-
-      const mapped = list.map((item) => ({
-        id: item.tripItemId ?? Date.now(),
-        type: "event",
-        title: item.name ?? "Untitled",
-        description: item.description ?? "",
-        location: item.location ?? "",
-        time:
-          typeof item.time === "string"
-            ? item.time
-            : item.time
-            ? `${String(item.time.hour ?? "00").padStart(2, "0")}:${String(
-                item.time.minute ?? "00"
-              ).padStart(2, "0")}`
-            : "",
-        packingSuggestion: item.packingSuggestion ?? "",
-        documents: item.documents || [],
-      }));
-
-      setDetails(mapped.length > 0 ? [mapped[mapped.length - 1]] : []);
-    } catch (err) {
-      console.error("❌ Error fetching day descriptions:", err);
-    }
-  };
-
-  useEffect(() => {
-    if (dayDetailId) fetchDayDescriptions();
-  }, [dayDetailId]);
-
-  // ✅ Save / Update
+  // returns created/updated item so parent can insert into local state
   const handleSave = async (data: any) => {
-    if (!data.title?.trim() || !data.description?.trim()) return;
-
-    const tripFormData = mapDayDescriptionToFormData(data, data.documents);
+    if (!data) return null;
+    const form = mapDayDescriptionToFormData(data, data.documents);
 
     try {
       if (editingItem) {
-        await updateTripDayDescription({
+        const res = await updateTripDayDescription({
           organizationId,
           tripPublicId,
           dayDetailId,
           itemId: String(editingItem.id),
-          data: tripFormData,
+          data: form,
         }).unwrap();
-        console.log("✏️ Updated Day Description:", editingItem.id);
+        // assume API returns updated item in res.data or res
+        const updated = (res as any)?.data ?? res ?? { ...data, id: editingItem.id };
+        setEditingItem(null);
+        setInitialData(null);
+        return updated;
       } else {
-        await createTripDayDescription({
+        const res = await createTripDayDescription({
           organizationId,
           tripPublicId,
           dayDetailId,
-          data: tripFormData,
+          data: form,
         }).unwrap();
-        console.log("🆕 Created Day Description");
-      }
-
-      if (data.saveInLibrary) {
-        try {
-          const libForm = mapDayDescriptionToFormData(data, data.documents);
-          await createLibraryDayDescription({ organizationId, data: libForm });
-          console.log("📚 Saved in Library");
-        } catch (err) {
-          console.warn("⚠️ Failed to save in Library:", err);
+        const created = (res as any)?.data ?? res ?? { ...data, id: (res as any)?.id ?? Math.floor(Math.random() * 1000000) };
+        // optionally save to library
+        if (data.saveInLibrary) {
+          try {
+            const libForm = mapDayDescriptionToFormData(data, data.documents);
+            await createLibraryDayDescription({ organizationId, data: libForm });
+          } catch (err) {
+            console.warn("Failed saving to library", err);
+          }
         }
+        return created;
       }
-
-      await fetchDayDescriptions();
-    } catch (error) {
-      console.error("❌ Error saving Day Description:", error);
-    } finally {
-      setEditingItem(null);
-      setInitialData(null);
+    } catch (err) {
+      console.error("Error saving day description", err);
+      throw err;
     }
   };
 
-  // ✅ Edit Handler
   const handleEdit = async (item: any) => {
-    try {
-      const res = await getTripDayDescriptionById({
-        organizationId,
-        tripPublicId,
-        dayDetailId,
-        itemId: String(item.id),
-      }).unwrap();
-
-      const data = res?.data ?? res;
-      setEditingItem(item);
-      setInitialData({
-        title: data?.name || "",
-        description: data?.description || "",
-        location: data?.location || "",
-        time:
-          typeof data?.time === "string"
-            ? data.time
-            : `${data?.time?.hour ?? "00"}:${data?.time?.minute ?? "00"}`,
-        packingSuggestion: data?.packingSuggestion || "",
-        documents: data?.documents || [],
-      });
-    } catch (err) {
-      console.error("❌ Error fetching single Day Description:", err);
-    }
+    // if you want to fetch single by id you can, but not required — parent already has item details
+    setEditingItem(item);
+    setInitialData(item);
+    return item;
   };
 
-  // ✅ Delete Handler
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (itemId: number | string) => {
     try {
-      await deleteTripDayDescription({
+      const res = await deleteTripDayDescription({
         organizationId,
         tripPublicId,
         dayDetailId,
-        itemId: String(id),
+        itemId: String(itemId),
       }).unwrap();
-
-      await fetchDayDescriptions();
+      return res;
     } catch (err) {
-      console.error("❌ Error deleting Day Description:", err);
+      console.error("Error deleting", err);
+      throw err;
     }
   };
 
@@ -170,7 +99,6 @@ export function useDayDescription({
     initialData,
     setEditingItem,
     setInitialData,
-    fetchDayDescriptions,
     handleSave,
     handleEdit,
     handleDelete,
