@@ -46,8 +46,6 @@ export function DetailsOptions({
   >(null);
 
   const [initialData, setInitialData] = useState<any>(null);
-
-  // ---------------- Hooks (API only) ----------------
   const dayDesc = useDayDescription({ organizationId, tripPublicId, dayDetailId });
   const transit = useTransit({ organizationId, tripPublicId, dayDetailId });
   const stay = useStay({ organizationId, tripPublicId, dayDetailId });
@@ -62,26 +60,42 @@ export function DetailsOptions({
 
     try {
       switch (modalType) {
-        case "event":
-          apiResult = await dayDesc.handleSave(formData);
-          break;
+  case "event":
+    apiResult = await dayDesc.handleSave({
+      ...formData,
+      id: initialData?.id,  // ***IMPORTANT***
+    });
+    break;
 
-        case "transit":
-          apiResult = await transit.handleTransitSave(formData);
-          break;
+  case "transit":
+    apiResult = await transit.handleTransitSave({
+      ...formData,
+      id: initialData?.id,
+    });
+    break;
 
-        case "stay":
-          apiResult = await stay.handleStaySave(formData);
-          break;
+  case "stay":
+    apiResult = await stay.handleStaySave({
+      ...formData,
+      id: initialData?.id,
+    });
+    break;
 
-        case "meal":
-          apiResult = await meal.handleMealSave(formData);
-          break;
+  case "meal":
+    apiResult = await meal.handleMealSave({
+      ...formData,
+      id: initialData?.id,
+    });
+    break;
 
-        case "activity":
-          apiResult = await activity.handleActivitySave(formData);
-          break;
-      }
+  case "activity":
+    apiResult = await activity.handleActivitySave({
+      ...formData,
+      id: initialData?.id,
+    });
+    break;
+}
+
 
 
       onLocalChange(isEdit ? "update" : "create", apiResult);
@@ -94,132 +108,247 @@ export function DetailsOptions({
   };
 
   // ---------------- Delete ----------------
-  const handleDelete = async (item: any) => {
-    try {
-      switch (item.tripType) {
-        case "DAY_DESCRIPTION":
-          await dayDesc.handleDelete(item.id);
-          break;
+const handleDelete = async (item: any) => {
+  const itemId = item.id || item.tripItemId;
 
-        case "TRANSIT":
-          await transit.handleTransitDelete(item.id);
-          break;
+  if (!itemId) {
+    console.error("❌ No valid item id found for deletion");
+    return;
+  }
 
-        case "STAY":
-          await stay.handleStayDelete(item.id);
-          break;
-
-        case "MEAL":
-          await meal.handleMealDelete(item.id);
-          break;
-
-        case "ACTIVITY":
-          await activity.handleActivityDelete(item.id);
-          break;
-      }
-
-
-      onLocalChange("delete", item);
-    } catch (err) {
-      console.error("❌ Delete failed:", err);
-    }
-  };
-
-  // ---------------- Edit ----------------
-  const handleEditClick = async (item: any) => {
-    setInitialData(item);
-
+  try {
     switch (item.tripType) {
       case "DAY_DESCRIPTION":
-        dayDesc.handleEdit(item);
-        setInitialData(dayDesc.initialData);
-        setModalType("event");
+        await dayDesc.handleDelete(itemId);
         break;
-
       case "TRANSIT":
-        await transit.handleTransitEdit(item); // async
-        setInitialData(transit.initialTransitData);
-        setModalType("transit");
+        await transit.handleTransitDelete(itemId);
         break;
-
       case "STAY":
-        stay.handleStayEdit(item);
-        setInitialData(stay.initialStayData);
-        setModalType("stay");
+        await stay.handleStayDelete(itemId);
         break;
-
       case "MEAL":
-        meal.handleMealEdit(item);
-        setInitialData(meal.initialMealData);
-        setModalType("meal");
+        await meal.handleMealDelete(itemId);
         break;
-
       case "ACTIVITY":
-        activity.handleActivityEdit(item);
-        setInitialData(activity.initialActivityData);
-        setModalType("activity");
+        await activity.handleActivityDelete(itemId);
         break;
     }
 
-  };
+    onLocalChange("delete", { id: itemId }); // ONLY send id
+  } catch (err) {
+    console.error("❌ Delete failed:", err);
+  }
+};
+  // ---------------- Edit ----------------
+const handleEditClick = async (item: any) => {
+  const itemId = item.id || item.tripItemId;
 
-  // ---------------- UI Render ----------------
+  setInitialData(null); // clear first
+
+  switch (item.tripType) {
+    case "DAY_DESCRIPTION":
+      dayDesc.handleEdit(item);
+      setInitialData(dayDesc.initialData);
+      setModalType("event");
+      break;
+
+    case "TRANSIT":
+      await transit.handleTransitEdit(itemId);
+      setInitialData(transit.initialTransitData);
+      setModalType("transit");
+      break;
+
+    case "STAY":
+      stay.handleStayEdit(item);
+      setInitialData(stay.initialStayData);
+      setModalType("stay");
+      break;
+
+    case "MEAL":
+      meal.handleMealEdit(item);
+      setInitialData(meal.initialMealData);
+      setModalType("meal");
+      break;
+
+    case "ACTIVITY":
+      activity.handleActivityEdit(item);
+      setInitialData(activity.initialActivityData);
+      setModalType("activity");
+      break;
+  }
+};
   return (
     <div className="flex flex-col gap-6 mt-4">
-      {/* Buttons */}
-      <div className="flex w-full gap-4">
-        <Button className="flex-1" onClick={() => setModalType("event")}>
-          Day Description
-        </Button>
+<div className="flex w-full gap-4">
 
-        <Button className="flex-1" onClick={() => setModalType("transit")}>
-          Transit
-        </Button>
+  {[
+    { type: "event", label: "Day Description", icon: <Calendar size={22} />, single: true },
+    { type: "transit", label: "Transit", icon: <Car size={22} />, single: false },
+    { type: "stay", label: "Stay", icon: <Home size={22} />, single: false },
+    { type: "meal", label: "Meal", icon: <Utensils size={22} />, single: false },
+    { type: "activity", label: "Activity", icon: <Activity size={22} />, single: false },
+  ].map((btn) => {
+    const isActive = modalType === btn.type;
 
-        <Button className="flex-1" onClick={() => setModalType("stay")}>
-          Stay
-        </Button>
+    const hasDayDescription = items.some(
+      (i) => i.tripType === "DAY_DESCRIPTION"
+    );
 
-        <Button className="flex-1" onClick={() => setModalType("meal")}>
-          Meal
-        </Button>
+    const disabled =
+      btn.type === "event" && hasDayDescription ? true : false;
 
-        <Button className="flex-1" onClick={() => setModalType("activity")}>
-          Activity
-        </Button>
-      </div>
+    const colorMap: any = {
+      event: "from-orange-100 to-orange-50 border-orange-400",
+      transit: "from-blue-100 to-blue-50 border-blue-400",
+      stay: "from-green-100 to-green-50 border-green-400",
+      meal: "from-rose-100 to-rose-50 border-rose-400",
+      activity: "from-yellow-100 to-yellow-50 border-yellow-400",
+    };
+
+    return (
+      <button
+        key={btn.type}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) {
+            setModalType(btn.type as any);
+            setInitialData(null);
+          }
+        }}
+        className={`
+          flex flex-col items-center justify-center gap-2
+          flex-1 h-26 rounded-2xl shadow-md border
+          bg-gradient-to-b
+          transition-all duration-200
+          ${
+            disabled
+              ? "opacity-50 cursor-not-allowed bg-gray-100 border-gray-300"
+              : isActive
+              ? colorMap[btn.type] + " scale-[1.03]"
+              : "bg-white border-gray-200"
+          }
+        `}
+      >
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+          {btn.icon}
+        </div>
+
+        <span className="text-[13px] font-medium text-gray-700">
+          {btn.label}
+        </span>
+      </button>
+    );
+  })}
+</div>
+
 
       {/* List items */}
-      {items.length === 0 ? (
-        <p className="text-sm text-gray-500 italic">No items added yet.</p>
-      ) : (
-        items.map((item) => (
-          <div
-            key={item.id || item.tripItemId || `${item.tripType}`}
-            className="bg-white border rounded-xl p-4 shadow-sm flex justify-between mb-3"
-          >
-            <div>
-              <p className="font-medium">{item.title || item.name}</p>
-              <p className="text-sm text-gray-600">{item.description}</p>
+{items.length === 0 ? (
+  <p className="text-sm text-gray-500 italic">No items added yet.</p>
+) : (
+  <div className="space-y-5 w-full">
+
+    {items.map((item, index) => {
+      const colorMap: any = {
+        DAY_DESCRIPTION: "border-orange-400 bg-orange-50",
+        TRANSIT: "border-blue-400 bg-blue-50",
+        STAY: "border-green-400 bg-green-50",
+        MEAL: "border-rose-400 bg-rose-50",
+        ACTIVITY: "border-yellow-400 bg-yellow-50",
+      };
+
+      const iconMap: any = {
+        DAY_DESCRIPTION: <Calendar className="text-orange-500" size={20} />,
+        TRANSIT: <Car className="text-blue-500" size={20} />,
+        STAY: <Home className="text-green-500" size={20} />,
+        MEAL: <Utensils className="text-rose-500" size={20} />,
+        ACTIVITY: <Activity className="text-yellow-500" size={20} />,
+      };
+
+      const colorClass = colorMap[item.tripType] || "border-gray-300 bg-gray-50";
+
+      return (
+        <div
+          key={item.id || item.tripItemId || index}
+          className={`rounded-xl border-l-4 ${colorClass} p-5 shadow-sm`}
+        >
+          {/* TOP ROW */}
+          <div className="flex justify-between items-start">
+            <div className="flex gap-3">
+              {/* Icon Box */}
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow border">
+                {iconMap[item.tripType]}
+              </div>
+
+              {/* Title & Subtitle */}
+              <div>
+                <p className="font-semibold text-gray-800 text-[15px]">
+                  {item.name || item.title || "Untitled"}
+                </p>
+
+                {(item.location || item.from || item.to) && (
+                  <p className="text-gray-600 text-sm">
+                    {item.location ||
+                      `${item.from || ""} ${item.to ? "to " + item.to : ""}`}
+                  </p>
+                )}
+
+                {/* Time */}
+                {item.time || item.startTime || item.endTime ? (
+                  <p className="text-gray-500 text-xs mt-1">
+                    {item.time ||
+                      `${item.startTime || ""}${
+                        item.endTime ? " - " + item.endTime : ""
+                      }`}
+                  </p>
+                ) : null}
+              </div>
             </div>
 
+            {/* EDIT + DELETE */}
             <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={() => handleEditClick(item)}>
-                <Pencil size={14} />
-              </Button>
+              <button
+                className="p-2 rounded-full hover:bg-gray-200 transition"
+                onClick={() => handleEditClick(item)}
+              >
+                <Pencil size={14} className="text-gray-700" />
+              </button>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-red-500"
+              <button
+                className="p-2 rounded-full hover:bg-red-100 transition text-red-500"
                 onClick={() => handleDelete(item)}
               >
                 <Trash2 size={14} />
-              </Button>
+              </button>
             </div>
           </div>
-        ))
-      )}
+
+          {/* IMAGES ROW */}
+          {item.documents?.length > 0 && (
+            <div className="flex gap-3 mt-3 flex-wrap">
+              {item.documents.map((doc: any, idx: number) => {
+                const src =
+                  typeof doc === "string"
+                    ? doc
+                    : doc?.url ||
+                      (doc instanceof File ? URL.createObjectURL(doc) : "");
+
+                return (
+                  <img
+                    key={idx}
+                    src={src}
+                    className="w-20 h-20 object-cover rounded-lg border"
+                  />
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+)}
 
       {/* --------- MODALS --------- */}
 

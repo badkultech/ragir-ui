@@ -22,34 +22,39 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
 
   const [createLibraryTransit] = useCreateOrganizerTransitMutation();
 
-  const handleTransitEdit = async (item: any) => {
-    try {
-      const res = await getTransitById({
-        organizationId,
-        tripPublicId,
-        dayDetailId,
-        itemId: String(item.id),
-      }).unwrap();
+ const handleTransitEdit = async (itemId: string | number) => {
+  try {
+    const res = await getTransitById({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      itemId: String(itemId),
+    }).unwrap();
 
-      const data = (res as any)?.data ?? res;
+    const data = (res as any)?.data ?? res;
 
-      setEditingTransit(item);
-      setInitialTransitData({
-        name: data.name || "",
-        fromLocation: data.fromLocation,
-        toLocation: data.toLocation,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        vehicleType: data.vehicleType,
-        arrangedBy: data.arrangedBy,
-        description: data.description,
-        packingSuggestion: data.packingSuggestion,
-        documents: data.documents || [],
-      });
-    } catch (err) {
-      console.error("Transit edit error:", err);
-    }
-  };
+    setEditingTransit({ id: itemId });
+
+    setInitialTransitData({
+      id: itemId,          // <-- MOST IMPORTANT
+      name: data.name || "",
+      fromLocation: data.fromLocation,
+      toLocation: data.toLocation,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      vehicleTypes: data.vehicleTypes,
+      customVehicleType: data.customVehicleType,
+      arrangedBy: data.arrangedBy,
+      description: data.description,
+      packingSuggestion: data.packingSuggestion,
+      documents: data.documents || [],
+    });
+
+  } catch (err) {
+    console.error("Transit edit error:", err);
+  }
+};
+
 
   const handleTransitSave = async (data: any) => {
     try {

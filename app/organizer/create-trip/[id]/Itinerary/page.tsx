@@ -23,9 +23,7 @@ import { useLazyGetItineraryDayDetailsQuery,
   useUpdateItineraryDayDetailMutation } from "@/lib/services/organizer/trip/itinerary/day-details";
 
 type Day = { day: number; date: string };
-
-// ---- shape coming from API for tripItems ----
-type TripItem = any; // keep flexible; you can tighten types later
+type TripItem = any;
 
 export default function ItineraryPage() {
   const searchParams = useSearchParams();
@@ -46,13 +44,9 @@ export default function ItineraryPage() {
   const [endDate, setEndDate] = useState(
     searchParams.get("endDate") || new Date().toISOString()
   );
-
-  // map of dayNumber -> dayDetailId
   const [dayDetailIds, setDayDetailIds] = useState<Record<number, string>>(
     {}
   );
-
-  // LOCAL store of items per day (so we don't re-fetch)
   const [dayItemsMap, setDayItemsMap] = useState<
     Record<number, TripItem[] | null>
   >({});
@@ -64,7 +58,6 @@ export default function ItineraryPage() {
   const [updateDayDetail] = useUpdateItineraryDayDetailMutation();
   const [updateItinerary] = useUpdateItineraryMutation();
 
-  // ---------- single initial fetch ----------
   useEffect(() => {
     const fetch = async () => {
       if (!organizationId || !tripId) return;
@@ -149,36 +142,41 @@ export default function ItineraryPage() {
     fetch();
   }, [organizationId, tripId]);
 
-  // ---------- callback to apply local changes after create/update/delete ----------
-  // op: 'create' | 'update' | 'delete'
   const applyLocalChange = useCallback(
-    (op: "create" | "update" | "delete", dayNumber: number, item: any) => {
-      setDayItemsMap((prev) => {
-        const copy = { ...(prev ?? {}) };
-        const list = Array.isArray(copy[dayNumber]) ? [...(copy[dayNumber] as any[])] : [];
-        if (op === "create") {
-          // push to beginning for visibility
-          list.unshift(item);
-          copy[dayNumber] = list;
-        } else if (op === "update") {
-          const idx = list.findIndex((x) => x.id === item.id || x.tripItemId === item.tripItemId);
-          if (idx >= 0) {
-            list[idx] = { ...list[idx], ...item };
-          } else {
-            // fallback: push if not found
-            list.unshift(item);
-          }
-          copy[dayNumber] = list;
-        } else if (op === "delete") {
-          copy[dayNumber] = list.filter((x) => !(x.id === item.id || x.tripItemId === item.tripItemId));
-        }
-        return copy;
-      });
-    },
-    []
-  );
+  (op: "create" | "update" | "delete", dayNumber: number, item: any) => {
+    setDayItemsMap((prev) => {
+      const copy = { ...(prev ?? {}) };
+      const list = Array.isArray(copy[dayNumber]) ? [...copy[dayNumber]] : [];
 
-  // ---------- Render ----------
+      if (op === "create") {
+        list.unshift(item);
+      }
+
+      if (op === "update") {
+        const idx = list.findIndex(
+          (x) => x.id === item.id || x.tripItemId === item.id
+        );
+        if (idx >= 0) {
+          list[idx] = { ...list[idx], ...item };
+        } else {
+          list.unshift(item);
+        }
+      }
+
+      if (op === "delete") {
+        copy[dayNumber] = list.filter(
+          (x) => x.id !== item.id && x.tripItemId !== item.id
+        );
+        return copy;
+      }
+
+      copy[dayNumber] = list;
+      return copy;
+    });
+  },
+  []
+);
+
   const handleAddDetailsClick = (idx: number) => {
     const copy = [...showDetails];
     copy[idx] = true;
@@ -188,13 +186,9 @@ export default function ItineraryPage() {
   const handlePrevClick = async () => {
     const orgId = localStorage.getItem("organizationId");
     if (tripId && orgId) {
-      // optional fetch before navigating back
-      // await triggerGetTrip({ organizationId: orgId, tripId: tripId as string });
     }
     router.push(`/organizer/create-trip/${tripId}`);
   };
-
-  // Update itinerary (same as your existing function)
   const formatTime = (date: Date) =>
     `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
 
@@ -208,7 +202,6 @@ export default function ItineraryPage() {
       fd.append("endDate", endDate.split("T")[0]);
       fd.append("startTime", formatTime(new Date(startDate)));
       fd.append("endTime", formatTime(new Date(endDate)));
-      // append itineraryPdf if needed...
       await updateItinerary({ organizationId, tripPublicId: tripId as string, data: fd as unknown as any }).unwrap();
       router.push(`/organizer/create-trip/${tripId}/exclusions`);
     } catch (err) {
