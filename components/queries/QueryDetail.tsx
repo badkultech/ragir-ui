@@ -137,7 +137,6 @@ const needsDivider = (current: string, previous?: string) => {
         </div>
 
         {/* Messages */}
-        {/* Messages */}
         <div className="h-[260px] overflow-y-auto pr-2 pb-4 border-t border-b border-gray-100">
           {isLoading ? (
             <p className="text-center text-sm mt-4 text-gray-400">Loading...</p>
@@ -217,7 +216,7 @@ const needsDivider = (current: string, previous?: string) => {
 
         {/* Response Box */}
         <div className="mt-6">
-          <QueryResponseForm onSend={handleSendResponse} />
+          <QueryResponseForm onSend={handleSendResponse} onCancel={onBack}/>
         </div>
       </div>
     </div>
