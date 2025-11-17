@@ -4,10 +4,10 @@ import { Trash2 } from "lucide-react";
 export default function QueryItem({ query, onView, onDelete }: any) {
   // a small helper to render status badge + age badge
   const StatusBadge = () => {
-    if (query.status === "OPEN") {
+    if (query.status ) {
       return (
         <div className="inline-flex items-center gap-2">
-          <span className="text-xs font-medium bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full">Open</span>
+          <span className="text-xs font-medium bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full">{query.status}</span>
           {query.age && (
             <span className="text-xs bg-red-50 text-red-700 px-3 py-1 rounded-full">{query.age}</span>
           )}

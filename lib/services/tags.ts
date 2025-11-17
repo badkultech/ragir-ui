@@ -24,4 +24,5 @@ export const TAGS = {
   tripLeads: 'tripLeads',
   tickets: "tickets",
   tripQueries :'tripQueries',
+  tripQueryComments: 'tripQueryComments',
 } as const;

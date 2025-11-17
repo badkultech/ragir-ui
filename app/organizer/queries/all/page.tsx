@@ -166,7 +166,7 @@ export default function AllQueriesPage() {
             <>
               {/* Breadcrumb */}
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                <Link href="/queries" className="hover:text-[#F97316] transition-colors">
+                <Link href="/organizer/queries/all" className="hover:text-[#F97316] transition-colors">
                   Queries
                 </Link>
                 <ChevronRight className="w-4 h-4" />

@@ -112,7 +112,7 @@ export default function QueriesPage() {
                   Trip Queries
                 </h2>
 
-                <Link href={`/organizer/queries/all?trip=${tripPublicId}`}>
+                <Link href={`/organizer/queries/all`}>
                   <Button className="bg-[#F97316] hover:bg-[#ea6d14] text-white px-6 rounded-lg">
                     View All Queries
                   </Button>
