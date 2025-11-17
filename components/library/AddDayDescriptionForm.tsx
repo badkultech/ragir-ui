@@ -62,7 +62,6 @@ export function AddDayDescriptionForm({
 
     if (!title.trim()) newErrors.title = "Title is required";
     if (!description.trim()) newErrors.description = "Description is required";
-    if (!location.trim()) newErrors.location = "Location is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -141,7 +140,7 @@ export function AddDayDescriptionForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Location *
+            Location
           </label>
           <Input
             value={location}
@@ -154,7 +153,7 @@ export function AddDayDescriptionForm({
         </div>
       </div>
       <div>
-        <label className="block text-[0.95rem] font-[] font-medium mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Time
         </label>
         <Input
