@@ -103,7 +103,7 @@ export function AddDayDescriptionForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-1">Title <span className="text-red-500">*</span></label>
         <div className="relative">
           <Input
             value={title}
@@ -124,7 +124,7 @@ export function AddDayDescriptionForm({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description *
+          Description <span className="text-red-500">*</span>
         </label>
         <RichTextEditor
           value={description}
