@@ -5,6 +5,7 @@ import {
   useCreateTripStayMutation,
   useUpdateTripStayMutation,
   useDeleteTripStayMutation,
+  useLazyGetTripStayByIdQuery,
 } from "@/lib/services/organizer/trip/itinerary/day-details/stay";
 import { mapStayToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
@@ -12,74 +13,88 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
   const [editingStay, setEditingStay] = useState<any>(null);
   const [initialStayData, setInitialStayData] = useState<any>(null);
 
+  const [getStayById] = useLazyGetTripStayByIdQuery();
   const [createStay] = useCreateTripStayMutation();
   const [updateStay] = useUpdateTripStayMutation();
   const [deleteStay] = useDeleteTripStayMutation();
 
-  const handleStaySave = async (data: any) => {
-    const formData = mapStayToFormData(data);
+  /* EDIT */
+const handleStayEdit = async (itemId: number) => {
+  const res = await getStayById({
+    organizationId,
+    tripPublicId,
+    dayDetailId,
+    itemId: String(itemId),
+  }).unwrap();
 
-    try {
-      if (editingStay) {
-        const res = await updateStay({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          itemId: String(editingStay.id),
-          data: formData,
-        }).unwrap();
+  const data = (res as any)?.data || res;
 
-        setEditingStay(null);
-        setInitialStayData(null);
+  const mapped = {
+    id: itemId,
 
-        return (res as any)?.data ?? res ?? { ...data, id: editingStay.id };
-      } else {
-        const res = await createStay({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          data: formData,
-        }).unwrap();
+    // CORRECT FIELDS FROM API
+    name: data.name || "",
+    location: data.location || "",
 
-        return (res as any)?.data ?? res ?? {
-          ...data,
-          id: Math.floor(Math.random() * 100000),
-        };
-      }
-    } catch (err) {
-      console.error("Stay save error:", err);
-      throw err;
-    }
+    checkInTime: data.checkInTime?.slice(0, 5) || "",
+    checkOutTime: data.checkOutTime?.slice(0, 5) || "",
+
+    description: data.description || "",
+    packingSuggestion: data.packingSuggestion || "",
+    sharingType: data.sharingType || "",
+
+    documents: data.documents || [],
   };
 
-  const handleStayEdit = (item: any) => {
-    setEditingStay(item);
-    setInitialStayData(item);
-  };
+  setEditingStay({ id: itemId });
+  setInitialStayData(mapped);
 
-  const handleStayDelete = async (id: number) => {
-    try {
-      await deleteStay({
+  return mapped;
+};
+
+
+  /* SAVE */
+  const handleStaySave = async (data: any, itemId?: number) => {
+    const form = mapStayToFormData(data);
+
+    if (itemId) {
+      const res = await updateStay({
         organizationId,
         tripPublicId,
         dayDetailId,
-        itemId: String(id),
+        itemId: String(itemId),
+        data: form,
       }).unwrap();
 
-      return { id };
-    } catch (err) {
-      console.error("Stay delete error:", err);
-      throw err;
+      return (res as any)?.data || res;
     }
+
+    const res = await createStay({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      data: form,
+    }).unwrap();
+
+    return (res as any)?.data || res;
+  };
+
+  const handleStayDelete = async (id: number) => {
+    await deleteStay({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      itemId: String(id),
+    }).unwrap();
+
+    return { id };
   };
 
   return {
     editingStay,
     initialStayData,
-    setEditingStay,
-    setInitialStayData,
-    handleStaySave,
     handleStayEdit,
+    handleStaySave,
     handleStayDelete,
   };
 }

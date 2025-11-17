@@ -16,11 +16,13 @@ import { selectAuthState } from "@/lib/slices/auth";
 
 import {
   useLazyGetItineraryByTripIdQuery,
- 
+
   useUpdateItineraryMutation,
 } from "@/lib/services/organizer/trip/itinerary";
-import { useLazyGetItineraryDayDetailsQuery,
-  useUpdateItineraryDayDetailMutation } from "@/lib/services/organizer/trip/itinerary/day-details";
+import {
+  useLazyGetItineraryDayDetailsQuery,
+  useUpdateItineraryDayDetailMutation
+} from "@/lib/services/organizer/trip/itinerary/day-details";
 
 type Day = { day: number; date: string };
 type TripItem = any;
@@ -143,39 +145,39 @@ export default function ItineraryPage() {
   }, [organizationId, tripId]);
 
   const applyLocalChange = useCallback(
-  (op: "create" | "update" | "delete", dayNumber: number, item: any) => {
-    setDayItemsMap((prev) => {
-      const copy = { ...(prev ?? {}) };
-      const list = Array.isArray(copy[dayNumber]) ? [...copy[dayNumber]] : [];
+    (op: "create" | "update" | "delete", dayNumber: number, item: any) => {
+      setDayItemsMap((prev) => {
+        const copy = { ...(prev ?? {}) };
+        const list = Array.isArray(copy[dayNumber]) ? [...copy[dayNumber]] : [];
 
-      if (op === "create") {
-        list.unshift(item);
-      }
-
-      if (op === "update") {
-        const idx = list.findIndex(
-          (x) => x.id === item.id || x.tripItemId === item.id
-        );
-        if (idx >= 0) {
-          list[idx] = { ...list[idx], ...item };
-        } else {
+        if (op === "create") {
           list.unshift(item);
         }
-      }
 
-      if (op === "delete") {
-        copy[dayNumber] = list.filter(
-          (x) => x.id !== item.id && x.tripItemId !== item.id
-        );
+        if (op === "update") {
+          const idx = list.findIndex(
+            (x) => x.id === item.id || x.tripItemId === item.id
+          );
+          if (idx >= 0) {
+            list[idx] = { ...list[idx], ...item };
+          } else {
+            list.unshift(item);
+          }
+        }
+
+        if (op === "delete") {
+          copy[dayNumber] = list.filter(
+            (x) => x.id !== item.id && x.tripItemId !== item.id
+          );
+          return copy;
+        }
+
+        copy[dayNumber] = list;
         return copy;
-      }
-
-      copy[dayNumber] = list;
-      return copy;
-    });
-  },
-  []
-);
+      });
+    },
+    []
+  );
 
   const handleAddDetailsClick = (idx: number) => {
     const copy = [...showDetails];
@@ -220,7 +222,7 @@ export default function ItineraryPage() {
           <div className="max-w-full mx-auto bg-white shadow rounded-2xl p-8 overflow-x-hidden">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">Itinerary</h2>
 
-            <FileUploadCard accept="application/pdf" maxSizeMB={10} initialMeta={null} onSelect={() => {}} onMetaChange={() => {}} />
+            <FileUploadCard accept="application/pdf" maxSizeMB={10} initialMeta={null} onSelect={() => { }} onMetaChange={() => { }} />
 
             {days.map((d, dayIdx) => {
               const itemsForDay = dayItemsMap[d.day] ?? null;
@@ -256,10 +258,13 @@ export default function ItineraryPage() {
                           tripPublicId={tripId as string}
                           dayDetailId={dayDetailIds[d.day]}
                           items={itemsForDay ?? []}
-                          onLocalChange={(op, createdOrUpdatedItem) => {
-                            // createdOrUpdatedItem must include dayNumber or we pass d.day
-                            applyLocalChange(op, d.day, createdOrUpdatedItem);
+                          onLocalChange={(op, item) => {
+                            applyLocalChange(op, d.day, {
+                              ...item,
+                              dayNumber: d.day
+                            });
                           }}
+
                         />
                       )}
                     </>

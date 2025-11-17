@@ -2,93 +2,91 @@
 
 import { useState } from "react";
 import {
+  useLazyGetTripActivityByIdQuery,
   useCreateTripActivityMutation,
   useUpdateTripActivityMutation,
   useDeleteTripActivityMutation,
 } from "@/lib/services/organizer/trip/itinerary/day-details/activity";
 import { mapActivityToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
-interface UseActivityProps {
-  organizationId: string;
-  tripPublicId: string;
-  dayDetailId: string;
-}
-
-export function useActivity({ organizationId, tripPublicId, dayDetailId }: UseActivityProps) {
+export function useActivity({ organizationId, tripPublicId, dayDetailId }: any) {
   const [editingActivity, setEditingActivity] = useState<any>(null);
   const [initialActivityData, setInitialActivityData] = useState<any>(null);
 
+  const [getActivityById] = useLazyGetTripActivityByIdQuery();
   const [createActivity] = useCreateTripActivityMutation();
   const [updateActivity] = useUpdateTripActivityMutation();
   const [deleteActivity] = useDeleteTripActivityMutation();
 
-  // create/update
-  const handleActivitySave = async (data: any) => {
-    const formData = mapActivityToFormData(data);
+  /* EDIT */
+  const handleActivityEdit = async (itemId: number) => {
+    const res = await getActivityById({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      itemId: String(itemId),
+    }).unwrap();
 
-    try {
-      if (editingActivity) {
-        const res = await updateActivity({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          itemId: String(editingActivity.id),
-          data: formData,
-        }).unwrap();
+    const data = (res as any)?.data || res;
 
-        setEditingActivity(null);
-        setInitialActivityData(null);
+    const mapped = {
+      id: itemId,
+      name: data.name || "",
+      location: data.location || "",
+      startTime: data.startTime?.slice(0, 5) || "",
+      endTime: data.endTime?.slice(0, 5) || "",
+      description: data.description || "",
+      documents: data.documents || [],
+    };
 
-        return (res as any)?.data ?? res ?? { ...data, id: editingActivity.id };
-      } else {
-        const res = await createActivity({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          data: formData,
-        }).unwrap();
-
-        return (res as any)?.data ?? res ?? {
-          ...data,
-          id: Math.floor(Math.random() * 100000),
-        };
-      }
-    } catch (err) {
-      console.error("Activity save error:", err);
-      throw err;
-    }
+    setEditingActivity({ id: itemId });
+    setInitialActivityData(mapped);
+    return mapped;
   };
 
-  // edit
-  const handleActivityEdit = (item: any) => {
-    setEditingActivity(item);
-    setInitialActivityData(item);
-  };
+  /* SAVE */
+  const handleActivitySave = async (data: any, itemId?: number) => {
+    const form = mapActivityToFormData(data);
 
-  // delete
-  const handleActivityDelete = async (id: number) => {
-    try {
-      await deleteActivity({
+    if (itemId) {
+      const res = await updateActivity({
         organizationId,
         tripPublicId,
         dayDetailId,
-        itemId: String(id),
+        itemId: String(itemId),
+        data: form,
       }).unwrap();
 
-      return { id };
-    } catch (err) {
-      console.error("Activity delete error:", err);
-      throw err;
+      return (res as any)?.data || res;
     }
+
+    const res = await createActivity({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      data: form,
+    }).unwrap();
+
+    return (res as any)?.data || res;
+  };
+
+  /* DELETE */
+  const handleActivityDelete = async (id: number) => {
+    await deleteActivity({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      itemId: String(id),
+    }).unwrap();
+
+    return { id };
   };
 
   return {
     editingActivity,
     initialActivityData,
-    setEditingActivity,
-    setInitialActivityData,
-    handleActivitySave,
     handleActivityEdit,
+    handleActivitySave,
     handleActivityDelete,
   };
 }

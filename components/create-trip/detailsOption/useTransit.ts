@@ -22,89 +22,91 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
 
   const [createLibraryTransit] = useCreateOrganizerTransitMutation();
 
- const handleTransitEdit = async (itemId: string | number) => {
-  try {
+
+  /* ---------------------- EDIT ---------------------- */
+  const handleTransitEdit = async (itemId: string | number) => {
     const res = await getTransitById({
       organizationId,
       tripPublicId,
       dayDetailId,
-      itemId: String(itemId),
+      itemId: String(itemId)
     }).unwrap();
 
     const data = (res as any)?.data ?? res;
 
-    setEditingTransit({ id: itemId });
-
-    setInitialTransitData({
-      id: itemId,          // <-- MOST IMPORTANT
+    const mapped = {
+      id: itemId,
       name: data.name || "",
       fromLocation: data.fromLocation,
       toLocation: data.toLocation,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      vehicleTypes: data.vehicleTypes,
-      customVehicleType: data.customVehicleType,
-      arrangedBy: data.arrangedBy,
-      description: data.description,
-      packingSuggestion: data.packingSuggestion,
-      documents: data.documents || [],
-    });
+      startTime: data.startTime?.slice(0,5) || "",
+      endTime: data.endTime?.slice(0,5) || "",
+      vehicleTypes: data.vehicleTypes || [],
+      customVehicleType: data.customVehicleType || "",
+      arrangedBy: data.arrangedBy || "ORGANIZER",
+      description: data.description || "",
+      packingSuggestion: data.packingSuggestion || "",
+      documents: data.documents || []
+    };
 
-  } catch (err) {
-    console.error("Transit edit error:", err);
-  }
-};
+    setEditingTransit({ id: itemId });
+    setInitialTransitData(mapped);
+
+    return mapped;
+  };
 
 
-  const handleTransitSave = async (data: any) => {
+  /* ---------------------- CREATE / UPDATE ---------------------- */
+  const handleTransitSave = async (data: any, itemId?: number) => {
     try {
       const { saveInLibrary, documents, ...pureData } = data;
       const form = mapTransitToFormData(pureData, documents);
 
-      if (editingTransit) {
+      /* ------------ UPDATE ------------ */
+      if (itemId) {
         const res = await updateTransit({
           organizationId,
           tripPublicId,
           dayDetailId,
-          itemId: String(editingTransit.id),
+          itemId: String(itemId),
           data: form,
         }).unwrap();
 
-        const updated =
-          (res as any)?.data ?? res ?? { ...data, id: editingTransit.id };
+        const updated = (res as any)?.data || res;
 
-        setEditingTransit(null);
-        setInitialTransitData(null);
-
-        return updated;
-      } else {
-        const res = await createTransit({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          data: form,
-        }).unwrap();
-
-        const created =
-          (res as any)?.data ?? res ?? {
-            ...data,
-            id: Math.floor(Math.random() * 100000),
-          };
-
-        // save to library
-        if (saveInLibrary) {
-          const libFD = mapTransitToFormData(pureData, documents);
-          await createLibraryTransit({ organizationId, data: libFD });
-        }
-
-        return created;
+        // 🔥 ALWAYS return consistent item structure
+        return {
+          ...updated,
+          id: updated.id || itemId,
+          tripItemId: updated.tripItemId || itemId,
+          tripType: "TRANSIT",
+        };
       }
+
+      /* ------------ CREATE ------------ */
+      const res = await createTransit({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        data: form,
+      }).unwrap();
+
+      const created = (res as any)?.data || res;
+
+      return {
+        ...created,
+        id: created.id,
+        tripItemId: created.tripItemId || created.id,
+        tripType: "TRANSIT",
+      };
     } catch (err) {
       console.error("Transit save error:", err);
       throw err;
     }
   };
 
+
+  /* ---------------------- DELETE ---------------------- */
   const handleTransitDelete = async (id: number) => {
     try {
       await deleteTransit({
@@ -131,3 +133,4 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
     handleTransitDelete,
   };
 }
+

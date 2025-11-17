@@ -53,59 +53,44 @@ export function DetailsOptions({
   const activity = useActivity({ organizationId, tripPublicId, dayDetailId });
 
   // ---------------- Create / Update ----------------
-  const handleSave = async (formData: any) => {
-    let apiResult = null;
+ const handleSave = async (formData: any) => {
+  let apiResult = null;
 
-    const isEdit = Boolean(initialData?.id || initialData?.tripItemId);
+  const itemId = getItemId(initialData);
+  const isEdit = Boolean(itemId);
 
-    try {
-      switch (modalType) {
-  case "event":
-    apiResult = await dayDesc.handleSave({
-      ...formData,
-      id: initialData?.id,  // ***IMPORTANT***
-    });
-    break;
+  try {
+    switch (modalType) {
+      case "event":
+        apiResult = await dayDesc.handleSave(formData, itemId);
+        break;
 
-  case "transit":
-    apiResult = await transit.handleTransitSave({
-      ...formData,
-      id: initialData?.id,
-    });
-    break;
+      case "transit":
+        apiResult = await transit.handleTransitSave(formData, itemId);
+        break;
 
-  case "stay":
-    apiResult = await stay.handleStaySave({
-      ...formData,
-      id: initialData?.id,
-    });
-    break;
+      case "stay":
+        apiResult = await stay.handleStaySave(formData, itemId);
+        break;
 
-  case "meal":
-    apiResult = await meal.handleMealSave({
-      ...formData,
-      id: initialData?.id,
-    });
-    break;
+      case "meal":
+        apiResult = await meal.handleMealSave(formData, itemId);
+        break;
 
-  case "activity":
-    apiResult = await activity.handleActivitySave({
-      ...formData,
-      id: initialData?.id,
-    });
-    break;
-}
-
-
-
-      onLocalChange(isEdit ? "update" : "create", apiResult);
-    } catch (err) {
-      console.error("❌ Save failed:", err);
+      case "activity":
+        apiResult = await activity.handleActivitySave(formData, itemId);
+        break;
     }
 
-    setModalType(null);
-    setInitialData(null);
-  };
+    onLocalChange(isEdit ? "update" : "create", apiResult);
+  } catch (err) {
+    console.error("❌ Save failed:", err);
+  }
+
+  setModalType(null);
+  setInitialData(null);
+};
+
 
   // ---------------- Delete ----------------
 const handleDelete = async (item: any) => {
@@ -140,44 +125,65 @@ const handleDelete = async (item: any) => {
     console.error("❌ Delete failed:", err);
   }
 };
+
+const getItemId = (item: any) => item?.id || item?.tripItemId;
+
   // ---------------- Edit ----------------
 const handleEditClick = async (item: any) => {
   const itemId = item.id || item.tripItemId;
+  if (!itemId) return;
 
-  setInitialData(null); // clear first
+  let mapped = null;
+  const getModalTypeFromTripType = (tripType: string) => {
+  switch (tripType) {
+    case "DAY_DESCRIPTION":
+      return "event";
+    case "TRANSIT":
+      return "transit";
+    case "STAY":
+      return "stay";
+    case "MEAL":
+      return "meal";
+    case "ACTIVITY":
+      return "activity";
+    default:
+      return null;
+  }
+};
+
 
   switch (item.tripType) {
     case "DAY_DESCRIPTION":
-      dayDesc.handleEdit(item);
-      setInitialData(dayDesc.initialData);
-      setModalType("event");
-      break;
+    const id = item.id || item.tripItemId;
+    mapped = await dayDesc.handleEdit({ ...item, id });
+    break;
+
 
     case "TRANSIT":
-      await transit.handleTransitEdit(itemId);
-      setInitialData(transit.initialTransitData);
-      setModalType("transit");
+      mapped = await transit.handleTransitEdit(itemId);
       break;
 
     case "STAY":
-      stay.handleStayEdit(item);
-      setInitialData(stay.initialStayData);
-      setModalType("stay");
+      mapped = await stay.handleStayEdit(itemId);
       break;
 
     case "MEAL":
-      meal.handleMealEdit(item);
-      setInitialData(meal.initialMealData);
-      setModalType("meal");
+      mapped = await meal.handleMealEdit(itemId);
       break;
 
     case "ACTIVITY":
-      activity.handleActivityEdit(item);
-      setInitialData(activity.initialActivityData);
-      setModalType("activity");
+      mapped = await activity.handleActivityEdit(itemId);
       break;
   }
+
+  // *** ONLY SET HERE ***
+  setInitialData(mapped);
+
+  // open correct modal
+setModalType(getModalTypeFromTripType(item.tripType));
+
 };
+
   return (
     <div className="flex flex-col gap-6 mt-4">
 <div className="flex w-full gap-4">
