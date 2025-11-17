@@ -62,16 +62,14 @@ export const tripLeadsAPI = baseAPI.injectEndpoints({
         organizationId: string;
         tripId: string;
         leadId: string | number;
-        data: FormData;
       }
     >({
-      query: ({ organizationId, tripId, leadId, data }) => ({
+      query: ({ organizationId, tripId, leadId }) => ({
         url: `${ENDPOINTS.ORGANIZER.TRIP_LEADS(
           organizationId,
           tripId
         )}/${leadId}`,
         method: "PUT",
-        body: data,
       }),
       transformResponse: (res: LibraryApiResponse<TripLeadsResponse>) =>
         res.data,
