@@ -16,12 +16,10 @@ import { selectAuthState } from "@/lib/slices/auth";
 
 import {
   useLazyGetItineraryByTripIdQuery,
-
   useUpdateItineraryMutation,
 } from "@/lib/services/organizer/trip/itinerary";
 import {
   useLazyGetItineraryDayDetailsQuery,
-  useUpdateItineraryDayDetailMutation
 } from "@/lib/services/organizer/trip/itinerary/day-details";
 
 type Day = { day: number; date: string };
@@ -57,7 +55,6 @@ export default function ItineraryPage() {
 
   const [triggerGetItineraryByTripId] = useLazyGetItineraryByTripIdQuery();
   const [triggerGetItineraryDayDetails] = useLazyGetItineraryDayDetailsQuery();
-  const [updateDayDetail] = useUpdateItineraryDayDetailMutation();
   const [updateItinerary] = useUpdateItineraryMutation();
 
   useEffect(() => {
@@ -65,22 +62,15 @@ export default function ItineraryPage() {
       if (!organizationId || !tripId) return;
 
       try {
-        console.log("📥 Fetching itinerary (single call)...");
-        // GET itinerary (main). If you already have endpoint that returns data.data or similar,
-        // adapt unwrap/structure accordingly.
         const itResp = await triggerGetItineraryByTripId({
           organizationId,
           tripPublicId: tripId as string,
         }).unwrap();
 
         const itData = (itResp as any) ?? {};
-        // the API you showed earlier had response: { status, message, data: { ... } }
-        // some RTK queries might already return data.data; adjust as needed.
-
-        const payload = itData.data ?? itData; // make tolerant
+        const payload = itData.data ?? itData;
         setStartingPoint(payload.startPoint ?? "");
         setEndPoint(payload.endPoint ?? "");
-        // Set start/end ISO if available
         if (payload.startDate && payload.startTime) {
           setStartDate(`${payload.startDate}T${payload.startTime}`);
         }
@@ -105,6 +95,8 @@ export default function ItineraryPage() {
           };
         });
         setDays(generatedDays);
+
+
         setShowDetails(Array(generatedDays.length).fill(false));
 
         // If itinerary contains dayDetailResponseList -> map them
@@ -113,24 +105,29 @@ export default function ItineraryPage() {
           if (d.dayNumber && d.id) idsMap[d.dayNumber] = String(d.id);
         });
         setDayDetailIds((prev) => ({ ...prev, ...idsMap }));
-
-        // Now fetch day-details endpoint which returns array of day details with tripItems
         const dayDetailsResp = await triggerGetItineraryDayDetails({
           organizationId,
           tripPublicId: tripId as string,
         }).unwrap();
 
         const ddData = (dayDetailsResp as any)?.data ?? dayDetailsResp ?? [];
-        // ddData is an array of { id, dayNumber, date, tripItems }
 
         const map: Record<number, TripItem[] | null> = {};
         ddData.forEach((d: any) => {
           map[d.dayNumber] = Array.isArray(d.tripItems) ? d.tripItems : null;
-          // ensure we also set dayDetailIds if missing
+
           if (d.dayNumber && d.id && !idsMap[d.dayNumber]) {
             idsMap[d.dayNumber] = String(d.id);
           }
         });
+
+        // 🔥 AUTO OPEN DAYS THAT ALREADY HAVE ITEMS
+        const initialShowDetails = generatedDays.map((day) => {
+          const items = map[day.day];
+          return Array.isArray(items) && items.length > 0;
+        });
+
+        setShowDetails(initialShowDetails);
 
         setDayItemsMap(map);
         setDayDetailIds((prev) => ({ ...prev, ...idsMap }));
