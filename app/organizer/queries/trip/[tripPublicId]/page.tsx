@@ -20,10 +20,10 @@ import {
 } from "@/lib/services/organizer/trip/queries";
 
 export default function QueriesPage() {
-  const params = useParams() as { tripPublicId?: string };
+  const { tripPublicId } = useParams() as { tripPublicId: string };
   const organizationId = useOrganizationId();
-  const tripPublicId = "4cfe8053-11bc-4cf5-a313-c817daa10682";
 
+  // selectedQuery may be the full TripQueryResponse object
   const [selectedQuery, setSelectedQuery] = useState<any>(null);
   const [showDelete, setShowDelete] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -43,26 +43,54 @@ export default function QueriesPage() {
   // Delete mutation
   const [deleteTripQuery, { isLoading: isDeleting }] = useDeleteTripQueryMutation();
 
+  // open delete flow: store selectedQuery (object) and open modal
   const onDeleteClick = (query: any) => {
     setSelectedQuery(query);
     setShowDelete(true);
   };
 
+  // confirm delete — robust to string|number ids and ensures refetch
   const confirmDelete = async () => {
-    if (!selectedQuery) return;
+    if (!selectedQuery) {
+      console.warn("confirmDelete called with no selectedQuery");
+      setShowDelete(false);
+      return;
+    }
+
+    const id = selectedQuery.id ?? selectedQuery.queryId ?? selectedQuery._id ?? null;
+    if (id === null || id === undefined || id === "") {
+      console.error("confirmDelete: selectedQuery.id is missing", selectedQuery);
+      setShowDelete(false);
+      setSelectedQuery(null);
+      return;
+    }
 
     try {
+      console.log("Deleting query:", { organizationId, tripPublicId, queryId: id, typeOfId: typeof id });
+
+      // adapt 'queryId' vs 'id' here depending on your RTK endpoint implementation.
+      // Most of our code has used `queryId`, so we keep that; change to `id` if required.
       await deleteTripQuery({
         organizationId,
         tripPublicId,
-        queryId: selectedQuery.id,
+        queryId: id,
       }).unwrap();
 
+      // close modal and clear selection
       setShowDelete(false);
       setSelectedQuery(null);
-      await refetch();
     } catch (e) {
       console.error("Delete error:", e);
+      // keep modal closed and selection cleared so user can retry or see updated state
+      setShowDelete(false);
+      setSelectedQuery(null);
+    } finally {
+      // always refresh to keep UI in sync
+      try {
+        await refetch();
+      } catch (refetchErr) {
+        console.error("Refetch after delete failed:", refetchErr);
+      }
     }
   };
 
@@ -84,7 +112,7 @@ export default function QueriesPage() {
                   Trip Queries
                 </h2>
 
-                <Link href={`/organizer/queries/all?trip=${tripPublicId}`}>
+                <Link href={`/organizer/queries/all`}>
                   <Button className="bg-[#F97316] hover:bg-[#ea6d14] text-white px-6 rounded-lg">
                     View All Queries
                   </Button>
@@ -109,6 +137,7 @@ export default function QueriesPage() {
                 <QueryList
                   queries={tripQueries}
                   onViewQuery={setSelectedQuery}
+                  // ensure we pass the object to the handler (QueryList already uses onDelete={() => onDelete(q)})
                   onDelete={(q: any) => onDeleteClick(q)}
                 />
               )}
@@ -125,7 +154,10 @@ export default function QueriesPage() {
           {/* Modals */}
           <ConfirmDeleteModal
             open={showDelete}
-            onClose={() => setShowDelete(false)}
+            onClose={() => {
+              setShowDelete(false);
+              setSelectedQuery(null);
+            }}
             onConfirm={confirmDelete}
             loading={isDeleting}
           />
