@@ -1,57 +1,79 @@
+"use client";
+
+import { Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 
 export default function QueryItem({ query, onView, onDelete }: any) {
-  // a small helper to render status badge + age badge
-  const StatusBadge = () => {
-    if (query.status === "open") {
-      return (
-        <div className="inline-flex items-center gap-2">
-          <span className="text-xs font-medium bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full">Open</span>
-          {query.age && (
-            <span className="text-xs bg-red-50 text-red-700 px-3 py-1 rounded-full">{query.age}</span>
-          )}
-        </div>
-      );
-    }
+  const isOpen = query.status === "OPEN";
 
-    return (
-      <div className="inline-flex items-center gap-2">
-        <span className="text-xs font-medium bg-green-50 text-green-800 px-3 py-1 rounded-full">Responded</span>
-      </div>
-    );
-  };
+  // calculate "n days open"
+  const created = new Date(query.createdDate );
+  const diff = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24));
 
   return (
-    <div className="bg-white border rounded-2xl p-5 flex items-start justify-between">
-      <div className="w-full pr-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h3 className="font-semibold text-lg">{query.name}</h3>
-              <StatusBadge />
-            </div>
+    <div className="w-full bg-white border rounded-xl p-5 shadow-sm flex flex-col gap-3">
 
-            <p className="text-sm text-gray-400 mt-1">Trip: {query.trip}</p>
+      {/* Top row: Name + badges + date */}
+      <div className="flex items-start justify-between w-full">
+        {/* Left side */}
+        <div>
+          <div className="font-semibold text-[15px] text-gray-900">
+            {query.userName}
           </div>
 
-          <div className="text-right">
-            <div className="text-sm text-gray-400">{query.date}</div>
+          <div className="flex items-center gap-2 mt-1">
+
+            {/* Status badge */}
+            {isOpen ? (
+              <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-700">
+                Open
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700">
+                Responded
+              </span>
+            )}
+
+            {/* Days open badge */}
+            {isOpen && (
+              <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">
+                {diff} days open
+              </span>
+            )}
+          </div>
+
+          {/* Trip name */}
+          <div className="text-sm text-gray-500 mt-1">
+            Trip: {query.tripName}
           </div>
         </div>
 
-        <p className="mt-4 text-gray-700">{query.question}</p>
+        {/* Right side date */}
+        <div className="text-gray-500 text-sm whitespace-nowrap">
+          {new Date(query.createdDate).toLocaleDateString("en-GB")}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-3 items-end">
-        <Button variant="ghost" className="px-4 py-2" onClick={onView}>
-          View <span className="ml-2">›</span>
+      {/* Question */}
+      <div className="text-gray-700 text-[15px] mt-2">
+        {query.question}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex justify-end items-center gap-3 mt-3">
+
+        <Button
+          variant="outline"
+          className="rounded-full px-4 flex items-center gap-1 text-gray-700"
+          onClick={onView}
+        >
+          View
+          <ChevronRight className="w-4 h-4" />
         </Button>
 
         <button
           onClick={onDelete}
-          className="border border-red-200 text-red-500 rounded-lg p-2 hover:bg-red-50"
-          aria-label="Delete"
+          className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-full"
         >
           <Trash2 className="w-4 h-4" />
         </button>

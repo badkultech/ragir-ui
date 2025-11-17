@@ -199,12 +199,13 @@ export default function OrganizerProfileEditPage() {
     );
   return (
     <div className='flex min-h-screen bg-gray-50'>
-      <OrganizerSidebar
+      {profile?.organizationPublicId && <OrganizerSidebar
         isOpen={false}
         onClose={function (): void {
           throw new Error('Function not implemented.');
         }}
       />
+      }
 
       <div className='flex-1 flex flex-col'>
         <AppHeader title='Organizer Profile' />

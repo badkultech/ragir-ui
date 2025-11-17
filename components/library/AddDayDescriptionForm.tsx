@@ -13,7 +13,7 @@ import {
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 
-type AddEventFormProps = {
+type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
   updateId?: number | null;
   onCancel: () => void;
@@ -22,14 +22,14 @@ type AddEventFormProps = {
   initialData?: any;
 };
 
-export function AddEventForm({
+export function AddDayDescriptionForm({
   mode = "trip",
   onCancel,
   updateId,
   onSave,
   header,
   initialData,
-}: AddEventFormProps) {
+}: AddDayDescriptionFormProps) {
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
 
   const [title, setTitle] = useState("");
@@ -62,7 +62,6 @@ export function AddEventForm({
 
     if (!title.trim()) newErrors.title = "Title is required";
     if (!description.trim()) newErrors.description = "Description is required";
-    if (!location.trim()) newErrors.location = "Location is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -79,9 +78,9 @@ export function AddEventForm({
         { title, description, location, time, packing, mode },
         docsManager.documents
       );
-      showSuccess("Event saved successfully!");
+      showSuccess("day description saved successfully!");
     } catch {
-      showApiError("Failed to save event");
+      showApiError("Failed to save day description");
     }
   };
 
@@ -104,7 +103,7 @@ export function AddEventForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-1">Title <span className="text-red-500">*</span></label>
         <div className="relative">
           <Input
             value={title}
@@ -125,7 +124,7 @@ export function AddEventForm({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description *
+          Description <span className="text-red-500">*</span>
         </label>
         <RichTextEditor
           value={description}
@@ -141,7 +140,7 @@ export function AddEventForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Location *
+            Location
           </label>
           <Input
             value={location}
@@ -154,7 +153,7 @@ export function AddEventForm({
         </div>
       </div>
       <div>
-        <label className="block text-[0.95rem] font-[] font-medium mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Time
         </label>
         <Input
@@ -239,7 +238,7 @@ export function AddEventForm({
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
           onSelect={handleLibrarySelect}
-          category="events"
+          category="day-description"
         />
       )}
     </div>

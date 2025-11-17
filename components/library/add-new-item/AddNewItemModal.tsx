@@ -92,7 +92,7 @@ function SaveStatusBar({
 -------------------------------------------------- */
 type Step =
   | "select"
-  | "event"
+  | "day-description"
   | "stay"
   | "transit"
   | "meal"
@@ -120,8 +120,8 @@ export function AddNewItemModal({
   const organizationId = useOrganizationId();
 
   // RTK mutations
-  const [createEvent] = useCreateDayDescriptionMutation();
-  const [updateEvent] = useUpdateDayDescriptionMutation();
+  const [createDayDescription] = useCreateDayDescriptionMutation();
+  const [updateDayDescription] = useUpdateDayDescriptionMutation();
   const [createTransit] = useCreateOrganizerTransitMutation();
   const [updateTransit] = useUpdateOrganizerTransitMutation();
   const [createMeal] = useCreateMealMutation();
@@ -150,7 +150,7 @@ export function AddNewItemModal({
     documents?: DocumentItem[]
   ) {
     const fdMappers: Record<Step, any> = {
-      event: mapDayDescriptionToFormData,
+      "day-description": mapDayDescriptionToFormData,
       stay: mapStayToFormData,
       transit: mapTransitToFormData,
       meal: mapMealToFormData,
@@ -169,14 +169,14 @@ export function AddNewItemModal({
     if (!fd) return;
 
     const actions: Record<Step, any> = {
-      event: updateId
+      "day-description": updateId
         ? () =>
-            updateEvent({
+            updateDayDescription({
               organizationId,
               dayDescriptionId: String(updateId),
               data: fd,
             }).unwrap()
-        : () => createEvent({ organizationId, data: fd }).unwrap(),
+        : () => createDayDescription({ organizationId, data: fd }).unwrap(),
       stay: updateId
         ? () =>
             updateStay({ organizationId, stayId: updateId, data: fd }).unwrap()
@@ -266,9 +266,9 @@ export function AddNewItemModal({
           {step === "select" ? (
             <CategorySelectStep
               categories={[
-                { label: "Events", icon: Calendar, step: "event" },
+                { label: "Day Descriptions", icon: Calendar, step: "day-description" },
                 { label: "Stays", icon: Hotel, step: "stay" },
-                { label: "Transit", icon: Bus, step: "transit" },
+                { label: "Transits", icon: Bus, step: "transit" },
                 { label: "Meals", icon: Utensils, step: "meal" },
                 { label: "Activities", icon: Activity, step: "activity" },
                 { label: "Trip Leaders", icon: Users, step: "trip-leader" },

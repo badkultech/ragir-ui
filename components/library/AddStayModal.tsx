@@ -23,9 +23,9 @@ import { AddStayForm } from "./AddStayForm";
 
 // Categories for Step 1
 const categories = [
-  { label: "Events", icon: Calendar },
+  { label: "Day Descriptions", icon: Calendar },
   { label: "Stays", icon: Hotel },
-  { label: "Transit", icon: Bus },
+  { label: "Transits", icon: Bus },
   { label: "Meals", icon: Utensils },
   { label: "Activities", icon: Activity },
   { label: "Trip Leaders", icon: Users },

@@ -182,7 +182,7 @@ export default function EventsPage() {
         open={modalOpen}
         updateId={updateId}
         onClose={() => setModalOpen(false)}
-        initialStep="event"
+        initialStep="day-description"
       />
 
       {/* DELETE DIALOG: show deleteTarget?.name for correct label */}

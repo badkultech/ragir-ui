@@ -5,7 +5,7 @@ import { StayModule } from "../modules/StayModule";
 import { MealModule } from "../modules/MealModule";
 import { ActivityModule } from "../modules/ActivityModule";
 import { TransitModule } from "../modules/TransitModule";
-import { EventModule } from "../modules/EventModule";
+import { EventModule } from "../modules/DayDescriptionModule";
 import { TripLeaderModule } from "../modules/TripLeaderModule";
 import { FAQModule } from "../modules/FAQModule";
 
@@ -46,8 +46,8 @@ export const StepRenderer: React.FC<Props> = ({
       return render("activity", "Activity", ActivityModule);
     case "transit":
       return render("transit", "Transit", TransitModule);
-    case "event":
-      return render("event", "Event", EventModule);
+    case "day-description":
+      return render("day-description", "day-description", EventModule);
     case "trip-leader":
       return render("trip-leader", "Trip Leader", TripLeaderModule);
     case "faq":

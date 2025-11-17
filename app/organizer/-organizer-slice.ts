@@ -5,6 +5,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { set } from 'lodash';
 
 export interface Profile {
+  organizationPublicId?: string;
   organizerName: string;
   tagline: string;
   description: string;

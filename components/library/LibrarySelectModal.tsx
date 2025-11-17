@@ -40,7 +40,7 @@ export type LibraryItem = {
 };
 
 type Category =
-  | "events"
+  | "day-description"
   | "stays"
   | "transit"
   | "meals"
@@ -105,7 +105,7 @@ export function LibrarySelectModal({
                   skip: shouldSkip,
                   refetchOnMountOrArgChange: true,
                 })
-              : category === 'events'
+              : category === 'day-description'
               ? useGetDayDescriptionsQuery(organizationId ?? '', {
                   skip: shouldSkip,
                   refetchOnMountOrArgChange: true,
