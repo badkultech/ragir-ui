@@ -161,7 +161,13 @@ export default function QueryList({ queries = [], onViewQuery, onDelete }: any) 
           <div className="text-center py-12 text-gray-500">No queries found.</div>
         ) : (
           filtered.map((q: any, idx: number) => (
-            <QueryItem key={q.id ?? idx} query={q} onView={() => onViewQuery(q)} onDelete={onDelete} />
+            // IMPORTANT: pass the query object when calling onDelete so parent receives the object (not an event)
+            <QueryItem
+              key={q.id ?? idx}
+              query={q}
+              onView={() => onViewQuery(q)}
+              onDelete={() => onDelete(q)}
+            />
           ))
         )}
       </div>
