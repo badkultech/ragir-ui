@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChevronRight } from "lucide-react";
@@ -10,22 +10,31 @@ import QueryList from "@/components/queries/QueryList";
 import ConfirmDeleteModal from "@/components/queries/ConfirmDeleteModal";
 import ReportQueryModal from "@/components/queries/ReportQueryModal";
 import QueryDetail from "@/components/queries/QueryDetail";
-import { useDeleteTripQueryMutation, useGetAllTripQueriesQuery, useGetTripQueriesQuery } from "@/lib/services/organizer/trip/queries";
+import {
+  useDeleteTripQueryMutation,
+  useGetAllTripQueriesQuery,
+  useGetTripQueriesQuery,
+} from "@/lib/services/organizer/trip/queries";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-
 
 export default function AllQueriesPage() {
   const params = useParams() as { organizationId?: string; tripPublicId?: string };
   const organizationId = useOrganizationId();
-  const tripPublicId = params?.tripPublicId ?? "";
+  const tripPublicIdFromRoute = params?.tripPublicId ?? "";
 
+  // UI state (matched to AllLeadsPage style)
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all"); // not all APIs use it, but kept for parity
   const [selectedQuery, setSelectedQuery] = useState<any>(null);
-  const [showDelete, setShowDelete] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
-  // 1) Fetch org-wide queries (depends only on organizationId)
+  // Delete state
+  const [showDelete, setShowDelete] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | string | null>(null);
+  const [pendingDeleteTripPublicId, setPendingDeleteTripPublicId] = useState<string>("");
+
+  // 1) org-wide queries
   const {
     data: orgQueries,
     isLoading: isOrgLoading,
@@ -35,7 +44,7 @@ export default function AllQueriesPage() {
     skip: !organizationId,
   });
 
-  // 2) Fetch trip-specific queries (depends on org + trip)
+  // 2) trip-specific queries
   const {
     data: tripQueries,
     isLoading: isTripLoading,
@@ -43,56 +52,100 @@ export default function AllQueriesPage() {
     isError: isTripError,
     refetch: refetchTripQueries,
   } = useGetTripQueriesQuery(
-    { organizationId, tripPublicId },
+    { organizationId, tripPublicId: tripPublicIdFromRoute },
     {
-      skip: !organizationId || !tripPublicId,
+      skip: !organizationId || !tripPublicIdFromRoute,
     }
   );
 
-  // Delete mutation (optional: ensure it's added in your RTK slice)
+  // delete mutation
   const [deleteTripQuery, { isLoading: isDeleting }] = useDeleteTripQueryMutation();
 
-  // Which list to show:
-  // - if tripPublicId present and tripQueries exist -> show tripQueries
-  // - otherwise fall back to orgQueries
-  const displayedQueries = tripPublicId ? tripQueries ?? [] : orgQueries ?? [];
+  // decide which list to show (same logic you already had)
+  const displayedQueries = tripPublicIdFromRoute ? tripQueries ?? [] : orgQueries ?? [];
 
-  // handle delete flow
+  // client-side search + status filtering (like AllLeadsPage)
+  const filteredQueries = useMemo(() => {
+    if (!displayedQueries) return [];
+    const s = search.trim().toLowerCase();
+    return displayedQueries.filter((q: any) => {
+      // status filter — only apply when not 'all'
+      if (status !== "all" && q.status) {
+        if (String(q.status).toLowerCase() !== String(status).toLowerCase()) {
+          return false;
+        }
+      }
+
+      if (!s) return true;
+
+      const tripTitle = String(q.tripTitle ?? "").toLowerCase();
+      const customerName = String(q.customerName ?? "").toLowerCase();
+      const message = String(q.message ?? "").toLowerCase();
+
+      return tripTitle.includes(s) || customerName.includes(s) || message.includes(s);
+    });
+  }, [displayedQueries, search, status]);
+
+  // open delete flow (called from list or detail)
   const onDeleteClick = (query: any) => {
-    setPendingDeleteId(query?.id ?? null);
-    setShowDelete(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!pendingDeleteId) {
-      setShowDelete(false);
+    // Guard: ensure we received a TripQueryResponse-like object with id:number
+    if (!query || (typeof query === "object" && (query.id === undefined || query.id === null))) {
+      console.error("onDeleteClick received invalid query object:", query);
+      // optionally show a toast in dev
+      alert("Cannot delete: query.id is missing. Check console for object shape.");
       return;
     }
 
-    try {
-      // call delete mutation if available
-      if (deleteTripQuery) {
-        // Prefer deleting with tripPublicId if available, else call org-level delete route shape (if exists)
-        await deleteTripQuery({
-          organizationId,
-          tripPublicId: tripPublicId || "", // backend might accept empty; adjust if you need an org-level delete route
-          queryId: pendingDeleteId,
-        }).unwrap();
-      }
+    // Use id directly (per TripQueryResponse)
+    setPendingDeleteId(query.id);
+    setPendingDeleteTripPublicId(query?.tripPublicId ?? query?.trip_public_id ?? "");
+    setShowDelete(true);
+  };
 
-      // refresh whichever list is currently displayed
-      if (tripPublicId) {
+  // perform delete (mirrors AllLeadsPage performDelete + refetch)
+  const performDelete = async (id: number | string | null) => {
+    if (id === null || id === undefined || id === "") {
+      setShowDelete(false);
+      setPendingDeleteId(null);
+      setPendingDeleteTripPublicId("");
+      return;
+    }
+
+    // debug logs
+    console.log("Perform delete — payload:", {
+      organizationId,
+      tripPublicId: pendingDeleteTripPublicId || undefined,
+      queryId: id,
+      typeOfId: typeof id,
+    });
+
+    try {
+      // adapt 'queryId' vs 'id' here depending on your RTK endpoint implementation.
+      // If your delete endpoint builds the URL with the id in the path, the RTK query should already do that.
+      const payload: any = { organizationId, queryId: id };
+      if (pendingDeleteTripPublicId) payload.tripPublicId = pendingDeleteTripPublicId;
+
+      const res = await deleteTripQuery(payload).unwrap();
+      console.log("Delete success response:", res);
+
+      // refresh whichever list is shown
+      if (tripPublicIdFromRoute) {
         await refetchTripQueries();
       } else {
         await refetchOrgQueries();
       }
 
+      // clear selection if it was the one open
+      if (selectedQuery && selectedQuery.id !== undefined && String(selectedQuery.id) === String(id)) {
+        setSelectedQuery(null);
+      }
+    } catch (err: any) {
+      console.error("Failed to delete query — caught error:", err);
+      // optionally surface to UI
+    } finally {
       setShowDelete(false);
-      setSelectedQuery(null);
       setPendingDeleteId(null);
-    } catch (err) {
-      console.error("Failed to delete query", err);
-      // surface a toast/snackbar here if you have one
+      setPendingDeleteTripPublicId("");
     }
   };
 
@@ -103,10 +156,8 @@ export default function AllQueriesPage() {
 
   return (
     <div className="flex min-h-screen bg-[#F9FAFB] overflow-x-hidden">
-      {/* Sidebar */}
       <OrganizerSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <AppHeader title="Queries" />
 
@@ -115,29 +166,28 @@ export default function AllQueriesPage() {
             <>
               {/* Breadcrumb */}
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                <Link href="/queries" className="hover:text-[#F97316] transition-colors">
+                <Link href="/organizer/queries/all" className="hover:text-[#F97316] transition-colors">
                   Queries
                 </Link>
                 <ChevronRight className="w-4 h-4" />
                 <span className="text-gray-700 font-medium">All Queries</span>
               </div>
 
-              {/* Loading / Error states */}
-              {((tripPublicId && (isTripLoading || isTripFetching)) ||
-                (!tripPublicId && isOrgLoading)) ? (
+              {/* Loading / Error / Empty states */}
+              {((tripPublicIdFromRoute && (isTripLoading || isTripFetching)) ||
+                (!tripPublicIdFromRoute && isOrgLoading)) ? (
                 <div className="py-20 text-center text-gray-500">Loading queries…</div>
-              ) : (tripPublicId && isTripError) || (!tripPublicId && isOrgError) ? (
+              ) : (tripPublicIdFromRoute && isTripError) || (!tripPublicIdFromRoute && isOrgError) ? (
                 <div className="py-20 text-center text-red-500">Failed to load queries. Try refreshing.</div>
-              ) : !displayedQueries || displayedQueries.length === 0 ? (
+              ) : !filteredQueries || filteredQueries.length === 0 ? (
                 <div className="py-20 text-center text-gray-500">
-                  {tripPublicId
+                  {tripPublicIdFromRoute
                     ? "No queries found for this trip."
                     : "No queries found for this organization."}
                 </div>
               ) : (
-                // Query List
                 <QueryList
-                  queries={displayedQueries}
+                  queries={filteredQueries}
                   onViewQuery={(q: any) => setSelectedQuery(q)}
                   onDelete={(q: any) => onDeleteClick(q)}
                   onReport={(q: any) => onReport(q)}
@@ -159,8 +209,9 @@ export default function AllQueriesPage() {
             onClose={() => {
               setShowDelete(false);
               setPendingDeleteId(null);
+              setPendingDeleteTripPublicId("");
             }}
-            onConfirm={confirmDelete}
+            onConfirm={() => performDelete(pendingDeleteId)}
             loading={isDeleting}
           />
           <ReportQueryModal

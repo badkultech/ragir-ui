@@ -4,7 +4,11 @@ export interface TripLeadsRequest {
   email: string;
   phone: string;
   tripLeadsStatus: TripLeadsStatus;
-  nudgeCount?: number;
+  nudgeCount: 0;
+  message: string;
+  customerName: string;
+  createdDate: string;
+  tripPublicId: string;
 }
 
 export interface TripLeadsResponse extends TripLeadsRequest {
@@ -18,7 +22,7 @@ export enum PreferredCommunication {
 }
 
 export enum TripLeadsStatus {
-  NEW = "NEW",
+  OPEN = "OPEN",
   IN_PROGRESS = "IN_PROGRESS",
   CLOSED = "CLOSED",
   CANCELLED = "CANCELLED",

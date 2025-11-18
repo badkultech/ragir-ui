@@ -18,3 +18,14 @@ export interface TripQueryResponse {
   question: string;
   createdDate?: string; // ISO string — backend LocalDateTime serialized
 }
+
+export interface TripQueryCommentResponse {
+  id: number;
+  userName: string;       // who sent it
+  comment: string;        // message text
+  createdDate: string;    // timestamp
+  tripPublicId: string;
+  tripQueryId: number;
+  userId: string;
+}
+

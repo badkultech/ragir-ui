@@ -38,8 +38,8 @@ export function LeadFilters({
   };
 
   const handleStatus = (value: string) => {
-    setStatus(value);
-    onStatusChange?.(value);
+    setStatus(value.toUpperCase());
+    onStatusChange?.(value.toUpperCase());
   };
 
   const handleSort = (value: string) => {
@@ -74,7 +74,7 @@ export function LeadFilters({
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {["all", "open", "in_progress", "converted", "closed"].map((opt) => (
+          {["all", "open", "converted"].map((opt) => (
             <DropdownMenuItem
               key={opt}
               onClick={() => handleStatus(opt)}
