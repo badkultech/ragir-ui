@@ -61,7 +61,7 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
         ...data,
         time: data.time,
       },
-      data.documents ?? []
+      documents,
     );
 
     let res;

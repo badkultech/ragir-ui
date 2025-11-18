@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
@@ -15,6 +15,10 @@ import {
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 import { MultiUploader } from "../common/UploadFieldShortcuts";
+import { set } from "lodash";
+import { useLazyGetStayByIdQuery } from "@/lib/services/organizer/trip/library/stay";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 
 type AddStayFormProps = {
@@ -47,6 +51,9 @@ export function AddStayForm({
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [usegetbyid] = useLazyGetStayByIdQuery();
+  const { userData } = useSelector(selectAuthState);
+
 
   // Documents manager: use external if provided else create local
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
@@ -96,11 +103,38 @@ export function AddStayForm({
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleLibrarySelect = (item: any) => {
-    setTitle(item.title || "");
-    setLocation(item.location || "");
-    setDescription(item.description || "");
-    setLibraryOpen(false);
+  const handleLibrarySelect = async (item: any) => {
+    try {
+      if (!item.id) return;
+      const organizationId = userData?.organizationPublicId ?? "";
+      const fd = await usegetbyid({ organizationId, stayId: String(item.id) }).unwrap();
+
+
+      setTitle(fd.name || "");
+      setLocation(fd.location || "");
+      setDescription(fd.description || "");
+      setPacking(fd.packingSuggestion || "");
+      setCheckIn(fd.checkInTime || "");
+      setCheckOut(fd.checkOutTime || "");
+      setSharingType(
+        typeof fd.sharingType === "string"
+          ? fd.sharingType
+          : fd.sharingType?.toString() ?? ""
+      );
+      const mappedDocs = (fd.documents ?? []).map((d: any) => ({
+        id: d.id ?? null,
+        url: d.url ?? null,
+        type: d.type ?? "IMAGE",
+        file: null,
+        markedForDeletion: false,
+      }));
+
+      docsManager.setDocuments(mappedDocs);
+      setLibraryOpen(false);
+    } catch (err) {
+      console.error("Error fetching stay from library:", err);
+      showApiError("Failed to load Stay from library");
+    }
   };
 
   const handleSubmit = async () => {

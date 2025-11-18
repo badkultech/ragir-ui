@@ -113,7 +113,7 @@ export function DetailsOptions({
           break;
       }
 
-      onLocalChange("delete", { id: itemId }); 
+      onLocalChange("delete", { id: itemId });
     } catch (err) {
       console.error("❌ Delete failed:", err);
     }
@@ -321,31 +321,34 @@ export function DetailsOptions({
                 {/* IMAGES ROW */}
                 {item.documents?.length > 0 && (
                   <div className="flex gap-3 mt-3 flex-wrap">
-                    {item.documents.map((doc: any, idx: number) => {
-                      const src =
-                        doc?.file instanceof File
-                          ? URL.createObjectURL(doc.file)
-                          : doc?.url
-                            ? doc.url
-                            : typeof doc === "string"
-                              ? doc
-                              : null;
+                    {item.documents
+                      .filter((d:any) => d?.url || d?.file)
+                      .map((doc:any, idx:number) => {
 
-                      return src ? (
-                        <img
-                          key={idx}
-                          src={src}
-                          className="w-20 h-20 object-cover rounded-lg border"
-                        />
-                      ) : (
-                        <div
-                          key={idx}
-                          className="w-20 h-20 rounded-lg border bg-gray-200 flex items-center justify-center text-xs text-gray-500"
-                        >
-                          No Image
-                        </div>
-                      );
-                    })}
+                        const src =
+                          doc?.file instanceof File
+                            ? URL.createObjectURL(doc.file)
+                            : doc?.url
+                              ? doc.url
+                              : typeof doc === "string"
+                                ? doc
+                                : null;
+
+                        return src ? (
+                          <img
+                            key={idx}
+                            src={src}
+                            className="w-20 h-20 object-cover rounded-lg border"
+                          />
+                        ) : (
+                          <div
+                            key={idx}
+                            className="w-20 h-20 rounded-lg border bg-gray-200 flex items-center justify-center text-xs text-gray-500"
+                          >
+                            No Image
+                          </div>
+                        );
+                      })}
                   </div>
                 )}
 

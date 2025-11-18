@@ -26,6 +26,7 @@ export interface MealResponse extends LibraryResponse {
     mealType: MealType;
     description?: string;
     packingSuggestion?: string;
+    time: string;
 }
 
 export const mealTypeLabels: Record<string, string> = {

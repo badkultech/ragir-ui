@@ -76,6 +76,7 @@ export const stayAPI = baseAPI.injectEndpoints({
 export const {
   useGetStaysQuery,
   useGetStayByIdQuery,
+  useLazyGetStayByIdQuery,
   useCreateStayMutation,
   useUpdateStayMutation,
   useDeleteStayMutation,

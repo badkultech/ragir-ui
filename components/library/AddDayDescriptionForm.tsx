@@ -12,6 +12,9 @@ import {
   useDocumentsManager,
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
+import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
@@ -41,6 +44,10 @@ export function AddDayDescriptionForm({
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [getbyid] = useLazyGetDayDescriptionByIdQuery();
+    const { userData } = useSelector(selectAuthState);
+
+  
 
   // ✅ Prefill when editing
   useEffect(() => {
@@ -51,10 +58,34 @@ export function AddDayDescriptionForm({
     setTime(initialData.time || "");
     setPacking(initialData.packingSuggestion || initialData.packing || "");
   }, [initialData]);
-  const handleLibrarySelect = (item: any) => {
-    setTitle(item.title || "");
-    setLocation(item.location || "");
-    setDescription(item.description || "");
+  const handleLibrarySelect = async (item: any) => {
+    try {
+      const organizationId = userData?.organizationPublicId ?? "";
+
+    const fd = await getbyid({
+      organizationId,
+      dayDescriptionId: item.id,
+    }).unwrap();
+    setTitle(fd.name || "");
+    setLocation(fd.location || "");
+    setDescription(fd.description || "");
+    setTime(fd.time || "");
+    setPacking(fd.packingSuggestion || "");
+    const mappedDocs = (fd.documents ?? []).map((d: any) => ({
+        id: d.id ?? null,
+        url: d.url ?? null,
+        type: d.type ?? "IMAGE",
+        file: null,
+        markedForDeletion: false,
+      }));
+
+      docsManager.setDocuments(mappedDocs);
+
+
+  } catch (error) {
+    console.error("Failed to fetch day description:", error);
+  }
+    setLibraryOpen(false);
   };
 
   const validateForm = () => {

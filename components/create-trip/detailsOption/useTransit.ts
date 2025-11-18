@@ -51,48 +51,64 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
 
     return mapped;
   };
-  const handleTransitSave = async (data: any, itemId?: number,documents: any[] = []) => {
-    try {
-    
-      const form = mapTransitToFormData(data, documents);
+const handleTransitSave = async (
+  data: any,
+  itemId?: number,
+  documents: any[] = [],
+  saveInLibrary?: boolean
+) => {
+  try {
+    const form = mapTransitToFormData(
+      {
+        ...data,
+        saveInLibrary: data.saveInLibrary ?? false,  
+      },
+      documents
+    );
 
-      if (itemId) {
-        const res = await updateTransit({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          itemId: String(itemId),
-          data: form,
-        }).unwrap();
+    let res;
 
-        const updated = (res as any)?.data || res;
-        return {
-          ...updated,
-          id: updated.id || itemId,
-          tripItemId: updated.tripItemId || itemId,
-          tripType: "TRANSIT",
-        };
-      }
-      const res = await createTransit({
+    if (itemId) {
+      res = await updateTransit({
         organizationId,
         tripPublicId,
         dayDetailId,
+        itemId: String(itemId),
         data: form,
       }).unwrap();
 
-      const created = (res as any)?.data || res;
+      const updated = res;
 
       return {
-        ...created,
-        id: created.id,
-        tripItemId: created.tripItemId || created.id,
+        ...updated,
+        id: updated.tripItemId,
+        tripItemId: updated.tripItemId || itemId,
         tripType: "TRANSIT",
       };
-    } catch (err) {
-      console.error("Transit save error:", err);
-      throw err;
     }
-  };
+
+    res = await createTransit({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      data: form,
+    }).unwrap();
+
+    const created = res;
+
+    return {
+      ...created,
+      id: created.tripItemId,
+      tripItemId: created.tripItemId ,
+      tripType: "TRANSIT",
+    };
+  } catch (err) {
+    console.error("Transit save error:", err);
+    throw err;
+  }
+};
+
+
   const handleTransitDelete = async (id: number) => {
     try {
       await deleteTransit({

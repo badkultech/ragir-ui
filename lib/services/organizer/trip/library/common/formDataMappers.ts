@@ -170,7 +170,7 @@ export function mapTransitToFormData(data: any, documents?: DocumentItem[]) {
   );
   fd.append("description", data.description ?? "");
   fd.append("packingSuggestion", data.packingSuggestion ?? "");
-  fd.append("addToLibrary", boolToString(true));
+  fd.append("addToLibrary", data.saveInLibrary ? "true" : "false");
   fd.append("name", data.title ?? "");
   appendDocuments(fd, documents);
   return fd;
@@ -213,6 +213,13 @@ export function mapActivityToFormData(data: any, documents?: DocumentItem[]) {
 
   if (data.priceType !== undefined)
     fd.append("priceCharge", String(data.priceType));
+  if (data.saveInLibrary) {
+  fd.append("addToLibrary", "true");
+  fd.append("name", data.saveAsName || data.title); 
+} else {
+  fd.append("addToLibrary", "false");
+}
+
 
   // moodTags: allow either array of strings or array of {label, value}
   const rawMoods = Array.isArray(data.moodTags) ? data.moodTags : [];
