@@ -1,7 +1,7 @@
-import { baseAPI } from "@/lib/services";
-import { ENDPOINTS } from "@/lib/utils";
-import { ApiResponse } from "@/lib/services/common-types";
-import { TAGS } from "@/lib/services/tags";
+import { baseAPI } from '@/lib/services';
+import { ENDPOINTS } from '@/lib/utils';
+import { ApiResponse } from '@/lib/services/common-types';
+import { TAGS } from '@/lib/services/tags';
 
 import {
   FAQItem,
@@ -9,20 +9,20 @@ import {
   CreateFAQRequest,
   UpdateFAQRequest,
   DeleteFAQResponse,
-} from "./types";
+} from './types';
 
 export const faqApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
-
     getAllFaqs: builder.query<
       FAQListResponse,
       { organizationId: string; tripPublicId: string }
     >({
       query: ({ organizationId, tripPublicId }) => ({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/faqs`,
-        method: "GET",
+        method: 'GET',
       }),
-      transformResponse: (response: ApiResponse<FAQListResponse>) => response.data,
+      transformResponse: (response: ApiResponse<FAQListResponse>) =>
+        response.data,
       providesTags: [TAGS.faq],
     }),
     getFaqById: builder.query<
@@ -30,8 +30,10 @@ export const faqApi = baseAPI.injectEndpoints({
       { organizationId: string; tripPublicId: string; faqId: string }
     >({
       query: ({ organizationId, tripPublicId, faqId }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/faqs/${faqId}`,
-        method: "GET",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/faqs/${faqId}`,
+        method: 'GET',
       }),
       transformResponse: (response: ApiResponse<FAQItem>) => response.data,
       providesTags: [TAGS.faq],
@@ -41,12 +43,12 @@ export const faqApi = baseAPI.injectEndpoints({
       {
         organizationId: string;
         tripPublicId: string;
-        data: CreateFAQRequest;
+        data: FormData;
       }
     >({
       query: ({ organizationId, tripPublicId, data }) => ({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/faqs`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
       transformResponse: (response: ApiResponse<FAQItem>) => response.data,
@@ -62,8 +64,10 @@ export const faqApi = baseAPI.injectEndpoints({
       }
     >({
       query: ({ organizationId, tripPublicId, faqId, data }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/faqs/${faqId}`,
-        method: "PUT",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/faqs/${faqId}`,
+        method: 'PUT',
         body: data,
       }),
       transformResponse: (response: ApiResponse<FAQItem>) => response.data,
@@ -74,8 +78,10 @@ export const faqApi = baseAPI.injectEndpoints({
       { organizationId: string; tripPublicId: string; faqId: string }
     >({
       query: ({ organizationId, tripPublicId, faqId }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/faqs/${faqId}`,
-        method: "DELETE",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/faqs/${faqId}`,
+        method: 'DELETE',
       }),
       transformResponse: (response: ApiResponse<DeleteFAQResponse>) =>
         response.data,

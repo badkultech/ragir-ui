@@ -72,7 +72,7 @@ export default function ExclusionsPage() {
       fd.append(`details[${index}].name`, value);
       fd.append(
         `details[${index}].category`,
-        options.includes(value) ? 'DEFAULT' : 'CUSTOM',
+        options.includes(value) ? 'DEFAULT' : 'DEFAULT',
       );
     });
     try {
