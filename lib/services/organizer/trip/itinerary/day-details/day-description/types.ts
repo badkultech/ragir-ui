@@ -25,7 +25,7 @@ export interface DayDescription {
   documents: DocumentItem[];
   description: string;
   location: string;
-  time: TimeObject;
+  time: TimeObject|string | null;
   packingSuggestion: string;
   dayDetailId: number;
 }

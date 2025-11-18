@@ -9,8 +9,19 @@ import {
 } from "@/lib/services/organizer/trip/itinerary/day-details/meal";
 import { mapMealToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
+function normalizeDocuments(docs: any[]) {
+  if (!Array.isArray(docs)) return [];
+
+  return docs.map((d: any) => ({
+    id: d.id ?? null,
+    url: d.url ?? "",
+    type: d.type ?? "IMAGE",
+    file: null,
+    markedForDeletion: false,
+  }));
+}
+
 export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
-  const [editingMeal, setEditingMeal] = useState<any>(null);
   const [initialMealData, setInitialMealData] = useState<any>(null);
 
   const [getMealById] = useLazyGetTripMealByIdQuery();
@@ -18,7 +29,7 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
   const [updateMeal] = useUpdateTripMealMutation();
   const [deleteMeal] = useDeleteTripMealMutation();
 
-  /* EDIT */
+  /* ------------------------- EDIT -------------------------- */
   const handleMealEdit = async (itemId: number) => {
     const res = await getMealById({
       organizationId,
@@ -27,48 +38,59 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
       itemId: String(itemId),
     }).unwrap();
 
-    const data = (res as any)?.data || res;
+    const data = res;
 
     const mapped = {
       id: itemId,
-      name: data.name || "",
-      type: data.type || "",
-      description: data.description || "",
-      documents: data.documents || [],
+      title: data.name ?? "",
+      description: data.description ?? "",
+      mealType: data.mealType ?? "",
+      time: data.time ?? "",
+      location: data.location ?? "",
+      priceCharge: data.priceCharge ?? "",
+      documents: normalizeDocuments(data.documents ?? []),
     };
 
-    setEditingMeal({ id: itemId });
     setInitialMealData(mapped);
     return mapped;
   };
 
-  /* SAVE */
-  const handleMealSave = async (data: any, itemId?: number) => {
-    const form = mapMealToFormData(data);
+  const handleMealSave = async (data: any, itemId?: number , documents:any[]=[] ) => {
+    const form = mapMealToFormData(
+      {
+        ...data,
+        time: data.time,
+      },
+      data.documents ?? []
+    );
+
+    let res;
 
     if (itemId) {
-      const res = await updateMeal({
+      res = await updateMeal({
         organizationId,
         tripPublicId,
         dayDetailId,
         itemId: String(itemId),
         data: form,
       }).unwrap();
-
-      return (res as any)?.data || res;
+    } else {
+      res = await createMeal({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        data: form,
+      }).unwrap();
     }
 
-    const res = await createMeal({
-      organizationId,
-      tripPublicId,
-      dayDetailId,
-      data: form,
-    }).unwrap();
+    const raw = res;
 
-    return (res as any)?.data || res;
+    return {
+      ...raw,
+      documents: normalizeDocuments(raw.documents ?? []),
+    };
   };
 
-  /* DELETE */
   const handleMealDelete = async (id: number) => {
     await deleteMeal({
       organizationId,
@@ -81,7 +103,6 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
   };
 
   return {
-    editingMeal,
     initialMealData,
     handleMealEdit,
     handleMealSave,

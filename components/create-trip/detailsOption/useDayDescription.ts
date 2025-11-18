@@ -10,8 +10,24 @@ import {
 
 import { mapDayDescriptionToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
+/* ---------------------- NORMALIZE SERVER DOCS ---------------------- */
+function normalizeDocuments(docs: any[]) {
+  if (!Array.isArray(docs)) return [];
+
+  return docs
+    .filter((d) => d?.url || d?.file)   // ⛔ remove empty docs
+    .map((d) => ({
+      id: d.id ?? null,
+      url: d.url ?? null,
+      type: d.type ?? "IMAGE",
+      file: d.file ?? null,
+      markedForDeletion: false,
+    }));
+}
+
+
+/* ------------------------- HOOK --------------------------- */
 export function useDayDescription({ organizationId, tripPublicId, dayDetailId }: any) {
-  const [editingItem, setEditingItem] = useState<any | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
 
   const [getDayDescById] = useLazyGetTripDayDescriptionByIdQuery();
@@ -19,90 +35,101 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
   const [updateDesc] = useUpdateTripDayDescriptionMutation();
   const [deleteDesc] = useDeleteTripDayDescriptionMutation();
 
-  // ------- EDIT (WITH GET API) -------
+  /* ---------------------- EDIT ---------------------- */
   const handleEdit = async (item: any) => {
     const itemId = item.id || item.tripItemId;
-    if (!itemId) {
-      console.error("❌ Edit failed: No valid ID", item);
-      return;
-    }
 
     const res = await getDayDescById({
       organizationId,
       tripPublicId,
       dayDetailId,
-      itemId: String(itemId)
+      itemId: String(itemId),
     }).unwrap();
 
-    const data = (res as any)?.data ?? res;
+    const data = res?.data ?? res;
 
     const mapped = {
-  id: itemId,
-  name: data.name || "",
-  description: data.description || "",
-  location: data.location || "",
-  packingSuggestion: data.packingSuggestion || "",
-  time:
-    typeof data.time === "string"
-      ? data.time.slice(0, 5)
-      : data.time?.hour !== undefined
-      ? `${String(data.time.hour).padStart(2, "0")}:${String(
-          data.time.minute
-        ).padStart(2, "0")}`
-      : "",
-  documents: data.documents || []
-};
+      id: itemId,
+      name: data.name ?? "",
+      description: data.description ?? "",
+      location: data.location ?? "",
+      packingSuggestion: data.packingSuggestion ?? "",
+      time:
+        typeof data.time === "string"
+          ? data.time.slice(0, 5)
+          : data.time?.hour !== undefined
+          ? `${String(data.time.hour).padStart(2, "0")}:${String(
+              data.time.minute
+            ).padStart(2, "0")}`
+          : "",
+      documents: normalizeDocuments(data.documents ?? []),
+    };
 
-
-    setEditingItem({ id: itemId });
     setInitialData(mapped);
-
     return mapped;
   };
 
-  // ------- SAVE -------
-  const handleSave = async (data: any, itemId?: number) => {
-    const form = mapDayDescriptionToFormData(data, data.documents || []);
+  /* ---------------------- SAVE ---------------------- */
+  const handleSave = async (
+    data: any,
+    itemId?: number,
+    documents: any[] = []
+  ) => {
+    const form = mapDayDescriptionToFormData(
+      {
+        ...data,
+        time: data.time,
+      },
+      documents
+    );
+
+    let res;
 
     if (itemId) {
-      const res = await updateDesc({
+      res = await updateDesc({
         organizationId,
         tripPublicId,
         dayDetailId,
         itemId: String(itemId),
-        data: form
+        data: form,
       }).unwrap();
-
-      return (res as any)?.data ?? res;
+    } else {
+      res = await createDesc({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        data: form,
+      }).unwrap();
     }
 
-    const res = await createDesc({
-      organizationId,
-      tripPublicId,
-      dayDetailId,
-      data: form
-    }).unwrap();
+    const raw = res;
 
-    return (res as any)?.data ?? res;
+    return {
+  ...raw,
+  tripType: "DAY_DESCRIPTION",
+  tripItemId:  itemId,
+  id: itemId,
+  documents: normalizeDocuments(raw.documents ?? []),
+};
+
   };
 
-  // ------- DELETE -------
-  const handleDelete = async (itemId: number) => {
+  /* ---------------------- DELETE ---------------------- */
+  const handleDelete = async (id: number) => {
     await deleteDesc({
       organizationId,
       tripPublicId,
       dayDetailId,
-      itemId: String(itemId)
+      itemId: String(id),
     }).unwrap();
 
-    return { id: itemId };
+    return { id };
   };
 
   return {
-    editingItem,
     initialData,
     handleEdit,
     handleSave,
-    handleDelete
+    handleDelete,
   };
 }

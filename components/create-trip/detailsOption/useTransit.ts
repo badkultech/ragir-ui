@@ -7,7 +7,6 @@ import {
   useUpdateTransitMutation,
   useDeleteTransitMutation,
 } from "@/lib/services/organizer/trip/itinerary/day-details/transit";
-
 import { useCreateOrganizerTransitMutation } from "@/lib/services/organizer/trip/library/transit";
 import { mapTransitToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
@@ -22,8 +21,6 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
 
   const [createLibraryTransit] = useCreateOrganizerTransitMutation();
 
-
-  /* ---------------------- EDIT ---------------------- */
   const handleTransitEdit = async (itemId: string | number) => {
     const res = await getTransitById({
       organizationId,
@@ -54,15 +51,11 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
 
     return mapped;
   };
-
-
-  /* ---------------------- CREATE / UPDATE ---------------------- */
-  const handleTransitSave = async (data: any, itemId?: number) => {
+  const handleTransitSave = async (data: any, itemId?: number,documents: any[] = []) => {
     try {
-      const { saveInLibrary, documents, ...pureData } = data;
-      const form = mapTransitToFormData(pureData, documents);
+    
+      const form = mapTransitToFormData(data, documents);
 
-      /* ------------ UPDATE ------------ */
       if (itemId) {
         const res = await updateTransit({
           organizationId,
@@ -73,8 +66,6 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
         }).unwrap();
 
         const updated = (res as any)?.data || res;
-
-        // 🔥 ALWAYS return consistent item structure
         return {
           ...updated,
           id: updated.id || itemId,
@@ -82,8 +73,6 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
           tripType: "TRANSIT",
         };
       }
-
-      /* ------------ CREATE ------------ */
       const res = await createTransit({
         organizationId,
         tripPublicId,
@@ -104,9 +93,6 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
       throw err;
     }
   };
-
-
-  /* ---------------------- DELETE ---------------------- */
   const handleTransitDelete = async (id: number) => {
     try {
       await deleteTransit({

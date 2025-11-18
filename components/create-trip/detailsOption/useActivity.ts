@@ -1,92 +1,136 @@
-"use client";
+  "use client";
 
-import { useState } from "react";
-import {
-  useLazyGetTripActivityByIdQuery,
-  useCreateTripActivityMutation,
-  useUpdateTripActivityMutation,
-  useDeleteTripActivityMutation,
-} from "@/lib/services/organizer/trip/itinerary/day-details/activity";
-import { mapActivityToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
+  import { useState } from "react";
+  import {
+    useLazyGetTripActivityByIdQuery,
+    useCreateTripActivityMutation,
+    useUpdateTripActivityMutation,
+    useDeleteTripActivityMutation,
+  } from "@/lib/services/organizer/trip/itinerary/day-details/activity";
+  import { mapActivityToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
 
-export function useActivity({ organizationId, tripPublicId, dayDetailId }: any) {
-  const [editingActivity, setEditingActivity] = useState<any>(null);
-  const [initialActivityData, setInitialActivityData] = useState<any>(null);
-
-  const [getActivityById] = useLazyGetTripActivityByIdQuery();
-  const [createActivity] = useCreateTripActivityMutation();
-  const [updateActivity] = useUpdateTripActivityMutation();
-  const [deleteActivity] = useDeleteTripActivityMutation();
-
-  /* EDIT */
-  const handleActivityEdit = async (itemId: number) => {
-    const res = await getActivityById({
-      organizationId,
-      tripPublicId,
-      dayDetailId,
-      itemId: String(itemId),
-    }).unwrap();
-
-    const data = (res as any)?.data || res;
-
-    const mapped = {
-      id: itemId,
-      name: data.name || "",
-      location: data.location || "",
-      startTime: data.startTime?.slice(0, 5) || "",
-      endTime: data.endTime?.slice(0, 5) || "",
-      description: data.description || "",
-      documents: data.documents || [],
-    };
-
-    setEditingActivity({ id: itemId });
-    setInitialActivityData(mapped);
-    return mapped;
+  export type ActivityDocument = {
+    id: number | null;
+    url: string;
+    type: string;
+    file: File | null;
+    markedForDeletion: boolean;
   };
+  export type ActivityFormData = {
+    id?: number;
+    title: string;
+    location: string;
+    description: string;
+    time: string;
+    moodTags: string[];
+    priceType: string;
+    documents: ActivityDocument[];
+  };
+  function normalizeDocuments(docs: any[]): ActivityDocument[] {
+    if (!Array.isArray(docs)) return [];
+    return docs.map((d) => ({
+      id: d.id ?? null,
+      url: d.url ?? "",
+      type: d.type ?? "IMAGE",
+      file: null,
+      markedForDeletion: false,
+    }));
+  }
 
-  /* SAVE */
-  const handleActivitySave = async (data: any, itemId?: number) => {
-    const form = mapActivityToFormData(data);
 
-    if (itemId) {
-      const res = await updateActivity({
+  export function useActivity({
+    organizationId,
+    tripPublicId,
+    dayDetailId,
+  }: any) {
+    const [initialActivityData, setInitialActivityData] =
+      useState<ActivityFormData | null>(null);
+    const [getActivityById] = useLazyGetTripActivityByIdQuery();
+    const [createActivity] = useCreateTripActivityMutation();
+    const [updateActivity] = useUpdateTripActivityMutation();
+    const [deleteActivity] = useDeleteTripActivityMutation();
+
+    const handleActivityEdit = async (itemId: number) => {
+      const res = await getActivityById({
         organizationId,
         tripPublicId,
         dayDetailId,
         itemId: String(itemId),
-        data: form,
       }).unwrap();
 
-      return (res as any)?.data || res;
-    }
+      const data = res;
 
-    const res = await createActivity({
-      organizationId,
-      tripPublicId,
-      dayDetailId,
-      data: form,
-    }).unwrap();
+      const mapped: ActivityFormData = {
+        id: itemId,
+        title: data.name ?? "",
+        location: data.location ?? "",
+        description: data.description ?? "",
+        time: data.time ?? "",
+        moodTags: data.moodTags ?? [],
+        priceType: data.priceCharge ?? "INCLUDED",
+        documents: normalizeDocuments(data.documents ?? []),
+      };
 
-    return (res as any)?.data || res;
-  };
+      setInitialActivityData(mapped);
+      return mapped;
+    };
 
-  /* DELETE */
-  const handleActivityDelete = async (id: number) => {
-    await deleteActivity({
-      organizationId,
-      tripPublicId,
-      dayDetailId,
-      itemId: String(id),
-    }).unwrap();
+    const handleActivitySave = async (
+    data: ActivityFormData,
+    itemId?: number,
+    documents: any[] = []
+  ) => {
+    const form = mapActivityToFormData(
+      {
+        ...data,
+        time: data.time,
+      },
+      documents
+    );
 
-    return { id };
-  };
 
-  return {
-    editingActivity,
-    initialActivityData,
-    handleActivityEdit,
-    handleActivitySave,
-    handleActivityDelete,
-  };
-}
+      let res;
+
+      if (itemId) {
+        res = await updateActivity({
+          organizationId,
+          tripPublicId,
+          dayDetailId,
+          itemId: String(itemId),
+          data: form,
+        }).unwrap();
+      } else {
+        res = await createActivity({
+          organizationId,
+          tripPublicId,
+          dayDetailId,
+          data: form,
+        }).unwrap();
+      }
+
+      const raw = res;
+
+      return {
+        ...raw,
+        documents: normalizeDocuments(raw.documents ?? []),
+      };
+    };
+
+    const handleActivityDelete = async (id: number) => {
+      await deleteActivity({
+        organizationId,
+        tripPublicId,
+        dayDetailId,
+        itemId: String(id),
+      }).unwrap();
+
+      return { id };
+    };
+
+    return {
+      initialActivityData,
+      handleActivityEdit,
+      handleActivitySave,
+      handleActivityDelete,
+    };
+  }

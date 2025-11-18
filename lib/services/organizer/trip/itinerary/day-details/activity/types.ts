@@ -6,6 +6,8 @@ export interface ActivityItem {
   name: string;
   location?: string;
   time?: string;
+  moodTags?: string[];
+  priceCharge?: string;
   description?: string;
   documents?: any[];      
   packingSuggestion?: string;
@@ -18,6 +20,8 @@ export interface ActivityResponse {
   time?: string;
   description?: string;
   documents?: any[];
+  moodTags?: string[];
+  priceCharge?: string;
   packingSuggestion?: string;
   dayDetailId: number;
   tripType: string; 
@@ -28,6 +32,8 @@ export interface CreateActivityRequest {
   location?: string;
   time?: string;
   description?: string;
+  moodTags?: string[];
+  priceCharge?: string;
   packingSuggestion?: string;
   documents?: File[] | string[];
 }

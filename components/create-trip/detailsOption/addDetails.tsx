@@ -10,15 +10,12 @@ import {
   Utensils,
   Activity,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ModalWrapper } from "@/components/ui/ModalWrapper";
-
 import { AddDayDescriptionForm } from "@/components/library/AddDayDescriptionForm";
 import { AddTransitForm } from "@/components/library/AddTransitForm";
 import { AddStayForm } from "@/components/library/AddStayForm";
 import { AddMealForm } from "@/components/library/AddMealForm";
 import { AddActivityForm } from "@/components/library/AddActivityForm";
-
 import { useDayDescription } from "./useDayDescription";
 import { useTransit } from "./useTransit";
 import { useStay } from "./useStay";
@@ -40,7 +37,6 @@ export function DetailsOptions({
   items = [],
   onLocalChange,
 }: DetailsOptionsProps) {
-  // -------------- Local modal controls --------------
   const [modalType, setModalType] = useState<
     "event" | "transit" | "stay" | "meal" | "activity" | null
   >(null);
@@ -52,8 +48,7 @@ export function DetailsOptions({
   const meal = useMeal({ organizationId, tripPublicId, dayDetailId });
   const activity = useActivity({ organizationId, tripPublicId, dayDetailId });
 
-  // ---------------- Create / Update ----------------
-  const handleSave = async (formData: any) => {
+  const handleSave = async (formData: any, documents: any[] = []) => {
     let apiResult = null;
 
     const itemId = getItemId(initialData);
@@ -62,23 +57,23 @@ export function DetailsOptions({
     try {
       switch (modalType) {
         case "event":
-          apiResult = await dayDesc.handleSave(formData, itemId);
+          apiResult = await dayDesc.handleSave(formData, itemId, documents);
           break;
 
         case "transit":
-          apiResult = await transit.handleTransitSave(formData, itemId);
+          apiResult = await transit.handleTransitSave(formData, itemId, documents);
           break;
 
         case "stay":
-          apiResult = await stay.handleStaySave(formData, itemId);
+          apiResult = await stay.handleStaySave(formData, itemId, documents);
           break;
 
         case "meal":
-          apiResult = await meal.handleMealSave(formData, itemId);
+          apiResult = await meal.handleMealSave(formData, itemId, documents);
           break;
 
         case "activity":
-          apiResult = await activity.handleActivitySave(formData, itemId);
+          apiResult = await activity.handleActivitySave(formData, itemId, documents);
           break;
       }
 
@@ -91,8 +86,6 @@ export function DetailsOptions({
     setInitialData(null);
   };
 
-
-  // ---------------- Delete ----------------
   const handleDelete = async (item: any) => {
     const itemId = item.id || item.tripItemId;
 
@@ -120,7 +113,7 @@ export function DetailsOptions({
           break;
       }
 
-      onLocalChange("delete", { id: itemId }); // ONLY send id
+      onLocalChange("delete", { id: itemId }); 
     } catch (err) {
       console.error("❌ Delete failed:", err);
     }
@@ -128,7 +121,6 @@ export function DetailsOptions({
 
   const getItemId = (item: any) => item?.id || item?.tripItemId;
 
-  // ---------------- Edit ----------------
   const handleEditClick = async (item: any) => {
     const itemId = item.id || item.tripItemId;
     if (!itemId) return;
@@ -176,10 +168,7 @@ export function DetailsOptions({
         break;
     }
 
-    // *** ONLY SET HERE ***
     setInitialData(mapped);
-
-    // open correct modal
     setModalType(getModalTypeFromTripType(item.tripType));
 
   };
@@ -334,21 +323,32 @@ export function DetailsOptions({
                   <div className="flex gap-3 mt-3 flex-wrap">
                     {item.documents.map((doc: any, idx: number) => {
                       const src =
-                        typeof doc === "string"
-                          ? doc
-                          : doc?.url ||
-                          (doc instanceof File ? URL.createObjectURL(doc) : "");
+                        doc?.file instanceof File
+                          ? URL.createObjectURL(doc.file)
+                          : doc?.url
+                            ? doc.url
+                            : typeof doc === "string"
+                              ? doc
+                              : null;
 
-                      return (
+                      return src ? (
                         <img
                           key={idx}
                           src={src}
                           className="w-20 h-20 object-cover rounded-lg border"
                         />
+                      ) : (
+                        <div
+                          key={idx}
+                          className="w-20 h-20 rounded-lg border bg-gray-200 flex items-center justify-center text-xs text-gray-500"
+                        >
+                          No Image
+                        </div>
                       );
                     })}
                   </div>
                 )}
+
               </div>
             );
           })}

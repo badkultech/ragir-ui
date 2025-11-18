@@ -3,6 +3,10 @@ export interface MealItem {
   tripItemId?: number;  
   name: string;
   mealType: string;
+  priceCharge?: "INCLUDED" | "CHARGEABLE";
+  location?: string; 
+  time?: string;
+
   description?: string;
   documents?: any[];
   tripType?: string;
@@ -20,6 +24,8 @@ export interface CreateMealRequest {
   description: string;
   location: string;
   time: string;
+  mealType: string;
+  priceCharge: "INCLUDED" | "CHARGEABLE";
   documents?: File[];
 }
 

@@ -17,6 +17,8 @@ export interface StayItem {
   hotelName: string;
   location: string;
   description?: string;
+  packingSuggestion?: string;
+  sharingType?: string;
   contactNumber?: string;
   documents: StayDocument[];
 }
