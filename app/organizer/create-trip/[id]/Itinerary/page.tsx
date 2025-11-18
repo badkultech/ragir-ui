@@ -44,6 +44,8 @@ export default function ItineraryPage() {
   const [endDate, setEndDate] = useState(
     searchParams.get("endDate") || new Date().toISOString()
   );
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [itineraryMeta, setItineraryMeta] = useState<any>(null);
   const [dayDetailIds, setDayDetailIds] = useState<Record<number, string>>(
     {}
   );
@@ -77,6 +79,19 @@ export default function ItineraryPage() {
         if (payload.endDate && payload.endTime) {
           setEndDate(`${payload.endDate}T${payload.endTime}`);
         }
+        if (payload.itineraryPdfDocument) {
+          const doc = payload.itineraryPdfDocument;
+
+          setItineraryMeta({
+            id: doc.id,
+            type: doc.type ?? "application/pdf",
+            url: doc.url ?? "",
+            markedForDeletion: false,
+          });
+        }
+
+
+
 
         // Generate days by totalDays or fallback to totalDaysParam
         const totalDays = payload.totalDays ?? totalDaysParam ?? 1;
@@ -188,6 +203,10 @@ export default function ItineraryPage() {
     }
     router.push(`/organizer/create-trip/${tripId}`);
   };
+
+
+
+
   const formatTime = (date: Date) =>
     `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
 
@@ -201,6 +220,28 @@ export default function ItineraryPage() {
       fd.append("endDate", endDate.split("T")[0]);
       fd.append("startTime", formatTime(new Date(startDate)));
       fd.append("endTime", formatTime(new Date(endDate)));
+
+      if (pdfFile) {
+        fd.append("itineraryPdf.id", "");
+        fd.append("itineraryPdf.type", "PDF");
+        fd.append("itineraryPdf.url", "");
+        fd.append("itineraryPdf.file", pdfFile);
+        fd.append("itineraryPdf.markedForDeletion", "false");
+
+      } else if (itineraryMeta?.url) {
+        fd.append("itineraryPdf.id", itineraryMeta.id?.toString() ?? "");
+        fd.append("itineraryPdf.type", itineraryMeta.type ?? "PDF");
+        fd.append("itineraryPdf.url", itineraryMeta.url ?? "");
+        fd.append("itineraryPdf.markedForDeletion", "false");
+
+      } else {
+        fd.append("itineraryPdf.id", "");
+        fd.append("itineraryPdf.file", "");
+        fd.append("itineraryPdf.markedForDeletion", "true");
+      }
+
+
+
       await updateItinerary({ organizationId, tripPublicId: tripId as string, data: fd as unknown as any }).unwrap();
       router.push(`/organizer/create-trip/${tripId}/exclusions`);
     } catch (err) {
@@ -219,7 +260,12 @@ export default function ItineraryPage() {
           <div className="max-w-full mx-auto bg-white shadow rounded-2xl p-8 overflow-x-hidden">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">Itinerary</h2>
 
-            <FileUploadCard accept="application/pdf" maxSizeMB={10} initialMeta={null} onSelect={() => { }} onMetaChange={() => { }} />
+            <FileUploadCard
+              accept="application/pdf"
+              maxSizeMB={10}
+              initialMeta={itineraryMeta}
+              onSelect={(file) => setPdfFile(file)}
+            />
 
             {days.map((d, dayIdx) => {
               const itemsForDay = dayItemsMap[d.day] ?? null;

@@ -69,6 +69,7 @@ import {
   setSelectedGroupLeaderId,
   setSelectedTags,
 } from '@/app/organizer/-organizer-slice';
+import { useSaveGroupLeaderMutation } from '@/lib/services/organizer/trip/library/leader';
 
 interface Props {
   tripId?: string;
@@ -185,7 +186,7 @@ export function CreateTrip({ tripId }: Props) {
       gradient: SpiritualGradient,
     },
   ];
- 
+
   const [createTrip, { isLoading: createTripLoading }] =
     useCreateTripMutation();
   const [updateTrip, { isLoading: updateTripLoading }] =
@@ -193,75 +194,78 @@ export function CreateTrip({ tripId }: Props) {
 
   const [triggerGetTrip, { data: tripData, isFetching }] =
     useLazyGetTripByIdQuery();
-    useEffect(() => {
-  if (!tripId || !organizationId) return;
-  
-  console.log("🔄 Fetching Trip...");
-  triggerGetTrip({
-    organizationId,
-    tripId,
-  });
-}, [tripId, organizationId]);
+  const [saveLeader] = useSaveGroupLeaderMutation();
 
 
   useEffect(() => {
-  if (!tripData?.data) return;
+    if (!tripId || !organizationId) return;
 
-  const trip = tripData.data;
-const safeParseTags = (arr: any): string[] => {
-  if (!arr) return [];
-  if (Array.isArray(arr) && typeof arr[0] === "string" && !arr[0].includes(`[`)) {
-    return arr;
-  }
-  try {
-    const fixedString = arr.join("");
-    const parsed = JSON.parse(fixedString);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (e) {}
-  try {
-    return JSON.parse(arr);
-  } catch (e) {}
+    console.log("🔄 Fetching Trip...");
+    triggerGetTrip({
+      organizationId,
+      tripId,
+    });
+  }, [tripId, organizationId]);
 
-  return [];
-};
-const parsedMoods = safeParseTags(trip.moodTags);
-const parsedCities = safeParseTags(trip.cityTags);
 
-  dispatch(
-    setFormData({
-      ...formData,
-      tripTitle: trip.name ?? "",
-      startDate: `${trip.startDate} ${trip.startTime}`,
-      endDate: `${trip.endDate} ${trip.endTime}`,
-      totalDays: trip.totalDays ?? 1,
-      minGroupSize: trip.minGroupSize,
-      maxGroupSize: trip.maxGroupSize,
-      minAge: trip.minAge,
-      maxAge: trip.maxAge,
-      tripHighlights: trip.highlights,
-    })
-  );
+  useEffect(() => {
+    if (!tripData?.data) return;
 
-  dispatch(setSelectedTags(parsedMoods));
-  dispatch(setCityTags(parsedCities));
+    const trip = tripData.data;
+    const safeParseTags = (arr: any): string[] => {
+      if (!arr) return [];
+      if (Array.isArray(arr) && typeof arr[0] === "string" && !arr[0].includes(`[`)) {
+        return arr;
+      }
+      try {
+        const fixedString = arr.join("");
+        const parsed = JSON.parse(fixedString);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) { }
+      try {
+        return JSON.parse(arr);
+      } catch (e) { }
 
-  if (trip.groupLeader) {
-    const leader = trip.groupLeader;
-
-    const mappedLeader = {
-      id: String(leader.id),
-      name: leader.name,
-      title: leader.name,
-      tagline: leader.tagline,
-      description: leader.tagline || leader.bio || "",
-      imageUrl: leader.documents?.[0]?.url || "",
+      return [];
     };
+    const parsedMoods = safeParseTags(trip.moodTags);
+    const parsedCities = safeParseTags(trip.cityTags);
 
-    dispatch(setLeaders([mappedLeader]));
-    dispatch(setSelectedGroupLeaderId(mappedLeader.id));
-  }
+    dispatch(
+      setFormData({
+        ...formData,
+        tripTitle: trip.name ?? "",
+        startDate: `${trip.startDate} ${trip.startTime}`,
+        endDate: `${trip.endDate} ${trip.endTime}`,
+        totalDays: trip.totalDays ?? 1,
+        minGroupSize: trip.minGroupSize,
+        maxGroupSize: trip.maxGroupSize,
+        minAge: trip.minAge,
+        maxAge: trip.maxAge,
+        tripHighlights: trip.highlights,
+      })
+    );
 
-}, [tripData]);
+    dispatch(setSelectedTags(parsedMoods));
+    dispatch(setCityTags(parsedCities));
+
+    if (trip.groupLeader) {
+      const leader = trip.groupLeader;
+
+      const mappedLeader = {
+        id: String(leader.id),
+        name: leader.name,
+        title: leader.name,
+        tagline: leader.tagline,
+        description: leader.tagline || leader.bio || "",
+        imageUrl: leader.documents?.[0]?.url || "",
+      };
+
+      dispatch(setLeaders([mappedLeader]));
+      dispatch(setSelectedGroupLeaderId(mappedLeader.id));
+    }
+
+  }, [tripData]);
 
 
   const handleSaveTrip = async () => {
@@ -666,7 +670,7 @@ const parsedCities = safeParseTags(trip.cityTags);
                   onChange={(val) =>
                     handleInputChange('tripHighlights', val ?? '')
                   }
-                  // Can be 'edit', 'live', or 'preview'
+                // Can be 'edit', 'live', or 'preview'
                 />
               </div>
             </div>
@@ -787,21 +791,45 @@ const parsedCities = safeParseTags(trip.cityTags);
             <div className='flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar'>
               <AddTripLeaderForm
                 onCancel={() => dispatch(setLeaderModalOpen(false))}
-                mode='trip'
-                onSave={(leaderData) => {
-                  console.log('✅ Leader Saved:', leaderData);
+                mode="trip"
+                onSave={async (formValues, documents) => {
 
-                  // ✅ Save in state so it shows in UI
-                  // setLeaders((prev) => [...prev, leaderData]);
+                  const fd = new FormData();
+                  fd.append("name", formValues.name);
+                  fd.append("tagline", formValues.tagline ?? "");
+                  fd.append("bio", formValues.bio ?? "");
+                  fd.append("organizationId", organizationId);
 
-                  // ✅ Also store ID for backend
-                  if (leaderData.id) {
-                    dispatch(setSelectedGroupLeaderId(leaderData.id));
+                  // Only 1 image allowed
+                  if (documents?.[0]?.file) {
+                    fd.append("documents[0].file", documents[0].file);
+                    fd.append("documents[0].type", "IMAGE");
                   }
 
+                  // 🔥 1) Library me save
+                  const savedLeader = await saveLeader({
+                    organizationId,
+                    data: fd,
+                  }).unwrap();
+
+                  // 🔥 2) Trip UI me add kardo
+                  dispatch(setLeaders([...leaders, {
+                    id: String(savedLeader.id),
+                    title: savedLeader.name || 'Untitled',
+                    name: savedLeader.name,
+                    tagline: savedLeader.tagline,
+                    description: savedLeader.bio,
+                    image: savedLeader.documents?.[0]?.url || ''
+                  }]));
+                  dispatch(setSelectedGroupLeaderId(String(savedLeader.id)));
+                  dispatch(setSelectedGroupLeaderId(String(savedLeader.id)));
+
+
+                  // Modal band
                   dispatch(setLeaderModalOpen(false));
                 }}
               />
+
             </div>
           </DialogContent>
         </Dialog>

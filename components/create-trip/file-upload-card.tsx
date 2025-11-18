@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '../ui/input';
@@ -43,6 +43,10 @@ export function FileUploadCard({
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [meta, setMeta] = useState(initialMeta);
+
+  useEffect(() => {
+  setMeta(initialMeta);
+}, [initialMeta]);
 
   const maxSizeInBytes = maxSizeMB * 1024 * 1024; // MB limit
 
