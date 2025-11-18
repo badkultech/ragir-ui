@@ -15,7 +15,6 @@ import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 
 import {
   useCreateExclusionMutation,
-  useUpdateExclusionMutation,
   useGetAllExclusionsQuery,
 } from '@/lib/services/organizer/trip/exclusion';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
@@ -31,7 +30,6 @@ const DEFAULT_OPTIONS = [
 
 export default function ExclusionsPage() {
   const router = useRouter();
-  const params = useParams();
   const organizationId = useOrganizationId();
   const { id: tripId } = useParams();
 
@@ -41,102 +39,48 @@ export default function ExclusionsPage() {
   });
 
   const [createExclusion] = useCreateExclusionMutation();
-  const [updateExclusion] = useUpdateExclusionMutation();
   const [triggerGetItineraryByTripId] = useLazyGetItineraryByTripIdQuery();
-
 
   const [options, setOptions] = useState<string[]>(DEFAULT_OPTIONS);
   const [selected, setSelected] = useState<string[]>([]);
   const [custom, setCustom] = useState('');
+  const [customOptions, setCustomOptions] = useState<Array<string>>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [backendMap, setBackendMap] = useState<Record<string, any>>({});
-
   useEffect(() => {
-    if (apiExclusions?.data) {
-      const names = apiExclusions.data.map((x) => x.name);
+    console.log('apiExclusions', apiExclusions);
+    if (apiExclusions?.details) {
+      const names = apiExclusions.details.map((x) => x.name);
 
       setOptions((prev) => Array.from(new Set([...prev, ...names])));
       setSelected(names);
-
-      const map: Record<string, any> = {};
-      apiExclusions.data.forEach((item) => {
-        map[item.name] = item;
-      });
-      setBackendMap(map);
     }
   }, [apiExclusions]);
 
   const addCustom = () => {
     const trimmed = custom.trim();
     if (!trimmed) return;
-
-    if (!options.includes(trimmed)) setOptions((prev) => [...prev, trimmed]);
+    if (!customOptions.includes(trimmed) && !options.includes(trimmed))
+      setCustomOptions((prev) => [...prev, trimmed]);
     if (!selected.includes(trimmed)) setSelected((prev) => [...prev, trimmed]);
-
     setCustom('');
   };
 
   const handleSave = async () => {
+    const fd = new FormData();
+    selected.forEach((value, index) => {
+      fd.append(`details[${index}].name`, value);
+      fd.append(
+        `details[${index}].category`,
+        options.includes(value) ? 'DEFAULT' : 'CUSTOM',
+      );
+    });
     try {
-      for (const exclusionName of selected) {
-        const existing = backendMap[exclusionName];
-
-        if (existing) {
-          // FULL UPDATE PAYLOAD
-          await updateExclusion({
-            organizationId,
-            tripPublicId: tripId as string,
-            exclusionId: existing.tripItemId,
-            data: {
-              requestId: existing.requestId ?? '',
-              currentTimestamp: new Date().toISOString(),
-              organizationId,
-
-              name: exclusionName,
-              saveToLibrary: existing.saveToLibrary ?? false,
-
-              documents: existing.documents ?? [],
-
-              fromLocation: existing.fromLocation ?? '',
-              toLocation: existing.toLocation ?? '',
-
-              startTime: existing.startTime ?? {
-                hour: 0,
-                minute: 0,
-                second: 0,
-                nano: 0,
-              },
-
-              endTime: existing.endTime ?? {
-                hour: 0,
-                minute: 0,
-                second: 0,
-                nano: 0,
-              },
-
-              vehicleType: existing.vehicleType ?? 'CAR',
-              customVehicleType: existing.customVehicleType,
-
-              arrangedBy: existing.arrangedBy ?? 'ORGANIZER',
-
-              description: existing.description ?? '',
-              packingSuggestion: existing.packingSuggestion ?? '',
-            },
-          }).unwrap();
-        } else {
-          // CREATE (POST)
-          await createExclusion({
-            organizationId,
-            tripPublicId: tripId as string,
-            data: {
-              name: exclusionName,
-              category: 'GENERAL',
-            },
-          }).unwrap();
-        }
-      }
-
+      await createExclusion({
+        organizationId,
+        tripPublicId: tripId as string,
+        data: fd,
+      }).unwrap();
       router.push(`/organizer/create-trip/${tripId}/faqs`);
     } catch (err) {
       console.error('Error saving exclusions:', err);
@@ -144,27 +88,25 @@ export default function ExclusionsPage() {
   };
 
   const handlePrev = async () => {
-  try {
-    const orgId = organizationId;
+    try {
+      const orgId = organizationId;
 
-    if (!orgId || !tripId) return;
+      if (!orgId || !tripId) return;
 
-    console.log("🔄 Fetching itinerary before going back...");
+      console.log('🔄 Fetching itinerary before going back...');
 
-    await triggerGetItineraryByTripId({
-      organizationId: orgId,
-      tripPublicId: tripId as string,
-    }).unwrap();
+      await triggerGetItineraryByTripId({
+        organizationId: orgId,
+        tripPublicId: tripId as string,
+      }).unwrap();
 
-    // Now navigate back
-    router.push(`/organizer/create-trip/${tripId}/Itinerary`);
-
-  } catch (error) {
-    console.error("❌ Failed fetching itinerary:", error);
-    router.push(`/organizer/create-trip/${tripId}/Itinerary`);
-  }
-};
-
+      // Now navigate back
+      router.push(`/organizer/create-trip/${tripId}/Itinerary`);
+    } catch (error) {
+      console.error('❌ Failed fetching itinerary:', error);
+      router.push(`/organizer/create-trip/${tripId}/Itinerary`);
+    }
+  };
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -181,7 +123,7 @@ export default function ExclusionsPage() {
           <SectionCard title='Exclusions'>
             <div className='space-y-6'>
               <PillCheckboxGroup
-                options={options}
+                options={[...options, ...customOptions]}
                 value={selected}
                 onChange={setSelected}
               />

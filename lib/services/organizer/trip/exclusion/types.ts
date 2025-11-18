@@ -1,4 +1,3 @@
-
 export interface ExclusionDocument {
   id?: number;
   type?: string;
@@ -40,7 +39,7 @@ export interface UpdateExclusionRequest {
   vehicleType: string;
   customVehicleType?: string;
 
-  arrangedBy: "ORGANIZER" | "SELF";
+  arrangedBy: 'ORGANIZER' | 'SELF';
 
   description?: string;
   packingSuggestion?: string;
@@ -70,7 +69,7 @@ export interface ExclusionItem {
 
   vehicleType: string;
   customVehicleType?: string;
-  arrangedBy: "ORGANIZER" | "SELF";
+  arrangedBy: 'ORGANIZER' | 'SELF';
   description?: string;
   packingSuggestion?: string;
   dayDetailId: number;
@@ -78,7 +77,7 @@ export interface ExclusionItem {
 export interface ExclusionListResponse {
   status: string;
   message: string;
-  data: ExclusionItem[];
+  details: ExclusionItem[];
   error?: string;
   timestamp: string;
 }

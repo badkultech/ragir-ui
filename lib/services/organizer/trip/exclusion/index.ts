@@ -1,7 +1,7 @@
-import { baseAPI } from "@/lib/services";
-import { ENDPOINTS } from "@/lib/utils";
-import { ApiResponse } from "@/lib/services/common-types";
-import { TAGS } from "@/lib/services/tags";
+import { baseAPI } from '@/lib/services';
+import { ENDPOINTS } from '@/lib/utils';
+import { ApiResponse } from '@/lib/services/common-types';
+import { TAGS } from '@/lib/services/tags';
 
 import {
   ExclusionItem,
@@ -9,18 +9,19 @@ import {
   CreateExclusionRequest,
   UpdateExclusionRequest,
   DeleteExclusionResponse,
-} from "./types";
+} from './types';
 
 export const exclusionApi = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
-
     getAllExclusions: builder.query<
       ExclusionListResponse,
       { organizationId: string; tripPublicId: string }
     >({
       query: ({ organizationId, tripPublicId }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/exclusions`,
-        method: "GET",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/exclusions`,
+        method: 'GET',
       }),
       transformResponse: (response: ApiResponse<ExclusionListResponse>) =>
         response.data,
@@ -31,8 +32,10 @@ export const exclusionApi = baseAPI.injectEndpoints({
       { organizationId: string; tripPublicId: string; exclusionId: string }
     >({
       query: ({ organizationId, tripPublicId, exclusionId }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/exclusions/${exclusionId}`,
-        method: "GET",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/exclusions/${exclusionId}`,
+        method: 'GET',
       }),
       transformResponse: (response: ApiResponse<ExclusionItem>) =>
         response.data,
@@ -43,12 +46,14 @@ export const exclusionApi = baseAPI.injectEndpoints({
       {
         organizationId: string;
         tripPublicId: string;
-        data: CreateExclusionRequest;
+        data: FormData;
       }
     >({
       query: ({ organizationId, tripPublicId, data }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/exclusions`,
-        method: "POST",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/exclusions`,
+        method: 'POST',
         body: data,
       }),
       transformResponse: (response: ApiResponse<ExclusionItem>) =>
@@ -65,8 +70,10 @@ export const exclusionApi = baseAPI.injectEndpoints({
       }
     >({
       query: ({ organizationId, tripPublicId, exclusionId, data }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/exclusions/${exclusionId}`,
-        method: "PUT",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/exclusions/${exclusionId}`,
+        method: 'PUT',
         body: data,
       }),
       transformResponse: (response: ApiResponse<ExclusionItem>) =>
@@ -78,8 +85,10 @@ export const exclusionApi = baseAPI.injectEndpoints({
       { organizationId: string; tripPublicId: string; exclusionId: string }
     >({
       query: ({ organizationId, tripPublicId, exclusionId }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/exclusions/${exclusionId}`,
-        method: "DELETE",
+        url: `${ENDPOINTS.ORGANIZER.TRIP(
+          organizationId,
+        )}/${tripPublicId}/exclusions/${exclusionId}`,
+        method: 'DELETE',
       }),
       transformResponse: (response: ApiResponse<DeleteExclusionResponse>) =>
         response.data,

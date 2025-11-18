@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '../ui/input';
+import { FileText } from 'lucide-react';
 
 export function FileUploadCard({
   label = 'Upload PDF Itinerary',
@@ -45,8 +46,8 @@ export function FileUploadCard({
   const [meta, setMeta] = useState(initialMeta);
 
   useEffect(() => {
-  setMeta(initialMeta);
-}, [initialMeta]);
+    setMeta(initialMeta);
+  }, [initialMeta]);
 
   const maxSizeInBytes = maxSizeMB * 1024 * 1024; // MB limit
 
@@ -119,20 +120,22 @@ export function FileUploadCard({
                  rounded-lg border border-dashed border-gray-300
                  bg-gray-50 p-6 cursor-pointer
                  w-full max-w-full overflow-hidden box-border'
-        onClick={handleDropAreaClick}
       >
-        <img
-          src='/itinerary.jpg'
-          alt=''
-          className='h-14 w-14 object-contain flex-shrink-0'
-        />
+        {meta?.url && (
+          <a
+            className='text-blue-400 hover:text-blue-800'
+            href={meta.url}
+            target='_black'
+          >
+            <FileText />
+          </a>
+        )}
 
         <div className='text-sm text-gray-600 text-center break-words max-w-full px-2'>
-          {file
-            ? `Selected: ${file.name}`
-            : meta?.url
-            ? `Uploaded: ${meta.url.split('/').pop()}`
+          {file || meta?.url
+            ? `Selected: ${file?.name ?? ''}`
             : 'No file selected'}
+
           {uploading && (
             <div className='text-xs text-gray-500'>Uploading...</div>
           )}
@@ -156,7 +159,8 @@ export function FileUploadCard({
               type='button'
               variant='outline'
               className='rounded-full'
-              onClick={(e) => e.stopPropagation()}
+              // onClick={(e) => e.stopPropagation()}
+              onClick={handleDropAreaClick}
             >
               Choose File
             </Button>
