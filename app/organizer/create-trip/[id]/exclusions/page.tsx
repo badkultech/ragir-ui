@@ -48,7 +48,9 @@ export default function ExclusionsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    console.log('apiExclusions', apiExclusions);
+    if (apiExclusions?.masterData) {
+      setOptions(apiExclusions.masterData.map((x) => x.name));
+    }
     if (apiExclusions?.details) {
       const names = apiExclusions.details.map((x) => x.name);
 

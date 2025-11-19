@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TripStepperHeader } from '@/components/create-trip/tripStepperHeader';
 import { SectionCard } from '@/components/create-trip/section-card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 
 import {
   useCreateFaqMutation,
+  useGetAllFaqsQuery,
   useUpdateFaqMutation,
 } from '@/lib/services/organizer/trip/faqs/index';
 import { useGetOrganizerFaqsQuery } from '@/lib/services/organizer/trip/library/faq';
@@ -33,57 +34,58 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { FAQ } from '@/lib/services/organizer/trip/faqs/types';
+import { PillCheckboxGroup } from '@/components/create-trip/pill-checkbox-group';
 
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-}
-
-const DEFAULT_FAQS: FAQ[] = [
-  {
-    id: '10',
-    question: "What's included in the trip?",
-    answer: 'Add details about inclusions here...',
-  },
-  {
-    id: '11',
-    question: 'What should I pack?',
-    answer: 'Add packing recommendations here...',
-  },
-  {
-    id: '12',
-    question: 'What is the cancellation policy?',
-    answer: 'Add cancellation policy details here...',
-  },
-  {
-    id: '13',
-    question: 'Fitness Requirements',
-    answer: 'Add fitness requirements here...',
-  },
-];
+// Local FAQ type with UI state
+type LocalFAQ = FAQ & { checked?: boolean };
 
 export default function FAQsPage() {
   const router = useRouter();
   const { id: tripId } = useParams();
-  const [faqs, setFaqs] = useState<FAQ[]>(DEFAULT_FAQS);
+  const [faqs, setFaqs] = useState<LocalFAQ[]>([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [newAnswer, setNewAnswer] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isChooseFromLibrary, setChooseFromLibrary] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState<any>(null);
 
+  console.log('faqs', faqs);
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
 
   const [createFaq] = useCreateFaqMutation();
   // const [updateFaq] = useUpdateFaqMutation();
+  const { data: faqsLibraryData = [] } = useGetOrganizerFaqsQuery(
+    organizationId ? { organizationId } : skipToken,
+  );
+
   const {
-    data: faqsData = [],
+    data: faqsData,
     isLoading,
     refetch,
-  } = useGetOrganizerFaqsQuery(organizationId ? { organizationId } : skipToken);
-  console.log('faqs', faqsData);
+  } = useGetAllFaqsQuery({
+    organizationId,
+    tripPublicId: tripId as string,
+  });
+  // console.log('faqsData', faqsData);
+
+  useEffect(() => {
+    if (faqsData?.data?.masterData) {
+      const selectedFaqs =
+        faqsData?.data?.details.map((f: FAQ) => f.question) ?? [];
+      // ensure local checked flag is present
+      setFaqs([
+        ...faqsData.data.masterData.filter(
+          (f: FAQ) => !selectedFaqs.includes(f.question),
+        ),
+        ...faqsData?.data?.details.map((f: FAQ) => ({
+          ...f,
+          isSelected: true,
+        })),
+      ]);
+    }
+  }, [faqsData]);
 
   const handleAddFromLibrary = (item: any) => {
     // Map library FAQ shape to local FAQ shape and close dialog
@@ -93,6 +95,7 @@ export default function FAQsPage() {
         id: `lib-${item.id}`,
         question: item.name ?? '',
         answer: item.answer ?? '',
+        isSelected: true,
       },
     ]);
     setChooseFromLibrary(false);
@@ -104,8 +107,14 @@ export default function FAQsPage() {
     );
   };
 
-  const handleRemoveFaq = (id: string) => {
-    setFaqs((prev) => prev.filter((f) => f.id !== id));
+  const handleRemoveFaq = (question: string) => {
+    setFaqs((prev) => prev.filter((f) => f.question !== question));
+  };
+
+  const toggleFaqChecked = (id: string) => {
+    setFaqs((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, checked: !f.checked } : f)),
+    );
   };
 
   const handleAddFaq = () => {
@@ -117,6 +126,7 @@ export default function FAQsPage() {
         id: 'local-' + Date.now(),
         question: newQuestion,
         answer: newAnswer,
+        checked: true,
       },
     ]);
 
@@ -127,11 +137,17 @@ export default function FAQsPage() {
   const handleNext = async () => {
     try {
       const fd = new FormData();
-      faqs.forEach((faq, index) => {
-        fd.append(`details[${index}].name`, faq.question);
-        fd.append(`details[${index}].answer`, faq.answer);
-        fd.append(`details[${index}].category`, 'DEFAULT');
-      });
+      console.log(
+        faqs.filter((faq) => faq.isSelected),
+        'selected faqa',
+      );
+      faqs
+        .filter((faq) => faq.isSelected)
+        .forEach((faq, index) => {
+          fd.append(`details[${index}].question`, faq.question);
+          fd.append(`details[${index}].answer`, faq.answer);
+          fd.append(`details[${index}].category`, 'DEFAULT');
+        });
       await createFaq({
         organizationId: organizationId,
         tripPublicId: tripId as string,
@@ -147,70 +163,76 @@ export default function FAQsPage() {
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <Dialog open={isChooseFromLibrary} onOpenChange={setChooseFromLibrary}>
-  <DialogContent className='sm:max-w-[40%]'>
-    <div className='relative'>
-      <DialogHeader>
-        <DialogTitle>Add From Library</DialogTitle>
-      </DialogHeader>
+        <DialogContent className='sm:max-w-[40%]'>
+          <div className='relative'>
+            <DialogHeader>
+              <DialogTitle>Add From Library</DialogTitle>
+            </DialogHeader>
 
-      <div className='mt-3 max-h-[60vh] overflow-y-auto space-y-2 pr-2'>
-        {faqsData && faqsData.length > 0 ? (
-          faqsData.map((faq: any) => (
-            <div
-              key={faq.id}
-              role='button'
-              tabIndex={0}
-              onClick={() => setSelectedFaq(faq)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setSelectedFaq(faq);
-                }
-              }}
-              className={`
-                flex items-start gap-3 p-3 rounded-md border bg-white 
+            <div className='mt-3 max-h-[60vh] overflow-y-auto space-y-2 pr-2'>
+              {faqsLibraryData && faqsLibraryData.length > 0 ? (
+                faqsLibraryData.map((faq: any) => (
+                  <div
+                    key={faq.id}
+                    role='button'
+                    tabIndex={0}
+                    onClick={() => setSelectedFaq(faq)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedFaq(faq);
+                      }
+                    }}
+                    className={`
+                flex items-start gap-3 p-3 rounded-md border bg-white
                 hover:bg-orange-50 hover:shadow-sm transition cursor-pointer
-                ${selectedFaq?.id === faq.id ? "border-orange-500 bg-orange-50" : ""}
+                ${
+                  selectedFaq?.id === faq.id
+                    ? 'border-orange-500 bg-orange-50'
+                    : ''
+                }
               `}
-            >
-              <div className='flex-1 min-w-0'>
-                <div className='font-medium text-sm text-gray-900 truncate'>
-                  {faq.name}
+                  >
+                    <div className='flex-1 min-w-0'>
+                      <div className='font-medium text-sm text-gray-900 truncate'>
+                        {faq.name}
+                      </div>
+                      <div className='text-sm text-muted-foreground mt-1 line-clamp-3'>
+                        {faq.answer}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className='text-sm text-muted-foreground p-3'>
+                  No library FAQs found.
                 </div>
-                <div className='text-sm text-muted-foreground mt-1 line-clamp-3'>
-                  {faq.answer}
-                </div>
-              </div>
+              )}
             </div>
-          ))
-        ) : (
-          <div className='text-sm text-muted-foreground p-3'>
-            No library FAQs found.
+
+            {/* Footer Buttons */}
+            <div className='flex justify-end gap-3 mt-4 pt-3 border-t'>
+              <Button
+                variant='outline'
+                onClick={() => setChooseFromLibrary(false)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                disabled={!selectedFaq}
+                onClick={() => {
+                  if (selectedFaq) handleAddFromLibrary(selectedFaq);
+                  setChooseFromLibrary(false);
+                }}
+                className='bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 text-white'
+              >
+                Select
+              </Button>
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* Footer Buttons */}
-      <div className="flex justify-end gap-3 mt-4 pt-3 border-t">
-        <Button variant="outline" onClick={() => setChooseFromLibrary(false)}>
-          Cancel
-        </Button>
-
-        <Button
-          disabled={!selectedFaq}
-          onClick={() => {
-            if (selectedFaq) handleAddFromLibrary(selectedFaq);
-            setChooseFromLibrary(false);
-          }}
-          className="bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 text-white"
-        >
-          Select
-        </Button>
-      </div>
-    </div>
-  </DialogContent>
-</Dialog>
-
+        </DialogContent>
+      </Dialog>
 
       <OrganizerSidebar
         isOpen={sidebarOpen}
@@ -227,20 +249,43 @@ export default function FAQsPage() {
             <Accordion type='single' collapsible className='w-full space-y-2'>
               {faqs.map((faq) => (
                 <AccordionItem
-                  key={faq.id}
-                  value={faq.id}
-                  className='relative group rounded-lg border bg-background px-2 sm:px-4'
+                  key={faq.question}
+                  value={faq.question ?? ''}
+                  className={`relative group rounded-lg border bg-background px-2 sm:px-4 ${
+                    faq.isSelected ? 'bg-sky-50' : ''
+                  }`}
                 >
-                  <AccordionTrigger className='text-left hover:no-underline'>
-                    {faq.question}
-                  </AccordionTrigger>
+                  <div className=' flex justify-between items-center'>
+                    <div className='flex items-center gap-2'>
+                      <Input
+                        className='w-4 h-4'
+                        size={10}
+                        type='checkbox'
+                        checked={faq.isSelected}
+                        onChange={(e) => {
+                          const updatedFaq = faqs.map((f) => {
+                            if (f.question === faq.question) {
+                              return {
+                                ...f,
+                                isSelected: e.target.checked,
+                              };
+                            }
+                            return f;
+                          });
+                          setFaqs(updatedFaq);
+                        }}
+                      />
+                      {faq.question}
+                    </div>
+                    <AccordionTrigger></AccordionTrigger>
+                  </div>
 
                   {/* Remove (X) icon in the top-right of the item */}
                   <button
                     type='button'
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleRemoveFaq(faq.id);
+                      handleRemoveFaq(faq.question ?? '');
                     }}
                     aria-label={`Remove ${faq.question}`}
                     className='absolute top-[-10px] right-[-9px] p-1 rounded hover:bg-red-50 text-gray-500 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-100 opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto'
@@ -252,7 +297,9 @@ export default function FAQsPage() {
                     <div className='border border-gray-200 rounded-lg p-2'>
                       <RichTextarea
                         value={faq.answer}
-                        onChange={(val) => updateAnswer(faq.id, val)}
+                        onChange={(val) =>
+                          updateAnswer(faq.question ?? '', val)
+                        }
                       />
                     </div>
                   </AccordionContent>

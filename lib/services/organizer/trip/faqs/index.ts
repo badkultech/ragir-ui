@@ -21,8 +21,6 @@ export const faqApi = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/faqs`,
         method: 'GET',
       }),
-      transformResponse: (response: ApiResponse<FAQListResponse>) =>
-        response.data,
       providesTags: [TAGS.faq],
     }),
     getFaqById: builder.query<

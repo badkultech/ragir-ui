@@ -78,6 +78,7 @@ export interface ExclusionListResponse {
   status: string;
   message: string;
   details: ExclusionItem[];
+  masterData: ExclusionItem[];
   error?: string;
   timestamp: string;
 }
