@@ -23,11 +23,11 @@ export default function ActivitiesPage() {
   const organizationId = useOrganizationId();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [updateId, setUpdateId] = useState<number | null>(null);
+  const [updateId, setUpdateId] = useState<number | string | null>(null);
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(
+  const [selectedActivityId, setSelectedActivityId] = useState<number| string | null>(
     null
   );
 
@@ -208,7 +208,7 @@ export default function ActivitiesPage() {
           setModalOpen(false);
           setTimeout(() => refetch(), 400);
         }}
-        updateId={updateId}
+        updateId={Number(updateId)}
         initialStep="activity"
       />
 
