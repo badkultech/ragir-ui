@@ -22,7 +22,9 @@ export const simplePricingAPI = baseAPI.injectEndpoints({
         url: `${ENDPOINTS.ORGANIZER.TRIP(organizationId)}/${tripPublicId}/pricing`,
         method: "GET",
       }),
-      transformResponse: (res: ApiResponse<PricingResponse>) => res.data.data,
+      transformResponse: (res: ApiResponse<PricingResponse>) =>  {
+    return res.data as unknown as PricingItem; 
+  },
       providesTags: [{ type: TAGS.pricing }],
     }),
 

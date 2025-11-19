@@ -9,10 +9,11 @@ import { WizardFooter } from '@/components/create-trip/wizard-footer';
 import { AppHeader } from '@/components/app-header';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import {
-  useGetReviewQuery,
   useCreateReviewMutation,
   useUpdateReviewMutation,
 } from '@/lib/services/organizer/trip/review';
+import { useOrganizationId } from '@/hooks/useOrganizationId';
+import { useGetTripByIdQuery } from '@/lib/services/organizer/trip/create-trip';
 
 interface ReviewPageState {
   tripName: string;
@@ -27,16 +28,51 @@ interface ReviewPageState {
 
 export default function ReviewPage() {
   const router = useRouter();
-  const { id: tripId } = useParams();
+  const params = useParams();
+ const organizationId = useOrganizationId();
+const tripId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const { data: reviewData } = useGetReviewQuery({
-    organizationId: '1',
-    tripPublicId: 'x1',
-  });
 
   const [createReview] = useCreateReviewMutation();
   const [updateReview] = useUpdateReviewMutation();
+
+
+ const {data :tripDetails} = useGetTripByIdQuery({
+  organizationId,
+  tripId : tripId as string,
+ })
+useEffect(() => {
+  if (!tripDetails) return;
+
+  setState(prev => ({
+    ...prev,
+    tripName: tripDetails.data.name,
+
+    travelDates: `${formatDateDMY(tripDetails.data.startDate)} to ${formatDateDMY(
+      tripDetails.data.endDate
+    )}`,
+    duration: calculateDuration(tripDetails.data.startDate, tripDetails.data.endDate),
+    groupSize: `${tripDetails.data.minGroupSize} - ${tripDetails.data.maxGroupSize} people`,
+    ageRange: `${tripDetails.data.minAge} - ${tripDetails.data.maxAge} years`,
+    leader: tripDetails.data.groupLeader?.name ?? "Not Assigned",
+    // itineraryType: (tripDetails.data.moodTags || []).join(", "),
+  }));
+}, [tripDetails]);
+
+function formatDateDMY(dateStr: string) {
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+function calculateDuration(start: string, end: string) {
+  const s = new Date(start);
+  const e = new Date(end);
+  const diffDays = Math.ceil((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24));
+  const nights = diffDays > 0 ? diffDays - 1 : 0;
+  return `${diffDays} Days | ${nights} Nights`;
+}
 
   const [state, setState] = useState<ReviewPageState>({
     tripName: 'Himalaya',
@@ -48,15 +84,6 @@ export default function ReviewPage() {
     itineraryType: 'Advanced',
     confirmed: false,
   });
-
-  useEffect(() => {
-    if (reviewData) {
-      setState((prev) => ({
-        ...prev,
-        confirmed: reviewData.confirmed ?? false,
-      }));
-    }
-  }, [reviewData]);
   const handleDraft = () => {
     console.log('Review draft saved:', state);
   };
@@ -69,16 +96,16 @@ export default function ReviewPage() {
     try {
       const payload = { confirmed: true };
 
-      if (!reviewData) {
+      if (!tripDetails) {
         await createReview({
-          organizationId: '1',
-          tripPublicId: 'x1',
+          organizationId,
+          tripPublicId: tripId as string,
           data: payload,
         });
       } else {
         await updateReview({
-          organizationId: '1',
-          tripPublicId: 'x1',
+          organizationId,
+          tripPublicId: tripId as string,
           data: payload,
         });
       }

@@ -74,6 +74,7 @@ export const tripAPI = baseAPI.injectEndpoints({
 export const {
   useCreateTripMutation,
   useGetTripsQuery,
+  useGetTripByIdQuery,
   useLazyGetTripByIdQuery,
   useUpdateTripMutation,
   useDeleteTripMutation,

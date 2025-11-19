@@ -71,6 +71,7 @@ export default function FAQsPage() {
   const [newAnswer, setNewAnswer] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isChooseFromLibrary, setChooseFromLibrary] = useState(false);
+  const [selectedFaq, setSelectedFaq] = useState<any>(null);
 
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
@@ -146,48 +147,70 @@ export default function FAQsPage() {
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <Dialog open={isChooseFromLibrary} onOpenChange={setChooseFromLibrary}>
-        <DialogContent className='sm:max-w-[40%]'>
-          <div className='relative'>
-            <DialogHeader>
-              <DialogTitle>Add From Library</DialogTitle>
-            </DialogHeader>
+  <DialogContent className='sm:max-w-[40%]'>
+    <div className='relative'>
+      <DialogHeader>
+        <DialogTitle>Add From Library</DialogTitle>
+      </DialogHeader>
 
-            {/* Scrollable list of library FAQs shown as rows */}
-            <div className='mt-3 max-h-[60vh] overflow-y-auto space-y-2 pr-2'>
-              {faqsData && faqsData.length > 0 ? (
-                faqsData.map((faq: any) => (
-                  <div
-                    key={faq.id}
-                    role='button'
-                    tabIndex={0}
-                    onClick={() => handleAddFromLibrary(faq)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleAddFromLibrary(faq);
-                      }
-                    }}
-                    className='flex items-start gap-3 p-3 rounded-md border bg-white hover:bg-sky-50 hover:shadow-sm transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-200'
-                  >
-                    <div className='flex-1 min-w-0'>
-                      <div className='font-medium text-sm text-gray-900 truncate'>
-                        {faq.name}
-                      </div>
-                      <div className='text-sm text-muted-foreground mt-1 line-clamp-3'>
-                        {faq.answer}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className='text-sm text-muted-foreground p-3'>
-                  No library FAQs found.
+      <div className='mt-3 max-h-[60vh] overflow-y-auto space-y-2 pr-2'>
+        {faqsData && faqsData.length > 0 ? (
+          faqsData.map((faq: any) => (
+            <div
+              key={faq.id}
+              role='button'
+              tabIndex={0}
+              onClick={() => setSelectedFaq(faq)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedFaq(faq);
+                }
+              }}
+              className={`
+                flex items-start gap-3 p-3 rounded-md border bg-white 
+                hover:bg-orange-50 hover:shadow-sm transition cursor-pointer
+                ${selectedFaq?.id === faq.id ? "border-orange-500 bg-orange-50" : ""}
+              `}
+            >
+              <div className='flex-1 min-w-0'>
+                <div className='font-medium text-sm text-gray-900 truncate'>
+                  {faq.name}
                 </div>
-              )}
+                <div className='text-sm text-muted-foreground mt-1 line-clamp-3'>
+                  {faq.answer}
+                </div>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className='text-sm text-muted-foreground p-3'>
+            No library FAQs found.
           </div>
-        </DialogContent>
-      </Dialog>
+        )}
+      </div>
+
+      {/* Footer Buttons */}
+      <div className="flex justify-end gap-3 mt-4 pt-3 border-t">
+        <Button variant="outline" onClick={() => setChooseFromLibrary(false)}>
+          Cancel
+        </Button>
+
+        <Button
+          disabled={!selectedFaq}
+          onClick={() => {
+            if (selectedFaq) handleAddFromLibrary(selectedFaq);
+            setChooseFromLibrary(false);
+          }}
+          className="bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 text-white"
+        >
+          Select
+        </Button>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
+
 
       <OrganizerSidebar
         isOpen={sidebarOpen}

@@ -20,10 +20,15 @@ import { AppHeader } from '@/components/app-header';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 
 import {
-  useGetPricingQuery,
+  useLazyGetPricingQuery,
   useCreatePricingMutation,
   useUpdatePricingMutation,
+  useGetPricingQuery,
 } from '@/lib/services/organizer/trip/pricing';
+import { tr } from 'date-fns/locale';
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '@/lib/slices/auth';
+import { useOrganizationId } from '@/hooks/useOrganizationId';
 
 type PricingMode = 'simple' | 'dynamic';
 
@@ -34,26 +39,17 @@ type Row = {
 
 export default function PricingPage() {
   const router = useRouter();
-  const { id: tripId } = useParams();
+  const params = useParams();
+const tripId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [gst, setGst] = useState<GstValue>('excludes');
   const [credit, setCredit] = useState({ card: true, emi: false });
   const [mode, setMode] = useState<PricingMode>('simple');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // SIMPLE PRICE
   const [price, setPrice] = useState('');
-
-  // DISCOUNT
   const [discount, setDiscount] = useState('');
   const [discountUntil, setDiscountUntil] = useState('');
-
-  // DEPOSIT
   const [depositPercent, setDepositPercent] = useState('');
-
-  // CANCELLATION POLICY
   const [policy, setPolicy] = useState('');
-
-  // ADD ONS
   const [addOns, setAddOns] = useState<
     { id: string; name: string; charge: number }[]
   >([]);
@@ -67,56 +63,92 @@ export default function PricingPage() {
     { particular: 'Price Particular', values: ['600', '900'] },
     { particular: 'Price Particular', values: ['800', '1100'] },
   ]);
-
-  // API HOOKS
-  const { data: pricingData } = useGetPricingQuery({
-    organizationId: '1',
-    tripPublicId: 'x1',
-  });
-
+        const organizationId = useOrganizationId();
+      
   const [createPricing] = useCreatePricingMutation();
   const [updatePricing] = useUpdatePricingMutation();
-
-  // Load pricing from backend into UI
-  useEffect(() => {
-    if (pricingData) {
-      setPrice(String(pricingData.basePrice || ''));
-
-      setGst(pricingData.includesGst ? 'includes' : 'excludes');
-
-      setDiscount(String(pricingData.discountPercent || ''));
-      setDiscountUntil(pricingData.discountValidUntil || '');
-
-      setDepositPercent(String(pricingData.depositRequiredPercent || ''));
-
-      setCredit({
-        card: pricingData.creditOptions === 'CREDIT_CARD',
-        emi: pricingData.creditOptions === 'EMI',
-      });
-
-      setPolicy(pricingData.cancellationPolicy || '');
-
-      setAddOns(
-        pricingData.addOns?.map((a) => ({
-          id: crypto.randomUUID(),
-          name: a.name,
-          charge: a.charge,
-        })) || [],
-      );
-    }
-  }, [pricingData]);
-
-  // Build payload for API
-  const buildPayload = () => ({
-    discountPercent: Number(discount || 0),
-    discountValidUntil: discountUntil || '',
-    includesGst: gst === 'includes',
-    depositRequiredPercent: Number(depositPercent || 0),
-    creditOptions: credit.card ? 'CREDIT_CARD' : 'EMI',
-    cancellationPolicy: policy || '',
-    basePrice: Number(price || 0),
-    addOns: addOns,
+  const  {data : pricingData}= useGetPricingQuery({
+    organizationId,
+    tripPublicId: tripId as string,
   });
+
+
+useEffect(() => {
+  console.log("pricingData loaded =>", pricingData);
+}, [pricingData]);
+
+
+
+// apply pricingData to UI
+useEffect(() => {
+  if (!pricingData) return;
+console.log(pricingData)
+  setPrice(String(pricingData.basePrice ?? ''));
+  setDiscount(String(pricingData.discountPercent ?? ''));
+  setDiscountUntil(pricingData.discountValidUntil || '');
+
+  setGst(pricingData.includesGst ? 'includes' : 'excludes');
+
+  setDepositPercent(String(pricingData.depositRequiredPercent ?? ''));
+
+  setCredit({
+    card: pricingData.creditOptions === 'CREDIT_CARD',
+    emi: pricingData.creditOptions === 'EMI',
+  });
+
+  setPolicy(pricingData.cancellationPolicy || '');
+
+  setAddOns(
+    (pricingData.addOns || []).map((a: any) => ({
+      id: String(a.id),
+      name: a.name,
+      charge: Number(a.charge),
+    }))
+  );
+
+}, [pricingData]);
+
+
+
+ const handleSavePricing = async () => {
+  if (!tripId) return;
+
+  try {
+    const fd = new FormData();
+
+    fd.append("discountPercent", String(Number(discount || 0)));
+    fd.append("discountValidUntil", discountUntil || "");
+    fd.append("includesGst", gst === "includes" ? "true" : "false");
+    fd.append("depositRequiredPercent", String(Number(depositPercent || 0)));
+    fd.append("creditOptions", credit.card ? "CREDIT_CARD" : "EMI");
+    fd.append("cancellationPolicy", policy || "");
+    fd.append("basePrice", String(Number(price || 0)));
+    addOns.forEach((addon, index) => {
+      fd.append(`addOns[${index}].id`, addon.id);
+      fd.append(`addOns[${index}].name`, addon.name);
+      fd.append(`addOns[${index}].charge`, String(addon.charge));
+    });
+
+    if (!pricingData) {
+      await createPricing({
+        organizationId,
+        tripPublicId: tripId,
+        data: fd as any,
+      });
+    } else {
+      await updatePricing({
+        organizationId,
+        tripPublicId: tripId,
+        data: fd as any,
+      });
+    }
+
+    router.push(`/organizer/create-trip/${tripId}/review`);
+  } catch (e) {
+    console.error("Pricing save error", e);
+  }
+};
+
 
   // Dynamic Handlers
   const addRow = () => {
@@ -263,27 +295,7 @@ export default function PricingPage() {
           <WizardFooter
             onPrev={() => router.push(`/organizer/create-trip/${tripId}/faqs`)}
             onDraft={() => console.log('Draft saved')}
-            onNext={async () => {
-              const payload = buildPayload();
-              try {
-                if (!pricingData) {
-                  await createPricing({
-                    organizationId: '1',
-                    tripPublicId: 'x1',
-                    data: payload,
-                  });
-                } else {
-                  await updatePricing({
-                    organizationId: '1',
-                    tripPublicId: 'x1',
-                    data: payload,
-                  });
-                }
-                router.push(`/organizer/create-trip/${tripId}/review`);
-              } catch (e) {
-                console.error('Pricing save error', e);
-              }
-            }}
+            onNext={handleSavePricing}
           />
         </main>
       </div>
