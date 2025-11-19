@@ -22,8 +22,9 @@ import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
 import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { useGetDayDescriptionsQuery } from '@/lib/services/organizer/trip/library/day-description';
-import { LazyImage } from '../ui/lazyImage';
+import {useGetDayDescriptionsQuery } from "@/lib/services/organizer/trip/library/day-description";
+import { LazyImage } from "../ui/lazyImage";
+
 
 export type LibraryItem = {
   id: string;

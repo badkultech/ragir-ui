@@ -14,19 +14,19 @@ import {
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 import { MultiUploader } from "../common/UploadFieldShortcuts";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { useLazyGetActivityByIdQuery } from "@/lib/services/organizer/trip/library/activity";
 
-/** ---------- Types ---------- */
 type AddActivityFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
   onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
-  initialData?: any; // accepts moodTags as string[] or {value,label}[]; images under images/documents/photos/assets
+  initialData?: any; 
 };
 
 type OptionType = { value: string; label: string };
-
-/** ---------- Constants ---------- */
 const moodOptions: OptionType[] = [
   { value: "ADVENTURE", label: "Adventure" },
   { value: "RELAXING", label: "Relaxing" },
@@ -34,7 +34,6 @@ const moodOptions: OptionType[] = [
   { value: "FAMILY", label: "Family" },
 ];
 
-/** ---------- Component ---------- */
 export function AddActivityForm({
   mode = "trip",
   onCancel,
@@ -56,14 +55,11 @@ export function AddActivityForm({
   const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
-
-  // react-select wants objects; we store OptionType[]
   const [moodTags, setMoodTags] = useState<OptionType[]>([]);
-
-
+  const { userData } = useSelector(selectAuthState);
+  const [getbyid] = useLazyGetActivityByIdQuery();
   const isTripMode = mode === "trip";
 
-  /** ---------- Helpers ---------- */
   const normalizeMoodOption = (x: any): OptionType | null => {
     if (!x) return null;
     if (typeof x === "object" && "value" in x && "label" in x) {
@@ -84,8 +80,6 @@ export function AddActivityForm({
     };
   };
 
-
-  /** ---------- Prefill (edit mode) ---------- */
   useEffect(() => {
     if (!initialData) return;
 
@@ -108,25 +102,47 @@ export function AddActivityForm({
 
   }, [initialData]);
 
+  const handleLibrarySelect = async (item: any) => {
+    const organizationId = userData?.organizationPublicId ?? "";
+    try {
+      const fd = await getbyid({
+        organizationId,
+        activityId: item.id,
+      }).unwrap();
 
+      setTitle(fd.name || "");
+      setLocation(fd.location || "");
+      setDescription(fd.description || "");
+      if (Array.isArray(fd.moodTags)) {
+        const opts = fd.moodTags
+          .map(normalizeMoodOption)
+          .filter(Boolean) as OptionType[];
+        setMoodTags(opts);
+      } else {
+        setMoodTags([]);
+      }
+      setTime(fd.time?.slice(0, 5) || "");
+      setPacking(fd.packingSuggestion || "");
+      setPriceType(
+        String(fd.priceCharge) === "CHARGEABLE"
+          ? "CHARGEABLE"
+          : "INCLUDED"
+      );
+      const mappedDocs = (fd.documents ?? []).map((d: any) => ({
+        id: d.id ?? null,
+        url: d.url ?? null,
+        type: d.type ?? "IMAGE",
+        file: null,
+        markedForDeletion: false,
+      }));
+      docsManager.setDocuments(mappedDocs);
 
- 
-
-
-  /** ---------- Library select ---------- */
-  const handleLibrarySelect = (item: any) => {
-    setTitle(item.title || "");
-    setLocation(item.location || "");
-    setDescription(item.description || "");
-    if (Array.isArray(item.moodTags)) {
-      const opts = item.moodTags
-        .map(normalizeMoodOption)
-        .filter(Boolean) as OptionType[];
-      setMoodTags(opts);
+    } catch (error) {
+      console.error("Failed to fetch activity:", error);
     }
+    setLibraryOpen(false);
   };
 
-  /** ---------- Validation + Submit ---------- */
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     if (!title.trim()) newErrors.title = "Title is required";
@@ -141,8 +157,6 @@ export function AddActivityForm({
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
-    // Only non-empty mood strings
     const moods = moodTags
       .map((t) => (t?.value ?? "").toString().trim())
       .filter((v) => v.length > 0);
@@ -151,9 +165,12 @@ export function AddActivityForm({
       await onSave(
         {
           title,
-          moodTags: moods, // string[]
-          priceType, // INCLUDED | CHARGEABLE
+          moodTags: moods, 
+          priceType, 
           location,
+          ...(isTripMode && {
+      saveInLibrary,
+    }),
           time,
           description,
           packing,

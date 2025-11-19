@@ -77,6 +77,7 @@ export const mealAPI = baseAPI.injectEndpoints({
 export const {
   useGetMealsQuery,
   useGetMealByIdQuery,
+  useLazyGetMealByIdQuery,
   useCreateMealMutation,
   useUpdateMealMutation,
   useDeleteMealMutation,

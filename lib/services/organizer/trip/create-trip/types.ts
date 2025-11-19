@@ -1,3 +1,5 @@
+import { GroupLeaderResponse } from "../library/leader/types";
+
 // Define response types (you can update according to your backend response)
 export interface Trip {
   tripId: string;
@@ -16,6 +18,7 @@ export interface Trip {
   cityTags: string[];
   highlights: string;
   groupLeaderId: number;
+  groupLeader?: GroupLeaderResponse;
 }
 
 export interface TripResponse {

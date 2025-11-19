@@ -17,9 +17,12 @@ export function ModalWrapper({
           ×
         </button>
 
-        {/* Modal Content */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 max-h-[90vh] overflow-auto">
-          {children}
+        {/* NOTE: keep rounded container without overflow-auto so scrollbar won't cut corners */}
+        <div className="bg-white rounded-2xl shadow-lg max-h-[90vh] overflow-hidden">
+          {/* inner scroll area — this is the only element that scrolls */}
+          <div className="p-6 overflow-auto max-h-[90vh]">
+            {children}
+          </div>
         </div>
       </div>
     </div>

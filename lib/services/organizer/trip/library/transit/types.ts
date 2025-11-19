@@ -5,11 +5,11 @@ export interface TransitRequest extends LibraryRequest {
   toLocation: string;
   startTime: string;
   endTime: string;
-  vehicleType: string;
+  vehicleTypes: string;
   customVehicleType?: string;
   arrangedBy: "ORGANIZER" | "SELF";
   description?: string;
-  packagingSuggestion?: string;
+  packingSuggestion?: string;
 }
 
 export interface TransitResponse extends LibraryResponse {
@@ -17,11 +17,11 @@ export interface TransitResponse extends LibraryResponse {
   toLocation: string;
   startTime: string;
   endTime: string;
-  vehicleType: string;
+  vehicleTypes: string;
   customVehicleType?: string;
   arrangedBy: "ORGANIZER" | "SELF";
   description?: string;
-  packagingSuggestion?: string;
+  packingSuggestion?: string;
 }
 
 

@@ -1,5 +1,6 @@
 import { userAgent } from 'next/server';
 import { itineraryAPI } from './organizer/trip/itinerary';
+import { m } from 'framer-motion';
 
 export const TAGS = {
   dayDescriptions: 'dayDescriptions',
@@ -12,6 +13,15 @@ export const TAGS = {
   trip:'trip',
   itinerary: 'itinerary',
   itineraryDayDetails: 'itineraryDayDetails',
+  dayDescription: 'dayDescription',
+  transit: 'transit',
+  stay: 'stay',
+  meal: 'meal',
+  activity: 'activity',
+  exclusion: 'exclusion',
+  faq: 'faq',
+  pricing: 'pricing',
+  review: 'review',
   user: 'user',
   otp: 'otp',
   notifications: 'notifications',

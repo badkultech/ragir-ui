@@ -13,6 +13,10 @@ import {
   useDocumentsManager,
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
+import { set } from "lodash";
+import { useLazyGetOrganizerTransitByIdQuery } from "@/lib/services/organizer/trip/library/transit";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
@@ -20,6 +24,7 @@ type AddTransitFormProps = {
   onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
   initialData?: any;
+  onLibrarySelect?: (item: any) => void;
 };
 
 const VEHICLES = [
@@ -38,6 +43,7 @@ export function AddTransitForm({
   onSave,
   header,
   initialData,
+  onLibrarySelect,
 }: AddTransitFormProps) {
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
   const [title, setTitle] = useState("");
@@ -57,6 +63,8 @@ export function AddTransitForm({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
+  const [getTransitByIdTrigger] = useLazyGetOrganizerTransitByIdQuery();
+  const { userData } = useSelector(selectAuthState);
 
   useEffect(() => {
     if (!initialData) return;
@@ -80,8 +88,8 @@ export function AddTransitForm({
       Array.isArray(initialData.vehicleTypes)
         ? initialData.vehicleTypes
         : initialData.vehicleType
-        ? [initialData.vehicleType]
-        : []
+          ? [initialData.vehicleType]
+          : []
     );
 
     // ✅ fix: populate custom vehicle type
@@ -124,6 +132,61 @@ export function AddTransitForm({
     );
   };
 
+const handleLibrarySelect = async (item:any) => {
+
+  if (!item.id) return;
+
+ const organizationId = userData?.organizationPublicId ?? "";
+
+  try {
+    const full = await getTransitByIdTrigger({
+      organizationId,
+      transitId: Number(item.id),
+    }).unwrap();
+
+    console.log("FULL TRANSIT FROM DB => ", full);
+
+    // Now full object contains: fromLocation, toLocation, times, vehicles etc.
+    setTitle(full.name ?? "");
+    setFrom(full.fromLocation ?? "");
+    setTo(full.toLocation ?? "");
+
+    setDeparture(full.startTime?.slice(0, 5) ?? "");
+    setArrival(full.endTime?.slice(0, 5) ?? "");
+
+    setDescription(full.description ?? "");
+    setPackingSuggestion(full.packingSuggestion ?? "");
+
+    setVehicle(
+      Array.isArray(full.vehicleTypes)
+        ? full.vehicleTypes
+        : full.vehicleTypes
+        ? [full.vehicleTypes]
+        : []
+    );
+    setCustomVehicleType(full.customVehicleType ?? "");
+
+    setArrangement(
+      (full.arrangedBy ?? "").toUpperCase() === "SELF"
+        ? "SELF"
+        : "ORGANIZER"
+    );
+
+    // Documents
+    const mappedDocs = (full.documents ?? []).map((d) => ({
+      id: d.id ?? null,
+      url: d.url ??  null,
+      type: d.type ?? "IMAGE",
+      file: null,
+      markedForDeletion: false,
+    }));
+
+    docsManager.setDocuments(mappedDocs);
+  } catch (err) {
+    console.error("Failed to load full transit", err);
+  }
+};
+
   const isEditorEmpty = (html: string) => {
     if (!html) return true;
 
@@ -136,7 +199,7 @@ export function AddTransitForm({
       .trim();
 
     return cleaned.length === 0;
-  };  
+  };
 
   const handleSubmit = async () => {
     const newErrors: { [key: string]: string } = {};
@@ -161,6 +224,7 @@ export function AddTransitForm({
           arrangement,
           description,
           packingSuggestion,
+          saveInLibrary,
           mode,
         },
         docsManager.documents
@@ -209,134 +273,134 @@ export function AddTransitForm({
 
       {/* Route */}
       <div>
-  <label
-    htmlFor="transit-route"
-    className="block text-[0.95rem] font-medium mb-1"
-  >
-    Transit Route <span className="text-red-500">*</span>
-  </label>
-
-  <div
-    id="transit-route"
-    className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-  >
-    {/* FROM FIELD */}
-    <div>
-      <label
-        htmlFor="route-from"
-        className="sr-only"
-      >
-        From
-      </label>
-      <Input
-        id="route-from"
-        value={from}
-        onChange={(e) => setFrom(e.target.value)}
-        placeholder="From"
-        aria-invalid={!!errors.from}
-        aria-describedby={errors.from ? "route-from-error" : undefined}
-      />
-
-      {errors.from && (
-        <p
-          id="route-from-error"
-          className="text-xs text-red-500 mt-1"
+        <label
+          htmlFor="transit-route"
+          className="block text-[0.95rem] font-medium mb-1"
         >
-          {errors.from}
-        </p>
-      )}
-    </div>
+          Transit Route <span className="text-red-500">*</span>
+        </label>
 
-    {/* TO FIELD */}
-    <div>
-      <label
-        htmlFor="route-to"
-        className="sr-only"
-      >
-        To
-      </label>
-      <Input
-        id="route-to"
-        value={to}
-        onChange={(e) => setTo(e.target.value)}
-        placeholder="To"
-        aria-invalid={!!errors.to}
-        aria-describedby={errors.to ? "route-to-error" : undefined}
-      />
-
-      {errors.to && (
-        <p
-          id="route-to-error"
-          className="text-xs text-red-500 mt-1"
+        <div
+          id="transit-route"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
         >
-          {errors.to}
-        </p>
-      )}
-    </div>
-  </div>
-</div>
+          {/* FROM FIELD */}
+          <div>
+            <label
+              htmlFor="route-from"
+              className="sr-only"
+            >
+              From
+            </label>
+            <Input
+              id="route-from"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              placeholder="From"
+              aria-invalid={!!errors.from}
+              aria-describedby={errors.from ? "route-from-error" : undefined}
+            />
+
+            {errors.from && (
+              <p
+                id="route-from-error"
+                className="text-xs text-red-500 mt-1"
+              >
+                {errors.from}
+              </p>
+            )}
+          </div>
+
+          {/* TO FIELD */}
+          <div>
+            <label
+              htmlFor="route-to"
+              className="sr-only"
+            >
+              To
+            </label>
+            <Input
+              id="route-to"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              placeholder="To"
+              aria-invalid={!!errors.to}
+              aria-describedby={errors.to ? "route-to-error" : undefined}
+            />
+
+            {errors.to && (
+              <p
+                id="route-to-error"
+                className="text-xs text-red-500 mt-1"
+              >
+                {errors.to}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
 
 
       {/* Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-  
-  {/* DEPARTURE TIME */}
-  <div>
-    <label
-      htmlFor="departure-time"
-      className="block text-[0.95rem] font-medium mb-1"
-    >
-      Departure Time <span className="text-red-500">*</span>
-    </label>
 
-    <Input
-      id="departure-time"
-      type="time"
-      value={departure}
-      onChange={(e) => setDeparture(e.target.value)}
-      aria-invalid={!!errors.departure}
-      aria-describedby={errors.departure ? "departure-time-error" : undefined}
-    />
+        {/* DEPARTURE TIME */}
+        <div>
+          <label
+            htmlFor="departure-time"
+            className="block text-[0.95rem] font-medium mb-1"
+          >
+            Departure Time <span className="text-red-500">*</span>
+          </label>
 
-    {errors.departure && (
-      <p
-        id="departure-time-error"
-        className="text-xs text-red-500 mt-1"
-      >
-        {errors.departure}
-      </p>
-    )}
-  </div>
+          <Input
+            id="departure-time"
+            type="time"
+            value={departure}
+            onChange={(e) => setDeparture(e.target.value)}
+            aria-invalid={!!errors.departure}
+            aria-describedby={errors.departure ? "departure-time-error" : undefined}
+          />
 
-  {/* ARRIVAL TIME */}
-  <div>
-    <label
-      htmlFor="arrival-time"
-      className="block text-[0.95rem] font-medium mb-1"
-    >
-      Arrival Time <span className="text-red-500">*</span>
-    </label>
+          {errors.departure && (
+            <p
+              id="departure-time-error"
+              className="text-xs text-red-500 mt-1"
+            >
+              {errors.departure}
+            </p>
+          )}
+        </div>
 
-    <Input
-      id="arrival-time"
-      type="time"
-      value={arrival}
-      onChange={(e) => setArrival(e.target.value)}
-      aria-invalid={!!errors.arrival}
-      aria-describedby={errors.arrival ? "arrival-time-error" : undefined}
-    />
+        {/* ARRIVAL TIME */}
+        <div>
+          <label
+            htmlFor="arrival-time"
+            className="block text-[0.95rem] font-medium mb-1"
+          >
+            Arrival Time <span className="text-red-500">*</span>
+          </label>
 
-    {errors.arrival && (
-      <p
-        id="arrival-time-error"
-        className="text-xs text-red-500 mt-1"
-      >
-        {errors.arrival}
-      </p>
-    )}
-  </div>
+          <Input
+            id="arrival-time"
+            type="time"
+            value={arrival}
+            onChange={(e) => setArrival(e.target.value)}
+            aria-invalid={!!errors.arrival}
+            aria-describedby={errors.arrival ? "arrival-time-error" : undefined}
+          />
 
-</div>
+          {errors.arrival && (
+            <p
+              id="arrival-time-error"
+              className="text-xs text-red-500 mt-1"
+            >
+              {errors.arrival}
+            </p>
+          )}
+        </div>
+
+      </div>
 
       {/* Vehicle */}
       <div>
@@ -349,11 +413,10 @@ export function AddTransitForm({
               key={v.value}
               type="button"
               onClick={() => toggleVehicle(v.value)}
-              className={`px-4 py-2 rounded-lg border text-sm ${
-                vehicle.includes(v.value)
+              className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
                   ? "bg-orange-500 text-white border-orange-500"
                   : "border-gray-300 hover:border-orange-400"
-              }`}
+                }`}
             >
               {v.label}
             </button>
@@ -414,8 +477,33 @@ export function AddTransitForm({
         />
       </div>
 
-      {/* Upload */}
-      <MultiUploader documentsManager={docsManager} label="Images" />
+      {/* Upload area: uses MultiUploader and shares docsManager */}
+      <div>
+        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
+        <MultiUploader documentsManager={docsManager} label="Images" />
+
+        {/* Show any manager-level error */}
+        {docsManager.error && (
+          <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>
+        )}
+      </div>
+      {/* Save in Library (Trip Mode Only) */}
+
+      {isTripMode && (
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex justify-end items-center gap-2">
+            <Input
+              type="checkbox"
+              checked={saveInLibrary}
+              onChange={(e) => setSaveInLibrary(e.target.checked)}
+              className="w-[22px]"
+            />
+            <label className="block text-[0.95rem] font-medium">
+              Save in Library
+            </label>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
@@ -435,7 +523,7 @@ export function AddTransitForm({
         <LibrarySelectModal
           open={libraryOpen}
           onClose={() => setLibraryOpen(false)}
-          onSelect={() => {}}
+          onSelect={handleLibrarySelect}
           category="transit"
         />
       )}
