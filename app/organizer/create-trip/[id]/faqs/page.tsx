@@ -123,10 +123,9 @@ export default function FAQsPage() {
     setFaqs((prev) => [
       ...prev,
       {
-        id: 'local-' + Date.now(),
         question: newQuestion,
         answer: newAnswer,
-        checked: true,
+        isSelected: true,
       },
     ]);
 
