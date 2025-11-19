@@ -11,6 +11,7 @@ export const TAGS = {
   organizations: 'organizations',
   orgs: 'org',
   trip:'trip',
+  myTrips: 'myTrips',
   itinerary: 'itinerary',
   itineraryDayDetails: 'itineraryDayDetails',
   dayDescription: 'dayDescription',
