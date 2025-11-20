@@ -24,18 +24,19 @@ export default function SwitchOrganization() {
     const org = organizations.find((o) => o.publicId === selectedOrg);
 
     {
-      org && localStorage.setItem(
-        "focusedOrganization",
-        JSON.stringify({
-          publicId: org.publicId,
-          name: org.entityName,
-          email: org.email,
-          status: org.status,
-        })
-      );
-    }
+      org &&
+        localStorage.setItem(
+          "focusedOrganization",
+          JSON.stringify({
+            publicId: org.publicId,
+            name: org.entityName,
+            email: org.email,
+            status: org.status,
+          })
+        );
 
-    showSuccess(`Organization switched to ${org.entityName}`);
+      showSuccess(`Organization switched to ${org.entityName}`);
+    }
     window.location.reload();
   };
 
@@ -47,7 +48,10 @@ export default function SwitchOrganization() {
       {/* Main Layout */}
       <div className="flex flex-col flex-1">
         {/* Header */}
-        <AppHeader title="Switch Organization" onMenuClick={() => setSidebarOpen(true)} />
+        <AppHeader
+          title="Switch Organization"
+          onMenuClick={() => setSidebarOpen(true)}
+        />
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
@@ -57,11 +61,15 @@ export default function SwitchOrganization() {
               <div className="p-4 bg-blue-100 rounded-full">
                 <ArrowLeftRight className="w-7 h-7 text-blue-700" />
               </div>
-              <h1 className="text-2xl font-semibold text-gray-900">Switch Organization</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                Switch Organization
+              </h1>
             </div>
 
             {/* Dropdown */}
-            <label className="block text-sm font-medium text-gray-700 mb-2">Select Organization</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Organization
+            </label>
 
             {isLoading ? (
               <div className="animate-pulse w-full h-12 bg-gray-200 rounded-lg" />
