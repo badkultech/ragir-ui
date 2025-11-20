@@ -13,6 +13,11 @@ import {
   useDocumentsManager,
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { useLazyGetMealByIdQuery } from "@/lib/services/organizer/trip/library/meal";
+import { slice } from "lodash";
+import { boolean } from "zod";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
@@ -39,8 +44,6 @@ export function AddMealForm({
   const [location, setLocation] = useState("Mumbai, India");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
-
-  // ✅ Image handling states
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<
@@ -52,10 +55,11 @@ export function AddMealForm({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
-
+    const { userData } = useSelector(selectAuthState);
+    const [usegetbyid] = useLazyGetMealByIdQuery();
+  
   const isTripMode = mode === "trip";
 
-  // ✅ Prefill form when editing
   useEffect(() => {
     if (!initialData) return;
     setTitle(initialData.title || initialData.name || "");
@@ -81,8 +85,6 @@ export function AddMealForm({
       );
     }
   }, [initialData]);
-
-  // ✅ File upload handler (new uploads)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
@@ -92,25 +94,39 @@ export function AddMealForm({
     }
   };
 
-  // ✅ Remove image (works for both backend + new)
-  const removeImage = (url: string) => {
-    const existing = existingImages.find((img) => img.url === url);
-    if (existing) {
-      setDeletedImageIds((prev) => [...prev, existing.id]);
-      setExistingImages((prev) => prev.filter((img) => img.url !== url));
-    } else {
-      setImages((prev) =>
-        prev.filter((_, i) => URL.createObjectURL(prev[i]) !== url)
-      );
-    }
-    setPreviewUrls((prev) => prev.filter((item) => item !== url));
-  };
 
-  // ✅ Select from library
-  const handleLibrarySelect = (item: any) => {
-    setTitle(item.title || "");
-    setLocation(item.location || "");
-    setDescription(item.description || "");
+  const handleLibrarySelect = async (item: any) => {
+    const organizationId = userData?.organizationPublicId ?? "";
+
+    try {
+      const fd = await usegetbyid({
+        organizationId,
+        mealId: item.id,
+      }).unwrap();
+    setTitle(fd.name || "");
+    setLocation(fd.location || "");
+    setDescription(fd.description || "");
+    setMealType(
+      typeof fd.mealType === "string"
+        ? fd.mealType
+        : ""
+    );
+    setTime(fd.time || "12:00");
+    setIncluded(fd.chargeable ? "chargeable" : "included");
+    setPacking(fd.packingSuggestion || "");
+    const mappedDocs = (fd.documents ?? []).map((d: any) => ({
+        id: d.id ?? null,
+        url: d.url ?? null,
+        type: d.type ?? "IMAGE",
+        file: null,
+        markedForDeletion: !!d.markedForDeletion,
+      }));
+      docsManager.setDocuments(mappedDocs);
+    } catch (error) {
+      showApiError("Failed to load Meal from library");
+      console.error("Failed to fetch meal:", error);
+    }
+    setLibraryOpen(false);
   };
 
   const validateForm = () => {

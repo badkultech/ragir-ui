@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { X } from "lucide-react"
 
-type AddOn = { id: string; name: string; amount: string }
+type AddOn = { id: string; name: string; charge: number }
 
 export function AddOnsFieldset({
   value,
@@ -23,7 +23,7 @@ export function AddOnsFieldset({
   }
 
   const addRow = () => {
-    const next = [...items, { id: crypto.randomUUID(), name: "", amount: "" }]
+    const next = [...items, { id: crypto.randomUUID(), name: "", charge: 0 }]
     pushChange(next)
   }
 
@@ -66,8 +66,8 @@ export function AddOnsFieldset({
               <Input
                 id={`amt-${row.id}`}
                 placeholder="Add on charge"
-                value={row.amount}
-                onChange={(e) => editRow(row.id, { amount: e.target.value })}
+                value={row.charge.toString()}
+                onChange={(e) => editRow(row.id, { charge: Number(e.target.value) })}
               />
             </div>
             <div className="md:col-span-1 flex items-center">

@@ -12,6 +12,7 @@ import {
   Undo2,
   PlusCircle,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
   const renderButtons = () => {
@@ -78,10 +79,12 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
         );
 
       // DRAFT TRIPS — fixed to match your screenshot
-      case "drafts":
+      case "draft":
         return (
           <>
             {/* Continue Editing — full width button */}
+            <Link href={`/organizer/create-trip/${trip.id}`}
+            className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg">
             <Button
               variant="outline"
               size="sm"
@@ -89,6 +92,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
             >
               <Edit size={15} /> Continue Editing
             </Button>
+            </Link>
 
             {/* Delete — icon-only button */}
             <Button

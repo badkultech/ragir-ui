@@ -28,6 +28,7 @@ export interface LibraryRequest {
 export interface LibraryResponse {
   id: number;
   name: string;
+  title?: string;
   documents?: DocumentRequest[];
   addedToLibrary: boolean;
   tripId?: number;

@@ -80,6 +80,7 @@ export const activityAPI = baseAPI.injectEndpoints({
 export const {
   useGetActivitiesQuery,
   useGetActivityByIdQuery,
+  useLazyGetActivityByIdQuery,
   useCreateActivityMutation,
   useUpdateActivityMutation,
   useDeleteActivityMutation,

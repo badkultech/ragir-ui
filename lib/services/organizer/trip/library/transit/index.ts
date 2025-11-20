@@ -84,6 +84,7 @@ export const {
   useCreateOrganizerTransitMutation,
   useGetOrganizerTransitsQuery,
   useGetOrganizerTransitByIdQuery,
+  useLazyGetOrganizerTransitByIdQuery,
   useUpdateOrganizerTransitMutation,
   useDeleteOrganizerTransitMutation,
 } = transitAPI;
