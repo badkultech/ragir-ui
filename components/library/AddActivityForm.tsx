@@ -327,7 +327,6 @@ export function AddActivityForm({
           value={description}
           onChange={setDescription}
           placeholder="Enter here"
-          maxLength={800}
         />
       </div>
 
@@ -340,7 +339,6 @@ export function AddActivityForm({
           value={packing}
           onChange={setPacking}
           placeholder="Enter here"
-          maxLength={800}
         />
       </div>
 

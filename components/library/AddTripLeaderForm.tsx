@@ -42,7 +42,7 @@ export function AddTripLeaderForm({
       setBio("");
       try {
         docsManager.resetDocuments?.();
-      } catch {}
+      } catch { }
       return;
     }
 
@@ -114,7 +114,7 @@ export function AddTripLeaderForm({
       {/* Bio */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">Bio <span className="text-red-500">*</span></label>
-        <RichTextEditor value={bio} onChange={setBio} placeholder="Enter here" maxLength={500} />
+        <RichTextEditor value={bio} onChange={setBio} placeholder="Enter here" maxWords={500} />
         {errors.bio && <p className="text-xs text-red-500 mt-1">{errors.bio}</p>}
       </div>
 

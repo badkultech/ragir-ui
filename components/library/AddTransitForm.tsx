@@ -132,60 +132,60 @@ export function AddTransitForm({
     );
   };
 
-const handleLibrarySelect = async (item:any) => {
+  const handleLibrarySelect = async (item: any) => {
 
-  if (!item.id) return;
+    if (!item.id) return;
 
- const organizationId = userData?.organizationPublicId ?? "";
+    const organizationId = userData?.organizationPublicId ?? "";
 
-  try {
-    const full = await getTransitByIdTrigger({
-      organizationId,
-      transitId: Number(item.id),
-    }).unwrap();
+    try {
+      const full = await getTransitByIdTrigger({
+        organizationId,
+        transitId: Number(item.id),
+      }).unwrap();
 
-    console.log("FULL TRANSIT FROM DB => ", full);
+      console.log("FULL TRANSIT FROM DB => ", full);
 
-    // Now full object contains: fromLocation, toLocation, times, vehicles etc.
-    setTitle(full.name ?? "");
-    setFrom(full.fromLocation ?? "");
-    setTo(full.toLocation ?? "");
+      // Now full object contains: fromLocation, toLocation, times, vehicles etc.
+      setTitle(full.name ?? "");
+      setFrom(full.fromLocation ?? "");
+      setTo(full.toLocation ?? "");
 
-    setDeparture(full.startTime?.slice(0, 5) ?? "");
-    setArrival(full.endTime?.slice(0, 5) ?? "");
+      setDeparture(full.startTime?.slice(0, 5) ?? "");
+      setArrival(full.endTime?.slice(0, 5) ?? "");
 
-    setDescription(full.description ?? "");
-    setPackingSuggestion(full.packingSuggestion ?? "");
+      setDescription(full.description ?? "");
+      setPackingSuggestion(full.packingSuggestion ?? "");
 
-    setVehicle(
-      Array.isArray(full.vehicleTypes)
-        ? full.vehicleTypes
-        : full.vehicleTypes
-        ? [full.vehicleTypes]
-        : []
-    );
-    setCustomVehicleType(full.customVehicleType ?? "");
+      setVehicle(
+        Array.isArray(full.vehicleTypes)
+          ? full.vehicleTypes
+          : full.vehicleTypes
+            ? [full.vehicleTypes]
+            : []
+      );
+      setCustomVehicleType(full.customVehicleType ?? "");
 
-    setArrangement(
-      (full.arrangedBy ?? "").toUpperCase() === "SELF"
-        ? "SELF"
-        : "ORGANIZER"
-    );
+      setArrangement(
+        (full.arrangedBy ?? "").toUpperCase() === "SELF"
+          ? "SELF"
+          : "ORGANIZER"
+      );
 
-    // Documents
-    const mappedDocs = (full.documents ?? []).map((d) => ({
-      id: d.id ?? null,
-      url: d.url ??  null,
-      type: d.type ?? "IMAGE",
-      file: null,
-      markedForDeletion: false,
-    }));
+      // Documents
+      const mappedDocs = (full.documents ?? []).map((d) => ({
+        id: d.id ?? null,
+        url: d.url ?? null,
+        type: d.type ?? "IMAGE",
+        file: null,
+        markedForDeletion: false,
+      }));
 
-    docsManager.setDocuments(mappedDocs);
-  } catch (err) {
-    console.error("Failed to load full transit", err);
-  }
-};
+      docsManager.setDocuments(mappedDocs);
+    } catch (err) {
+      console.error("Failed to load full transit", err);
+    }
+  };
 
   const isEditorEmpty = (html: string) => {
     if (!html) return true;
@@ -414,8 +414,8 @@ const handleLibrarySelect = async (item:any) => {
               type="button"
               onClick={() => toggleVehicle(v.value)}
               className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
-                  ? "bg-orange-500 text-white border-orange-500"
-                  : "border-gray-300 hover:border-orange-400"
+                ? "bg-orange-500 text-white border-orange-500"
+                : "border-gray-300 hover:border-orange-400"
                 }`}
             >
               {v.label}
@@ -461,7 +461,6 @@ const handleLibrarySelect = async (item:any) => {
         <RichTextEditor
           value={description}
           onChange={setDescription}
-          maxLength={800}
         />
       </div>
 
@@ -473,7 +472,6 @@ const handleLibrarySelect = async (item:any) => {
         <RichTextEditor
           value={packingSuggestion}
           onChange={setPackingSuggestion}
-          maxLength={800}
         />
       </div>
 

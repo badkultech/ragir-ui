@@ -163,7 +163,6 @@ export function AddDayDescriptionForm({
         <RichTextEditor
           value={description}
           onChange={setDescription}
-          maxLength={800}
         />
         {errors.description && (
           <p className="text-xs text-red-500 mt-1">{errors.description}</p>
@@ -202,18 +201,11 @@ export function AddDayDescriptionForm({
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Packing Suggestions
         </label>
-        {/* <Textarea
-          value={packing}
-          onChange={(e) => setPacking(e.target.value)}
-          placeholder='Enter here'
-          rows={5}
-          maxLength={800}
-        /> */}
+
         <RichTextEditor
           value={packing}
           onChange={setPacking}
           placeholder="Enter here"
-          maxLength={800}
         />
       </div>
 
