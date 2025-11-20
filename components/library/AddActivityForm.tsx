@@ -23,7 +23,7 @@ type AddActivityFormProps = {
   onCancel: () => void;
   onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
-  initialData?: any; 
+  initialData?: any;
 };
 
 type OptionType = { value: string; label: string };
@@ -94,7 +94,7 @@ export function AddActivityForm({
       setMoodTags([]);
     }
 
-    setPriceType(initialData.chargeable ? "CHARGEABLE" : "INCLUDED");
+    setPriceType(initialData.priceCharge ? "CHARGEABLE" : "INCLUDED");
     setLocation(initialData.location || "");
     setTime(initialData.time || "");
     setDescription(initialData.description || "");
@@ -165,12 +165,12 @@ export function AddActivityForm({
       await onSave(
         {
           title,
-          moodTags: moods, 
-          priceType, 
+          moodTags: moods,
+          priceType,
           location,
           ...(isTripMode && {
-      saveInLibrary,
-    }),
+            saveInLibrary,
+          }),
           time,
           description,
           packing,
@@ -277,7 +277,7 @@ export function AddActivityForm({
             />
             Included
           </label>
-          <label className="flex items-center gap-2 text-[0.85rem]">
+          <label className="flex items-center gap-2 text-[0.95rem]">
             <input
               type="radio"
               name="priceType"
