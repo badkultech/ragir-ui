@@ -55,9 +55,17 @@ export function AddMealForm({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
-    const { userData } = useSelector(selectAuthState);
-    const [usegetbyid] = useLazyGetMealByIdQuery();
-  
+  const { userData } = useSelector(selectAuthState);
+  const [usegetbyid] = useLazyGetMealByIdQuery();
+  const [isSaving, setIsSaving] = useState(false);
+
+
+  async function urlToFile(url: string, filename = "library_image.jpg") {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type });
+  }
+
   const isTripMode = mode === "trip";
 
   useEffect(() => {
@@ -103,24 +111,47 @@ export function AddMealForm({
         organizationId,
         mealId: item.id,
       }).unwrap();
-    setTitle(fd.name || "");
-    setLocation(fd.location || "");
-    setDescription(fd.description || "");
-    setMealType(
-      typeof fd.mealType === "string"
-        ? fd.mealType
-        : ""
-    );
-    setTime(fd.time || "12:00");
-    setIncluded(fd.chargeable ? "chargeable" : "included");
-    setPacking(fd.packingSuggestion || "");
-    const mappedDocs = (fd.documents ?? []).map((d: any) => ({
-        id: d.id ?? null,
-        url: d.url ?? null,
-        type: d.type ?? "IMAGE",
-        file: null,
-        markedForDeletion: !!d.markedForDeletion,
-      }));
+      setTitle(fd.name || "");
+      setLocation(fd.location || "");
+      setDescription(fd.description || "");
+      setMealType(
+        typeof fd.mealType === "string"
+          ? fd.mealType
+          : ""
+      );
+      setTime(fd.time || "12:00");
+      setIncluded(fd.chargeable ? "chargeable" : "included");
+      setPacking(fd.packingSuggestion || "");
+      const mappedDocs = await Promise.all(
+        (fd.documents ?? []).map(async (d: any, index: number) => {
+          if (d.url) {
+            const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
+            return {
+              id: null,                // new file → no ID
+              url: URL.createObjectURL(file),
+              type: file.type,
+              file,
+              markedForDeletion: false,
+            };
+          }
+          return {
+            id: null,
+            url: null,
+            type: null,
+            file: null,
+            markedForDeletion: false,
+          };
+        })
+      );
+      while (mappedDocs.length < 6) {
+        mappedDocs.push({
+          id: null,
+          url: null,
+          type: null,
+          file: null,
+          markedForDeletion: false,
+        });
+      }
       docsManager.setDocuments(mappedDocs);
     } catch (error) {
       showApiError("Failed to load Meal from library");
@@ -144,6 +175,8 @@ export function AddMealForm({
   const handleSubmit = async () => {
     const isValid = validateForm();
     if (!isValid) return;
+    setIsSaving(true);
+
 
     try {
       await onSave(
@@ -164,6 +197,8 @@ export function AddMealForm({
       showSuccess("Meal saved successfully!");
     } catch {
       showApiError("Failed to save Meal");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -329,6 +364,14 @@ export function AddMealForm({
         </div>
       )}
 
+
+      {isSaving && (
+        <div className="w-full flex justify-center my-2">
+          <p className="text-sm text-orange-500 font-medium">
+            Saving...
+          </p>
+        </div>
+      )}
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>

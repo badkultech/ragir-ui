@@ -254,7 +254,7 @@ export function mapDayDescriptionToFormData(
   // some dayDescriptions might include extra fields like packingSuggestion already handled above
   // handle attached documents (the `documents` param), as well as possibly pre-existing `data.documents`
   // prefer explicit passed documents (from your useDocumentsManager). If none passed, try data.documents
-  appendDocuments(fd, documents ?? data.documents ?? null);
+  appendDocuments(fd, documents);
   return fd;
 }
 

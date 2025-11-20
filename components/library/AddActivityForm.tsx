@@ -23,7 +23,7 @@ type AddActivityFormProps = {
   onCancel: () => void;
   onSave: (data: any, documents?: DocShape[]) => void;
   header?: string;
-  initialData?: any; 
+  initialData?: any;
 };
 
 type OptionType = { value: string; label: string };
@@ -59,6 +59,14 @@ export function AddActivityForm({
   const { userData } = useSelector(selectAuthState);
   const [getbyid] = useLazyGetActivityByIdQuery();
   const isTripMode = mode === "trip";
+  const [isSaving, setIsSaving] = useState(false);
+
+
+  async function urlToFile(url: string, filename = "library_image.jpg") {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type });
+  }
 
   const normalizeMoodOption = (x: any): OptionType | null => {
     if (!x) return null;
@@ -128,14 +136,38 @@ export function AddActivityForm({
           ? "CHARGEABLE"
           : "INCLUDED"
       );
-      const mappedDocs = (fd.documents ?? []).map((d: any) => ({
-        id: d.id ?? null,
-        url: d.url ?? null,
-        type: d.type ?? "IMAGE",
-        file: null,
-        markedForDeletion: false,
-      }));
+      const mappedDocs = await Promise.all(
+        (fd.documents ?? []).map(async (d: any, index: number) => {
+          if (d.url) {
+            const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
+            return {
+              id: null,
+              url: URL.createObjectURL(file),
+              type: file.type,
+              file,
+              markedForDeletion: false,
+            };
+          }
+          return {
+            id: null,
+            url: null,
+            type: null,
+            file: null,
+            markedForDeletion: false,
+          };
+        })
+      );
+      while (mappedDocs.length < 6) {
+        mappedDocs.push({
+          id: null,
+          url: null,
+          type: null,
+          file: null,
+          markedForDeletion: false,
+        });
+      }
       docsManager.setDocuments(mappedDocs);
+
 
     } catch (error) {
       console.error("Failed to fetch activity:", error);
@@ -157,6 +189,8 @@ export function AddActivityForm({
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
+
+    setIsSaving(true);
     const moods = moodTags
       .map((t) => (t?.value ?? "").toString().trim())
       .filter((v) => v.length > 0);
@@ -165,12 +199,12 @@ export function AddActivityForm({
       await onSave(
         {
           title,
-          moodTags: moods, 
-          priceType, 
+          moodTags: moods,
+          priceType,
           location,
           ...(isTripMode && {
-      saveInLibrary,
-    }),
+            saveInLibrary,
+          }),
           time,
           description,
           packing,
@@ -181,6 +215,8 @@ export function AddActivityForm({
       showSuccess("Activity saved successfully!");
     } catch {
       showApiError("Failed to save Activity");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -376,7 +412,13 @@ export function AddActivityForm({
           </div>
         </div>
       )}
-
+      {isSaving && (
+        <div className="w-full flex justify-center my-2">
+          <p className="text-sm text-orange-500 font-medium">
+            Saving...
+          </p>
+        </div>
+      )}
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>

@@ -64,6 +64,14 @@ export function AddTransitForm({
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [getTransitByIdTrigger] = useLazyGetOrganizerTransitByIdQuery();
   const { userData } = useSelector(selectAuthState);
+  const [isSaving, setIsSaving] = useState(false);
+
+
+  async function urlToFile(url: string, filename = "library_image.jpg") {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type });
+  }
 
   useEffect(() => {
     if (!initialData) return;
@@ -130,60 +138,81 @@ export function AddTransitForm({
     );
   };
 
-const handleLibrarySelect = async (item:any) => {
+  const handleLibrarySelect = async (item: any) => {
 
-  if (!item.id) return;
+    if (!item.id) return;
 
- const organizationId = userData?.organizationPublicId ?? "";
+    const organizationId = userData?.organizationPublicId ?? "";
 
-  try {
-    const full = await getTransitByIdTrigger({
-      organizationId,
-      transitId: Number(item.id),
-    }).unwrap();
+    try {
+      const full = await getTransitByIdTrigger({
+        organizationId,
+        transitId: Number(item.id),
+      }).unwrap();
 
-    console.log("FULL TRANSIT FROM DB => ", full);
+      console.log("FULL TRANSIT FROM DB => ", full);
 
-    // Now full object contains: fromLocation, toLocation, times, vehicles etc.
-    setTitle(full.name ?? "");
-    setFrom(full.fromLocation ?? "");
-    setTo(full.toLocation ?? "");
+      // Now full object contains: fromLocation, toLocation, times, vehicles etc.
+      setTitle(full.name ?? "");
+      setFrom(full.fromLocation ?? "");
+      setTo(full.toLocation ?? "");
 
-    setDeparture(full.startTime?.slice(0, 5) ?? "");
-    setArrival(full.endTime?.slice(0, 5) ?? "");
+      setDeparture(full.startTime?.slice(0, 5) ?? "");
+      setArrival(full.endTime?.slice(0, 5) ?? "");
 
-    setDescription(full.description ?? "");
-    setPackingSuggestion(full.packingSuggestion ?? "");
+      setDescription(full.description ?? "");
+      setPackingSuggestion(full.packingSuggestion ?? "");
 
-    setVehicle(
-      Array.isArray(full.vehicleTypes)
-        ? full.vehicleTypes
-        : full.vehicleTypes
-        ? [full.vehicleTypes]
-        : []
-    );
-    setCustomVehicleType(full.customVehicleType ?? "");
+      setVehicle(
+        Array.isArray(full.vehicleTypes)
+          ? full.vehicleTypes
+          : full.vehicleTypes
+            ? [full.vehicleTypes]
+            : []
+      );
+      setCustomVehicleType(full.customVehicleType ?? "");
 
-    setArrangement(
-      (full.arrangedBy ?? "").toUpperCase() === "SELF"
-        ? "SELF"
-        : "ORGANIZER"
-    );
+      setArrangement(
+        (full.arrangedBy ?? "").toUpperCase() === "SELF"
+          ? "SELF"
+          : "ORGANIZER"
+      );
 
-    // Documents
-    const mappedDocs = (full.documents ?? []).map((d) => ({
-      id: d.id ?? null,
-      url: d.url ??  null,
-      type: d.type ?? "IMAGE",
-      file: null,
-      markedForDeletion: false,
-    }));
-
-    docsManager.setDocuments(mappedDocs);
-  } catch (err) {
-    console.error("Failed to load full transit", err);
-  }
-};
+      const mappedDocs = await Promise.all(
+        (full.documents ?? []).map(async (d: any, index: number) => {
+          if (d.url) {
+            const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
+            return {
+              id: null,                // new file → no ID
+              url: URL.createObjectURL(file),
+              type: file.type,
+              file,
+              markedForDeletion: false,
+            };
+          }
+          return {
+            id: null,
+            url: null,
+            type: null,
+            file: null,
+            markedForDeletion: false,
+          };
+        })
+      );
+      while (mappedDocs.length < 6) {
+        mappedDocs.push({
+          id: null,
+          url: null,
+          type: null,
+          file: null,
+          markedForDeletion: false,
+        });
+      }
+      docsManager.setDocuments(mappedDocs);
+    } catch (err) {
+      console.error("Failed to load full transit", err);
+    }
+  };
 
   const isEditorEmpty = (html: string) => {
     if (!html) return true;
@@ -208,6 +237,8 @@ const handleLibrarySelect = async (item:any) => {
     if (!arrival.trim()) newErrors.arrival = "Arrival time is required";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+    setIsSaving(true);
+
 
     try {
       onSave(
@@ -230,6 +261,8 @@ const handleLibrarySelect = async (item:any) => {
       showSuccess("Transit saved successfully!");
     } catch {
       showApiError("Failed to save Transit");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -412,8 +445,8 @@ const handleLibrarySelect = async (item:any) => {
               type="button"
               onClick={() => toggleVehicle(v.value)}
               className={`px-4 py-2 rounded-lg border text-sm ${vehicle.includes(v.value)
-                  ? "bg-orange-500 text-white border-orange-500"
-                  : "border-gray-300 hover:border-orange-400"
+                ? "bg-orange-500 text-white border-orange-500"
+                : "border-gray-300 hover:border-orange-400"
                 }`}
             >
               {v.label}
@@ -510,6 +543,13 @@ const handleLibrarySelect = async (item:any) => {
         </div>
       )}
 
+      {isSaving && (
+        <div className="w-full flex justify-center my-2">
+          <p className="text-sm text-orange-500 font-medium">
+            Saving...
+          </p>
+        </div>
+      )}
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>
