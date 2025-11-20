@@ -35,7 +35,7 @@ export default function SwitchOrganization() {
           })
         );
 
-      showSuccess(`Organization switched to ${org.entityName}`);
+      showSuccess(`Organization switched to ${org?.entityName}`);
     }
     window.location.reload();
   };
