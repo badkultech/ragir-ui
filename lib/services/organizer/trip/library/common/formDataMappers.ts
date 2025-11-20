@@ -145,7 +145,9 @@ export function mapStayToFormData(data: any, documents?: DocumentItem[]) {
     fd.append("sharingType", String(data.sharingType));
   if (data.checkIn !== undefined) fd.append("checkInTime", data.checkIn);
   if (data.checkOut !== undefined) fd.append("checkOutTime", data.checkOut);
-
+  if (data.saveInLibrary) {
+    fd.append("addToLibrary", "true");
+  }
   appendDocuments(fd, documents);
   return fd;
 }
@@ -215,7 +217,6 @@ export function mapActivityToFormData(data: any, documents?: DocumentItem[]) {
     fd.append("priceCharge", String(data.priceType));
   if (data.saveInLibrary) {
   fd.append("addToLibrary", "true");
-  fd.append("name", data.saveAsName || data.title); 
 } else {
   fd.append("addToLibrary", "false");
 }
@@ -245,8 +246,6 @@ export function mapDayDescriptionToFormData(
     location: data.location ?? "",
     packing: data.packing ?? "",
     time: data.time ?? "",
-   addToLibrary: data.addToLibrary ?? false,
-
   });
    if (data.saveInLibrary) {
     fd.append("addToLibrary", "true");

@@ -29,6 +29,7 @@ import { tr } from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import { selectAuthState } from '@/lib/slices/auth';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
+import { CustomDateTimePicker } from '@/components/ui/date-time-picker';
 
 type PricingMode = 'simple' | 'dynamic';
 
@@ -71,14 +72,6 @@ const tripId = Array.isArray(params.id) ? params.id[0] : params.id;
     organizationId,
     tripPublicId: tripId as string,
   });
-
-
-useEffect(() => {
-  console.log("pricingData loaded =>", pricingData);
-}, [pricingData]);
-
-
-
 // apply pricingData to UI
 useEffect(() => {
   if (!pricingData) return;
@@ -246,10 +239,10 @@ console.log(pricingData)
                       />
 
                       <Label>Discount Valid Until</Label>
-                      <Input
-                        type='date'
+                      <CustomDateTimePicker
+                        mode='date'
                         value={discountUntil}
-                        onChange={(e) => setDiscountUntil(e.target.value)}
+                        onChange={setDiscountUntil}
                       />
 
                       <Label>GST Status *</Label>

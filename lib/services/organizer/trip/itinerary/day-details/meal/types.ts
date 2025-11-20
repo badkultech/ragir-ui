@@ -4,9 +4,10 @@ export interface MealItem {
   name: string;
   mealType: string;
   priceCharge?: "INCLUDED" | "CHARGEABLE";
+  chargeable?:string,
   location?: string; 
   time?: string;
-
+  packingSuggestion?:string;
   description?: string;
   documents?: any[];
   tripType?: string;

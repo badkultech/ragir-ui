@@ -47,7 +47,8 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
       mealType: data.mealType ?? "",
       time: data.time ?? "",
       location: data.location ?? "",
-      priceCharge: data.priceCharge ?? "",
+      chargeable: data.chargeable ?? false,   
+      packingSuggestion :data.packingSuggestion??"",
       documents: normalizeDocuments(data.documents ?? []),
     };
 

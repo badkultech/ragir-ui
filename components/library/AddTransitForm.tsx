@@ -62,7 +62,6 @@ export function AddTransitForm({
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState("");
   const [getTransitByIdTrigger] = useLazyGetOrganizerTransitByIdQuery();
   const { userData } = useSelector(selectAuthState);
 
@@ -102,7 +101,6 @@ export function AddTransitForm({
     );
 
     setSaveInLibrary(!!initialData.addedToLibrary);
-    setSaveAsName(initialData.name ?? initialData.title ?? "");
 
     // ✅ reset documents
     const mappedDocs = (
@@ -492,11 +490,18 @@ const handleLibrarySelect = async (item:any) => {
       {isTripMode && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
-            <Input
+            <input
               type="checkbox"
               checked={saveInLibrary}
               onChange={(e) => setSaveInLibrary(e.target.checked)}
-              className="w-[22px]"
+              className="appearance-none w-5 h-5 border-2 rounded-sm checked:bg-orange-500 checked:border-orange-500 flex items-center justify-center cursor-pointer"
+              style={{
+                backgroundImage: saveInLibrary
+                  ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M6.003 10.803l-2.85-2.849L1.3 9.808l4.703 4.704L14.7 5.815l-1.854-1.854z'/%3E%3C/svg%3E\")"
+                  : "none",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
             />
             <label className="block text-[0.95rem] font-medium">
               Save in Library

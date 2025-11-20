@@ -107,8 +107,8 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
     return {
   ...raw,
   tripType: "DAY_DESCRIPTION",
-  tripItemId:  itemId,
-  id: itemId,
+  tripItemId:raw.tripItemId,
+  id: raw.tripItemId,
   documents: normalizeDocuments(raw.documents ?? []),
 };
 
