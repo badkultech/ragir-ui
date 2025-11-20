@@ -23,15 +23,17 @@ export default function SwitchOrganization() {
 
     const org = organizations.find((o) => o.publicId === selectedOrg);
 
-    localStorage.setItem(
-      "focusedOrganization",
-      JSON.stringify({
-        publicId: org.publicId,
-        name: org.entityName,
-        email: org.email,
-        status: org.status,
-      })
-    );
+    {
+      org && localStorage.setItem(
+        "focusedOrganization",
+        JSON.stringify({
+          publicId: org.publicId,
+          name: org.entityName,
+          email: org.email,
+          status: org.status,
+        })
+      );
+    }
 
     showSuccess(`Organization switched to ${org.entityName}`);
     window.location.reload();
