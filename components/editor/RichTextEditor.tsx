@@ -17,17 +17,17 @@ interface RichTextEditorProps {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
-  maxLength?: number;
+  maxWords?: number;
 }
 
 export default function RichTextEditor({
   value,
   onChange,
   placeholder = "Enter here",
-  maxLength = 800,
+  maxWords = 800,
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement | null>(null);
-  const [charCount, setCharCount] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
@@ -50,7 +50,7 @@ export default function RichTextEditor({
     if (!isFocused && value !== el.innerHTML && !isTransformingRef.current) {
       el.innerHTML = value || "";
       const text = el.innerText || "";
-      setCharCount(text.length);
+      setWordCount(countWords(text));
     }
   }, [value, isFocused]);
 
@@ -63,10 +63,10 @@ export default function RichTextEditor({
       blockTag.includes("h1")
         ? "h1"
         : blockTag.includes("h2")
-        ? "h2"
-        : blockTag.includes("h3")
-        ? "h3"
-        : "p"
+          ? "h2"
+          : blockTag.includes("h3")
+            ? "h3"
+            : "p"
     );
 
     setActiveFormats({
@@ -107,17 +107,26 @@ export default function RichTextEditor({
       : "";
   };
 
+  const countWords = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return 0;
+    return trimmed.split(/\s+/).length;
+  };
+
+
   // Handle input
   const handleInput = useCallback(() => {
     const el = editorRef.current;
     if (!el) return;
     const html = el.innerHTML.trim();
     const text = el.innerText || "";
-    setCharCount(text.length);
+
+    const words = countWords(text);
+    setWordCount(words);
+
     const normalized = normalizeHTML(html);
     onChange(normalized);
 
-    // Log HTML for backend debug
     console.clear();
     console.log(
       "%c📤 HTML sent to backend:",
@@ -127,6 +136,7 @@ export default function RichTextEditor({
 
     updateActiveFormats();
   }, [onChange, updateActiveFormats]);
+
 
   // Markdown shortcut (safe delayed transform)
   const handleMarkdownKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -223,8 +233,8 @@ export default function RichTextEditor({
       align === "left"
         ? "justifyLeft"
         : align === "center"
-        ? "justifyCenter"
-        : "justifyRight";
+          ? "justifyCenter"
+          : "justifyRight";
     document.execCommand(cmd, false);
     setTimeout(() => handleInput(), 0);
   };
@@ -233,13 +243,24 @@ export default function RichTextEditor({
   const handleBeforeInput = (e: InputEvent) => {
     const el = editorRef.current;
     if (!el) return;
+
     const text = el.innerText || "";
     const incoming = e.data ?? "";
-    const sel = document.getSelection();
-    const selectedText = sel?.toString() || "";
-    const newLength = text.length - selectedText.length + incoming.length;
-    if (newLength > maxLength) e.preventDefault();
+
+    const selection = document.getSelection();
+    const selectedText = selection?.toString() || "";
+
+    // Remove selected text (will be replaced by incoming)
+    const baseText = selectedText ? text.replace(selectedText, "") : text;
+
+    const simulated = (baseText + " " + incoming).trim();
+    const newWordCount = countWords(simulated);
+
+    if (newWordCount > maxWords) {
+      e.preventDefault();
+    }
   };
+
 
   // Paste event
   const handlePaste = (e: ClipboardEvent) => {
@@ -254,36 +275,50 @@ export default function RichTextEditor({
     const sel = document.getSelection();
     const selectedText = sel?.toString() || "";
 
-    // Calculate new text length after paste
-    const newLength = currentText.length - selectedText.length + paste.length;
+    const baseText = selectedText
+      ? currentText.replace(selectedText, "")
+      : currentText;
 
-    // ✅ Block paste if it exceeds limit
-    if (newLength > maxLength) {
-      const allowedChars =
-        maxLength - (currentText.length - selectedText.length);
-      if (allowedChars > 0) {
-        const partialPaste = paste.slice(0, allowedChars);
-        document.execCommand("insertText", false, partialPaste);
+    const baseWords = countWords(baseText);
+    const pasteWordsArray = paste.trim().split(/\s+/).filter(Boolean);
+    const pasteWordsCount = pasteWordsArray.length;
+
+    const newWordCount = baseWords + pasteWordsCount;
+
+    if (newWordCount > maxWords) {
+      const allowedWords = maxWords - baseWords;
+
+      if (allowedWords > 0) {
+        const partialPaste = pasteWordsArray.slice(0, allowedWords).join(" ");
+        document.execCommand("insertText", false, partialPaste + " ");
       }
+      // If no words allowed, just block
       return;
     }
 
-    // ✅ Otherwise, allow paste normally
     document.execCommand("insertText", false, paste);
-
-    // Trigger your normal input handler to update state
     setTimeout(() => handleInput(), 0);
   };
+
 
   // Attach listeners
   useEffect(() => {
     const el = editorRef.current;
     if (!el) return;
-    el.addEventListener("beforeinput", (e) =>
-      handleBeforeInput(e as InputEvent)
-    );
-    el.addEventListener("paste", (e) => handlePaste(e as ClipboardEvent));
-  }, []);
+
+    const beforeInputHandler = (e: Event) =>
+      handleBeforeInput(e as InputEvent);
+    const pasteHandler = (e: Event) => handlePaste(e as ClipboardEvent);
+
+    el.addEventListener("beforeinput", beforeInputHandler);
+    el.addEventListener("paste", pasteHandler);
+
+    return () => {
+      el.removeEventListener("beforeinput", beforeInputHandler);
+      el.removeEventListener("paste", pasteHandler);
+    };
+  }, [handleBeforeInput, handlePaste]);
+
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden focus-within:border-orange-400 transition">
@@ -387,8 +422,9 @@ export default function RichTextEditor({
           data-placeholder={placeholder}
         />
         <span className="absolute bottom-2 right-3 text-xs text-orange-500">
-          {charCount}/{maxLength} Characters
+          {wordCount}/{maxWords} Words
         </span>
+
       </div>
       {showPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -474,11 +510,10 @@ function ToolbarButton({
     <button
       type="button"
       onClick={onClick}
-      className={`p-1.5 rounded-md transition-colors ${
-        active
-          ? "bg-orange-100 text-orange-600"
-          : "hover:bg-gray-100 active:bg-gray-200 text-gray-600"
-      }`}
+      className={`p-1.5 rounded-md transition-colors ${active
+        ? "bg-orange-100 text-orange-600"
+        : "hover:bg-gray-100 active:bg-gray-200 text-gray-600"
+        }`}
     >
       {icon}
     </button>

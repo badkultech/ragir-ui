@@ -19,6 +19,7 @@ import { set } from "lodash";
 import { useLazyGetStayByIdQuery } from "@/lib/services/organizer/trip/library/stay";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import RequiredStar from "../common/RequiredStar";
 
 
 type AddStayFormProps = {
@@ -181,7 +182,7 @@ export function AddStayForm({
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Title <RequiredStar /></label>
         <div className="relative">
           <Input
             value={title}
@@ -199,28 +200,30 @@ export function AddStayForm({
 
       {/* Sharing */}
       <div>
+        <RequiredStar />
         <select
           value={sharingType}
           onChange={(e) => setSharingType(e.target.value)}
           className="w-full border rounded-lg p-2 text-sm text-gray-700"
         >
-          <option value="">Type of Sharing</option>
+          <option value="">Type of Sharing  </option>
           <option value="SINGLE">Single Occupancy</option>
           <option value="DOUBLE">Double Occupancy</option>
           <option value="TRIPLE">Triple Occupancy</option>
         </select>
+
         {errors.sharingType && <p className="text-xs text-red-500 mt-1">{errors.sharingType}</p>}
       </div>
 
       {/* Check-in / Check-out */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Time *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Time <RequiredStar /></label>
           <Input type="time" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
           {errors.checkIn && <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Check-out Time *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Check-out Time <RequiredStar /></label>
           <Input type="time" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
           {errors.checkOut && <p className="text-xs text-red-500 mt-1">{errors.checkOut}</p>}
         </div>
@@ -234,7 +237,7 @@ export function AddStayForm({
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Description <RequiredStar /></label>
         <RichTextEditor placeholder="Enter description" value={description} onChange={setDescription} />
         {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
       </div>
@@ -242,7 +245,7 @@ export function AddStayForm({
       {/* Packing Suggestions */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Packing Suggestions</label>
-        <RichTextEditor value={packing} onChange={setPacking} placeholder="Enter here" maxLength={800} />
+        <RichTextEditor value={packing} onChange={setPacking} placeholder="Enter here" maxWords={800} />
       </div>
 
       {/* Upload area: uses MultiUploader and shares docsManager */}

@@ -18,6 +18,7 @@ import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetMealByIdQuery } from "@/lib/services/organizer/trip/library/meal";
 import { slice } from "lodash";
 import { boolean } from "zod";
+import RequiredStar from "../common/RequiredStar";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
@@ -55,9 +56,9 @@ export function AddMealForm({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
-    const { userData } = useSelector(selectAuthState);
-    const [usegetbyid] = useLazyGetMealByIdQuery();
-  
+  const { userData } = useSelector(selectAuthState);
+  const [usegetbyid] = useLazyGetMealByIdQuery();
+
   const isTripMode = mode === "trip";
 
   useEffect(() => {
@@ -103,18 +104,18 @@ export function AddMealForm({
         organizationId,
         mealId: item.id,
       }).unwrap();
-    setTitle(fd.name || "");
-    setLocation(fd.location || "");
-    setDescription(fd.description || "");
-    setMealType(
-      typeof fd.mealType === "string"
-        ? fd.mealType
-        : ""
-    );
-    setTime(fd.time || "12:00");
-    setIncluded(fd.chargeable ? "chargeable" : "included");
-    setPacking(fd.packingSuggestion || "");
-    const mappedDocs = (fd.documents ?? []).map((d: any) => ({
+      setTitle(fd.name || "");
+      setLocation(fd.location || "");
+      setDescription(fd.description || "");
+      setMealType(
+        typeof fd.mealType === "string"
+          ? fd.mealType
+          : ""
+      );
+      setTime(fd.time || "12:00");
+      setIncluded(fd.chargeable ? "chargeable" : "included");
+      setPacking(fd.packingSuggestion || "");
+      const mappedDocs = (fd.documents ?? []).map((d: any) => ({
         id: d.id ?? null,
         url: d.url ?? null,
         type: d.type ?? "IMAGE",
@@ -190,7 +191,7 @@ export function AddMealForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Title <RequiredStar /></label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -209,7 +210,7 @@ export function AddMealForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">
-            Meal Type *
+            Meal Type <RequiredStar />
           </label>
           <select
             value={mealType}
@@ -234,7 +235,7 @@ export function AddMealForm({
         </div>
 
         <div>
-          <label className="block text-[0.95rem] font-medium mb-2">Time</label>
+          <label className="block text-[0.95rem] font-medium mb-2">Time <RequiredStar /></label>
           <Input
             type="time"
             value={time}
@@ -269,7 +270,7 @@ export function AddMealForm({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description
+          Description <RequiredStar />
         </label>
         <RichTextEditor
           placeholder="Enter description"
@@ -290,7 +291,7 @@ export function AddMealForm({
           value={packing}
           onChange={setPacking}
           placeholder="Enter packing suggestions"
-          maxLength={800}
+          maxWords={800}
         />
       </div>
 

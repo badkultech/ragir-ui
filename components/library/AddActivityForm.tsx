@@ -17,6 +17,7 @@ import { MultiUploader } from "../common/UploadFieldShortcuts";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetActivityByIdQuery } from "@/lib/services/organizer/trip/library/activity";
+import RequiredStar from "../common/RequiredStar";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -204,7 +205,7 @@ export function AddActivityForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Title <RequiredStar /></label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -222,7 +223,7 @@ export function AddActivityForm({
       {/* Mood Tags */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Mood Tags *
+          Mood Tags <RequiredStar />
         </label>
         <Select
           options={moodOptions}
@@ -265,7 +266,7 @@ export function AddActivityForm({
       {/* Price Type */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Price Charge *
+          Price Charge <RequiredStar />
         </label>
         <div className="flex items-center gap-6">
           <label className="flex items-center gap-2 text-[0.95rem]">
@@ -296,7 +297,7 @@ export function AddActivityForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">
-            Location
+            Location <RequiredStar />
           </label>
           <Input
             value={location}
@@ -320,7 +321,7 @@ export function AddActivityForm({
       {/* Description */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-1">
-          Description
+          Description <RequiredStar />
         </label>
         <RichTextEditor
           value={description}

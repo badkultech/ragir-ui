@@ -15,6 +15,7 @@ import {
 import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import RequiredStar from "../common/RequiredStar";
 
 type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
@@ -45,9 +46,9 @@ export function AddDayDescriptionForm({
   const [saveAsName, setSaveAsName] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [getbyid] = useLazyGetDayDescriptionByIdQuery();
-    const { userData } = useSelector(selectAuthState);
+  const { userData } = useSelector(selectAuthState);
 
-  
+
 
   // ✅ Prefill when editing
   useEffect(() => {
@@ -62,16 +63,16 @@ export function AddDayDescriptionForm({
     try {
       const organizationId = userData?.organizationPublicId ?? "";
 
-    const fd = await getbyid({
-      organizationId,
-      dayDescriptionId: item.id,
-    }).unwrap();
-    setTitle(fd.name || "");
-    setLocation(fd.location || "");
-    setDescription(fd.description || "");
-    setTime(fd.time || "");
-    setPacking(fd.packingSuggestion || "");
-    const mappedDocs = (fd.documents ?? []).map((d: any) => ({
+      const fd = await getbyid({
+        organizationId,
+        dayDescriptionId: item.id,
+      }).unwrap();
+      setTitle(fd.name || "");
+      setLocation(fd.location || "");
+      setDescription(fd.description || "");
+      setTime(fd.time || "");
+      setPacking(fd.packingSuggestion || "");
+      const mappedDocs = (fd.documents ?? []).map((d: any) => ({
         id: d.id ?? null,
         url: d.url ?? null,
         type: d.type ?? "IMAGE",
@@ -82,9 +83,9 @@ export function AddDayDescriptionForm({
       docsManager.setDocuments(mappedDocs);
 
 
-  } catch (error) {
-    console.error("Failed to fetch day description:", error);
-  }
+    } catch (error) {
+      console.error("Failed to fetch day description:", error);
+    }
     setLibraryOpen(false);
   };
 
@@ -106,7 +107,7 @@ export function AddDayDescriptionForm({
     //  Trigger save
     try {
       await onSave(
-        { title, description, location, time, packing,saveInLibrary, mode },
+        { title, description, location, time, packing, saveInLibrary, mode },
         docsManager.documents
       );
 
@@ -136,7 +137,7 @@ export function AddDayDescriptionForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">Title <span className="text-red-500">*</span></label>
+        <label className="block text-[0.95rem] font-medium mb-1">Title <RequiredStar /></label>
         <div className="relative">
           <Input
             value={title}
@@ -157,7 +158,7 @@ export function AddDayDescriptionForm({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description <span className="text-red-500">*</span>
+          Description <RequiredStar />
         </label>
         <RichTextEditor
           value={description}
