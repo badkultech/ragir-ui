@@ -10,7 +10,6 @@ import {
   useUpdateOrganizerProfileMutation,
 } from '@/lib/services/organizer';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAuthState } from '@/lib/slices/auth';
 import { FileText, Trash2, X } from 'lucide-react';
 import {
   Document,
@@ -28,10 +27,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { UploadIcon } from 'lucide-react';
 import { LazyImage } from '@/components/ui/lazyImage';
+import { useOrganizationId } from '@/hooks/useOrganizationId';
 
 export default function OrganizerProfileEditPage() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const focusedOrgPublicId=useOrganizationId();
 
   const state = useSelector(organizerState);
 
@@ -56,8 +57,7 @@ export default function OrganizerProfileEditPage() {
   // Lazy image helper: shows skeleton while loading and fades in.
   // Handles cached images by checking image.complete and enforces a short
   // minimum skeleton duration so the user perceives a loading state.
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = focusedOrgPublicId;
 
   const [updatedOrgProfile, { isLoading }] =
     useUpdateOrganizerProfileMutation();
