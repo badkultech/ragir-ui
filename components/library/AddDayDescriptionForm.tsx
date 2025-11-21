@@ -15,6 +15,8 @@ import {
 import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
@@ -28,7 +30,6 @@ type AddDayDescriptionFormProps = {
 export function AddDayDescriptionForm({
   mode = "trip",
   onCancel,
-  updateId,
   onSave,
   header,
   initialData,
@@ -115,7 +116,6 @@ export function AddDayDescriptionForm({
       docsManager.setDocuments(mappedDocs);
 
 
-
     } catch (error) {
       console.error("Failed to fetch day description:", error);
     }
@@ -123,10 +123,10 @@ export function AddDayDescriptionForm({
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!description.trim()) newErrors.description = "Description is required";
+    const newErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "description", label: "Description", value: description },
+    ]);
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -173,7 +173,7 @@ export function AddDayDescriptionForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">Title <span className="text-red-500">*</span></label>
+        <label className="block text-[0.95rem] font-medium mb-1">Title <RequiredStar /></label>
         <div className="relative">
           <Input
             value={title}
@@ -194,12 +194,11 @@ export function AddDayDescriptionForm({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description <span className="text-red-500">*</span>
+          Description <RequiredStar />
         </label>
         <RichTextEditor
           value={description}
           onChange={setDescription}
-          maxLength={800}
         />
         {errors.description && (
           <p className="text-xs text-red-500 mt-1">{errors.description}</p>
@@ -238,18 +237,11 @@ export function AddDayDescriptionForm({
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Packing Suggestions
         </label>
-        {/* <Textarea
-          value={packing}
-          onChange={(e) => setPacking(e.target.value)}
-          placeholder='Enter here'
-          rows={5}
-          maxLength={800}
-        /> */}
+
         <RichTextEditor
           value={packing}
           onChange={setPacking}
           placeholder="Enter here"
-          maxLength={800}
         />
       </div>
 

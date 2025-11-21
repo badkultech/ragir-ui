@@ -8,57 +8,108 @@ import {
   ChevronDown,
   Check,
 } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 
-export default function TripFilterBar({ tab }: { tab: string }) {
-  const key = String(tab || "").toLowerCase().replace(/s$/, "");
-  const [sortBy, setSortBy] = React.useState("Newest to Oldest");
-  const [status, setStatus] = React.useState("All Status");
-  const [dateRange, setDateRange] = React.useState<{
-    from?: Date;
-    to?: Date;
-  }>({
-    from: new Date(),
-    to: addDays(new Date(), 7),
-  });
+interface Props {
+  tab: string;
+
+  // search
+  search: string;
+  setSearch: (v: string) => void;
+
+  // status (backend TripStatus)
+  statusFilter?: "PUBLISHED" | "UNDER_REVIEW" | "REQUIRES_MODIFICATION";
+  setStatusFilter: (v: any) => void;
+
+  // date range
+  dateRange: { start?: string; end?: string };
+  setDateRange: (v: any) => void;
+
+  // sort
+  sortBy: string;
+  setSortBy: (v: string) => void;
+  sortDir: "ASC" | "DESC";
+  setSortDir: (v: "ASC" | "DESC") => void;
+
+  loading?: boolean;
+}
+
+export default function TripFilterBar({
+  tab,
+  search,
+  setSearch,
+  statusFilter,
+  setStatusFilter,
+  dateRange,
+  setDateRange,
+  sortBy,
+  setSortBy,
+  sortDir,
+  setSortDir,
+  loading,
+}: Props) {
+  const isUpcoming = tab === "upcoming";
+  const isPast = tab === "past";
+
   const [calendarOpen, setCalendarOpen] = React.useState(false);
 
-  const sortOptions: Record<string, string[]> = {
-    upcoming: ["First to Last Trip", "Last to First Trip"],
-    past: ["Most Viewed", "Recent First"],
-    draft: ["Newest to Oldest", "Oldest to Newest"],
-    archived: ["Newest to Oldest", "Oldest to Newest"],
-    deleted: ["Newest to Oldest", "Oldest to Newest"],
-  };
-
+  // convert UI date → label
   const formattedRange =
-    dateRange?.from && dateRange?.to
-      ? `${format(dateRange.from, "dd MMM, yyyy")} - ${format(dateRange.to, "dd MMM, yyyy")}`
+    dateRange.start && dateRange.end
+      ? `${format(new Date(dateRange.start), "dd MMM yyyy")} - ${format(
+          new Date(dateRange.end),
+          "dd MMM yyyy"
+        )}`
       : "Date Range";
+
+  /** ---------------- SORT OPTIONS (mapped to backend) ---------------- */
+  const sortOptions: { label: string; sortBy: string; sortDir: "ASC" | "DESC" }[] =
+    tab === "upcoming"
+      ? [
+          { label: "First to Last Trip", sortBy: "startDate", sortDir: "ASC" },
+          { label: "Last to First Trip", sortBy: "startDate", sortDir: "DESC" },
+        ]
+      : tab === "past"
+      ? [
+          { label: "Most Viewed", sortBy: "views", sortDir: "DESC" },
+          { label: "Recent First", sortBy: "startDate", sortDir: "DESC" },
+        ]
+      : [
+          { label: "Newest to Oldest", sortBy: "createdAt", sortDir: "DESC" },
+          { label: "Oldest to Newest", sortBy: "createdAt", sortDir: "ASC" },
+        ];
+
+  const currentSort = sortOptions.find(
+    (s) => s.sortBy === sortBy && s.sortDir === sortDir
+  )?.label;
 
   return (
     <div className="flex flex-wrap gap-3 items-center mt-4">
-      {/* 🔍 Search Input */}
+      {/* -------------------------------- SEARCH -------------------------------- */}
       <div className="relative flex-1 min-w-[240px]">
         <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
         <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           type="text"
-          placeholder="Search trips by name or destination.."
+          placeholder="Search trips by name or destination..."
           className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 focus:ring-1 focus:ring-gray-300 focus:outline-none"
         />
       </div>
 
-      {/* 🗓️ Date Range - only for Upcoming & Past */}
-      {(key === "upcoming" || key === "past") && (
+      {/* -------------------------------- DATE RANGE -------------------------------- */}
+      {(isUpcoming || isPast) && (
         <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -69,32 +120,38 @@ export default function TripFilterBar({ tab }: { tab: string }) {
               {formattedRange}
             </Button>
           </PopoverTrigger>
+
           <PopoverContent align="start" className="w-auto p-0">
             <div className="p-4">
               <Calendar
                 mode="range"
-                selected={dateRange.from && dateRange.to ? { from: dateRange.from, to: dateRange.to } : undefined}
-                onSelect={(range) => setDateRange(range ? { from: range.from, to: range.to } : { from: undefined, to: undefined })}
-                numberOfMonths={1}
-                className="rounded-md border"
-                required={false}
-                styles={{
-                  day_selected: {
-                    backgroundColor: "#FF6B00",
-                    color: "white",
-                  },
-                  day_range_middle: {
-                    backgroundColor: "#FFF3E9",
-                    color: "#FF6B00",
-                  },
+                selected={
+                  dateRange.start && dateRange.end
+                    ? {
+                        from: new Date(dateRange.start),
+                        to: new Date(dateRange.end),
+                      }
+                    : undefined
+                }
+                onSelect={(range) => {
+                  if (!range) {
+                    setDateRange({ start: undefined, end: undefined });
+                    return;
+                  }
+
+                  setDateRange({
+                    start: range.from?.toISOString()?.slice(0, 10),
+                    end: range.to?.toISOString()?.slice(0, 10),
+                  });
                 }}
               />
+
               <div className="flex justify-between mt-3">
                 <Button
                   variant="outline"
                   size="sm"
                   className="text-gray-700 border-gray-300"
-                  onClick={() => setDateRange({ from: undefined, to: undefined })}
+                  onClick={() => setDateRange({ start: undefined, end: undefined })}
                 >
                   Clear
                 </Button>
@@ -111,8 +168,8 @@ export default function TripFilterBar({ tab }: { tab: string }) {
         </Popover>
       )}
 
-      {/* 🎚️ All Status - only for Upcoming */}
-      {key === "upcoming" && (
+      {/* -------------------------------- STATUS FILTER (Upcoming only) -------------------------------- */}
+      {isUpcoming && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -120,27 +177,42 @@ export default function TripFilterBar({ tab }: { tab: string }) {
               className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               <SlidersHorizontal size={16} />
-              {status}
+              {statusFilter ?? "All Status"}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44">
-            {["All Status", "Published", "Under Review", "Requires Modification"].map(
-              (item) => (
-                <DropdownMenuItem
-                  key={item}
-                  onClick={() => setStatus(item)}
-                  className="flex items-center justify-between text-sm"
-                >
-                  {item}
-                  {status === item && <Check className="w-4 h-4 text-orange-500" />}
-                </DropdownMenuItem>
-              )
-            )}
+
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => setStatusFilter(undefined)}>
+              All Status
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => setStatusFilter("PUBLISHED")}>
+              Published
+              {statusFilter === "PUBLISHED" && (
+                <Check className="w-4 h-4 text-orange-500 ml-auto" />
+              )}
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => setStatusFilter("UNDER_REVIEW")}>
+              Under Review
+              {statusFilter === "UNDER_REVIEW" && (
+                <Check className="w-4 h-4 text-orange-500 ml-auto" />
+              )}
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => setStatusFilter("REQUIRES_MODIFICATION")}
+            >
+              Requires Modification
+              {statusFilter === "REQUIRES_MODIFICATION" && (
+                <Check className="w-4 h-4 text-orange-500 ml-auto" />
+              )}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
 
-      {/* 🧭 Sort By (all tabs) */}
+      {/* -------------------------------- SORT BY -------------------------------- */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -151,15 +223,21 @@ export default function TripFilterBar({ tab }: { tab: string }) {
             <ChevronDown size={14} />
           </Button>
         </DropdownMenuTrigger>
+
         <DropdownMenuContent align="end" className="w-48">
-          {sortOptions[key]?.map((item) => (
+          {sortOptions.map((opt) => (
             <DropdownMenuItem
-              key={item}
-              onClick={() => setSortBy(item)}
+              key={opt.label}
+              onClick={() => {
+                setSortBy(opt.sortBy);
+                setSortDir(opt.sortDir);
+              }}
               className="flex items-center justify-between text-sm"
             >
-              {item}
-              {sortBy === item && <Check className="w-4 h-4 text-orange-500" />}
+              {opt.label}
+              {currentSort === opt.label && (
+                <Check className="w-4 h-4 text-orange-500" />
+              )}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

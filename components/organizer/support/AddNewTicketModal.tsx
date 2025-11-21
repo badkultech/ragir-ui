@@ -16,6 +16,7 @@ import { Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import RequiredStar from "@/components/common/RequiredStar";
 
 // ✅ Validation Schema
 const ticketSchema = z.object({
@@ -91,7 +92,7 @@ export function AddNewTicketModal({ open, onClose }: AddNewTicketModalProps) {
           {/* Subject */}
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Subject <span className="text-red-500">*</span>
+              Subject <RequiredStar />
             </label>
             <div className="relative">
               <Input
@@ -112,7 +113,7 @@ export function AddNewTicketModal({ open, onClose }: AddNewTicketModalProps) {
           {/* Category */}
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Category <span className="text-red-500">*</span>
+              Category <RequiredStar />
             </label>
             <Select
               onValueChange={(value) => setValue("category", value, { shouldValidate: true })}
@@ -135,7 +136,7 @@ export function AddNewTicketModal({ open, onClose }: AddNewTicketModalProps) {
           {/* Description */}
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Description <span className="text-red-500">*</span>
+              Description <RequiredStar />
             </label>
             <div className="relative">
               <Textarea
@@ -200,11 +201,10 @@ export function AddNewTicketModal({ open, onClose }: AddNewTicketModalProps) {
             <Button
               type="submit"
               disabled={!isValid}
-              className={`rounded-full text-white ${
-                isValid
+              className={`rounded-full text-white ${isValid
                   ? "bg-gradient-to-r from-orange-500 to-pink-500 hover:opacity-90"
                   : "bg-gray-300 cursor-not-allowed"
-              }`}
+                }`}
             >
               Submit Ticket
             </Button>

@@ -26,6 +26,7 @@ import {
   RegisterOrganizerRequest,
 } from "@/lib/services/superadmin/add-organizer/type";
 import { AppHeader } from "@/components/app-header";
+import RequiredStar from "@/components/common/RequiredStar";
 
 type FormFields = {
   organizerId: string;
@@ -57,15 +58,15 @@ export default function RegisterOrganizer() {
 
   const validate = () => {
     const next: typeof errors = {};
-     if (!formData.name.trim()) {
-    next.name = "Organizer name is required";
-  } else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
-    next.name = "Name can only contain letters and spaces";
-  } else if (formData.name.trim().length < 3) {
-    next.name = "Name must be at least 3 characters long";
-  } else if (formData.name.trim().length > 70) {
-    next.name = "Name cannot exceed 70 characters";
-  }
+    if (!formData.name.trim()) {
+      next.name = "Organizer name is required";
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
+      next.name = "Name can only contain letters and spaces";
+    } else if (formData.name.trim().length < 3) {
+      next.name = "Name must be at least 3 characters long";
+    } else if (formData.name.trim().length > 70) {
+      next.name = "Name cannot exceed 70 characters";
+    }
     if (
       !formData.email.trim() ||
       !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)
@@ -155,7 +156,7 @@ export default function RegisterOrganizer() {
               {/* Organizer Name */}
               <div className="w-3/4">
                 <Label htmlFor="name" className="text-sm font-medium">
-                  Organizer Name <span className="text-red-500">*</span>
+                  Organizer Name <RequiredStar />
                 </Label>
                 <Input
                   id="name"
@@ -173,7 +174,7 @@ export default function RegisterOrganizer() {
               {/* Email */}
               <div className="w-3/4">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email Address <span className="text-red-500">*</span>
+                  Email Address <RequiredStar />
                 </Label>
                 <Input
                   id="email"
@@ -207,9 +208,8 @@ export default function RegisterOrganizer() {
                       if (digits.length > 10) digits = digits.slice(0, 10);
                       setFormData((f) => ({ ...f, phone: digits }));
                     }}
-                    className={`h-10 px-3 text-sm rounded-l-none w-full ${
-                      errors.phone ? "border-red-500" : ""
-                    }`}
+                    className={`h-10 px-3 text-sm rounded-l-none w-full ${errors.phone ? "border-red-500" : ""
+                      }`}
                   />
                 </div>
                 {errors.phone && (
@@ -230,9 +230,8 @@ export default function RegisterOrganizer() {
                   }
                 >
                   <SelectTrigger
-                    className={` h-10 text-sm w-full ${
-                      errors.businessType ? "border-red-500" : ""
-                    }`}
+                    className={` h-10 text-sm w-full ${errors.businessType ? "border-red-500" : ""
+                      }`}
                   >
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>

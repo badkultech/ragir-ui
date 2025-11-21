@@ -26,7 +26,7 @@ export interface LibraryRequest {
 
 // --- Library Response ---
 export interface LibraryResponse {
-  id: string;
+  id: number;
   name: string;
   title?: string;
   documents?: DocumentRequest[];

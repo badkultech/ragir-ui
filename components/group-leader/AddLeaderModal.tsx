@@ -8,6 +8,7 @@ import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import RichTextEditor from "../editor/RichTextEditor"
+import RequiredStar from "../common/RequiredStar"
 
 export function AddLeaderModal({
   open,
@@ -89,7 +90,7 @@ export function AddLeaderModal({
 
         <div className="mb-4">
           <Label className="text-sm font-medium block mb-2">
-            Name <span className="text-red-500">*</span>
+            Name <RequiredStar />
           </Label>
           <Input
             className="w-full border px-4 py-2 rounded-md focus:ring-2 focus:ring-orange-400 outline-none"
@@ -102,11 +103,11 @@ export function AddLeaderModal({
         <div className="mb-4">
           <Label className="text-sm font-medium block mb-2">Bio</Label>
           <RichTextEditor
-                    value={bio}
-                    onChange={setBio}
-                    placeholder="Enter here"
-                  />
-          
+            value={bio}
+            onChange={setBio}
+            placeholder="Enter here"
+          />
+
         </div>
 
         <div className="flex justify-end gap-3">

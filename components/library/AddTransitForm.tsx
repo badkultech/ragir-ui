@@ -13,10 +13,11 @@ import {
   useDocumentsManager,
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
-import { set } from "lodash";
 import { useLazyGetOrganizerTransitByIdQuery } from "@/lib/services/organizer/trip/library/transit";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
@@ -43,7 +44,6 @@ export function AddTransitForm({
   onSave,
   header,
   initialData,
-  onLibrarySelect,
 }: AddTransitFormProps) {
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
   const [title, setTitle] = useState("");
@@ -228,16 +228,24 @@ export function AddTransitForm({
     return cleaned.length === 0;
   };
 
+
   const handleSubmit = async () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!from.trim()) newErrors.from = "Starting point is required";
-    if (!to.trim()) newErrors.to = "Destination is required";
-    if (!departure.trim()) newErrors.departure = "Departure time is required";
-    if (!arrival.trim()) newErrors.arrival = "Arrival time is required";
+    const newErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "from", label: "Starting point", value: from },
+      { key: "to", label: "Destination", value: to },
+      { key: "departure", label: "Departure time", value: departure },
+      { key: "arrival", label: "Arrival time", value: arrival },
+      { key: "description", label: "Description", value: description },
+      { key: "customVehicleType", label: "Custom vehicle type", value: customVehicleType },
+    ]);
+
     setErrors(newErrors);
+
+    // if errors exist, stop execution (same behavior as before)
     if (Object.keys(newErrors).length > 0) return;
     setIsSaving(true);
+
 
 
     try {
@@ -287,7 +295,7 @@ export function AddTransitForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-1">Title <span className="text-red-500">*</span></label>
+        <label className="block text-[0.95rem] font-medium mb-1">Title <RequiredStar /></label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -308,7 +316,7 @@ export function AddTransitForm({
           htmlFor="transit-route"
           className="block text-[0.95rem] font-medium mb-1"
         >
-          Transit Route <span className="text-red-500">*</span>
+          Transit Route <RequiredStar />
         </label>
 
         <div
@@ -381,7 +389,7 @@ export function AddTransitForm({
             htmlFor="departure-time"
             className="block text-[0.95rem] font-medium mb-1"
           >
-            Departure Time <span className="text-red-500">*</span>
+            Departure Time <RequiredStar />
           </label>
 
           <Input
@@ -409,7 +417,7 @@ export function AddTransitForm({
             htmlFor="arrival-time"
             className="block text-[0.95rem] font-medium mb-1"
           >
-            Arrival Time <span className="text-red-500">*</span>
+            Arrival Time <RequiredStar />
           </label>
 
           <Input
@@ -436,7 +444,7 @@ export function AddTransitForm({
       {/* Vehicle */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Vehicle <span className="text-red-500">*</span>
+          Vehicle <RequiredStar />
         </label>
         <div className="flex flex-wrap gap-2">
           {VEHICLES.map((v) => (
@@ -487,12 +495,11 @@ export function AddTransitForm({
       {/* Description */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Description
+          Description <RequiredStar />
         </label>
         <RichTextEditor
           value={description}
           onChange={setDescription}
-          maxLength={800}
         />
       </div>
 
@@ -504,7 +511,6 @@ export function AddTransitForm({
         <RichTextEditor
           value={packingSuggestion}
           onChange={setPackingSuggestion}
-          maxLength={800}
         />
       </div>
 

@@ -17,6 +17,8 @@ import { MultiUploader } from "../common/UploadFieldShortcuts";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetActivityByIdQuery } from "@/lib/services/organizer/trip/library/activity";
+import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -102,7 +104,7 @@ export function AddActivityForm({
       setMoodTags([]);
     }
 
-    setPriceType(initialData.priceType || "INCLUDED");
+    setPriceType(initialData.priceCharge ? "CHARGEABLE" : "INCLUDED");
     setLocation(initialData.location || "");
     setTime(initialData.time || "");
     setDescription(initialData.description || "");
@@ -176,16 +178,27 @@ export function AddActivityForm({
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!moodTags || moodTags.length === 0)
-      newErrors.moodTags = "Mood Tags are required";
-    if (!priceType?.trim()) newErrors.priceType = "Price Type is required";
-    if (!description.trim()) newErrors.description = "Description is required";
-    if (!location.trim()) newErrors.location = "Location is required";
+    // Validate all string fields
+    const stringFieldErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "priceType", label: "Price Type", value: priceType },
+      { key: "description", label: "Description", value: description },
+      { key: "location", label: "Location", value: location },
+    ]);
+
+    // Custom validation for non-string fields
+    const customErrors: { [key: string]: string } = {};
+    if (!moodTags || moodTags.length === 0) {
+      customErrors.moodTags = "Mood Tags are required";
+    }
+
+    // Merge
+    const newErrors = { ...stringFieldErrors, ...customErrors };
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
@@ -240,7 +253,7 @@ export function AddActivityForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Title <RequiredStar /></label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -258,7 +271,7 @@ export function AddActivityForm({
       {/* Mood Tags */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Mood Tags *
+          Mood Tags <RequiredStar />
         </label>
         <Select
           options={moodOptions}
@@ -301,7 +314,7 @@ export function AddActivityForm({
       {/* Price Type */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Price Charge *
+          Price Charge <RequiredStar />
         </label>
         <div className="flex items-center gap-6">
           <label className="flex items-center gap-2 text-[0.95rem]">
@@ -313,7 +326,7 @@ export function AddActivityForm({
             />
             Included
           </label>
-          <label className="flex items-center gap-2 text-[0.85rem]">
+          <label className="flex items-center gap-2 text-[0.95rem]">
             <input
               type="radio"
               name="priceType"
@@ -332,7 +345,7 @@ export function AddActivityForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">
-            Location
+            Location <RequiredStar />
           </label>
           <Input
             value={location}
@@ -356,13 +369,12 @@ export function AddActivityForm({
       {/* Description */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-1">
-          Description
+          Description <RequiredStar />
         </label>
         <RichTextEditor
           value={description}
           onChange={setDescription}
           placeholder="Enter here"
-          maxLength={800}
         />
       </div>
 
@@ -375,7 +387,6 @@ export function AddActivityForm({
           value={packing}
           onChange={setPacking}
           placeholder="Enter here"
-          maxLength={800}
         />
       </div>
 

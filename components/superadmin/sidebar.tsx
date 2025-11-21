@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronRight,
   X,
+  Shuffle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { LogoutButton } from "../common/LogoutButton";
@@ -41,6 +42,11 @@ const nav: NavItem[] = [
         boxedPlus: true,
       },
     ],
+  },
+  {
+    label: "Switch Organization",
+    href: "/superadmin/switch",
+    icon: Shuffle
   },
 ];
 

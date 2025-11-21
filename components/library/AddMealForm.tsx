@@ -18,6 +18,8 @@ import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetMealByIdQuery } from "@/lib/services/organizer/trip/library/meal";
 import { slice } from "lodash";
 import { boolean } from "zod";
+import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
@@ -161,12 +163,14 @@ export function AddMealForm({
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!time.trim()) newErrors.time = "Meal Time is required";
-    if (!mealType.trim()) newErrors.mealType = "Meal Type is required";
-    if (!description.trim()) newErrors.description = "Description is required";
-    if (!location.trim()) newErrors.location = "Location is required";
+    const newErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "time", label: "Meal Time", value: time },
+      { key: "mealType", label: "Meal Type", value: mealType },
+      { key: "location", label: "Location", value: location },
+      { key: "description", label: "Description", value: description },
+    ]);
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -225,7 +229,7 @@ export function AddMealForm({
 
       {/* Title */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Title *</label>
+        <label className="block text-[0.95rem] font-medium mb-2">Title <RequiredStar /></label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -244,7 +248,7 @@ export function AddMealForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">
-            Meal Type *
+            Meal Type <RequiredStar />
           </label>
           <select
             value={mealType}
@@ -269,7 +273,7 @@ export function AddMealForm({
         </div>
 
         <div>
-          <label className="block text-[0.95rem] font-medium mb-2">Time</label>
+          <label className="block text-[0.95rem] font-medium mb-2">Time <RequiredStar /></label>
           <Input
             type="time"
             value={time}
@@ -304,7 +308,7 @@ export function AddMealForm({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description
+          Description <RequiredStar />
         </label>
         <RichTextEditor
           placeholder="Enter description"
@@ -325,7 +329,7 @@ export function AddMealForm({
           value={packing}
           onChange={setPacking}
           placeholder="Enter packing suggestions"
-          maxLength={800}
+          maxWords={800}
         />
       </div>
 
