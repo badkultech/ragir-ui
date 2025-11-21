@@ -9,6 +9,7 @@ type AuthState = {
   refreshToken: string | null;
   userData?: AuthTokenPayload | null | undefined;
   isTokenExpired?: boolean;
+  focusedOrganization?: string | null;
 };
 
 const initialState: AuthState = {
@@ -16,6 +17,7 @@ const initialState: AuthState = {
   refreshToken: null,
   userData: null,
   isTokenExpired: false,
+  focusedOrganization: null,
 };
 
 const authSlice = createSlice({
@@ -30,6 +32,9 @@ const authSlice = createSlice({
           action.payload.accessToken,
         );
         state.userData = decodedData;
+        state.focusedOrganization =
+          action.payload.focusedOrganization ??
+          decodedData.organizationPublicId;
         if (decodedData.exp && Date.now() >= decodedData.exp * 1000) {
           console.warn('Token has expired');
           state.isTokenExpired = true;
@@ -42,9 +47,13 @@ const authSlice = createSlice({
       state.userData = null;
       state.isTokenExpired = true;
     },
+    setFocusedOrganization: (state, action: PayloadAction<string>) => {
+      state.focusedOrganization = action.payload;
+    },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, setFocusedOrganization } =
+  authSlice.actions;
 export const selectAuthState = (state: RootState) => state.auth;
 export default authSlice;

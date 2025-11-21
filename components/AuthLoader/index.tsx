@@ -1,16 +1,18 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useRouter, usePathname } from "next/navigation";
-import { selectAuthState, setCredentials } from "@/lib/slices/auth";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter, usePathname } from 'next/navigation';
+import { selectAuthState, setCredentials } from '@/lib/slices/auth';
 import {
   getDashboardPath,
   PublicRoutes,
   ROLE_ROUTE_ACCESS,
   ROLES,
   RoleType,
-} from "@/lib/utils";
+} from '@/lib/utils';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { OrganizationDTO } from '@/lib/services/superadmin/organizations/types';
 
 /**
  * Utility to check if a given route is allowed for the role
@@ -32,6 +34,7 @@ export default function HydratedAuth({
   children: React.ReactNode;
 }) {
   const dispatch = useDispatch();
+  const { getValue } = useLocalStorage();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -42,14 +45,23 @@ export default function HydratedAuth({
 
   useEffect(() => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      const refreshToken = localStorage.getItem("refreshToken");
+      const accessToken = getValue('accessToken');
+      const refreshToken = getValue('refreshToken');
+      const focusedOrganization: OrganizationDTO = getValue(
+        'focusedOrganization',
+      );
 
       if (accessToken || refreshToken) {
-        dispatch(setCredentials({ accessToken, refreshToken }));
+        dispatch(
+          setCredentials({
+            accessToken,
+            refreshToken,
+            focusedOrganization: focusedOrganization?.publicId ?? null,
+          }),
+        );
       }
     } catch (e) {
-      console.error("Error reading tokens from localStorage", e);
+      console.error('Error reading tokens from localStorage', e);
     } finally {
       setHydrated(true);
     }
@@ -61,7 +73,7 @@ export default function HydratedAuth({
     const isAuthenticated = accessToken && !tokenExpired(accessToken);
 
     // Case 1: User on a login page (root `/` or `/something/login`)
-    const isLoginPage = pathname === "/" || pathname.includes("/login");
+    const isLoginPage = pathname === '/' || pathname.includes('/login');
     if (isLoginPage) {
       if (isAuthenticated && userData?.userType) {
         const dashboardPath = getDashboardPath(userData.userType);
@@ -77,19 +89,19 @@ export default function HydratedAuth({
 
     // Case 3: Guarded routes
     if (!isAuthenticated) {
-      router.replace("/"); // redirect to root login
+      router.replace('/'); // redirect to root login
       return;
     }
 
     if (!userData?.userType) {
-      router.replace("/");
+      router.replace('/');
       return;
     }
 
     // Case 4: Not allowed route → send to dashboard
     if (!isAllowedRoutes(pathname, userData.userType)) {
       const dashboardPath = getDashboardPath(userData.userType);
-      router.replace(dashboardPath + "/dashboard");
+      router.replace(dashboardPath + '/dashboard');
     }
   }, [hydrated, accessToken, userData, pathname, router]);
 
@@ -102,17 +114,17 @@ export default function HydratedAuth({
    * @param token - The JWT string (access token).
    * @returns true if expired, false if still valid.
    */
-   function tokenExpired(token: string | null | undefined): boolean {
+  function tokenExpired(token: string | null | undefined): boolean {
     if (!token) return true;
 
     try {
       // JWT format: header.payload.signature
-      const [, payload] = token.split(".");
+      const [, payload] = token.split('.');
       if (!payload) return true;
 
       // Decode base64 payload
       const decoded = JSON.parse(
-        atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+        atob(payload.replace(/-/g, '+').replace(/_/g, '/')),
       );
 
       if (!decoded.exp) return true;
@@ -121,7 +133,7 @@ export default function HydratedAuth({
       const expiry = decoded.exp * 1000;
       return Date.now() >= expiry;
     } catch (error) {
-      console.error("Failed to parse token", error);
+      console.error('Failed to parse token', error);
       return true; // Treat invalid tokens as expired
     }
   }
