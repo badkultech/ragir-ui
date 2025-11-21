@@ -9,6 +9,7 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { GradientButton } from "@/components/gradient-button";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
+import RequiredStar from "@/components/common/RequiredStar";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function ForgotPasswordPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <label className="block text-sm !font-poppins font-medium text-gray-700">
-                    Enter Email <span className="text-red-500">*</span>
+                    Enter Email <RequiredStar />
                   </label>
                   <input
                     id="email"

@@ -16,6 +16,7 @@ import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
@@ -29,7 +30,6 @@ type AddDayDescriptionFormProps = {
 export function AddDayDescriptionForm({
   mode = "trip",
   onCancel,
-  updateId,
   onSave,
   header,
   initialData,
@@ -90,10 +90,10 @@ export function AddDayDescriptionForm({
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!description.trim()) newErrors.description = "Description is required";
+    const newErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "description", label: "Description", value: description },
+    ]);
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

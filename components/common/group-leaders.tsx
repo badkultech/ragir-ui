@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { GradientButton } from "../gradient-button"
+import RequiredStar from "./RequiredStar"
 
 interface Leader {
   id: string
@@ -123,9 +124,8 @@ export function GroupLeaders() {
             <div
               key={leader.id}
               onClick={() => toggleLeaderSelection(leader.id)}
-              className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                isSelected ? "border-orange-500 bg-orange-50" : "border-gray-200 bg-gray-50 hover:border-gray-300"
-              }`}
+              className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${isSelected ? "border-orange-500 bg-orange-50" : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                }`}
             >
               <div className="flex items-center gap-3">
                 <img
@@ -188,7 +188,7 @@ export function GroupLeaders() {
               {/* Name Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name <span className="text-red-500">*</span>
+                  Name <RequiredStar />
                 </label>
                 <input
                   type="text"
@@ -214,7 +214,7 @@ export function GroupLeaders() {
               {/* Description Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description <span className="text-red-500">*</span>
+                  Description <RequiredStar />
                 </label>
 
                 {/* Rich Text Editor Toolbar */}

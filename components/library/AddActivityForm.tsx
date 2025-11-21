@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetActivityByIdQuery } from "@/lib/services/organizer/trip/library/activity";
 import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -145,16 +146,27 @@ export function AddActivityForm({
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!moodTags || moodTags.length === 0)
-      newErrors.moodTags = "Mood Tags are required";
-    if (!priceType?.trim()) newErrors.priceType = "Price Type is required";
-    if (!description.trim()) newErrors.description = "Description is required";
-    if (!location.trim()) newErrors.location = "Location is required";
+    // Validate all string fields
+    const stringFieldErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "priceType", label: "Price Type", value: priceType },
+      { key: "description", label: "Description", value: description },
+      { key: "location", label: "Location", value: location },
+    ]);
+
+    // Custom validation for non-string fields
+    const customErrors: { [key: string]: string } = {};
+    if (!moodTags || moodTags.length === 0) {
+      customErrors.moodTags = "Mood Tags are required";
+    }
+
+    // Merge
+    const newErrors = { ...stringFieldErrors, ...customErrors };
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
 
   const handleSubmit = async () => {
     if (!validateForm()) return;

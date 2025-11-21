@@ -25,6 +25,7 @@ import { CreateSuperAdminRequest } from "@/lib/services/superadmin/add-admin/typ
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import RequiredStar from "@/components/common/RequiredStar";
 
 export default function AddAdmin() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -131,7 +132,7 @@ export default function AddAdmin() {
                 {/* Email */}
                 <div>
                   <Label htmlFor="email" className="text-sm font-medium">
-                    Email Address <span className="text-red-500">*</span>
+                    Email Address <RequiredStar />
                   </Label>
                   <Input
                     id="email"
@@ -150,7 +151,7 @@ export default function AddAdmin() {
                 {/* First Name */}
                 <div>
                   <Label htmlFor="firstName" className="text-sm font-medium">
-                    First Name <span className="text-red-500">*</span>
+                    First Name <RequiredStar />
                   </Label>
                   <Input
                     id="firstName"
@@ -170,7 +171,7 @@ export default function AddAdmin() {
                 {/* Last Name */}
                 <div>
                   <Label htmlFor="lastName" className="text-sm font-medium">
-                    Last Name <span className="text-red-500">*</span>
+                    Last Name <RequiredStar />
                   </Label>
                   <Input
                     id="lastName"

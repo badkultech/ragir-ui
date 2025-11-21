@@ -19,6 +19,7 @@ import { useLazyGetMealByIdQuery } from "@/lib/services/organizer/trip/library/m
 import { slice } from "lodash";
 import { boolean } from "zod";
 import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
@@ -131,12 +132,14 @@ export function AddMealForm({
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!title.trim()) newErrors.title = "Title is required";
-    if (!time.trim()) newErrors.time = "Meal Time is required";
-    if (!mealType.trim()) newErrors.mealType = "Meal Type is required";
-    if (!description.trim()) newErrors.description = "Description is required";
-    if (!location.trim()) newErrors.location = "Location is required";
+    const newErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "time", label: "Meal Time", value: time },
+      { key: "mealType", label: "Meal Type", value: mealType },
+      { key: "location", label: "Location", value: location },
+      { key: "description", label: "Description", value: description },
+    ]);
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

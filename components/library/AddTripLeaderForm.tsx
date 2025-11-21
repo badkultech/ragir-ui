@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import RichTextEditor from "../editor/RichTextEditor";
 import { SingleUploader } from "../common/UploadFieldShortcuts";
 import { useDocumentsManager, Document as DocShape } from "@/hooks/useDocumentsManager";
+import RequiredStar from "../common/RequiredStar";
 
 type AddTripLeaderFormProps = {
   updateId?: number | null;
@@ -100,7 +101,7 @@ export function AddTripLeaderForm({
 
       {/* Name */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Name <span className="text-red-500">*</span></label>
+        <label className="block text-[0.95rem] font-medium mb-2">Name <RequiredStar /></label>
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter name" maxLength={50} />
         {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
       </div>
@@ -113,7 +114,7 @@ export function AddTripLeaderForm({
 
       {/* Bio */}
       <div>
-        <label className="block text-[0.95rem] font-medium mb-2">Bio <span className="text-red-500">*</span></label>
+        <label className="block text-[0.95rem] font-medium mb-2">Bio <RequiredStar /></label>
         <RichTextEditor value={bio} onChange={setBio} placeholder="Enter here" maxWords={500} />
         {errors.bio && <p className="text-xs text-red-500 mt-1">{errors.bio}</p>}
       </div>

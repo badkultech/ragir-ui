@@ -20,6 +20,7 @@ import { useLazyGetStayByIdQuery } from "@/lib/services/organizer/trip/library/s
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
+import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 
 
 type AddStayFormProps = {
@@ -92,16 +93,17 @@ export function AddStayForm({
 
   // validation
   const validateForm = () => {
-    const nextErrors: Record<string, string> = {};
-    if (!title.trim()) nextErrors.title = "Title is required";
-    if (!sharingType.trim()) nextErrors.sharingType = "Sharing Type is required";
-    if (!checkIn.trim()) nextErrors.checkIn = "Check In Time is required";
-    if (!checkOut.trim()) nextErrors.checkOut = "Check Out Time is required";
-    if (!location.trim()) nextErrors.location = "Location is required";
-    if (!description.trim()) nextErrors.description = "Description is required";
+    const newErrors = validateRequiredFields([
+      { key: "title", label: "Title", value: title },
+      { key: "sharingType", label: "Sharing Type", value: sharingType },
+      { key: "checkIn", label: "Check In Time", value: checkIn },
+      { key: "checkOut", label: "Check Out Time", value: checkOut },
+      { key: "location", label: "Location", value: location },
+      { key: "description", label: "Description", value: description },
+    ]);
 
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleLibrarySelect = async (item: any) => {
