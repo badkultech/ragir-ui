@@ -8,12 +8,14 @@ export function WizardFooter({
   onNext,
   prevLabel = "← Previous",   
   nextLabel = "Save & Next",
+  loading = false,  
 }: {
   onPrev?: () => void
   onDraft?: () => void
   onNext?: () => void
   prevLabel?: string
   nextLabel?: string
+  loading?: boolean 
 }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
@@ -41,11 +43,30 @@ export function WizardFooter({
         ) : null}
         {onNext ? (
           <Button
-            className="px-8 py-2 rounded-full font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 transition flex items-center gap-2"
-            onClick={onNext}
-          >
-            {nextLabel}
-          </Button>
+  className={`
+    px-8 py-2 rounded-full font-medium text-white
+    bg-gradient-to-r from-orange-400 to-pink-500 shadow
+    flex items-center gap-2 transition
+    ${loading ? "opacity-50 cursor-not-allowed" : "hover:from-orange-500 hover:to-pink-600"}
+  `}
+  onClick={!loading ? onNext : undefined}
+  disabled={loading}
+>
+  {loading ? "Saving..." : nextLabel}
+
+  {!loading && (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+    >
+      <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )}
+</Button>
+
         ) : null}
       </div>
     </div>

@@ -58,6 +58,8 @@ export default function ItineraryPage() {
   const [triggerGetItineraryByTripId] = useLazyGetItineraryByTripIdQuery();
   const [triggerGetItineraryDayDetails] = useLazyGetItineraryDayDetailsQuery();
   const [updateItinerary] = useUpdateItineraryMutation();
+  const [isSavingNext, setIsSavingNext] = useState(false);
+
 
   useEffect(() => {
     const fetch = async () => {
@@ -213,6 +215,7 @@ export default function ItineraryPage() {
   const handleUpdateItinerary = async () => {
     if (!organizationId || !tripId) return;
     try {
+      setIsSavingNext(true); 
       const fd = new FormData();
       fd.append("startPoint", startingPoint);
       fd.append("endPoint", endPoint);
@@ -246,7 +249,9 @@ export default function ItineraryPage() {
       router.push(`/organizer/create-trip/${tripId}/exclusions`);
     } catch (err) {
       console.error("❌ Failed to update itinerary:", err);
-    }
+    } finally {
+    setIsSavingNext(false); 
+  }
   };
 
   return (
@@ -297,7 +302,7 @@ export default function ItineraryPage() {
                       ) : (
                         <DetailsOptions
                           key={dayDetailIds[d.day]}
-                          organizationId={organizationId || "00000000-0000-0000-0000-000000000000"}
+                          organizationId={organizationId}
                           tripPublicId={tripId as string}
                           dayDetailId={dayDetailIds[d.day]}
                           items={itemsForDay ?? []}
@@ -326,7 +331,7 @@ export default function ItineraryPage() {
           </div>
 
           <div className="pr-9">
-            <WizardFooter onPrev={handlePrevClick} onDraft={() => console.log("Draft itinerary saved")} onNext={handleUpdateItinerary} />
+            <WizardFooter onPrev={handlePrevClick} onDraft={() => console.log("Draft itinerary saved")} onNext={handleUpdateItinerary} loading={isSavingNext} />
           </div>
         </div>
       </div>

@@ -302,8 +302,15 @@ export function CreateTrip({ tripId }: Props) {
       data.append('maxAge', formData.maxAge.toString());
       data.append('highlights', formData.tripHighlights);
       data.append('moodTags', JSON.stringify(selectedTags));
-      data.append('groupLeaderId', selectedGroupLeaderId);
       data.append('cityTags', JSON.stringify(cityTags));
+      data.append('groupLeaderId', selectedGroupLeaderId);
+
+
+      // // MULTIPLE LEADERS SUPPORT
+      // const leaderIds = leaders.map(l => Number(l.id));
+      // data.append("groupLeaderIds", JSON.stringify(leaderIds));
+
+
 
       // ✅ Call API
 
@@ -344,12 +351,6 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const handleNumberChange = (field: string, increment: boolean) => {
-    // setFormData((prev) => ({
-    //     ...prev,
-    //     [field]: increment
-    //         ? (prev[field as keyof typeof prev] as number) + 1
-    //         : Math.max(0, (prev[field as keyof typeof prev] as number) - 1),
-    // }));
     const currentValue = formData[field as keyof typeof formData] as number;
     const newValue = increment
       ? currentValue + 1
@@ -369,7 +370,6 @@ export function CreateTrip({ tripId }: Props) {
 
   const addCityTag = () => {
     if (cityInput.trim() && !cityTags.includes(cityInput.trim())) {
-      // setCityTags((prev) => [...prev, cityInput.trim()]);
       dispatch(setCityTags([...cityTags, cityInput.trim()]));
       dispatch(setCityInput(''));
     }
@@ -378,8 +378,6 @@ export function CreateTrip({ tripId }: Props) {
   const removeCityTag = (tagToRemove: string) => {
     dispatch(setCityTags(cityTags.filter((tag) => tag !== tagToRemove)));
   };
-
-  // Auto-calculate totalDays whenever startDate or endDate changes
 
   useEffect(() => {
     if (!formData.startDate || !formData.endDate) return;
@@ -397,8 +395,6 @@ export function CreateTrip({ tripId }: Props) {
 
     const diffTime = end.getTime() - start.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-    // setFormData((prev) => ({ ...prev, totalDays: diffDays }));
     dispatch(setFormData({ ...formData, totalDays: diffDays }));
   }, [formData.startDate, formData.endDate]);
 
@@ -702,52 +698,53 @@ export function CreateTrip({ tripId }: Props) {
             <p className='text-gray-400 text-base'>
               Select from existing leaders or add new
             </p>
-
-            {leaders.map((leader, index) => (
-              <div
-                key={leader.id || index}
-                className='flex items-center justify-between gap-3 border rounded-xl p-3 shadow-sm bg-gray-50 hover:bg-gray-100 transition'
-              >
-                {/* Left side: Leader info */}
-                <div className='flex items-center gap-3'>
-                  {/* Image */}
-                  {leader.imageUrl || leader.profileImageUrl ? (
-                    <img
-                      src={leader.imageUrl || leader.profileImageUrl}
-                      alt={leader.name || leader.title || 'Leader'}
-                      className='w-10 h-10 rounded-full object-cover'
-                    />
-                  ) : (
-                    <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>
-                      <span className='text-xs'>No Img</span>
-                    </div>
-                  )}
-
-                  {/* Details */}
-                  <div>
-                    <p className='font-medium text-gray-800'>
-                      {leader.name || leader.title || 'Unnamed'}
-                    </p>
-                    {(leader.tagline || leader.description) && (
-                      <p className='text-xs text-gray-500'>
-                        {leader.tagline || leader.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right side: Remove button */}
-                <button
-                  onClick={() =>
-                    dispatch(setLeaders(leaders.filter((_, i) => i !== index)))
-                  }
-                  className='text-gray-400 hover:text-red-500 transition text-xl font-bold'
-                  title='Remove Leader'
+            <div className="flex flex-col gap-4 mt-4">
+              {leaders.map((leader, index) => (
+                <div
+                  key={leader.id || index}
+                  className='flex items-center justify-between gap-3 border rounded-xl p-3 shadow-sm bg-gray-50 hover:bg-gray-100 transition'
                 >
-                  ×
-                </button>
-              </div>
-            ))}
+                  {/* Left side: Leader info */}
+                  <div className='flex items-center gap-3'>
+                    {/* Image */}
+                    {leader.imageUrl || leader.profileImageUrl ? (
+                      <img
+                        src={leader.imageUrl || leader.profileImageUrl}
+                        alt={leader.name || leader.title || 'Leader'}
+                        className='w-10 h-10 rounded-full object-cover'
+                      />
+                    ) : (
+                      <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>
+                        <span className='text-xs'>No Img</span>
+                      </div>
+                    )}
+
+                    {/* Details */}
+                    <div>
+                      <p className='font-medium text-gray-800'>
+                        {leader.name || leader.title || 'Unnamed'}
+                      </p>
+                      {(leader.tagline || leader.description) && (
+                        <p className='text-xs text-gray-500'>
+                          {leader.tagline || leader.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right side: Remove button */}
+                  <button
+                    onClick={() =>
+                      dispatch(setLeaders(leaders.filter((_, i) => i !== index)))
+                    }
+                    className='text-gray-400 hover:text-red-500 transition text-xl font-bold'
+                    title='Remove Leader'
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className='flex items-center gap-4 mt-10 justify-end-safe'>
@@ -755,43 +752,43 @@ export function CreateTrip({ tripId }: Props) {
               Save as Draft
             </Button>
             <Button
-  onClick={async () => {
-    if (tripSaving) return;                          // 🚫 Prevent double click
-    setTripSaving(true);                             // 🔒 Lock whole UI
+              onClick={async () => {
+                if (tripSaving) return;
+                setTripSaving(true);
 
-    await handleSaveTrip();                          // ⏳ Run API
+                await handleSaveTrip();
 
-    setTripSaving(false);                            // 🔓 Unlock after done
-  }}
-  disabled={tripSaving || createTripLoading || updateTripLoading}
-  className={`
+                setTripSaving(false);
+              }}
+              disabled={tripSaving || createTripLoading || updateTripLoading}
+              className={`
     px-8 py-2 rounded-full font-medium text-white 
     bg-gradient-to-r from-orange-400 to-pink-500 shadow
     flex items-center gap-2 transition
     ${tripSaving || createTripLoading || updateTripLoading
-      ? "opacity-50 cursor-not-allowed"
-      : "hover:from-orange-500 hover:to-pink-600"
-    }
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:from-orange-500 hover:to-pink-600"
+                }
   `}
->
-  {tripSaving || createTripLoading || updateTripLoading
-    ? "Saving..."
-    : "Save & Next"}
+            >
+              {tripSaving || createTripLoading || updateTripLoading
+                ? "Saving..."
+                : "Save & Next"}
 
-  <svg
-    className='w-5 h-5'
-    fill='none'
-    stroke='currentColor'
-    strokeWidth={2}
-    viewBox='0 0 24 24'
-  >
-    <path
-      d='M9 5l7 7-7 7'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
-  </svg>
-</Button>
+              <svg
+                className='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth={2}
+                viewBox='0 0 24 24'
+              >
+                <path
+                  d='M9 5l7 7-7 7'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            </Button>
 
           </div>
         </div>
