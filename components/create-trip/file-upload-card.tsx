@@ -38,6 +38,7 @@ export function FileUploadCard({
   } | null;
   // optional upload function: (file) => Promise<{ id?, url, type? }>
   upload?: (file: File) => Promise<{ id?: number; url: string; type?: string }>;
+  buttonLabel?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -66,6 +67,7 @@ export function FileUploadCard({
         setFile(null);
         return;
       }
+      setMeta(null);
       setFile(selectedFile);
       onSelect?.(selectedFile);
 
@@ -145,39 +147,40 @@ export function FileUploadCard({
           <div className='text-red-500 text-xs text-center'>{error}</div>
         )}
 
-        <div className='flex gap-3 flex-wrap justify-center max-w-full'>
+        <div className="flex gap-3 flex-wrap justify-center max-w-full">
           <Input
             ref={inputRef}
-            type='file'
+            type="file"
             accept={accept}
-            className='sr-only'
+            className="sr-only"
             onChange={onFileChange}
             aria-label={label}
           />
-          {!file ? (
+
+          {meta?.url || file ? (
             <Button
-              type='button'
-              variant='outline'
-              className='rounded-full'
-              // onClick={(e) => e.stopPropagation()}
-              onClick={handleDropAreaClick}
-            >
-              Choose File
-            </Button>
-          ) : (
-            <Button
-              type='button'
-              variant='outline'
+              type="button"
+              variant="outline"
               onClick={(e) => {
                 e.stopPropagation();
                 clearFile();
               }}
-              className='rounded-full'
+              className="rounded-full"
             >
-              Clear
+              Clear PDF
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-full"
+              onClick={handleDropAreaClick}
+            >
+              Choose PDF
             </Button>
           )}
         </div>
+
 
         <p className='text-center text-gray-500 text-sm mt-2'>
           Or create itinerary below
