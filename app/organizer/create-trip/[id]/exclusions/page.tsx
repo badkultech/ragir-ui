@@ -46,6 +46,9 @@ export default function ExclusionsPage() {
   const [custom, setCustom] = useState("");
   const [customOptions, setCustomOptions] = useState<Array<string>>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const mergedOptions = Array.from(new Set([...options, ...customOptions]));
+
+  
 
   useEffect(() => {
     if (apiExclusions?.masterData) {
@@ -127,7 +130,7 @@ export default function ExclusionsPage() {
           <SectionCard title="Exclusions">
             <div className="space-y-6">
               <PillCheckboxGroup
-                options={[...options, ...customOptions]}
+                options={mergedOptions}
                 value={selected ?? []}
                 onChange={setSelected}
               />

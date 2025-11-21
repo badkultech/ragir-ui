@@ -265,6 +265,7 @@ export default function ItineraryPage() {
         <TripStepperHeader activeStep={2} />
 
         <div className="p-8 bg-white">
+          <div className={isSavingNext ? "pointer-events-none opacity-50" : ""}>
           <div className="max-w-full mx-auto bg-white shadow rounded-2xl p-8 overflow-x-hidden">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">Itinerary</h2>
 
@@ -352,7 +353,7 @@ export default function ItineraryPage() {
               <CustomDateTimePicker value={endDate} onChange={setEndDate} placeholder="Select end date & time" className="mt-3 self-end w-full" />
             </div>
           </div>
-
+</div>
           <div className="pr-9">
             <WizardFooter onPrev={handlePrevClick} onDraft={() => console.log("Draft itinerary saved")} onNext={handleUpdateItinerary} loading={isSavingNext} />
           </div>

@@ -307,9 +307,10 @@ export function CreateTrip({ tripId }: Props) {
 
 
       // // MULTIPLE LEADERS SUPPORT
-      // const leaderIds = leaders.map(l => Number(l.id));
+      // // const leaderIds = leaders.map(l => Number(l.id));
+      // // data.append("groupLeaderIds", JSON.stringify(leaderIds));
+      // const leaderIds = leaders.map(l => (l.id));
       // data.append("groupLeaderIds", JSON.stringify(leaderIds));
-
 
 
       // ✅ Call API
@@ -379,26 +380,26 @@ export function CreateTrip({ tripId }: Props) {
     dispatch(setCityTags(cityTags.filter((tag) => tag !== tagToRemove)));
   };
 
- useEffect(() => {
-  if (!formData.startDate || !formData.endDate) return;
+  useEffect(() => {
+    if (!formData.startDate || !formData.endDate) return;
 
-  const parseDateOnly = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate()); // time removed
-  };
+    const parseDateOnly = (dateStr: string) => {
+      const d = new Date(dateStr);
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate()); // time removed
+    };
 
-  const start = parseDateOnly(formData.startDate);
-  const end = parseDateOnly(formData.endDate);
+    const start = parseDateOnly(formData.startDate);
+    const end = parseDateOnly(formData.endDate);
 
-  // Calculate pure DATE difference (no time)
-  const diffTime = end.getTime() - start.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    // Calculate pure DATE difference (no time)
+    const diffTime = end.getTime() - start.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-  // Ensure minimum 1 day always
-  const finalDays = diffDays < 1 ? 1 : diffDays;
+    // Ensure minimum 1 day always
+    const finalDays = diffDays < 1 ? 1 : diffDays;
 
-  dispatch(setFormData({ ...formData, totalDays: finalDays }));
-}, [formData.startDate, formData.endDate]);
+    dispatch(setFormData({ ...formData, totalDays: finalDays }));
+  }, [formData.startDate, formData.endDate]);
 
 
   return (
