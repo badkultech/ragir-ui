@@ -260,7 +260,7 @@ export default function FAQsPage() {
                         className='w-4 h-4'
                         size={10}
                         type='checkbox'
-                        checked={faq.isSelected}
+                        checked={faq.isSelected ?? false}
                         onChange={(e) => {
                           const updatedFaq = faqs.map((f) => {
                             if (f.question === faq.question) {

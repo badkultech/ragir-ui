@@ -62,9 +62,16 @@ export function AddTransitForm({
   const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState("");
   const [getTransitByIdTrigger] = useLazyGetOrganizerTransitByIdQuery();
   const { userData } = useSelector(selectAuthState);
+  const [isSaving, setIsSaving] = useState(false);
+
+
+  async function urlToFile(url: string, filename = "library_image.jpg") {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type });
+  }
 
   useEffect(() => {
     if (!initialData) return;
@@ -102,7 +109,6 @@ export function AddTransitForm({
     );
 
     setSaveInLibrary(!!initialData.addedToLibrary);
-    setSaveAsName(initialData.name ?? initialData.title ?? "");
 
     // ✅ reset documents
     const mappedDocs = (
@@ -172,19 +178,54 @@ export function AddTransitForm({
           : "ORGANIZER"
       );
 
-      // Documents
-      const mappedDocs = (full.documents ?? []).map((d) => ({
-        id: d.id ?? null,
-        url: d.url ?? null,
-        type: d.type ?? "IMAGE",
-        file: null,
-        markedForDeletion: false,
-      }));
-
+      const mappedDocs = await Promise.all(
+        (full.documents ?? []).map(async (d: any, index: number) => {
+          if (d.url) {
+            const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
+            return {
+              id: null,                // new file → no ID
+              url: URL.createObjectURL(file),
+              type: file.type,
+              file,
+              markedForDeletion: false,
+            };
+          }
+          return {
+            id: null,
+            url: null,
+            type: null,
+            file: null,
+            markedForDeletion: false,
+          };
+        })
+      );
+      while (mappedDocs.length < 6) {
+        mappedDocs.push({
+          id: null,
+          url: null,
+          type: null,
+          file: null,
+          markedForDeletion: false,
+        });
+      }
       docsManager.setDocuments(mappedDocs);
     } catch (err) {
       console.error("Failed to load full transit", err);
     }
+  };
+
+  const isEditorEmpty = (html: string) => {
+    if (!html) return true;
+
+    const cleaned = html
+      .replace(/<p><br[^>]*?><\/p>/gi, "")
+      .replace(/<br[^>]*?>/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/gi, "")
+      .replace(/\s+/g, "")
+      .trim();
+
+    return cleaned.length === 0;
   };
 
 
@@ -203,6 +244,8 @@ export function AddTransitForm({
 
     // if errors exist, stop execution (same behavior as before)
     if (Object.keys(newErrors).length > 0) return;
+    setIsSaving(true);
+
 
 
     try {
@@ -226,6 +269,8 @@ export function AddTransitForm({
       showSuccess("Transit saved successfully!");
     } catch {
       showApiError("Failed to save Transit");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -484,11 +529,18 @@ export function AddTransitForm({
       {isTripMode && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
-            <Input
+            <input
               type="checkbox"
               checked={saveInLibrary}
               onChange={(e) => setSaveInLibrary(e.target.checked)}
-              className="w-[22px]"
+              className="appearance-none w-5 h-5 border-2 rounded-sm checked:bg-orange-500 checked:border-orange-500 flex items-center justify-center cursor-pointer"
+              style={{
+                backgroundImage: saveInLibrary
+                  ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M6.003 10.803l-2.85-2.849L1.3 9.808l4.703 4.704L14.7 5.815l-1.854-1.854z'/%3E%3C/svg%3E\")"
+                  : "none",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
             />
             <label className="block text-[0.95rem] font-medium">
               Save in Library
@@ -497,6 +549,13 @@ export function AddTransitForm({
         </div>
       )}
 
+      {isSaving && (
+        <div className="w-full flex justify-center my-2">
+          <p className="text-sm text-orange-500 font-medium">
+            Saving...
+          </p>
+        </div>
+      )}
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 my-6">
         <Button variant="outline" onClick={onCancel}>

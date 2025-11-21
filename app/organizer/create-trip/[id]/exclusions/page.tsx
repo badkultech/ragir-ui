@@ -1,31 +1,31 @@
-'use client';
+"use client";
 
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { TripStepperHeader } from '@/components/create-trip/tripStepperHeader';
-import { SectionCard } from '@/components/create-trip/section-card';
-import { PillCheckboxGroup } from '@/components/create-trip/pill-checkbox-group';
-import { WizardFooter } from '@/components/create-trip/wizard-footer';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { AppHeader } from '@/components/app-header';
-import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
+import { TripStepperHeader } from "@/components/create-trip/tripStepperHeader";
+import { SectionCard } from "@/components/create-trip/section-card";
+import { PillCheckboxGroup } from "@/components/create-trip/pill-checkbox-group";
+import { WizardFooter } from "@/components/create-trip/wizard-footer";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { AppHeader } from "@/components/app-header";
+import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 
 import {
   useCreateExclusionMutation,
   useGetAllExclusionsQuery,
-} from '@/lib/services/organizer/trip/exclusion';
-import { useOrganizationId } from '@/hooks/useOrganizationId';
-import { useLazyGetItineraryByTripIdQuery } from '@/lib/services/organizer/trip/itinerary';
+} from "@/lib/services/organizer/trip/exclusion";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { useLazyGetItineraryByTripIdQuery } from "@/lib/services/organizer/trip/itinerary";
 
 const DEFAULT_OPTIONS = [
-  'Personal Expenses',
-  'Travel Insurance',
-  'Tips and Gratuities',
-  'Visa and Passport Fees',
-  'Meals Not Listed',
+  "Personal Expenses",
+  "Travel Insurance",
+  "Tips and Gratuities",
+  "Visa and Passport Fees",
+  "Meals Not Listed",
 ];
 
 export default function ExclusionsPage() {
@@ -43,7 +43,7 @@ export default function ExclusionsPage() {
 
   const [options, setOptions] = useState<string[]>(DEFAULT_OPTIONS);
   const [selected, setSelected] = useState<string[]>([]);
-  const [custom, setCustom] = useState('');
+  const [custom, setCustom] = useState("");
   const [customOptions, setCustomOptions] = useState<Array<string>>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -52,7 +52,9 @@ export default function ExclusionsPage() {
       setOptions(apiExclusions.masterData.map((x) => x.name));
     }
     if (apiExclusions?.details) {
-      const names = apiExclusions.details.map((x) => x.name);
+      const names = apiExclusions.details
+        .map((x) => x.name ?? "") // SAFE
+        .filter((x) => x.trim() !== ""); // remove empty names
 
       setOptions((prev) => Array.from(new Set([...prev, ...names])));
       setSelected(names);
@@ -65,7 +67,7 @@ export default function ExclusionsPage() {
     if (!customOptions.includes(trimmed) && !options.includes(trimmed))
       setCustomOptions((prev) => [...prev, trimmed]);
     if (!selected.includes(trimmed)) setSelected((prev) => [...prev, trimmed]);
-    setCustom('');
+    setCustom("");
   };
 
   const handleSave = async () => {
@@ -74,7 +76,7 @@ export default function ExclusionsPage() {
       fd.append(`details[${index}].name`, value);
       fd.append(
         `details[${index}].category`,
-        options.includes(value) ? 'DEFAULT' : 'DEFAULT',
+        options.includes(value) ? "DEFAULT" : "DEFAULT"
       );
     });
     try {
@@ -85,7 +87,7 @@ export default function ExclusionsPage() {
       }).unwrap();
       router.push(`/organizer/create-trip/${tripId}/faqs`);
     } catch (err) {
-      console.error('Error saving exclusions:', err);
+      console.error("Error saving exclusions:", err);
     }
   };
 
@@ -95,7 +97,7 @@ export default function ExclusionsPage() {
 
       if (!orgId || !tripId) return;
 
-      console.log('🔄 Fetching itinerary before going back...');
+      console.log("🔄 Fetching itinerary before going back...");
 
       await triggerGetItineraryByTripId({
         organizationId: orgId,
@@ -105,46 +107,46 @@ export default function ExclusionsPage() {
       // Now navigate back
       router.push(`/organizer/create-trip/${tripId}/Itinerary`);
     } catch (error) {
-      console.error('❌ Failed fetching itinerary:', error);
+      console.error("❌ Failed fetching itinerary:", error);
       router.push(`/organizer/create-trip/${tripId}/Itinerary`);
     }
   };
 
   return (
-    <div className='flex min-h-screen bg-gray-50'>
+    <div className="flex min-h-screen bg-gray-50">
       <OrganizerSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className='flex-1 w-full min-h-screen flex flex-col'>
-        <AppHeader title='Create New Trip' />
+      <div className="flex-1 w-full min-h-screen flex flex-col">
+        <AppHeader title="Create New Trip" />
         <TripStepperHeader activeStep={3} />
 
-        <div className='p-8 bg-white min-h-screen'>
-          <SectionCard title='Exclusions'>
-            <div className='space-y-6'>
+        <div className="p-8 bg-white min-h-screen">
+          <SectionCard title="Exclusions">
+            <div className="space-y-6">
               <PillCheckboxGroup
                 options={[...options, ...customOptions]}
-                value={selected}
+                value={selected ?? []}
                 onChange={setSelected}
               />
 
-              <div className='space-y-2'>
-                <Label htmlFor='custom-exclusion'>Custom Exclusion</Label>
+              <div className="space-y-2">
+                <Label htmlFor="custom-exclusion">Custom Exclusion</Label>
 
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <Input
-                    id='custom-exclusion'
-                    placeholder='Enter custom exclusion'
-                    value={custom}
+                    id="custom-exclusion"
+                    placeholder="Enter custom exclusion"
+                    value={custom ?? ""}
                     onChange={(e) => setCustom(e.target.value)}
                   />
 
                   <Button
-                    type='button'
-                    variant='outline'
-                    className='px-8 py-2 rounded-full font-medium text-orange-500 border-orange-400 hover:bg-orange-50 transition'
+                    type="button"
+                    variant="outline"
+                    className="px-8 py-2 rounded-full font-medium text-orange-500 border-orange-400 hover:bg-orange-50 transition"
                     onClick={addCustom}
                   >
                     + Add
@@ -156,7 +158,7 @@ export default function ExclusionsPage() {
 
           <WizardFooter
             onPrev={handlePrev}
-            onDraft={() => console.log('Draft exclusions:', selected)}
+            onDraft={() => console.log("Draft exclusions:", selected)}
             onNext={handleSave}
           />
         </div>

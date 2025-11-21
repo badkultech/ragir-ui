@@ -36,6 +36,14 @@ export function AddDayDescriptionForm({
 }: AddDayDescriptionFormProps) {
   const docsManager = useDocumentsManager(initialData?.documents ?? [], 6);
 
+  // Convert image URL to File object
+  async function urlToFile(url: string, filename = "library_image.jpg") {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type });
+  }
+
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -47,6 +55,8 @@ export function AddDayDescriptionForm({
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [getbyid] = useLazyGetDayDescriptionByIdQuery();
   const { userData } = useSelector(selectAuthState);
+  const [isSaving, setIsSaving] = useState(false);
+
 
 
 
@@ -72,13 +82,36 @@ export function AddDayDescriptionForm({
       setDescription(fd.description || "");
       setTime(fd.time || "");
       setPacking(fd.packingSuggestion || "");
-      const mappedDocs = (fd.documents ?? []).map((d: any) => ({
-        id: d.id ?? null,
-        url: d.url ?? null,
-        type: d.type ?? "IMAGE",
-        file: null,
-        markedForDeletion: false,
-      }));
+      const mappedDocs = await Promise.all(
+        (fd.documents ?? []).map(async (d: any, index: number) => {
+          if (d.url) {
+            const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
+            return {
+              id: null,
+              url: URL.createObjectURL(file),
+              type: file.type,
+              file,
+              markedForDeletion: false,
+            };
+          }
+          return {
+            id: null,
+            url: null,
+            type: null,
+            file: null,
+            markedForDeletion: false,
+          };
+        })
+      );
+      while (mappedDocs.length < 6) {
+        mappedDocs.push({
+          id: null,
+          url: null,
+          type: null,
+          file: null,
+          markedForDeletion: false,
+        });
+      }
 
       docsManager.setDocuments(mappedDocs);
 
@@ -103,6 +136,7 @@ export function AddDayDescriptionForm({
     // Run validation
     const isValid = validateForm();
     if (!isValid) return;
+    setIsSaving(true);
 
     //  Trigger save
     try {
@@ -115,6 +149,8 @@ export function AddDayDescriptionForm({
       console.log("📸 Uploaded documents:", docsManager.documents);
     } catch {
       showApiError("Failed to save day description");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -224,11 +260,18 @@ export function AddDayDescriptionForm({
       {isTripMode && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
-            <Input
+            <input
               type="checkbox"
               checked={saveInLibrary}
               onChange={(e) => setSaveInLibrary(e.target.checked)}
-              className="w-[22px]"
+              className="appearance-none w-5 h-5 border-2 rounded-sm checked:bg-orange-500 checked:border-orange-500 flex items-center justify-center cursor-pointer"
+              style={{
+                backgroundImage: saveInLibrary
+                  ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M6.003 10.803l-2.85-2.849L1.3 9.808l4.703 4.704L14.7 5.815l-1.854-1.854z'/%3E%3C/svg%3E\")"
+                  : "none",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
             />
             <label className="block text-[0.95rem] font-medium">
               Save in Library
@@ -237,6 +280,14 @@ export function AddDayDescriptionForm({
         </div>
       )}
 
+
+      {isSaving && (
+        <div className="w-full flex justify-center my-2">
+          <p className="text-sm text-orange-500 font-medium">
+            Saving...
+          </p>
+        </div>
+      )}
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
         <Button variant="outline" onClick={onCancel}>

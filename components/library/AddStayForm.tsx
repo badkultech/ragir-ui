@@ -55,6 +55,14 @@ export function AddStayForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [usegetbyid] = useLazyGetStayByIdQuery();
   const { userData } = useSelector(selectAuthState);
+  const [isSaving, setIsSaving] = useState(false);
+
+
+  async function urlToFile(url: string, filename = "library_image.jpg") {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type });
+  }
 
 
   // Documents manager: use external if provided else create local
@@ -124,15 +132,38 @@ export function AddStayForm({
           ? fd.sharingType
           : fd.sharingType?.toString() ?? ""
       );
-      const mappedDocs = (fd.documents ?? []).map((d: any) => ({
-        id: d.id ?? null,
-        url: d.url ?? null,
-        type: d.type ?? "IMAGE",
-        file: null,
-        markedForDeletion: false,
-      }));
-
+      const mappedDocs = await Promise.all(
+        (fd.documents ?? []).map(async (d: any, index: number) => {
+          if (d.url) {
+            const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
+            return {
+              id: null,                // new file → no ID
+              url: URL.createObjectURL(file),
+              type: file.type,
+              file,
+              markedForDeletion: false,
+            };
+          }
+          return {
+            id: null,
+            url: null,
+            type: null,
+            file: null,
+            markedForDeletion: false,
+          };
+        })
+      );
+      while (mappedDocs.length < 6) {
+        mappedDocs.push({
+          id: null,
+          url: null,
+          type: null,
+          file: null,
+          markedForDeletion: false,
+        });
+      }
       docsManager.setDocuments(mappedDocs);
+
       setLibraryOpen(false);
     } catch (err) {
       console.error("Error fetching stay from library:", err);
@@ -144,6 +175,8 @@ export function AddStayForm({
     if (!validateForm()) {
       return;
     }
+    setIsSaving(true);
+
 
     const payload = {
       title,
@@ -163,6 +196,8 @@ export function AddStayForm({
     } catch (err) {
       console.error("Save stay failed", err);
       showApiError("Failed to save Stay");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -282,6 +317,14 @@ export function AddStayForm({
         </div>
       )}
 
+
+      {isSaving && (
+        <div className="w-full flex justify-center my-2">
+          <p className="text-sm text-orange-500 font-medium">
+            Saving...
+          </p>
+        </div>
+      )}
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
         <Button variant="outline" className="rounded-full px-6" onClick={onCancel}>

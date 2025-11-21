@@ -13,6 +13,8 @@ export interface StayItem {
   type: "stay";
   name: string;
   checkIn: string;
+  checkInTime?:string;
+  checkOutTime?:string;
   checkOut: string;
   hotelName: string;
   location: string;

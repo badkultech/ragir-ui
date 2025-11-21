@@ -16,16 +16,7 @@
     file: File | null;
     markedForDeletion: boolean;
   };
-  export type ActivityFormData = {
-    id?: number;
-    title: string;
-    location: string;
-    description: string;
-    time: string;
-    moodTags: string[];
-    priceType: string;
-    documents: ActivityDocument[];
-  };
+
   function normalizeDocuments(docs: any[]): ActivityDocument[] {
     if (!Array.isArray(docs)) return [];
     return docs.map((d) => ({
@@ -43,8 +34,7 @@
     tripPublicId,
     dayDetailId,
   }: any) {
-    const [initialActivityData, setInitialActivityData] =
-      useState<ActivityFormData | null>(null);
+    const [initialActivityData, setInitialActivityData] = useState<any>(null);
     const [getActivityById] = useLazyGetTripActivityByIdQuery();
     const [createActivity] = useCreateTripActivityMutation();
     const [updateActivity] = useUpdateTripActivityMutation();
@@ -60,14 +50,15 @@
 
       const data = res;
 
-      const mapped: ActivityFormData = {
+      const mapped = {
         id: itemId,
         title: data.name ?? "",
         location: data.location ?? "",
         description: data.description ?? "",
         time: data.time ?? "",
         moodTags: data.moodTags ?? [],
-        priceType: data.priceCharge ?? "INCLUDED",
+        packingSuggestion :data.packingSuggestion??"",
+        priceType: data.priceCharge === "CHARGEABLE" ? "CHARGEABLE" : "INCLUDED",
         documents: normalizeDocuments(data.documents ?? []),
       };
 
@@ -76,7 +67,7 @@
     };
 
     const handleActivitySave = async (
-    data: ActivityFormData,
+    data: any,
     itemId?: number,
     documents: any[] = []
   ) => {

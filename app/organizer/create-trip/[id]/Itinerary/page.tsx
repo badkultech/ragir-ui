@@ -58,6 +58,8 @@ export default function ItineraryPage() {
   const [triggerGetItineraryByTripId] = useLazyGetItineraryByTripIdQuery();
   const [triggerGetItineraryDayDetails] = useLazyGetItineraryDayDetailsQuery();
   const [updateItinerary] = useUpdateItineraryMutation();
+  const [isSavingNext, setIsSavingNext] = useState(false);
+
 
   useEffect(() => {
     const fetch = async () => {
@@ -205,14 +207,13 @@ export default function ItineraryPage() {
   };
 
 
-
-
   const formatTime = (date: Date) =>
     `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
 
   const handleUpdateItinerary = async () => {
     if (!organizationId || !tripId) return;
     try {
+      setIsSavingNext(true);
       const fd = new FormData();
       fd.append("startPoint", startingPoint);
       fd.append("endPoint", endPoint);
@@ -222,11 +223,20 @@ export default function ItineraryPage() {
       fd.append("endTime", formatTime(new Date(endDate)));
 
       if (pdfFile) {
+
+        if (itineraryMeta?.id && itineraryMeta?.markedForDeletion) {
+          fd.append("itineraryPdf.id", itineraryMeta.id?.toString() ?? "");
+          fd.append("itineraryPdf.markedForDeletion", "true");
+        }
         fd.append("itineraryPdf.id", "");
         fd.append("itineraryPdf.type", "PDF");
         fd.append("itineraryPdf.url", "");
         fd.append("itineraryPdf.file", pdfFile);
         fd.append("itineraryPdf.markedForDeletion", "false");
+      }
+      else if (itineraryMeta?.markedForDeletion) {
+        fd.append("itineraryPdf.id", itineraryMeta.id?.toString() ?? "");
+        fd.append("itineraryPdf.markedForDeletion", "true");
 
       } else if (itineraryMeta?.url) {
         fd.append("itineraryPdf.id", itineraryMeta.id?.toString() ?? "");
@@ -236,16 +246,14 @@ export default function ItineraryPage() {
 
       } else {
         fd.append("itineraryPdf.id", "");
-        fd.append("itineraryPdf.file", "");
-        fd.append("itineraryPdf.markedForDeletion", "true");
       }
-
-
 
       await updateItinerary({ organizationId, tripPublicId: tripId as string, data: fd as unknown as any }).unwrap();
       router.push(`/organizer/create-trip/${tripId}/exclusions`);
     } catch (err) {
       console.error("❌ Failed to update itinerary:", err);
+    } finally {
+      setIsSavingNext(false);
     }
   };
 
@@ -264,8 +272,28 @@ export default function ItineraryPage() {
               accept="application/pdf"
               maxSizeMB={10}
               initialMeta={itineraryMeta}
-              onSelect={(file) => setPdfFile(file)}
+              buttonLabel={itineraryMeta?.url ? "Clear PDF" : "Choose PDF"}   // 👈 new line
+              onSelect={(file) => {
+                if (!file) {
+                  // 🔥 user pressed CLEAR
+                  if (itineraryMeta?.id) {
+                    // mark old PDF for deletion
+                    setItineraryMeta({
+                      ...itineraryMeta,
+                      markedForDeletion: true,
+                      url: "",
+                    });
+                  } else {
+                    setItineraryMeta(null);
+                  }
+
+                  setPdfFile(null);
+                  return;
+                }
+                setPdfFile(file);
+              }}
             />
+
 
             {days.map((d, dayIdx) => {
               const itemsForDay = dayItemsMap[d.day] ?? null;
@@ -297,7 +325,7 @@ export default function ItineraryPage() {
                       ) : (
                         <DetailsOptions
                           key={dayDetailIds[d.day]}
-                          organizationId={organizationId || "00000000-0000-0000-0000-000000000000"}
+                          organizationId={organizationId}
                           tripPublicId={tripId as string}
                           dayDetailId={dayDetailIds[d.day]}
                           items={itemsForDay ?? []}
@@ -326,7 +354,7 @@ export default function ItineraryPage() {
           </div>
 
           <div className="pr-9">
-            <WizardFooter onPrev={handlePrevClick} onDraft={() => console.log("Draft itinerary saved")} onNext={handleUpdateItinerary} />
+            <WizardFooter onPrev={handlePrevClick} onDraft={() => console.log("Draft itinerary saved")} onNext={handleUpdateItinerary} loading={isSavingNext} />
           </div>
         </div>
       </div>

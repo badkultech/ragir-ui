@@ -14,7 +14,8 @@ type AddTripLeaderFormProps = {
   updateId?: number | null;
   mode?: "library" | "trip";
   onCancel: () => void;
-  onSave: (data: any, documents?: DocShape[]) => void;
+  onSave: (data: any, documents?: DocShape[], done?: () => void) => void;
+  parentLoading?: boolean;
   initialData?: any;
 };
 
@@ -24,11 +25,14 @@ export function AddTripLeaderForm({
   onCancel,
   onSave,
   initialData,
+  parentLoading,
 }: AddTripLeaderFormProps) {
   const [name, setName] = useState("");
   const [tagline, setTagline] = useState("");
   const [bio, setBio] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
+
 
   const isTripMode = mode === "trip";
 
@@ -79,17 +83,19 @@ export function AddTripLeaderForm({
   // emit-only: delegate saving to parent (modal)
   const handleSubmit = () => {
     if (!validateForm()) return;
-
+    setLoading(true);
     const payload = {
       name: name.trim(),
       tagline: tagline.trim(),
       bio: bio.trim(),
       mode,
       updateId,
+      _internalLoading: true,
     };
 
-    // IMPORTANT: pass documents manager's documents array so parent can map to FormData
-    onSave(payload, docsManager.documents);
+    onSave(payload, docsManager.documents, () => {
+      setLoading(false);
+    });
   };
 
   return (
@@ -122,9 +128,20 @@ export function AddTripLeaderForm({
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
         <Button variant="outline" className="rounded-full" onClick={onCancel}>Cancel</Button>
-        <Button onClick={handleSubmit} className="rounded-full px-6 gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white">
-          Save
+        <Button
+          onClick={handleSubmit}
+          disabled={loading || parentLoading}
+
+          className={`rounded-full px-6 gap-2 text-white bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]
+               ${(loading || parentLoading)
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:opacity-90"
+            }
+              `}
+        >
+          {(loading || parentLoading) ? "Saving..." : "Save"}
         </Button>
+
       </div>
     </div>
   );

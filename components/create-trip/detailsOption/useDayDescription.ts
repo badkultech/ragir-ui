@@ -15,9 +15,9 @@ function normalizeDocuments(docs: any[]) {
   if (!Array.isArray(docs)) return [];
 
   return docs
-    .filter((d) => d?.url || d?.file)   // ⛔ remove empty docs
+    .filter((d) => d?.url || d?.file) 
     .map((d) => ({
-      id: d.id ?? null,
+      id:null,
       url: d.url ?? null,
       type: d.type ?? "IMAGE",
       file: d.file ?? null,
@@ -107,8 +107,8 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
     return {
   ...raw,
   tripType: "DAY_DESCRIPTION",
-  tripItemId:  itemId,
-  id: itemId,
+  tripItemId:raw.tripItemId,
+  id: raw.tripItemId,
   documents: normalizeDocuments(raw.documents ?? []),
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -90,8 +90,11 @@ export function CreateTrip({ tripId }: Props) {
   } = state;
   const { userData } = useSelector(selectAuthState);
   const organizationId = userData?.organizationPublicId;
-
   const router = useRouter();
+  const [leaderSaving, setLeaderSaving] = useState(false);
+  const [tripSaving, setTripSaving] = useState(false);
+
+
 
   const tags = [
     {
@@ -299,8 +302,15 @@ export function CreateTrip({ tripId }: Props) {
       data.append('maxAge', formData.maxAge.toString());
       data.append('highlights', formData.tripHighlights);
       data.append('moodTags', JSON.stringify(selectedTags));
-      data.append('groupLeaderId', selectedGroupLeaderId);
       data.append('cityTags', JSON.stringify(cityTags));
+      data.append('groupLeaderId', selectedGroupLeaderId);
+
+
+      // // MULTIPLE LEADERS SUPPORT
+      // const leaderIds = leaders.map(l => Number(l.id));
+      // data.append("groupLeaderIds", JSON.stringify(leaderIds));
+
+
 
       // ✅ Call API
 
@@ -341,12 +351,6 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const handleNumberChange = (field: string, increment: boolean) => {
-    // setFormData((prev) => ({
-    //     ...prev,
-    //     [field]: increment
-    //         ? (prev[field as keyof typeof prev] as number) + 1
-    //         : Math.max(0, (prev[field as keyof typeof prev] as number) - 1),
-    // }));
     const currentValue = formData[field as keyof typeof formData] as number;
     const newValue = increment
       ? currentValue + 1
@@ -366,7 +370,6 @@ export function CreateTrip({ tripId }: Props) {
 
   const addCityTag = () => {
     if (cityInput.trim() && !cityTags.includes(cityInput.trim())) {
-      // setCityTags((prev) => [...prev, cityInput.trim()]);
       dispatch(setCityTags([...cityTags, cityInput.trim()]));
       dispatch(setCityInput(''));
     }
@@ -376,33 +379,32 @@ export function CreateTrip({ tripId }: Props) {
     dispatch(setCityTags(cityTags.filter((tag) => tag !== tagToRemove)));
   };
 
-  // Auto-calculate totalDays whenever startDate or endDate changes
+ useEffect(() => {
+  if (!formData.startDate || !formData.endDate) return;
 
-  useEffect(() => {
-    if (!formData.startDate || !formData.endDate) return;
+  const parseDateOnly = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()); // time removed
+  };
 
-    // Convert dd/MM/yyyy to yyyy-MM-dd
-    const parseDate = (dateStr: string) => {
-      const parts = dateStr.split('/');
-      if (parts.length === 3)
-        return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-      return new Date(dateStr);
-    };
+  const start = parseDateOnly(formData.startDate);
+  const end = parseDateOnly(formData.endDate);
 
-    const start = parseDate(formData.startDate);
-    const end = parseDate(formData.endDate);
+  // Calculate pure DATE difference (no time)
+  const diffTime = end.getTime() - start.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-    const diffTime = end.getTime() - start.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  // Ensure minimum 1 day always
+  const finalDays = diffDays < 1 ? 1 : diffDays;
 
-    // setFormData((prev) => ({ ...prev, totalDays: diffDays }));
-    dispatch(setFormData({ ...formData, totalDays: diffDays }));
-  }, [formData.startDate, formData.endDate]);
+  dispatch(setFormData({ ...formData, totalDays: finalDays }));
+}, [formData.startDate, formData.endDate]);
+
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <div className='flex-1'>
-        <div className='p-8 bg-white min-h-screen '>
+        <div className={`p-8 bg-white min-h-screen ${tripSaving ? "pointer-events-none opacity-50" : ""}`}>
           <div className='max-w-auto mx-auto bg-white shadow rounded-2xl p-8'>
             <h2 className='text-2xl font-semibold text-gray-800 mb-6'>
               Trip Overview
@@ -699,52 +701,53 @@ export function CreateTrip({ tripId }: Props) {
             <p className='text-gray-400 text-base'>
               Select from existing leaders or add new
             </p>
-
-            {leaders.map((leader, index) => (
-              <div
-                key={leader.id || index}
-                className='flex items-center justify-between gap-3 border rounded-xl p-3 shadow-sm bg-gray-50 hover:bg-gray-100 transition'
-              >
-                {/* Left side: Leader info */}
-                <div className='flex items-center gap-3'>
-                  {/* Image */}
-                  {leader.imageUrl || leader.profileImageUrl ? (
-                    <img
-                      src={leader.imageUrl || leader.profileImageUrl}
-                      alt={leader.name || leader.title || 'Leader'}
-                      className='w-10 h-10 rounded-full object-cover'
-                    />
-                  ) : (
-                    <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>
-                      <span className='text-xs'>No Img</span>
-                    </div>
-                  )}
-
-                  {/* Details */}
-                  <div>
-                    <p className='font-medium text-gray-800'>
-                      {leader.name || leader.title || 'Unnamed'}
-                    </p>
-                    {(leader.tagline || leader.description) && (
-                      <p className='text-xs text-gray-500'>
-                        {leader.tagline || leader.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right side: Remove button */}
-                <button
-                  onClick={() =>
-                    dispatch(setLeaders(leaders.filter((_, i) => i !== index)))
-                  }
-                  className='text-gray-400 hover:text-red-500 transition text-xl font-bold'
-                  title='Remove Leader'
+            <div className="flex flex-col gap-4 mt-4">
+              {leaders.map((leader, index) => (
+                <div
+                  key={leader.id || index}
+                  className='flex items-center justify-between gap-3 border rounded-xl p-3 shadow-sm bg-gray-50 hover:bg-gray-100 transition'
                 >
-                  ×
-                </button>
-              </div>
-            ))}
+                  {/* Left side: Leader info */}
+                  <div className='flex items-center gap-3'>
+                    {/* Image */}
+                    {leader.imageUrl || leader.profileImageUrl ? (
+                      <img
+                        src={leader.imageUrl || leader.profileImageUrl}
+                        alt={leader.name || leader.title || 'Leader'}
+                        className='w-10 h-10 rounded-full object-cover'
+                      />
+                    ) : (
+                      <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>
+                        <span className='text-xs'>No Img</span>
+                      </div>
+                    )}
+
+                    {/* Details */}
+                    <div>
+                      <p className='font-medium text-gray-800'>
+                        {leader.name || leader.title || 'Unnamed'}
+                      </p>
+                      {(leader.tagline || leader.description) && (
+                        <p className='text-xs text-gray-500'>
+                          {leader.tagline || leader.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right side: Remove button */}
+                  <button
+                    onClick={() =>
+                      dispatch(setLeaders(leaders.filter((_, i) => i !== index)))
+                    }
+                    className='text-gray-400 hover:text-red-500 transition text-xl font-bold'
+                    title='Remove Leader'
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className='flex items-center gap-4 mt-10 justify-end-safe'>
@@ -752,12 +755,29 @@ export function CreateTrip({ tripId }: Props) {
               Save as Draft
             </Button>
             <Button
-              onClick={handleSaveTrip}
-              className='px-8 py-2 rounded-full font-medium text-white bg-gradient-to-r from-orange-400 to-pink-500 shadow hover:from-orange-500 hover:to-pink-600 transition flex items-center gap-2'
+              onClick={async () => {
+                if (tripSaving) return;
+                setTripSaving(true);
+
+                await handleSaveTrip();
+
+                setTripSaving(false);
+              }}
+              disabled={tripSaving || createTripLoading || updateTripLoading}
+              className={`
+    px-8 py-2 rounded-full font-medium text-white 
+    bg-gradient-to-r from-orange-400 to-pink-500 shadow
+    flex items-center gap-2 transition
+    ${tripSaving || createTripLoading || updateTripLoading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:from-orange-500 hover:to-pink-600"
+                }
+  `}
             >
-              {createTripLoading || updateTripLoading
-                ? 'Saving...'
-                : 'Save & Next'}
+              {tripSaving || createTripLoading || updateTripLoading
+                ? "Saving..."
+                : "Save & Next"}
+
               <svg
                 className='w-5 h-5'
                 fill='none'
@@ -772,6 +792,7 @@ export function CreateTrip({ tripId }: Props) {
                 />
               </svg>
             </Button>
+
           </div>
         </div>
         {/* ✅ Add Leader Modal */}
@@ -781,58 +802,69 @@ export function CreateTrip({ tripId }: Props) {
             dispatch(setLeaderModalOpen(data));
           }}
         >
-          <DialogContent className='max-w-3xl w-full h-[90vh] p-0 overflow-hidden flex flex-col rounded-2xl'>
+          <DialogContent className="max-w-3xl w-full h-[90vh] p-0 overflow-hidden flex flex-col rounded-2xl">
             <DialogHeader>
-              <DialogTitle className='text-lg font-semibold px-6 pt-6'>
+              <DialogTitle className="text-lg font-semibold px-6 pt-6">
                 Add New Group Leader
               </DialogTitle>
             </DialogHeader>
 
-            <div className='flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar'>
+            <div className="flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
               <AddTripLeaderForm
-                onCancel={() => dispatch(setLeaderModalOpen(false))}
                 mode="trip"
-                onSave={async (formValues, documents) => {
+                onCancel={() => dispatch(setLeaderModalOpen(false))}
+                parentLoading={leaderSaving}
+                onSave={async (formValues, documents, done) => {
 
-                  const fd = new FormData();
-                  fd.append("name", formValues.name);
-                  fd.append("tagline", formValues.tagline ?? "");
-                  fd.append("bio", formValues.bio ?? "");
-                  fd.append("organizationId", organizationId);
+                  if (leaderSaving) return;        // 🚫 double click block
+                  setLeaderSaving(true);
 
-                  // Only 1 image allowed
-                  if (documents?.[0]?.file) {
-                    fd.append("documents[0].file", documents[0].file);
-                    fd.append("documents[0].type", "IMAGE");
+                  try {
+                    const fd = new FormData();
+                    fd.append("name", formValues.name);
+                    fd.append("tagline", formValues.tagline ?? "");
+                    fd.append("bio", formValues.bio ?? "");
+                    fd.append("organizationId", organizationId);
+                    if (documents?.[0]?.file) {
+                      fd.append("documents[0].file", documents[0].file);
+                      fd.append("documents[0].type", "IMAGE");
+                    }
+
+                    const savedLeader = await saveLeader({
+                      organizationId,
+                      data: fd,
+                    }).unwrap();
+
+                    dispatch(
+                      setLeaders([
+                        ...leaders,
+                        {
+                          id: String(savedLeader.id),
+                          title: savedLeader.name || "Untitled",
+                          name: savedLeader.name,
+                          tagline: savedLeader.tagline,
+                          description: savedLeader.bio,
+                          imageUrl: documents?.[0]?.file
+                            ? URL.createObjectURL(documents[0].file)
+                            : savedLeader.documents?.[0]?.url || "",
+                        },
+                      ])
+                    );
+
+                    dispatch(setSelectedGroupLeaderId(String(savedLeader.id)));
+                    dispatch(setLeaderModalOpen(false));
+                  } catch (error) {
+                    console.error("❌ Error saving leader:", error);
+                  } finally {
+                    setLeaderSaving(false);
+                    done?.();
                   }
-
-                  // 🔥 1) Library me save
-                  const savedLeader = await saveLeader({
-                    organizationId,
-                    data: fd,
-                  }).unwrap();
-
-                  // 🔥 2) Trip UI me add kardo
-                  dispatch(setLeaders([...leaders, {
-                    id: String(savedLeader.id),
-                    title: savedLeader.name || 'Untitled',
-                    name: savedLeader.name,
-                    tagline: savedLeader.tagline,
-                    description: savedLeader.bio,
-                    image: savedLeader.documents?.[0]?.url || ''
-                  }]));
-                  dispatch(setSelectedGroupLeaderId(String(savedLeader.id)));
-                  dispatch(setSelectedGroupLeaderId(String(savedLeader.id)));
-
-
-                  // Modal band
-                  dispatch(setLeaderModalOpen(false));
                 }}
               />
-
             </div>
           </DialogContent>
         </Dialog>
+
 
         {/* ✅ Choose Leader Modal */}
         <LibrarySelectModal
@@ -842,16 +874,29 @@ export function CreateTrip({ tripId }: Props) {
           }}
           category='trip-leaders'
           onSelect={(item) => {
-            console.log('✅ Selected Leader from Library:', item);
+            const image =
+              item.image ||
+              item.imageUrl ||
+              item.profileImageUrl ||
+              "";
 
-            // ✅ Save selected leader’s ID for backend
-            dispatch(setSelectedGroupLeaderId(item.id));
-
-            // (Optional) If you want to show the name somewhere:
-            // setSelectedLeaderName(item.name);
-            dispatch(setLeaders([...leaders, item])); // ✅ Add to leaders list
+            dispatch(
+              setLeaders([
+                ...leaders,
+                {
+                  id: String(item.id),
+                  name: item.name || item.title || "",
+                  title: item.title || item.name || "",
+                  tagline: item.tagline || "",
+                  description: item.description || "",
+                  imageUrl: image,
+                },
+              ])
+            );
+            dispatch(setSelectedGroupLeaderId(String(item.id)));
             dispatch(setChooseModalOpen(false));
           }}
+
         />
       </div>
     </div>
