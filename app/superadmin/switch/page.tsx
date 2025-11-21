@@ -44,8 +44,7 @@ export default function SwitchOrganization() {
       setValue('focusedOrganization', selectedOrg);
       showSuccess(`Organization switched to ${selectedOrg?.entityName}`);
     }
-
-    window.location.reload();
+    router.replace("/organizer/dashboard");
   };
 
   return (
