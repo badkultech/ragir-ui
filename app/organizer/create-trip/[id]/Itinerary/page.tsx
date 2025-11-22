@@ -11,8 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CustomDateTimePicker } from "@/components/ui/date-time-picker";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 
 import {
   useLazyGetItineraryByTripIdQuery,
@@ -21,6 +19,7 @@ import {
 import {
   useLazyGetItineraryDayDetailsQuery,
 } from "@/lib/services/organizer/trip/itinerary/day-details";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type Day = { day: number; date: string };
 type TripItem = any;
@@ -29,9 +28,8 @@ export default function ItineraryPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { id: tripId } = useParams();
-  const { userData } = useSelector(selectAuthState);
 
-  const organizationId = userData?.organizationPublicId ?? "";
+  const organizationId = useOrganizationId();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [days, setDays] = useState<Day[]>([]);

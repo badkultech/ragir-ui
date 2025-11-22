@@ -18,8 +18,6 @@ import {
   useGetNextOrganizatioNumberQuery,
   useCreateOrganizationMutation,
 } from "@/lib/services/superadmin/add-organizer";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import { showError, showSuccess } from "@/lib/utils/toastHelpers";
 import {
   BusinessType,
@@ -27,6 +25,7 @@ import {
 } from "@/lib/services/superadmin/add-organizer/type";
 import { AppHeader } from "@/components/app-header";
 import RequiredStar from "@/components/common/RequiredStar";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type FormFields = {
   organizerId: string;
@@ -47,8 +46,7 @@ export default function RegisterOrganizer() {
   });
 
   const router = useRouter();
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   const [errors, setErrors] = useState<Partial<Record<keyof FormFields, string>>>({});
   const [submitting, setSubmitting] = useState(false);

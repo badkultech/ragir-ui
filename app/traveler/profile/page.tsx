@@ -29,6 +29,7 @@ import {
 import { useRouter } from "next/navigation";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { GradientButton } from "@/components/gradient-button";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type MoodsState = {
   mountain: boolean;
@@ -40,7 +41,7 @@ type MoodsState = {
 
 export default function TravelerProfile() {
   const { userData } = useSelector(selectAuthState);
-  const orgId = userData?.organizationPublicId || "";
+  const orgId = useOrganizationId();
   const userPublicId = userData?.userPublicId || "";
   // Inside component
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -194,11 +195,11 @@ export default function TravelerProfile() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-     {/* Sidebar */}
-                <OrganizerSidebar
-                  isOpen={sidebarOpen}
-                  onClose={() => setSidebarOpen(false)}
-                />
+      {/* Sidebar */}
+      <OrganizerSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <div className="flex-1">
         <AppHeader showAvatar={true} title="Traveler Profile" />

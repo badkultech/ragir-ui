@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type AddDayDescriptionFormProps = {
   mode?: "library" | "trip";
@@ -71,7 +72,7 @@ export function AddDayDescriptionForm({
   }, [initialData]);
   const handleLibrarySelect = async (item: any) => {
     try {
-      const organizationId = userData?.organizationPublicId ?? "";
+      const organizationId = useOrganizationId();
 
       const fd = await getbyid({
         organizationId,

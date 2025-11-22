@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 
 type AddStayFormProps = {
@@ -117,7 +118,7 @@ export function AddStayForm({
   const handleLibrarySelect = async (item: any) => {
     try {
       if (!item.id) return;
-      const organizationId = userData?.organizationPublicId ?? "";
+      const organizationId = useOrganizationId();
       const fd = await usegetbyid({ organizationId, stayId: String(item.id) }).unwrap();
 
 

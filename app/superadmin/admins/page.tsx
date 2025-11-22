@@ -18,6 +18,7 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
 import { Pagination } from "@/components/common/Pagination";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 // Modal Component
 interface ActionModalProps {
@@ -72,6 +73,7 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(0);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
+  const organizationId = useOrganizationId();
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     type: "activate" | "deactivate" | "resend" | null;
@@ -96,9 +98,9 @@ export default function Dashboard() {
     {
       page: currentPage,
       size: pageSize,
-      organizationId: userData?.organizationPublicId as string,
+      organizationId: organizationId,
     },
-    { skip: !userData?.organizationPublicId }
+    { skip: !organizationId }
   );
   const [resendInvite] = useResendInviteMutation();
   const [activateUser] = useActivateSuperAdminMutation();
@@ -134,12 +136,10 @@ export default function Dashboard() {
 
     try {
       // call setup password mutation
-      const result = await resendInvite({ email }).unwrap();
       showSuccess("Invite resent successfully");
     } catch (err) {
       console.error("mutation failed:", err);
       // Use your custom toast for backend error messages
-      const fetchError = err as FetchBaseQueryError;
       showApiError(err);
     }
   };
@@ -148,9 +148,6 @@ export default function Dashboard() {
   const totalPages = adminData?.totalPages || 0;
   const totalElements = adminData?.totalElements || 0;
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-US", {
@@ -259,17 +256,16 @@ export default function Dashboard() {
               : undefined
           }
           disabled={isActive || isPending}
-          className={`transition-colors ${
-            isActive || isPending
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-green-600 hover:text-green-900"
-          }`}
+          className={`transition-colors ${isActive || isPending
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-green-600 hover:text-green-900"
+            }`}
           title={
             isActive
               ? "Already Active"
               : isPending
-              ? "Cannot activate pending admin"
-              : "Activate Admin"
+                ? "Cannot activate pending admin"
+                : "Activate Admin"
           }
           type="button"
         >
@@ -284,11 +280,10 @@ export default function Dashboard() {
               : undefined
           }
           disabled={!isActive}
-          className={`transition-colors ${
-            !isActive
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-red-600 hover:text-red-900"
-          }`}
+          className={`transition-colors ${!isActive
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-red-600 hover:text-red-900"
+            }`}
           title={
             !isActive
               ? "Cannot deactivate inactive/pending admin"
@@ -307,11 +302,10 @@ export default function Dashboard() {
               : undefined
           }
           disabled={!isPending}
-          className={`transition-colors ${
-            !isPending
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-blue-600 hover:text-blue-900"
-          }`}
+          className={`transition-colors ${!isPending
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-blue-600 hover:text-blue-900"
+            }`}
           title={
             !isPending
               ? "Can only resend invite to pending admins"
@@ -357,7 +351,7 @@ export default function Dashboard() {
     );
   }
 
-  if (!userData?.organizationPublicId) {
+  if (!useOrganizationId()) {
     return (
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -384,63 +378,14 @@ export default function Dashboard() {
     admin: Admin | null;
   }
 
-  
+
 
   const openDetailsModal = (admin: Admin) => {
     setSelectedAdmin(admin);
     setDetailsModalOpen(true);
   };
 
-  const closeDetailsModal = () => {
-    setSelectedAdmin(null);
-    setDetailsModalOpen(false);
-  };
 
-  const DetailsModal: React.FC<DetailsModalProps> = ({
-    isOpen,
-    onClose,
-    admin,
-  }) => {
-    if (!isOpen || !admin) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Administrator Details
-          </h3>
-
-          <div className="space-y-3 text-sm text-gray-700">
-            <p>
-              <strong>Email:</strong> {admin.email}
-            </p>
-
-            <p>
-              <strong>User Type:</strong> {admin.userType}
-            </p>
-
-            <p>
-              <strong>Status:</strong> {admin.status}
-            </p>
-            <p>
-              <strong>Created:</strong>{" "}
-              {new Date(admin.createdDate).toLocaleString()}
-            </p>
-          </div>
-
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              type="button"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -619,10 +564,10 @@ export default function Dashboard() {
                               {admin.status === "ACTIVE"
                                 ? "Active"
                                 : admin.status === "INACTIVE"
-                                ? "Inactive"
-                                : admin.status === "PENDING"
-                                ? "Pending"
-                                : admin.status}
+                                  ? "Inactive"
+                                  : admin.status === "PENDING"
+                                    ? "Pending"
+                                    : admin.status}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

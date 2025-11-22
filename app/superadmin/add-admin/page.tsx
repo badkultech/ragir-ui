@@ -18,14 +18,13 @@ import {
   useCreateSuperAdminMutation,
   useGetNextAdminIdQuery,
 } from "@/lib/services/superadmin/add-admin";
-import { selectAuthState } from "@/lib/slices/auth";
-import { useSelector } from "react-redux";
 import { GradientButton } from "@/components/gradient-button";
 import { CreateSuperAdminRequest } from "@/lib/services/superadmin/add-admin/types";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import RequiredStar from "@/components/common/RequiredStar";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 export default function AddAdmin() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,8 +37,7 @@ export default function AddAdmin() {
   });
   const [emailError, setEmailError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
   const { data: data } = useGetNextAdminIdQuery(organizationId);
   const router = useRouter();
   const [createSuperAdmin] = useCreateSuperAdminMutation();

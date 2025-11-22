@@ -3,11 +3,8 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Pencil, Trash2, Eye } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import {
   useGetGroupLeaderByIdQuery,
   useGetGroupLeadersQuery,
@@ -18,10 +15,10 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButtons } from "@/components/library/ActionButtons";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 export default function TripLeadersPage() {
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId ?? undefined;
+  const organizationId = useOrganizationId();
 
   // UI state
   const [modalOpen, setModalOpen] = useState(false);

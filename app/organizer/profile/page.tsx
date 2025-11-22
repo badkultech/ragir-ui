@@ -15,7 +15,6 @@ import {
   setTestimonialScreenshotFile,
 } from '../-organizer-slice';
 import { useLazyGetOrganizerProfileQuery } from '@/lib/services/organizer';
-import { selectAuthState } from '@/lib/slices/auth';
 import { EMPTY_DOCUMENT } from '@/hooks/useDocumentsManager';
 import {
   ImagePlaceHolder,
@@ -26,22 +25,16 @@ import { GradientButton } from '@/components/gradient-button';
 import { LazyImage } from '@/components/ui/lazyImage';
 import { Certificate } from '@/components/library/SvgComponents/Icons/certificate';
 import { Check } from 'lucide-react';
+import { useOrganizationId } from '@/hooks/useOrganizationId';
 
 const hasProfile = true;
 
-// const testimonials = [
-//   {
-//     feedback: 'feedback',
-//     name: 'name',
-//     designation: 'designation',
-//   },
-// ];
+
 
 export default function OrganizerProfilePage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const state = useSelector(organizerState);
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
   const dispatch = useDispatch();
   const {
     logoFile,

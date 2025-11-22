@@ -14,6 +14,7 @@ import { SuperAdminNotificationDropdown } from "./notificationDropdowns/superAdm
 import { UserNotificationDropdown } from "./notificationDropdowns/userNotificationDropdown";
 import { ManagerNotificationDropdown } from "./notificationDropdowns/managerNotificationDropdown";
 import { DefaultNotificationDropdown } from "./notificationDropdowns/defaultNotificationDropdown";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type AppHeaderProps = {
   title?: string;
@@ -29,7 +30,7 @@ export function AppHeader({
   onMenuClick,
 }: AppHeaderProps) {
   const { userData } = useSelector(selectAuthState);
-
+  const organizationId = useOrganizationId();
   // choose ProfileDropdown
   let ProfileDropdown: React.FC = DefaultProfileDropdown;
   switch (userData?.userType) {
@@ -93,9 +94,9 @@ export function AppHeader({
       {/* Right side (Notifications + Profile) */}
       {showAvatar && (
         <div className="flex items-center space-x-4">
-          {userData?.organizationPublicId && userData?.userPublicId ? (
+          {organizationId && userData?.userPublicId ? (
             <NotificationDropdown
-              organizationId={userData.organizationPublicId}
+              organizationId={organizationId}
               userId={userData.userPublicId}
               role={userData.userType}
             />

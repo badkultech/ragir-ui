@@ -3,11 +3,9 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Pencil, MessageCircleQuestion } from "lucide-react";
+import { MessageCircleQuestion } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import {
   useGetOrganizerFaqsQuery,
   useDeleteOrganizerFaqMutation,
@@ -17,6 +15,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButtons } from "@/components/library/ActionButtons";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 export default function FAQsPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,8 +24,7 @@ export default function FAQsPage() {
   const [selectedFaq, setSelectedFaq] = useState<any>(null);
   const [updateId, setUpdateId] = useState<number | null>(null);
 
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Search state (controlled)

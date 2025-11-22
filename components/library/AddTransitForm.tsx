@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type AddTransitFormProps = {
   mode?: "library" | "trip";
@@ -142,7 +143,7 @@ export function AddTransitForm({
 
     if (!item.id) return;
 
-    const organizationId = userData?.organizationPublicId ?? "";
+    const organizationId = useOrganizationId();
 
     try {
       const full = await getTransitByIdTrigger({

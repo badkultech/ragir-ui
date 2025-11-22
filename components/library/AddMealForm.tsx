@@ -20,6 +20,7 @@ import { slice } from "lodash";
 import { boolean } from "zod";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type AddMealFormProps = {
   mode?: "library" | "trip";
@@ -106,7 +107,7 @@ export function AddMealForm({
 
 
   const handleLibrarySelect = async (item: any) => {
-    const organizationId = userData?.organizationPublicId ?? "";
+    const organizationId = useOrganizationId();
 
     try {
       const fd = await usegetbyid({

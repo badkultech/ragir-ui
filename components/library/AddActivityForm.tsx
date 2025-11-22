@@ -19,6 +19,7 @@ import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetActivityByIdQuery } from "@/lib/services/organizer/trip/library/activity";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type AddActivityFormProps = {
   mode?: "library" | "trip";
@@ -113,7 +114,7 @@ export function AddActivityForm({
   }, [initialData]);
 
   const handleLibrarySelect = async (item: any) => {
-    const organizationId = userData?.organizationPublicId ?? "";
+    const organizationId = useOrganizationId();
     try {
       const fd = await getbyid({
         organizationId,

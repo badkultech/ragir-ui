@@ -20,22 +20,18 @@ import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import {
   useCreateFaqMutation,
   useGetAllFaqsQuery,
-  useUpdateFaqMutation,
 } from '@/lib/services/organizer/trip/faqs/index';
 import { useGetOrganizerFaqsQuery } from '@/lib/services/organizer/trip/library/faq';
-import { useSelector } from 'react-redux';
-import { selectAuthState } from '@/lib/slices/auth';
 import { skipToken } from '@reduxjs/toolkit/query';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { FAQ } from '@/lib/services/organizer/trip/faqs/types';
-import { PillCheckboxGroup } from '@/components/create-trip/pill-checkbox-group';
 import RichTextEditor from '@/components/editor/RichTextEditor';
+import { useOrganizationId } from '@/hooks/useOrganizationId';
 
 // Local FAQ type with UI state
 type LocalFAQ = FAQ & { checked?: boolean };
@@ -50,12 +46,9 @@ export default function FAQsPage() {
   const [isChooseFromLibrary, setChooseFromLibrary] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState<any>(null);
 
-  console.log('faqs', faqs);
-  const { userData } = useSelector(selectAuthState);
-  const organizationId = userData?.organizationPublicId;
+  const organizationId = useOrganizationId();
 
   const [createFaq] = useCreateFaqMutation();
-  // const [updateFaq] = useUpdateFaqMutation();
   const { data: faqsLibraryData = [] } = useGetOrganizerFaqsQuery(
     organizationId ? { organizationId } : skipToken,
   );
@@ -68,7 +61,6 @@ export default function FAQsPage() {
     organizationId,
     tripPublicId: tripId as string,
   });
-  // console.log('faqsData', faqsData);
 
   useEffect(() => {
     if (faqsData?.data?.masterData) {
