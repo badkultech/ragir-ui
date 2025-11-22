@@ -306,9 +306,10 @@ export function CreateTrip({ tripId }: Props) {
 
 
       // // MULTIPLE LEADERS SUPPORT
-      // const leaderIds = leaders.map(l => Number(l.id));
+      // // const leaderIds = leaders.map(l => Number(l.id));
+      // // data.append("groupLeaderIds", JSON.stringify(leaderIds));
+      // const leaderIds = leaders.map(l => (l.id));
       // data.append("groupLeaderIds", JSON.stringify(leaderIds));
-
 
 
       // ✅ Call API
