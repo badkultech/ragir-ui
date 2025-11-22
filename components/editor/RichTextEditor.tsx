@@ -377,7 +377,7 @@ export default function RichTextEditor({
         <div className="h-4 w-px bg-gray-200 mx-1" />
 
         {/* Alignment */}
-        <ToolbarButton
+        {/* <ToolbarButton
           onClick={() => setAlign("left")}
           icon={<AlignLeft className="w-4 h-4" />}
         />
@@ -393,7 +393,7 @@ export default function RichTextEditor({
         <ToolbarButton
           onClick={() => setShowPreview(true)}
           icon={<Eye className="w-4 h-4" />}
-        />
+        /> */}
       </div>
 
       {/* Editable Area */}
