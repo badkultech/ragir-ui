@@ -12,7 +12,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { RichTextarea } from '@/components/create-trip/rich-textarea';
 import { Input } from '@/components/ui/input';
 import { WizardFooter } from '@/components/create-trip/wizard-footer';
 import { AppHeader } from '@/components/app-header';
@@ -36,6 +35,7 @@ import {
 } from '@/components/ui/dialog';
 import { FAQ } from '@/lib/services/organizer/trip/faqs/types';
 import { PillCheckboxGroup } from '@/components/create-trip/pill-checkbox-group';
+import RichTextEditor from '@/components/editor/RichTextEditor';
 
 // Local FAQ type with UI state
 type LocalFAQ = FAQ & { checked?: boolean };
@@ -185,11 +185,10 @@ export default function FAQsPage() {
                     className={`
                 flex items-start gap-3 p-3 rounded-md border bg-white
                 hover:bg-orange-50 hover:shadow-sm transition cursor-pointer
-                ${
-                  selectedFaq?.id === faq.id
-                    ? 'border-orange-500 bg-orange-50'
-                    : ''
-                }
+                ${selectedFaq?.id === faq.id
+                        ? 'border-orange-500 bg-orange-50'
+                        : ''
+                      }
               `}
                   >
                     <div className='flex-1 min-w-0'>
@@ -250,9 +249,8 @@ export default function FAQsPage() {
                 <AccordionItem
                   key={faq.question}
                   value={faq.question ?? ''}
-                  className={`relative group rounded-lg border bg-background px-2 sm:px-4 ${
-                    faq.isSelected ? 'bg-sky-50' : ''
-                  }`}
+                  className={`relative group rounded-lg border bg-background px-2 sm:px-4 ${faq.isSelected ? 'bg-sky-50' : ''
+                    }`}
                 >
                   <div className=' flex justify-between items-center'>
                     <div className='flex items-center gap-2'>
@@ -294,7 +292,7 @@ export default function FAQsPage() {
 
                   <AccordionContent className='pt-2 pb-4'>
                     <div className='border border-gray-200 rounded-lg p-2'>
-                      <RichTextarea
+                      <RichTextEditor
                         value={faq.answer}
                         onChange={(val) =>
                           updateAnswer(faq.question ?? '', val)
@@ -316,8 +314,9 @@ export default function FAQsPage() {
               />
 
               <div className='border border-gray-200 rounded-lg p-2'>
-                <RichTextarea
+                <RichTextEditor
                   value={newAnswer}
+                  placeholder='Enter your answer..'
                   onChange={(val) => setNewAnswer(val ?? '')}
                 />
               </div>

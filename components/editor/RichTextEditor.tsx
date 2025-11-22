@@ -374,7 +374,7 @@ export default function RichTextEditor({
           icon={<ListOrdered className="w-4 h-4" />}
         />
 
-        <div className="h-4 w-px bg-gray-200 mx-1" />
+        {/* <div className="h-4 w-px bg-gray-200 mx-1" /> */}
 
         {/* Alignment */}
         {/* <ToolbarButton
