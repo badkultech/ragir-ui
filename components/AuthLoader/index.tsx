@@ -1,6 +1,7 @@
+// components/HydratedAuth.tsx (or wherever you keep it)
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, usePathname } from 'next/navigation';
 import { selectAuthState, setCredentials } from '@/lib/slices/auth';
@@ -12,84 +13,91 @@ import {
   RoleType,
 } from '@/lib/utils';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { OrganizationDTO } from '@/lib/services/superadmin/organizations/types';
+import type { OrganizationDTO } from '@/lib/services/superadmin/organizations/types';
 
 /**
- * Utility to check if a given route is allowed for the role
+ * HydratedAuth
+ * - Reads tokens from localStorage and hydrates redux on client mount
+ * - Performs route guards only after hydration completes
+ * - Protects against SSR & token parsing issues
  */
-export function isAllowedRoutes(route: string, role?: RoleType): boolean {
-  if (!role) return false;
-  if (role === ROLES.SYSTEM_ADMIN) return true; // unrestricted access
-
-  const allowedRoutes = ROLE_ROUTE_ACCESS[role];
-  if (!allowedRoutes) return false;
-
-  // ✅ exact match or prefix match (for dynamic routes)
-  return allowedRoutes.some((allowed) => route === allowed);
-}
-
 export default function HydratedAuth({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const dispatch = useDispatch();
-  const { getValue } = useLocalStorage();
   const router = useRouter();
   const pathname = usePathname();
+  const { getValue } = useLocalStorage();
 
   const [hydrated, setHydrated] = useState(false);
 
-  const { accessToken, userData, isTokenExpired } =
-    useSelector(selectAuthState);
+  // read minimal auth state from redux
+  const authState = useSelector(selectAuthState);
+  const accessToken = authState?.accessToken ?? null;
+  const userData = authState?.userData ?? null;
 
+  // token expiry check memoized to avoid re-decoding on every render
+  const accessTokenExpired = useMemo(() => tokenExpired(accessToken), [accessToken]);
+
+  // Hydrate redux from localStorage on first client mount
   useEffect(() => {
-    try {
-      const accessToken = getValue('accessToken');
-      const refreshToken = getValue('refreshToken');
-      const focusedOrganization: OrganizationDTO = getValue(
-        'focusedOrganization',
-      );
+    let mounted = true;
+    (async () => {
+      try {
+        // read from localStorage safely
+        const accessToken = getValue('accessToken');
+        const refreshToken = getValue('refreshToken');
+        const focusedOrganization: OrganizationDTO | null = getValue('focusedOrganization');
 
-      if (accessToken || refreshToken) {
-        dispatch(
-          setCredentials({
-            accessToken,
-            refreshToken,
-            focusedOrganization: focusedOrganization?.publicId ?? null,
-          }),
-        );
+        if (accessToken || refreshToken) {
+          dispatch(
+            setCredentials({
+              accessToken: accessToken ?? null,
+              refreshToken: refreshToken ?? null,
+              focusedOrganization: focusedOrganization?.publicId ?? null,
+            }),
+          );
+        }
+      } catch (e) {
+        // non-fatal - we log only
+        // eslint-disable-next-line no-console
+        console.error('Error reading tokens from localStorage', e);
+      } finally {
+        if (mounted) setHydrated(true);
       }
-    } catch (e) {
-      console.error('Error reading tokens from localStorage', e);
-    } finally {
-      setHydrated(true);
-    }
-  }, [dispatch]);
+    })();
 
+    return () => {
+      mounted = false;
+    };
+  }, [dispatch, getValue]);
+
+  // Perform routing guards only after hydration completed
   useEffect(() => {
     if (!hydrated) return;
 
-    const isAuthenticated = accessToken && !tokenExpired(accessToken);
+    const isAuthenticated = Boolean(authState?.accessToken && !accessTokenExpired);
 
-    // Case 1: User on a login page (root `/` or `/something/login`)
+    // Case: login pages (root or includes /login)
     const isLoginPage = pathname === '/' || pathname.includes('/login');
     if (isLoginPage) {
       if (isAuthenticated && userData?.userType) {
         const dashboardPath = getDashboardPath(userData.userType);
         router.replace(dashboardPath);
       }
-      return; // ✅ Don't process further if already on login page
+      return;
     }
 
-    // Case 2: Always allow public routes
+    // Public routes allowed without auth
     if (PublicRoutes.some((route) => pathname.startsWith(route))) {
       return;
     }
 
-    // Case 3: Guarded routes
+    // Protected routes must be authenticated
     if (!isAuthenticated) {
-      router.replace('/'); // redirect to root login
+      router.replace('/');
       return;
     }
 
@@ -98,43 +106,62 @@ export default function HydratedAuth({
       return;
     }
 
-    // Case 4: Not allowed route → send to dashboard
+    // Role-based route access
     if (!isAllowedRoutes(pathname, userData.userType)) {
       const dashboardPath = getDashboardPath(userData.userType);
       router.replace(dashboardPath + '/dashboard');
     }
-  }, [hydrated, accessToken, userData, pathname, router]);
+  }, [hydrated, authState?.accessToken, accessTokenExpired, authState?.userData, pathname, router]);
 
   if (!hydrated) return null;
 
   return <>{children}</>;
+}
 
-  /**
-   * Checks whether a JWT access token is expired.
-   * @param token - The JWT string (access token).
-   * @returns true if expired, false if still valid.
-   */
-  function tokenExpired(token: string | null | undefined): boolean {
-    if (!token) return true;
+/**
+ * Safe token expiry checker.
+ * Returns true if token is missing / invalid / expired.
+ */
+function tokenExpired(token: string | null | undefined): boolean {
+  if (!token) return true;
+  try {
+    // JWT format check
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
 
-    try {
-      // JWT format: header.payload.signature
-      const [, payload] = token.split('.');
-      if (!payload) return true;
+    const payload = parts[1];
+    // Browser: atob is available; ensure padding handled
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    // Pad base64 string if necessary
+    const pad = base64.length % 4;
+    const padded = pad ? base64 + '='.repeat(4 - pad) : base64;
 
-      // Decode base64 payload
-      const decoded = JSON.parse(
-        atob(payload.replace(/-/g, '+').replace(/_/g, '/')),
-      );
+    const decoded = JSON.parse(atob(padded));
+    if (!decoded || typeof decoded !== 'object') return true;
+    if (!decoded.exp) return true;
 
-      if (!decoded.exp) return true;
+    const expiryMs = Number(decoded.exp) * 1000;
+    if (Number.isNaN(expiryMs)) return true;
 
-      // exp is in seconds → compare with current time in seconds
-      const expiry = decoded.exp * 1000;
-      return Date.now() >= expiry;
-    } catch (error) {
-      console.error('Failed to parse token', error);
-      return true; // Treat invalid tokens as expired
-    }
+    return Date.now() >= expiryMs;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to parse token', error);
+    return true;
   }
+}
+
+/**
+ * Utility to check whether a given route is allowed for the role
+ * (kept here because the original component referenced it)
+ */
+function isAllowedRoutes(route: string, role?: RoleType): boolean {
+  if (!role) return false;
+  if (role === ROLES.SYSTEM_ADMIN) return true; // unrestricted access
+
+  const allowedRoutes = ROLE_ROUTE_ACCESS[role];
+  if (!allowedRoutes) return false;
+
+  // exact match or prefix match for dynamic routes
+  return allowedRoutes.some((allowed) => route === allowed || route.startsWith(allowed));
 }
