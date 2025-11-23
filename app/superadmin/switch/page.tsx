@@ -22,16 +22,16 @@ import { Button } from '@/components/ui/button';
 import { OrganizationDTO } from '@/lib/services/superadmin/organizations/types';
 import { json } from 'stream/consumers';
 import { useDispatch } from 'react-redux';
-import { setFocusedOrganization } from '@/lib/slices/auth';
+import { setFocusedOrganizationId } from '@/lib/slices/auth';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
 
 export default function SwitchOrganization() {
   const dispatch = useDispatch();
-  const { getValue, setValue } = useLocalStorage();
+  const { getValueFromLocalStorage: getValue, setValueInLocalStorage: setValue } = useLocalStorage();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<OrganizationDTO | null>(
-    getValue('focusedOrganization'),
+    getValue('focusedOrganizationId'),
   );
 
   const { data, isLoading } = useGetOrganizationsQuery({ page: 0, size: 200 });
@@ -40,8 +40,8 @@ export default function SwitchOrganization() {
   const handleApply = () => {
     if (!selectedOrg) return;
     if (selectedOrg) {
-      dispatch(setFocusedOrganization(selectedOrg.publicId));
-      setValue('focusedOrganization', selectedOrg);
+      dispatch(setFocusedOrganizationId(selectedOrg.publicId));
+      setValue('focusedOrganizationId', selectedOrg.publicId);
       showSuccess(`Organization switched to ${selectedOrg?.entityName}`);
     }
     router.replace("/organizer/dashboard");

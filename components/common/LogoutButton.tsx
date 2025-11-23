@@ -32,8 +32,8 @@ export const LogoutButton = ({
     dispatch(logout());
 
     // ✅ Remove tokens
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    localStorage.clear();
+    
 
     // ✅ Redirect to login/root
     router.push("/");

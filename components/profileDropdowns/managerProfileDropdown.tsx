@@ -58,8 +58,7 @@ export function ManagerProfileDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
+            localStorage.clear();
             // Optionally redirect
             window.location.href = "/superadmin/login";
           }}
