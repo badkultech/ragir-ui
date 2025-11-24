@@ -71,6 +71,7 @@ import {
 import { useSaveGroupLeaderMutation } from '@/lib/services/organizer/trip/library/leader';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
 import { validateRequiredFields } from '@/lib/utils/validateRequiredFields';
+import RequiredStar from '../common/RequiredStar';
 
 interface Props {
   tripId?: string;
@@ -466,7 +467,7 @@ export function CreateTrip({ tripId }: Props) {
             {/* Trip Title */}
             <div className='mb-6'>
               <Label className='block text-gray-600 mb-2 font-medium'>
-                Trip Title <span className='text-black'>*</span>
+                Trip Title <RequiredStar />
               </Label>
               <div className='relative'>
                 <Input
@@ -496,7 +497,7 @@ export function CreateTrip({ tripId }: Props) {
               {/* Start Date */}
               <div className='flex flex-col gap-1'>
                 <Label className='text-gray-600 font-medium'>
-                  Start Date<span className='text-black'>*</span>
+                  Start Date<RequiredStar />
                 </Label>
                 <CustomDateTimePicker
                   value={formData.startDate}
@@ -511,7 +512,7 @@ export function CreateTrip({ tripId }: Props) {
               {/* End Date */}
               <div className='flex flex-col gap-1'>
                 <Label className='text-gray-600 font-medium'>
-                  End Date<span className='text-black'>*</span>
+                  End Date<RequiredStar />
                 </Label>
                 <CustomDateTimePicker
                   value={formData.endDate}
@@ -544,7 +545,7 @@ export function CreateTrip({ tripId }: Props) {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-5'>
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Minimum Group Size <span className='text-black'>*</span>
+                  Minimum Group Size <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
@@ -576,11 +577,11 @@ export function CreateTrip({ tripId }: Props) {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Group Size <span className='text-black'>*</span>
+                  Maximum Group Size <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
-                    value={formData.maxGroupSize.toString()}
+                    value={formData.maxGroupSize.toString().padStart(2, '0')}
                     readOnly
                     className='pr-8 text-center'
                   />
@@ -612,11 +613,11 @@ export function CreateTrip({ tripId }: Props) {
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
                   Minimum Age (18yrs or above){' '}
-                  <span className='text-black'>*</span>
+                  <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
-                    value={formData.minAge.toString()}
+                    value={formData.minAge.toString().padStart(2, '0')}
                     readOnly
                     className='pr-8 text-center'
                   />
@@ -644,11 +645,11 @@ export function CreateTrip({ tripId }: Props) {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Age <span className='text-black'>*</span>
+                  Maximum Age <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
-                    value={formData.maxAge.toString()}
+                    value={formData.maxAge.toString().padStart(2, '0')}
                     readOnly
                     className='pr-8 text-center'
                   />
@@ -678,7 +679,7 @@ export function CreateTrip({ tripId }: Props) {
             {/* Mood Tags */}
             <div className='mb-6 mt-6'>
               <Label className='block text-gray-600 mb-3 font-medium'>
-                Mood Tags<span className='text-black'>*</span>
+                Mood Tags<RequiredStar />
               </Label>
               <div className='flex flex-wrap gap-3'>
                 {tags.map((tag) => (
@@ -707,7 +708,7 @@ export function CreateTrip({ tripId }: Props) {
             {/* Locations */}
             <div className='mb-6'>
               <Label className='block text-gray-600 mb-2 font-medium'>
-                City Tags<span className='text-black'>*</span>
+                City Tags<RequiredStar />
               </Label>
               <div className='space-y-3'>
                 <div className='flex gap-2'>
