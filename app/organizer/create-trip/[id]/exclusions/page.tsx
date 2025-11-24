@@ -46,6 +46,10 @@ export default function ExclusionsPage() {
   const [custom, setCustom] = useState("");
   const [customOptions, setCustomOptions] = useState<Array<string>>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const mergedOptions = Array.from(new Set([...options, ...customOptions]));
+  const [isSaving, setIsSaving] = useState(false);
+
+
 
   useEffect(() => {
     if (apiExclusions?.masterData) {
@@ -71,25 +75,29 @@ export default function ExclusionsPage() {
   };
 
   const handleSave = async () => {
+    setIsSaving(true); 
+
     const fd = new FormData();
     selected.forEach((value, index) => {
       fd.append(`details[${index}].name`, value);
-      fd.append(
-        `details[${index}].category`,
-        options.includes(value) ? "DEFAULT" : "DEFAULT"
-      );
+      fd.append(`details[${index}].category`, "DEFAULT");
     });
+
     try {
       await createExclusion({
         organizationId,
         tripPublicId: tripId as string,
         data: fd,
       }).unwrap();
+
       router.push(`/organizer/create-trip/${tripId}/faqs`);
     } catch (err) {
       console.error("Error saving exclusions:", err);
+    } finally {
+      setIsSaving(false); 
     }
   };
+
 
   const handlePrev = async () => {
     try {
@@ -124,42 +132,44 @@ export default function ExclusionsPage() {
         <TripStepperHeader activeStep={3} />
 
         <div className="p-8 bg-white min-h-screen">
-          <SectionCard title="Exclusions">
-            <div className="space-y-6">
-              <PillCheckboxGroup
-                options={[...options, ...customOptions]}
-                value={selected ?? []}
-                onChange={setSelected}
-              />
+          <div className={isSaving ? "pointer-events-none opacity-50" : ""}>
+            <SectionCard title="Exclusions">
+              <div className="space-y-6">
+                <PillCheckboxGroup
+                  options={mergedOptions}
+                  value={selected ?? []}
+                  onChange={setSelected}
+                />
 
-              <div className="space-y-2">
-                <Label htmlFor="custom-exclusion">Custom Exclusion</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="custom-exclusion">Custom Exclusion</Label>
 
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="custom-exclusion"
-                    placeholder="Enter custom exclusion"
-                    value={custom ?? ""}
-                    onChange={(e) => setCustom(e.target.value)}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="custom-exclusion"
+                      placeholder="Enter custom exclusion"
+                      value={custom ?? ""}
+                      onChange={(e) => setCustom(e.target.value)}
+                    />
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="px-8 py-2 rounded-full font-medium text-orange-500 border-orange-400 hover:bg-orange-50 transition"
-                    onClick={addCustom}
-                  >
-                    + Add
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="px-8 py-2 rounded-full font-medium text-orange-500 border-orange-400 hover:bg-orange-50 transition"
+                      onClick={addCustom}
+                    >
+                      + Add
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </SectionCard>
-
+            </SectionCard>
+          </div>
           <WizardFooter
             onPrev={handlePrev}
             onDraft={() => console.log("Draft exclusions:", selected)}
             onNext={handleSave}
+            loading={isSaving}
           />
         </div>
       </div>

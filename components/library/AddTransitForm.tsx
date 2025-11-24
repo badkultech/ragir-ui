@@ -238,19 +238,16 @@ export function AddTransitForm({
       { key: "departure", label: "Departure time", value: departure },
       { key: "arrival", label: "Arrival time", value: arrival },
       { key: "description", label: "Description", value: description },
-      { key: "customVehicleType", label: "Custom vehicle type", value: customVehicleType },
+      { key: "vehicleTypes", label: "Vehicle", value: vehicle },
     ]);
 
     setErrors(newErrors);
-
-    // if errors exist, stop execution (same behavior as before)
     if (Object.keys(newErrors).length > 0) return;
+
     setIsSaving(true);
 
-
-
     try {
-      onSave(
+      await onSave(
         {
           title,
           from,
@@ -267,13 +264,17 @@ export function AddTransitForm({
         },
         docsManager.documents
       );
+
       showSuccess("Transit saved successfully!");
-    } catch {
+
+      onCancel(); 
+    } catch (e) {
       showApiError("Failed to save Transit");
     } finally {
       setIsSaving(false);
     }
   };
+
 
   const isTripMode = mode === "trip";
 
