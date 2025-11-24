@@ -1,15 +1,17 @@
 // lib/features/authSlice.ts
 import { AuthTokenPayload } from '@/hooks/useDecodedToken';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { RootState } from '@/lib/slices/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 
+const localStorage = useLocalStorage();
 type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
   userData?: AuthTokenPayload | null | undefined;
   isTokenExpired?: boolean;
-  focusedOrganization?: string | null;
+  focusedOrganizationId?: string | null;
 };
 
 const initialState: AuthState = {
@@ -17,7 +19,7 @@ const initialState: AuthState = {
   refreshToken: null,
   userData: null,
   isTokenExpired: false,
-  focusedOrganization: null,
+  focusedOrganizationId: null,
 };
 
 const authSlice = createSlice({
@@ -32,8 +34,8 @@ const authSlice = createSlice({
           action.payload.accessToken,
         );
         state.userData = decodedData;
-        state.focusedOrganization =
-          action.payload.focusedOrganization ??
+        state.focusedOrganizationId =
+          action.payload.focusedOrganizationId ??
           decodedData.organizationPublicId;
         if (decodedData.exp && Date.now() >= decodedData.exp * 1000) {
           console.warn('Token has expired');
@@ -42,18 +44,16 @@ const authSlice = createSlice({
       }
     },
     logout: (state) => {
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.userData = null;
-      state.isTokenExpired = true;
+     state = initialState;
     },
-    setFocusedOrganization: (state, action: PayloadAction<string>) => {
-      state.focusedOrganization = action.payload;
+    
+    setFocusedOrganizationId: (state, action: PayloadAction<string>) => {
+      state.focusedOrganizationId = action.payload;
     },
   },
 });
 
-export const { setCredentials, logout, setFocusedOrganization } =
+export const { setCredentials, logout, setFocusedOrganizationId } =
   authSlice.actions;
 export const selectAuthState = (state: RootState) => state.auth;
 export default authSlice;

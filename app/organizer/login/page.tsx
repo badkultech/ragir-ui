@@ -14,8 +14,10 @@ import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
 import { jwtDecode } from "jwt-decode";
 import type { AuthTokenPayload } from "@/hooks/useDecodedToken";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function AdminLogin() {
+  const { setValueInLocalStorage } = useLocalStorage();
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -38,16 +40,12 @@ export default function AdminLogin() {
     try {
       const result = await login({ email, password }).unwrap();
       if (result.accessToken && result.refreshToken) {
-        if (rememberMe) {
-          localStorage.setItem("accessToken", result.accessToken);
-          localStorage.setItem("refreshToken", result.refreshToken);
-        } else {
-          localStorage.setItem("accessToken", result.accessToken);
-          localStorage.setItem("refreshToken", result.refreshToken);
-        }
-
         const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
-
+        if (rememberMe) {
+          setValueInLocalStorage("accessToken", result.accessToken);
+          setValueInLocalStorage("refreshToken", result.refreshToken);
+          setValueInLocalStorage("focusedOrganizationId", decodedData.organizationPublicId);
+        }
         dispatch(
           setCredentials({
             accessToken: result.accessToken,

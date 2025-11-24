@@ -192,7 +192,7 @@ export const getDashboardPath = (role?: string) => {
     case ROLES.SYSTEM_ADMIN:
       return '/superadmin';
     case ROLES.ORGANIZER:
-      return '/organizer';
+      return '/organizer/dashboard';
     case ROLES.USER:
       return '/traveler/profile'; // adjust to your actual path
     default:

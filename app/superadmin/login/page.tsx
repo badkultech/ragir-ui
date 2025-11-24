@@ -14,6 +14,7 @@ import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
 import { jwtDecode } from "jwt-decode";
 import type { AuthTokenPayload } from "@/hooks/useDecodedToken";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,8 +47,13 @@ export default function AdminLogin() {
           localStorage.setItem("refreshToken", result.refreshToken);
         }
 
-        const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
+        const { setValueInLocalStorage } = useLocalStorage();
 
+        setValueInLocalStorage("accessToken", result.accessToken);
+        setValueInLocalStorage("refreshToken", result.refreshToken);
+
+        const decodedData = jwtDecode<AuthTokenPayload>(result.accessToken);
+        setValueInLocalStorage("focusedOrganizationId", decodedData.organizationPublicId);
         dispatch(
           setCredentials({
             accessToken: result.accessToken,
