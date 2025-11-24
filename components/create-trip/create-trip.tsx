@@ -330,7 +330,7 @@ export function CreateTrip({ tripId }: Props) {
           organizationId,
           data,
         }).unwrap();
-        const tripId = response?.data.publicId; // make sure your backend returns it
+        const tripId = response?.data.publicId; 
 
         if (tripId) {
           router.push(`/organizer/create-trip/${tripId}/Itinerary`);
@@ -641,13 +641,13 @@ export function CreateTrip({ tripId }: Props) {
                         key={tag}
                         onClick={() => {
                           dispatch(setCityInput(tag));
-                        }} // ✅ click to move tag text back to input
+                        }}
                         className='inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-sm cursor-pointer hover:bg-blue-100 transition'
                       >
                         {tag}
                         <button
                           onClick={(e) => {
-                            e.stopPropagation(); // ❗ stop click bubbling (so delete doesn’t trigger input fill)
+                            e.stopPropagation(); 
                             removeCityTag(tag);
                           }}
                           className='ml-1 text-blue-500 hover:text-blue-700'
@@ -672,7 +672,7 @@ export function CreateTrip({ tripId }: Props) {
                   onChange={(val) =>
                     handleInputChange('tripHighlights', val ?? '')
                   }
-                // Can be 'edit', 'live', or 'preview'
+             
                 />
               </div>
             </div>
@@ -816,7 +816,7 @@ export function CreateTrip({ tripId }: Props) {
                 parentLoading={leaderSaving}
                 onSave={async (formValues, documents, done) => {
 
-                  if (leaderSaving) return;        // 🚫 double click block
+                  if (leaderSaving) return;      
                   setLeaderSaving(true);
 
                   try {

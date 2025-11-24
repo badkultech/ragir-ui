@@ -271,12 +271,11 @@ export default function ItineraryPage() {
               accept="application/pdf"
               maxSizeMB={10}
               initialMeta={itineraryMeta}
-              buttonLabel={itineraryMeta?.url ? "Clear PDF" : "Choose PDF"}   // 👈 new line
+              buttonLabel={itineraryMeta?.url ? "Clear PDF" : "Choose PDF"} 
               onSelect={(file) => {
                 if (!file) {
-                  // 🔥 user pressed CLEAR
+              
                   if (itineraryMeta?.id) {
-                    // mark old PDF for deletion
                     setItineraryMeta({
                       ...itineraryMeta,
                       markedForDeletion: true,
