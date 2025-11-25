@@ -66,6 +66,8 @@ export function AddTransitForm({
   const [getTransitByIdTrigger] = useLazyGetOrganizerTransitByIdQuery();
   const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
+  const organizationId = useOrganizationId();
+
 
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
@@ -143,7 +145,6 @@ export function AddTransitForm({
 
     if (!item.id) return;
 
-    const organizationId = useOrganizationId();
 
     try {
       const full = await getTransitByIdTrigger({

@@ -57,6 +57,8 @@ export function AddStayForm({
   const [usegetbyid] = useLazyGetStayByIdQuery();
   const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
+  const organizationId = useOrganizationId();
+
 
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
@@ -118,7 +120,6 @@ export function AddStayForm({
   const handleLibrarySelect = async (item: any) => {
     try {
       if (!item.id) return;
-      const organizationId = useOrganizationId();
       const fd = await usegetbyid({ organizationId, stayId: String(item.id) }).unwrap();
 
 
