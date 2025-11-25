@@ -294,6 +294,15 @@ export function CreateTrip({ tripId }: Props) {
       }
     }
 
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate).getTime();
+      const end = new Date(formData.endDate).getTime();
+
+      if (start === end) {
+        newErrors.endDate = "End date & time cannot be same as start date & time";
+      }
+    }
+
     if (Number(formData.minGroupSize) <= 0) {
       newErrors.minGroupSize = "Minimum group size must be greater than 0";
     }
@@ -488,10 +497,11 @@ export function CreateTrip({ tripId }: Props) {
                   placeholder='Enter trip title'
                   maxLength={80}
                   value={formData.tripTitle}
-                  onChange={(e) => {
+                  onChange={(e) => { {
                     handleInputChange('tripTitle', e.target.value);
+                    clearError("tripTitle");;
                     clearError("tripTitle");
-                  }}
+                  }}}
                   className='w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500'
                 />
 
@@ -509,15 +519,9 @@ export function CreateTrip({ tripId }: Props) {
             {/* Start and End Dates */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               {/* Start Date */}
-<<<<<<< Updated upstream
-              <div className='flex flex-col gap-1'>
-                <Label className='text-gray-600 font-medium'>
-                  Start Date<RequiredStar />
-=======
               <div className="flex flex-col gap-1 relative pb-5">
                 <Label className="text-gray-600 font-medium">
                   Start Date <span className="text-black">*</span>
->>>>>>> Stashed changes
                 </Label>
                 <CustomDateTimePicker
                   value={formData.startDate}
@@ -536,15 +540,9 @@ export function CreateTrip({ tripId }: Props) {
                 )}
               </div>
               {/* End Date */}
-<<<<<<< Updated upstream
               <div className='flex flex-col gap-1'>
                 <Label className='text-gray-600 font-medium'>
                   End Date<RequiredStar />
-=======
-              <div className="flex flex-col gap-1 relative pb-5">
-                <Label className="text-gray-600 font-medium">
-                  End Date <span className="text-black">*</span>
->>>>>>> Stashed changes
                 </Label>
                 <CustomDateTimePicker
                   value={formData.endDate}
