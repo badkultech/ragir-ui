@@ -66,46 +66,64 @@
       return mapped;
     };
 
-    const handleActivitySave = async (
-    data: any,
-    itemId?: number,
-    documents: any[] = []
-  ) => {
-    const form = mapActivityToFormData(
-      {
-        ...data,
-        time: data.time,
-      },
-      documents
-    );
+   const handleActivitySave = async (data : any, itemId: any, documents : any[] = []) => {
+  const cleanDocs = documents.filter(doc =>
+    doc.file || doc.id || doc.markedForDeletion
+  );
+
+  const normalized = cleanDocs.map(doc => ({
+    ...doc,
+    markedForDeletion: doc.markedForDeletion || false
+  }));
+
+  const finalDocs = documents
+  .filter(doc => doc.id || doc.file || doc.markedForDeletion) 
+  .map(doc => ({
+    id: doc.id || "",
+    file: doc.file || null,
+    url: doc.url || "",
+    type: doc.type || "IMAGE",
+    markedForDeletion: !!doc.markedForDeletion,
+  }));
 
 
-      let res;
+  const form = mapActivityToFormData(
+    {
+      ...data,
+      time: data.time,
+    },
+    finalDocs 
+  );
 
-      if (itemId) {
-        res = await updateActivity({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          itemId: String(itemId),
-          data: form,
-        }).unwrap();
-      } else {
-        res = await createActivity({
-          organizationId,
-          tripPublicId,
-          dayDetailId,
-          data: form,
-        }).unwrap();
-      }
+  let res;
 
-      const raw = res;
+ if (itemId) {
+  const correctId = data.tripItemId || itemId;
 
-      return {
-        ...raw,
-        documents: normalizeDocuments(raw.documents ?? []),
-      };
-    };
+  res = await updateActivity({
+    organizationId,
+    tripPublicId,
+    dayDetailId,
+    itemId: String(correctId),
+    data: form
+  }).unwrap();
+}
+else {
+    res = await createActivity({
+      organizationId,
+      tripPublicId,
+      dayDetailId,
+      data: form,
+    }).unwrap();
+  }
+
+  return {
+  ...res, 
+  documents: res.documents || [],
+};
+
+};
+
 
     const handleActivityDelete = async (id: number) => {
       await deleteActivity({

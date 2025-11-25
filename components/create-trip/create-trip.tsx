@@ -255,18 +255,18 @@ export function CreateTrip({ tripId }: Props) {
     dispatch(setCityTags(parsedCities));
 
     if (trip.groupLeaders && trip.groupLeaders.length > 0) {
-  const mapped = trip.groupLeaders.map((leader: any) => ({
-    id: String(leader.id),
-    name: leader.name,
-    title: leader.name,
-    tagline: leader.tagline,
-    description: leader.tagline || leader.bio || "",
-    imageUrl: leader.documents?.[0]?.url || "",
-  }));
+      const mapped = trip.groupLeaders.map((leader: any) => ({
+        id: String(leader.id),
+        name: leader.name,
+        title: leader.name,
+        tagline: leader.tagline,
+        description: leader.tagline || leader.bio || "",
+        imageUrl: leader.documents?.[0]?.url || "",
+      }));
 
-  dispatch(setLeaders(mapped));
-  dispatch(setSelectedGroupLeaderId(mapped[0].id));
-}
+      dispatch(setLeaders(mapped));
+      dispatch(setSelectedGroupLeaderId(mapped[0].id));
+    }
 
 
   }, [tripData]);
@@ -278,8 +278,7 @@ export function CreateTrip({ tripId }: Props) {
       { key: "endDate", label: "End Date", value: formData.endDate },
       { key: "moodTags", label: "Mood Tags", value: selectedTags },
       { key: "cityTags", label: "City Tags", value: cityTags },
-      { key: "tripHighlights", label: "Trip Highlights", value: formData.tripHighlights },
-      { key: "groupLeaderId", label: "Group Leader", value: selectedGroupLeaderId },
+  
     ]);
 
     const newErrors: any = { ...baseErrors };
@@ -288,19 +287,16 @@ export function CreateTrip({ tripId }: Props) {
       const start = new Date(formData.startDate).getTime();
       const end = new Date(formData.endDate).getTime();
 
-      if (start === end) {
-        newErrors.endDate = "End date & time cannot be same as start date & time";
-      }
-    }
-
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate).getTime();
-      const end = new Date(formData.endDate).getTime();
+        if (end < start) {
+    newErrors.endDate = "End date cannot be before start date";
+  }
 
       if (start === end) {
         newErrors.endDate = "End date & time cannot be same as start date & time";
       }
     }
+
+  
 
     if (Number(formData.minGroupSize) <= 0) {
       newErrors.minGroupSize = "Minimum group size must be greater than 0";
@@ -488,7 +484,7 @@ export function CreateTrip({ tripId }: Props) {
                 <Input
                   type='text'
                   placeholder='Enter trip title'
-                  maxLength={80}
+                  maxLength={70}
                   value={formData.tripTitle}
                   onChange={(e) => {
                     {
@@ -502,7 +498,7 @@ export function CreateTrip({ tripId }: Props) {
 
 
                 <span className='absolute right-4 top-1/2 -translate-y-1/2 text-sm text-orange-500'>
-                  {formData.tripTitle.length}/80 Characters
+                  {formData.tripTitle.length}/70 Characters
                 </span>
 
               </div>
@@ -523,7 +519,7 @@ export function CreateTrip({ tripId }: Props) {
                   onChange={(val) => {
                     handleInputChange('startDate', val);
                     clearError("startDate");
-                    clearError("endDate"); // endDate same-error remove
+                    
                   }}
                   placeholder="Select start date & time"
                   className="w-full"
@@ -535,7 +531,7 @@ export function CreateTrip({ tripId }: Props) {
                 )}
               </div>
               {/* End Date */}
-              <div className='flex flex-col gap-1'>
+              <div className="flex flex-col gap-1 relative pb-5">
                 <Label className='text-gray-600 font-medium'>
                   End Date<RequiredStar />
                 </Label>
@@ -549,11 +545,12 @@ export function CreateTrip({ tripId }: Props) {
                   className="w-full"
                 />
                 {errors.endDate && (
-                  <p className="text-red-500 text-sm absolute left-0 -bottom-2">
+                  <p className="text-red-500 text-sm absolute left-0 top-15">
                     {errors.endDate}
                   </p>
                 )}
               </div>
+
             </div>
 
             {/* Total Days */}
@@ -744,7 +741,9 @@ export function CreateTrip({ tripId }: Props) {
             {/* Mood Tags */}
             <div className='mb-6 mt-6'>
               <Label className='block text-gray-600 mb-3 font-medium'>
-                Mood Tags<RequiredStar />
+                Mood Tags<RequiredStar />{errors.moodTags && (
+                  <span className="text-red-500 text-sm mt-1">({errors.moodTags})</span>
+                )}
               </Label>
               <div className='flex flex-wrap gap-3'>
                 {tags.map((tag) => (
@@ -767,9 +766,7 @@ export function CreateTrip({ tripId }: Props) {
                     }
                   />
                 ))}
-                {errors.moodTags && (
-                  <p className="text-red-500 text-sm mt-1">{errors.moodTags}</p>
-                )}
+                
 
               </div>
             </div>
@@ -836,12 +833,9 @@ export function CreateTrip({ tripId }: Props) {
                   value={formData.tripHighlights}
                   onChange={(val) => {
                     handleInputChange('tripHighlights', val ?? '');
-                    clearError("tripHighlights")
                   }}
 
-                />{errors.tripHighlights && (
-                  <p className="text-red-500 text-sm mt-1">{errors.tripHighlights}</p>
-                )}
+                />
               </div>
             </div>
           </div>
@@ -868,11 +862,7 @@ export function CreateTrip({ tripId }: Props) {
             </div>
             <p className='text-gray-400 text-base'>
               Select from existing leaders or add new
-            </p>{errors.groupLeaderId && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.groupLeaderId}
-              </p>
-            )}
+            </p>
             <div className="flex flex-col gap-4 mt-4">
               {leaders.map((leader, index) => (
                 <div
