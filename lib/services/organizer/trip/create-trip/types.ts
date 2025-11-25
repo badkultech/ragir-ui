@@ -19,6 +19,13 @@ export interface Trip {
   highlights: string;
   groupLeaderId: number;
   groupLeader?: GroupLeaderResponse;
+  groupLeaders?: {
+    id: number;
+    name: string;
+    tagline?: string;
+    bio?: string;
+    documents?: { id: number; url: string; type: string }[];
+  }[];
 }
 
 export interface TripResponse {

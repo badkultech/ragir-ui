@@ -254,21 +254,20 @@ export function CreateTrip({ tripId }: Props) {
     dispatch(setSelectedTags(parsedMoods));
     dispatch(setCityTags(parsedCities));
 
-    if (trip.groupLeader) {
-      const leader = trip.groupLeader;
+    if (trip.groupLeaders && trip.groupLeaders.length > 0) {
+  const mapped = trip.groupLeaders.map((leader: any) => ({
+    id: String(leader.id),
+    name: leader.name,
+    title: leader.name,
+    tagline: leader.tagline,
+    description: leader.tagline || leader.bio || "",
+    imageUrl: leader.documents?.[0]?.url || "",
+  }));
 
-      const mappedLeader = {
-        id: String(leader.id),
-        name: leader.name,
-        title: leader.name,
-        tagline: leader.tagline,
-        description: leader.tagline || leader.bio || "",
-        imageUrl: leader.documents?.[0]?.url || "",
-      };
+  dispatch(setLeaders(mapped));
+  dispatch(setSelectedGroupLeaderId(mapped[0].id));
+}
 
-      dispatch(setLeaders([mappedLeader]));
-      dispatch(setSelectedGroupLeaderId(mappedLeader.id));
-    }
 
   }, [tripData]);
 
@@ -372,15 +371,10 @@ export function CreateTrip({ tripId }: Props) {
       data.append('highlights', formData.tripHighlights);
       data.append('moodTags', JSON.stringify(selectedTags));
       data.append('cityTags', JSON.stringify(cityTags));
-      data.append('groupLeaderId', selectedGroupLeaderId);
-
-
-      // // MULTIPLE LEADERS SUPPORT
-      // // const leaderIds = leaders.map(l => Number(l.id));
-      // // data.append("groupLeaderIds", JSON.stringify(leaderIds));
-      // const leaderIds = leaders.map(l => (l.id));
-      // data.append("groupLeaderIds", JSON.stringify(leaderIds));
-
+      // data.append('groupLeaderId', selectedGroupLeaderId);
+      leaders.forEach((leader) => {
+        data.append("groupLeaderIds", leader.id.toString());
+      });
       if (tripId) {
         await updateTrip({
           organizationId,
@@ -413,7 +407,6 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const handleInputChange = (field: string, value: string | number) => {
-    // setFormData((prev) => ({ ...prev, [field]: value }));
     dispatch(setFormData({ ...formData, [field]: value }));
   };
 
@@ -497,11 +490,13 @@ export function CreateTrip({ tripId }: Props) {
                   placeholder='Enter trip title'
                   maxLength={80}
                   value={formData.tripTitle}
-                  onChange={(e) => { {
-                    handleInputChange('tripTitle', e.target.value);
-                    clearError("tripTitle");;
-                    clearError("tripTitle");
-                  }}}
+                  onChange={(e) => {
+                    {
+                      handleInputChange('tripTitle', e.target.value);
+                      clearError("tripTitle");;
+                      clearError("tripTitle");
+                    }
+                  }}
                   className='w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500'
                 />
 
@@ -520,8 +515,8 @@ export function CreateTrip({ tripId }: Props) {
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               {/* Start Date */}
               <div className="flex flex-col gap-1 relative pb-5">
-                <Label className="text-gray-600 font-medium">
-                  Start Date <span className="text-black">*</span>
+                <Label className='text-gray-600 font-medium'>
+                  Start Date<RequiredStar />
                 </Label>
                 <CustomDateTimePicker
                   value={formData.startDate}
