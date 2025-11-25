@@ -63,7 +63,7 @@ export function AddActivityForm({
   const [getbyid] = useLazyGetActivityByIdQuery();
   const isTripMode = mode === "trip";
   const [isSaving, setIsSaving] = useState(false);
-
+  const organizationId = useOrganizationId();
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
@@ -114,7 +114,6 @@ export function AddActivityForm({
   }, [initialData]);
 
   const handleLibrarySelect = async (item: any) => {
-    const organizationId = useOrganizationId();
     try {
       const fd = await getbyid({
         organizationId,

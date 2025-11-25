@@ -349,12 +349,15 @@ export default function ItineraryPage() {
                             <Label className="text-sm font-medium mb-1 opacity-0 select-none">
                               invisible label
                             </Label>
-                            <CustomDateTimePicker
-                              value={startDate}
-                              onChange={setStartDate}
-                              placeholder="Select start date & time"
-                              className="w-full"
-                            />
+                            <div className="pointer-events-none opacity-60">
+                              <CustomDateTimePicker
+                                value={startDate}
+                                onChange={setStartDate}
+                                placeholder="Select start date & time"
+                                className="w-full"
+                              />
+                            </div>
+
                             <div className="h-4"></div>
                           </div>
                         </div>
@@ -410,12 +413,15 @@ export default function ItineraryPage() {
                 </div>
                 <div className="flex-1 flex flex-col">
                   <label className="text-sm block mb-1 opacity-0 font-medium">End Date & Time</label>
-                  <CustomDateTimePicker
-                    value={endDate}
-                    onChange={setEndDate}
-                    placeholder="Select end date & time"
-                    className="w-full"
-                  />
+                  <div className="pointer-events-none opacity-60">
+                    <CustomDateTimePicker
+                      value={endDate}
+                      onChange={setEndDate}
+                      placeholder="Select end date & time"
+                      className="w-full"
+                    />
+                  </div>
+
                   <div className="h-4"></div>
                 </div>
               </div>

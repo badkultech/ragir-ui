@@ -66,6 +66,8 @@ export function CustomDateTimePicker({
       <Calendar
         size={18}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+        onClick={handleOpenPicker}
+
       />
 
       {/* Hidden actual picker */}

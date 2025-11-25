@@ -71,6 +71,7 @@ import {
 import { useSaveGroupLeaderMutation } from '@/lib/services/organizer/trip/library/leader';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
 import { validateRequiredFields } from '@/lib/utils/validateRequiredFields';
+import RequiredStar from '../common/RequiredStar';
 
 interface Props {
   tripId?: string;
@@ -253,21 +254,20 @@ export function CreateTrip({ tripId }: Props) {
     dispatch(setSelectedTags(parsedMoods));
     dispatch(setCityTags(parsedCities));
 
-    if (trip.groupLeader) {
-      const leader = trip.groupLeader;
+    if (trip.groupLeaders && trip.groupLeaders.length > 0) {
+  const mapped = trip.groupLeaders.map((leader: any) => ({
+    id: String(leader.id),
+    name: leader.name,
+    title: leader.name,
+    tagline: leader.tagline,
+    description: leader.tagline || leader.bio || "",
+    imageUrl: leader.documents?.[0]?.url || "",
+  }));
 
-      const mappedLeader = {
-        id: String(leader.id),
-        name: leader.name,
-        title: leader.name,
-        tagline: leader.tagline,
-        description: leader.tagline || leader.bio || "",
-        imageUrl: leader.documents?.[0]?.url || "",
-      };
+  dispatch(setLeaders(mapped));
+  dispatch(setSelectedGroupLeaderId(mapped[0].id));
+}
 
-      dispatch(setLeaders([mappedLeader]));
-      dispatch(setSelectedGroupLeaderId(mappedLeader.id));
-    }
 
   }, [tripData]);
 
@@ -283,6 +283,24 @@ export function CreateTrip({ tripId }: Props) {
     ]);
 
     const newErrors: any = { ...baseErrors };
+
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate).getTime();
+      const end = new Date(formData.endDate).getTime();
+
+      if (start === end) {
+        newErrors.endDate = "End date & time cannot be same as start date & time";
+      }
+    }
+
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate).getTime();
+      const end = new Date(formData.endDate).getTime();
+
+      if (start === end) {
+        newErrors.endDate = "End date & time cannot be same as start date & time";
+      }
+    }
 
     if (Number(formData.minGroupSize) <= 0) {
       newErrors.minGroupSize = "Minimum group size must be greater than 0";
@@ -307,6 +325,10 @@ export function CreateTrip({ tripId }: Props) {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const clearError = (field: string) => {
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
 
@@ -349,15 +371,10 @@ export function CreateTrip({ tripId }: Props) {
       data.append('highlights', formData.tripHighlights);
       data.append('moodTags', JSON.stringify(selectedTags));
       data.append('cityTags', JSON.stringify(cityTags));
-      data.append('groupLeaderId', selectedGroupLeaderId);
-
-
-      // // MULTIPLE LEADERS SUPPORT
-      // // const leaderIds = leaders.map(l => Number(l.id));
-      // // data.append("groupLeaderIds", JSON.stringify(leaderIds));
-      // const leaderIds = leaders.map(l => (l.id));
-      // data.append("groupLeaderIds", JSON.stringify(leaderIds));
-
+      // data.append('groupLeaderId', selectedGroupLeaderId);
+      leaders.forEach((leader) => {
+        data.append("groupLeaderIds", leader.id.toString());
+      });
       if (tripId) {
         await updateTrip({
           organizationId,
@@ -390,7 +407,6 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const handleInputChange = (field: string, value: string | number) => {
-    // setFormData((prev) => ({ ...prev, [field]: value }));
     dispatch(setFormData({ ...formData, [field]: value }));
   };
 
@@ -402,7 +418,7 @@ export function CreateTrip({ tripId }: Props) {
       : currentValue - 1;
 
     if (field === "minAge") {
-      newValue = Math.max(18, newValue); // 🔥 minAge can never go below 18
+      newValue = Math.max(18, newValue);
     } else {
       newValue = Math.max(0, newValue);
     }
@@ -466,7 +482,7 @@ export function CreateTrip({ tripId }: Props) {
             {/* Trip Title */}
             <div className='mb-6'>
               <Label className='block text-gray-600 mb-2 font-medium'>
-                Trip Title <span className='text-black'>*</span>
+                Trip Title <RequiredStar />
               </Label>
               <div className='relative'>
                 <Input
@@ -474,9 +490,13 @@ export function CreateTrip({ tripId }: Props) {
                   placeholder='Enter trip title'
                   maxLength={80}
                   value={formData.tripTitle}
-                  onChange={(e) =>
-                    handleInputChange('tripTitle', e.target.value)
-                  }
+                  onChange={(e) => {
+                    {
+                      handleInputChange('tripTitle', e.target.value);
+                      clearError("tripTitle");;
+                      clearError("tripTitle");
+                    }
+                  }}
                   className='w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500'
                 />
 
@@ -492,35 +512,47 @@ export function CreateTrip({ tripId }: Props) {
             </div>
 
             {/* Start and End Dates */}
-            <div className='grid md:grid-cols-2 gap-6 mb-6'>
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
               {/* Start Date */}
-              <div className='flex flex-col gap-1'>
+              <div className="flex flex-col gap-1 relative pb-5">
                 <Label className='text-gray-600 font-medium'>
-                  Start Date<span className='text-black'>*</span>
+                  Start Date<RequiredStar />
                 </Label>
                 <CustomDateTimePicker
                   value={formData.startDate}
-                  onChange={(val) => handleInputChange('startDate', val)}
-                  placeholder='Select start date & time'
-                />{errors.startDate && (
-                  <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>
+                  onChange={(val) => {
+                    handleInputChange('startDate', val);
+                    clearError("startDate");
+                    clearError("endDate"); // endDate same-error remove
+                  }}
+                  placeholder="Select start date & time"
+                  className="w-full"
+                />
+                {errors.startDate && (
+                  <p className="text-red-500 text-sm absolute left-0 -bottom-2">
+                    {errors.startDate}
+                  </p>
                 )}
-
               </div>
-
               {/* End Date */}
               <div className='flex flex-col gap-1'>
                 <Label className='text-gray-600 font-medium'>
-                  End Date<span className='text-black'>*</span>
+                  End Date<RequiredStar />
                 </Label>
                 <CustomDateTimePicker
                   value={formData.endDate}
-                  onChange={(val) => handleInputChange('endDate', val)}
-                  placeholder='Select end date & time'
-                />{errors.endDate && (
-                  <p className="text-red-500 text-sm mt-1">{errors.endDate}</p>
+                  onChange={(val) => {
+                    handleInputChange('endDate', val);
+                    clearError("endDate");
+                  }}
+                  placeholder="Select end date & time"
+                  className="w-full"
+                />
+                {errors.endDate && (
+                  <p className="text-red-500 text-sm absolute left-0 -bottom-2">
+                    {errors.endDate}
+                  </p>
                 )}
-
               </div>
             </div>
 
@@ -544,7 +576,7 @@ export function CreateTrip({ tripId }: Props) {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-5'>
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Minimum Group Size <span className='text-black'>*</span>
+                  Minimum Group Size <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
@@ -555,13 +587,22 @@ export function CreateTrip({ tripId }: Props) {
 
                   <div className='absolute right-2 top-1/2 -translate-y-1/2 flex flex-col'>
                     <button
-                      onClick={() => handleNumberChange('minGroupSize', true)}
+                      onClick={() => {
+                        handleNumberChange('minGroupSize', true);
+                        clearError("minGroupSize");
+                        clearError("maxGroupSize");
+                      }}
+
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
                       ▲
                     </button>
                     <button
-                      onClick={() => handleNumberChange('minGroupSize', false)}
+                      onClick={() => {
+                        handleNumberChange('minGroupSize', false);
+                        clearError("minGroupSize");
+                        clearError("maxGroupSize");
+                      }}
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
                       ▼
@@ -576,24 +617,32 @@ export function CreateTrip({ tripId }: Props) {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Group Size <span className='text-black'>*</span>
+                  Maximum Group Size <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
-                    value={formData.maxGroupSize.toString()}
+                    value={formData.maxGroupSize.toString().padStart(2, '0')}
                     readOnly
                     className='pr-8 text-center'
                   />
 
                   <div className='absolute right-2 top-1/2 -translate-y-1/2 flex flex-col'>
                     <button
-                      onClick={() => handleNumberChange('maxGroupSize', true)}
+                      onClick={() => {
+                        handleNumberChange('maxGroupSize', true);
+                        clearError("maxGroupSize");
+                        clearError("minGroupSize");
+                      }}
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
                       ▲
                     </button>
                     <button
-                      onClick={() => handleNumberChange('maxGroupSize', false)}
+                      onClick={() => {
+                        handleNumberChange('maxGroupSize', false);
+                        clearError("maxGroupSize");
+                        clearError("minGroupSize");
+                      }}
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
                       ▼
@@ -612,24 +661,33 @@ export function CreateTrip({ tripId }: Props) {
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
                   Minimum Age (18yrs or above){' '}
-                  <span className='text-black'>*</span>
+                  <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
-                    value={formData.minAge.toString()}
+                    value={formData.minAge.toString().padStart(2, '0')}
                     readOnly
                     className='pr-8 text-center'
                   />
 
                   <div className='absolute right-2 top-1/2 -translate-y-1/2 flex flex-col'>
                     <button
-                      onClick={() => handleNumberChange('minAge', true)}
+                      onClick={() => {
+                        handleNumberChange('minAge', true);
+                        clearError("minAge");
+                        clearError("maxAge");
+                      }}
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
                       ▲
                     </button>
                     <button
-                      onClick={() => handleNumberChange('minAge', false)}
+                      onClick={() => {
+                        handleNumberChange('minAge', false);
+                        clearError("minAge");
+                        clearError("maxAge");
+                      }}
+
                       disabled={formData.minAge <= 18}
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
@@ -644,24 +702,32 @@ export function CreateTrip({ tripId }: Props) {
 
               <div>
                 <Label className='text-sm font-medium text-gray-700 mb-2 block'>
-                  Maximum Age <span className='text-black'>*</span>
+                  Maximum Age <RequiredStar />
                 </Label>
                 <div className='relative'>
                   <Input
-                    value={formData.maxAge.toString()}
+                    value={formData.maxAge.toString().padStart(2, '0')}
                     readOnly
                     className='pr-8 text-center'
                   />
 
                   <div className='absolute right-2 top-1/2 -translate-y-1/2 flex flex-col'>
                     <button
-                      onClick={() => handleNumberChange('maxAge', true)}
+                      onClick={() => {
+                        handleNumberChange('maxAge', true);
+                        clearError("maxAge");
+                        clearError("minAge");
+                      }}
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
                       ▲
                     </button>
                     <button
-                      onClick={() => handleNumberChange('maxAge', false)}
+                      onClick={() => {
+                        handleNumberChange('maxAge', false);
+                        clearError("maxAge");
+                        clearError("minAge");
+                      }}
                       disabled={formData.maxAge <= formData.minAge}
                       className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
                     >
@@ -678,7 +744,7 @@ export function CreateTrip({ tripId }: Props) {
             {/* Mood Tags */}
             <div className='mb-6 mt-6'>
               <Label className='block text-gray-600 mb-3 font-medium'>
-                Mood Tags<span className='text-black'>*</span>
+                Mood Tags<RequiredStar />
               </Label>
               <div className='flex flex-wrap gap-3'>
                 {tags.map((tag) => (
@@ -688,7 +754,11 @@ export function CreateTrip({ tripId }: Props) {
                     className={` hover:border-orange-300`}
                     Icon={tag.icon}
                     selected={selectedTags.includes(tag.id)} // ✅ highlight selected
-                    onClick={() => toggleTag(tag.id)} // ✅ toggle on click
+                    onClick={() => {
+                      toggleTag(tag.id);
+                      clearError("moodTags");
+                    }}
+
                     iconColor={
                       selectedTags.includes(tag.id) ? 'Orange' : 'black'
                     }
@@ -707,7 +777,7 @@ export function CreateTrip({ tripId }: Props) {
             {/* Locations */}
             <div className='mb-6'>
               <Label className='block text-gray-600 mb-2 font-medium'>
-                City Tags<span className='text-black'>*</span>
+                City Tags<RequiredStar />
               </Label>
               <div className='space-y-3'>
                 <div className='flex gap-2'>
@@ -717,7 +787,9 @@ export function CreateTrip({ tripId }: Props) {
                     value={cityInput}
                     onChange={(e) => {
                       dispatch(setCityInput(e.target.value));
+                      clearError("cityTags");
                     }}
+
                     onKeyPress={(e) => e.key === 'Enter' && addCityTag()}
                     className='flex-1'
                   />
@@ -762,9 +834,10 @@ export function CreateTrip({ tripId }: Props) {
               <div className='border border-gray-200 rounded-2xl'>
                 <RichTextEditor
                   value={formData.tripHighlights}
-                  onChange={(val) =>
-                    handleInputChange('tripHighlights', val ?? '')
-                  }
+                  onChange={(val) => {
+                    handleInputChange('tripHighlights', val ?? '');
+                    clearError("tripHighlights")
+                  }}
 
                 />{errors.tripHighlights && (
                   <p className="text-red-500 text-sm mt-1">{errors.tripHighlights}</p>
@@ -957,6 +1030,7 @@ export function CreateTrip({ tripId }: Props) {
 
 
                     dispatch(setSelectedGroupLeaderId(String(savedLeader.id)));
+                    clearError("groupLeaderId");
                     dispatch(setLeaderModalOpen(false));
                   } catch (error) {
                     console.error("❌ Error saving leader:", error);
@@ -1000,11 +1074,13 @@ export function CreateTrip({ tripId }: Props) {
             );
 
             dispatch(setSelectedGroupLeaderId(String(item.id)));
+            clearError("groupLeaderId");
             dispatch(setChooseModalOpen(false));
+
           }}
 
         />
       </div>
-    </div>
+    </div >
   );
 }

@@ -57,6 +57,8 @@ export function AddDayDescriptionForm({
   const [getbyid] = useLazyGetDayDescriptionByIdQuery();
   const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
+      const organizationId = useOrganizationId();
+
 
 
 
@@ -72,7 +74,6 @@ export function AddDayDescriptionForm({
   }, [initialData]);
   const handleLibrarySelect = async (item: any) => {
     try {
-      const organizationId = useOrganizationId();
 
       const fd = await getbyid({
         organizationId,
