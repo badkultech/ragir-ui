@@ -156,14 +156,14 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   {[
                     ...(Array.isArray(content.vehicleTypes)
                       ? content.vehicleTypes.map(
-                          (v: string) => TransitTypeLabels[v] ?? v
-                        )
+                        (v: string) => TransitTypeLabels[v] ?? v
+                      )
                       : content.vehicleTypes
-                      ? [
+                        ? [
                           TransitTypeLabels[content.vehicleTypes] ??
-                            content.vehicleTypes,
+                          content.vehicleTypes,
                         ]
-                      : []),
+                        : []),
                     content.customVehicleType,
                   ]
                     .filter(Boolean)
@@ -371,7 +371,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
       <>
         <Dialog open={open} onOpenChange={onClose}>
           <DialogContent className="w-[95vw] sm:w-[90vw] md:max-w-2xl lg:max-w-2xl p-0 overflow-hidden rounded-2xl">
-            <div className="max-h-[90vh] overflow-y-auto px-4 py-3 font-barlow">
+            <div className="max-h-[90vh] overflow-y-auto px-4 py-3 font-poppins">
               <DialogHeader>
                 <DialogTitle className="text-lg md:text-lg font-[600] text-gray-900 px-1 pb-3">
                   {content.name}
@@ -386,11 +386,11 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   width={800}
                   height={400}
                   className="w-full h-56 md:h-60 rounded-[12px] object-cover"
-                  // unoptimized // <-- stops /_next/image proxying
-                  // // optional: if it expires, hide and show fallback
-                  // onError={(e) =>
-                  //   ((e.target as HTMLImageElement).style.display = 'none')
-                  // }
+                // unoptimized // <-- stops /_next/image proxying
+                // // optional: if it expires, hide and show fallback
+                // onError={(e) =>
+                //   ((e.target as HTMLImageElement).style.display = 'none')
+                // }
                 />
               ) : (
                 <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">
