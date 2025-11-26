@@ -60,7 +60,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   </h3>
                 </div>
 
-                <h3 className="font-semibold text-sm text-gray-900 text-right truncate max-w-[60%] sm:max-w-none">
+                <h3 className="font-semibold  text-gray-900 text-right truncate max-w-[60%] sm:max-w-none">
                   {content.location
                     ?.split(",")
                     .map((loc: string) => loc.trim())
@@ -75,7 +75,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   <h3 className="text-base font-normal text-gray-800">From</h3>
                 </div>
 
-                <h3 className="font-medium text-sm text-gray-900">
+                <h3 className="font-medium  text-gray-900">
                   {formatTime(content.time)}
                 </h3>
               </div>
@@ -292,7 +292,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 {content.moodTags?.map((tag: string, idx: number) => (
                   <span
                     key={idx}
-                    className="flex items-center gap-2 px-4 py-1 border border-orange-400 text-orange-500 rounded-full text-sm"
+                    className="flex items-center gap-2 px-4 py-1 border border-orange-400 text-orange-500 rounded-full "
                   >
                     {/* Optional icon */}
                     <svg
@@ -431,7 +431,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                       }}
                       className="relative w-[80px] h-[60px] sm:w-[130px] sm:h-[110px] rounded-md overflow-hidden bg-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-400 transition"
                     >
-                      <span className="text-gray-800 font-medium text-sm">
+                      <span className="text-gray-800 font-medium ">
                         +{gallery.length - 5} more
                       </span>
                     </div>
@@ -448,7 +448,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   }}
                 ></p>
 
-                <div className="flex justify-center flex-col text-neutral-500 w-full gap-y-5 text-sm mt-4  border-b-1 border-[#E4E4E4] border-t-1 py-3">
+                <div className="flex justify-center flex-col text-neutral-500 w-full gap-y-5  mt-4  border-b-1 border-[#E4E4E4] border-t-1 py-3">
                   {returnStepContent()}
                 </div>
 
@@ -467,7 +467,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                           <p className="font-medium text-neutral-500 capitalize mb-1">
                             {key}
                           </p>
-                          <ul className="list-disc pl-5 text-sm text-neutral-500 space-y-1">
+                          <ul className="list-disc pl-5  text-neutral-500 space-y-1">
                             {list.map((item, i) => (
                               <li key={i}>{item}</li>
                             ))}
