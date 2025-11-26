@@ -93,7 +93,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {content.location
                     ?.split(",")
@@ -110,7 +110,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {content.sharingType}
                 </h3>
@@ -122,7 +122,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 <h3 className="text-base font-normal text-gray-800">From</h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {formatTime(content.checkInTime)}
                 </h3>
@@ -134,7 +134,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 <h3 className="text-base font-normal text-gray-800">To</h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {formatTime(content.checkOutTime)}
                 </h3>
@@ -152,7 +152,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               </div>
 
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {[
                     ...(Array.isArray(content.vehicleTypes)
                       ? content.vehicleTypes.map(
@@ -180,7 +180,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {content.fromLocation}
                   {"  |  "}
                   {formatTime(content.startTime)}
@@ -193,7 +193,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 <h3 className="text-base font-normal text-gray-800">Arrival</h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {content.toLocation}
                   {"  |  "}
                   {formatTime(content.endTime)}
@@ -208,7 +208,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {ArrangedByTypeLabels[content.arrangedBy]}
                 </h3>
@@ -227,7 +227,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {content.location
                     ?.split(",")
@@ -245,7 +245,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               </div>
               <div className="flex items-center">
                 {content.mealType !== undefined && (
-                  <h3 className="font-medium text-[14px] text-gray-900">
+                  <h3 className="font-medium text-[16px] text-gray-900">
                     {" "}
                     {mealTypeLabels[content.mealType]}
                   </h3>
@@ -261,7 +261,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {content.chargeable ? "Chargeable" : "Included"}
                 </h3>
               </div>
@@ -272,7 +272,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 <h3 className="text-base font-normal text-gray-800">Time</h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {formatTime(content.time)}
                 </h3>
@@ -323,7 +323,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {content.location
                     ?.split(",")
@@ -341,7 +341,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 </h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {content.priceCharge}
                 </h3>
@@ -353,7 +353,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 <h3 className="text-base font-normal text-gray-800">Time</h3>
               </div>
               <div className="flex items-center">
-                <h3 className="font-medium text-[14px] text-gray-900">
+                <h3 className="font-medium text-[16px] text-gray-900">
                   {" "}
                   {formatTime(content.time)}
                 </h3>
@@ -442,7 +442,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               {/* Text Content */}
               <div className="">
                 <p
-                  className="text-gray-700 text-[14px] mt-4 leading-relaxed"
+                  className="text-gray-700 text-[16px] mt-4 leading-relaxed"
                   dangerouslySetInnerHTML={{
                     __html: content.description || "",
                   }}
