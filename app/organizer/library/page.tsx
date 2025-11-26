@@ -11,7 +11,6 @@ import {
   Home,
   ForkKnife,
   User2,
-  PlusCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
@@ -44,29 +43,6 @@ export default function LibraryOverviewPage() {
         <AppHeader title="Library" onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="flex-1 p-6 md:p-8 lg:max-w-[1400px] w-full lg:mx-auto">
-
-
-          {/* <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Ragir Library
-              </h1>
-              <p className="text-sm text-gray-500">
-                Manage your travel content and organize into custom collections
-              </p>
-            </div>
-            <GradientButton
-              className="flex items-center justify-center gap-2 
-             w-auto 
-             px-5 py-2 
-             bg-orange-500 hover:bg-orange-600 text-white"
-              onClick={() => setModalOpen(true)}
-            >
-              <PlusCircle className="w-4 h-4" />
-              Add Item
-            </GradientButton>
-          </div> */  }
-
           {/* Header with Add Item */}
 
           <LibraryHeader

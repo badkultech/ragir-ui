@@ -18,6 +18,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { ActionButtons } from "@/components/library/ActionButtons";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
+import ScreenLoader from "@/components/common/ScreenLoader";
 
 export default function ActivitiesPage() {
   const organizationId = useOrganizationId();
@@ -30,6 +31,7 @@ export default function ActivitiesPage() {
   const [selectedActivityId, setSelectedActivityId] = useState<number | null>(
     null
   );
+  const [viewLoading, setViewLoading] = useState(false);
 
   // for delete flow
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -170,9 +172,12 @@ export default function ActivitiesPage() {
                     {/* ✅ Buttons stay bottom-right */}
                     <div className="mt-auto pt-4 flex justify-end">
                       <ActionButtons
-                        onView={() => {
+                        onView={async () => {
+                          setViewLoading(true);
+                          await new Promise(res => setTimeout(res, 1000));
                           setSelectedActivityId(activity.id);
                           setViewModalOpen(true);
+                          setViewLoading(false);
                         }}
                         onEdit={() => {
                           setUpdateId(activity.id);
@@ -190,10 +195,10 @@ export default function ActivitiesPage() {
                   {qLen === 0 && activities.length === 0
                     ? "No activities found."
                     : qLen === 0 && activities.length > 0
-                    ? "Showing all activities. Type at least 3 characters to search."
-                    : qLen > 0 && qLen < 3
-                    ? "Type at least 3 characters to search."
-                    : "No activities found."}
+                      ? "Showing all activities. Type at least 3 characters to search."
+                      : qLen > 0 && qLen < 3
+                        ? "Type at least 3 characters to search."
+                        : "No activities found."}
                 </div>
               )}
             </div>
@@ -235,6 +240,7 @@ export default function ActivitiesPage() {
         isDeleting={Boolean(deletingId)}
         onConfirm={handleDeleteConfirm}
       />
+      {viewLoading && <ScreenLoader />}
     </div>
   );
 }

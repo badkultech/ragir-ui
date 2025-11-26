@@ -18,6 +18,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButtons } from "@/components/library/ActionButtons";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import ScreenLoader from "@/components/common/ScreenLoader";
 
 export default function StaysPage() {
   const organizationId = useOrganizationId();
@@ -29,6 +30,7 @@ export default function StaysPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedStayId, setSelectedStayId] = useState<number | null>(null);
+  const [viewLoading, setViewLoading] = useState(false);
 
   // Delete state
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -173,9 +175,12 @@ export default function StaysPage() {
                     {/* Actions */}
                     <div className="mt-4">
                       <ActionButtons
-                        onView={() => {
+                        onView={async () => {
+                          setViewLoading(true);
+                          await new Promise(res => setTimeout(res, 1000));
                           setSelectedStayId(stay.id);
                           setViewModalOpen(true);
+                          setViewLoading(false);
                         }}
                         onEdit={() => {
                           setEditStayId(stay.id);
@@ -193,10 +198,10 @@ export default function StaysPage() {
                   {qLen === 0 && stays.length === 0
                     ? "No stays found."
                     : qLen === 0 && stays.length > 0
-                    ? "Showing all stays. Type at least 3 characters to search."
-                    : qLen > 0 && qLen < 3
-                    ? "Type at least 3 characters to search."
-                    : "No stays found."}
+                      ? "Showing all stays. Type at least 3 characters to search."
+                      : qLen > 0 && qLen < 3
+                        ? "Type at least 3 characters to search."
+                        : "No stays found."}
                 </div>
               )}
             </div>
@@ -238,6 +243,7 @@ export default function StaysPage() {
         isDeleting={Boolean(deletingId)}
         onConfirm={handleDeleteConfirm}
       />
+      {viewLoading && <ScreenLoader />}
     </div>
   );
 }

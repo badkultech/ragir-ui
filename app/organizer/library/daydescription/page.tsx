@@ -18,6 +18,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 import { ActionButtons } from "@/components/library/ActionButtons";
+import ScreenLoader from "@/components/common/ScreenLoader";
 
 export default function EventsPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,6 +29,7 @@ export default function EventsPage() {
   const [selectedDayId, setSelectedDayId] = useState<any>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [viewLoading, setViewLoading] = useState(false);
 
   // NEW: holds the item we intend to delete (id + name)
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name?: string } | null>(null);
@@ -149,9 +151,12 @@ export default function EventsPage() {
 
                     <div className="flex justify-end gap-3 text-gray-500 mt-3">
                       <ActionButtons
-                        onView={() => {
+                        onView={async () => {
+                          setViewLoading(true);
+                          await new Promise(res => setTimeout(res, 1000));
                           setSelectedDayId(dayDescription.id);
                           setViewModalOpen(true);
+                          setViewLoading(false);
                         }}
                         onEdit={() => {
                           setUpdateId(dayDescription.id);
@@ -207,6 +212,7 @@ export default function EventsPage() {
         }}
         data={selectedDay}
       />
+      {viewLoading && <ScreenLoader />}
     </div>
   );
 }

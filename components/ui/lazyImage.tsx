@@ -1,10 +1,10 @@
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 export const LazyImage = ({
   src,
-  alt = '',
-  className = '',
+  alt = "",
+  className = "",
   width = 400,
   height = 400,
   ...rest
@@ -16,30 +16,24 @@ export const LazyImage = ({
   height?: number;
 }) => {
   const [loaded, setLoaded] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
-  // When src changes, reset states and listen for load or check complete.
   useEffect(() => {
     let cancel = false;
     setLoaded(false);
-    setShowSkeleton(true);
 
     const imgEl = imgRef.current;
 
     const finish = () => {
       if (cancel) return;
-      // keep skeleton visible for at least 200ms so it's noticeable
+
+      // delay loader fade for smooth effect
       setTimeout(() => {
-        if (!cancel) {
-          setLoaded(true);
-          setShowSkeleton(false);
-        }
+        if (!cancel) setLoaded(true);
       }, 200);
     };
 
     if (imgEl && imgEl.complete) {
-      // image already cached/loaded
       finish();
       return () => {
         cancel = true;
@@ -47,30 +41,39 @@ export const LazyImage = ({
     }
 
     const onLoad = () => finish();
-    imgEl?.addEventListener('load', onLoad);
+    imgEl?.addEventListener("load", onLoad);
 
     return () => {
       cancel = true;
-      imgEl?.removeEventListener('load', onLoad);
+      imgEl?.removeEventListener("load", onLoad);
     };
   }, [src]);
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {showSkeleton && (
-        <div className='absolute inset-0 bg-gray-200 animate-pulse z-0' />
+      {/* Mini loader */}
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center z-0 bg-gray-100">
+          <div
+            className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"
+            style={{
+              borderColor: "#FFB27D", // peach
+              borderTopColor: "#FF7A00", // orange
+            }}
+          />
+        </div>
       )}
+
       <Image
         ref={imgRef}
         src={src}
         alt={alt}
         height={height}
         width={width}
-        unoptimized 
-        loading='lazy'
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-10 ${
-          loaded ? 'opacity-100' : 'opacity-0'
-        }`}
+        unoptimized
+        loading="lazy"
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-10 ${loaded ? "opacity-100" : "opacity-0"
+          }`}
         {...rest}
       />
     </div>

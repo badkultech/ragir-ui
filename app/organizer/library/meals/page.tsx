@@ -19,6 +19,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButtons } from "@/components/library/ActionButtons";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import ScreenLoader from "@/components/common/ScreenLoader";
 
 export default function MealsPage() {
   const organizationId = useOrganizationId();
@@ -30,6 +31,7 @@ export default function MealsPage() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedMealId, setSelectedMealId] = useState<number | null>(null);
   const [editMeal, setEditMeal] = useState<any>(null);
+  const [viewLoading, setViewLoading] = useState(false);
 
   // Delete state
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -181,9 +183,12 @@ export default function MealsPage() {
                     {/* Actions */}
                     <div className="mt-6">
                       <ActionButtons
-                        onView={() => {
-                          setViewModalOpen(true);
+                        onView={async () => {
+                          setViewLoading(true);
+                          await new Promise(res => setTimeout(res, 1000));
                           setSelectedMealId(meal.id);
+                          setViewModalOpen(true);
+                          setViewLoading(false);
                         }}
                         onEdit={() => {
                           setEditMeal(meal);
@@ -201,10 +206,10 @@ export default function MealsPage() {
                   {qLen === 0 && meals.length === 0
                     ? "No meals found."
                     : qLen === 0 && meals.length > 0
-                    ? "Showing all meals. Type at least 3 characters to search."
-                    : qLen > 0 && qLen < 3
-                    ? "Type at least 3 characters to search."
-                    : "No meals found."}
+                      ? "Showing all meals. Type at least 3 characters to search."
+                      : qLen > 0 && qLen < 3
+                        ? "Type at least 3 characters to search."
+                        : "No meals found."}
                 </div>
               )}
             </div>
@@ -246,6 +251,7 @@ export default function MealsPage() {
         isDeleting={Boolean(deletingId)}
         onConfirm={handleDeleteConfirm}
       />
+      {viewLoading && <ScreenLoader />}
     </div>
   );
 }

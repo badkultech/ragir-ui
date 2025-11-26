@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
-import { Car, Pencil, Eye, Trash2, MapPin, Loader2 } from "lucide-react";
+import { Car } from "lucide-react";
 import { AddNewItemModal } from "@/components/library/add-new-item/AddNewItemModal";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -20,6 +20,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButtons } from "@/components/library/ActionButtons";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import ScreenLoader from "@/components/common/ScreenLoader";
 
 export default function TransitPage() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function TransitPage() {
 
   // Controlled search state
   const [search, setSearch] = useState("");
+  const [viewLoading, setViewLoading] = useState(false);
 
   const organizationId = useOrganizationId();
 
@@ -150,10 +152,10 @@ export default function TransitPage() {
                 {qLen === 0 && transits.length === 0
                   ? "No transits found."
                   : qLen === 0 && transits.length > 0
-                  ? "Showing all transits. Type at least 3 characters to search."
-                  : qLen > 0 && qLen < 3
-                  ? "Type at least 3 characters to search."
-                  : "No transits found."}
+                    ? "Showing all transits. Type at least 3 characters to search."
+                    : qLen > 0 && qLen < 3
+                      ? "Type at least 3 characters to search."
+                      : "No transits found."}
               </div>
             ) : (
               filtered.map((t: any) => (
@@ -181,14 +183,14 @@ export default function TransitPage() {
                             // map known vehicle types using label map
                             ...(Array.isArray(t.vehicleTypes)
                               ? t.vehicleTypes.map(
-                                  (v: string) => TransitTypeLabels[v] ?? v
-                                )
+                                (v: string) => TransitTypeLabels[v] ?? v
+                              )
                               : t.vehicleTypes
-                              ? [
+                                ? [
                                   TransitTypeLabels[t.vehicleTypes] ??
-                                    t.vehicleTypes,
+                                  t.vehicleTypes,
                                 ]
-                              : []),
+                                : []),
 
                             // include custom type if present
                             t.customVehicleType,
@@ -216,10 +218,14 @@ export default function TransitPage() {
                       <div className="flex items-center gap-3 text-gray-500">
                         {/* Delete (uses ActionButtons-style spinner) */}
                         <ActionButtons
-                          onView={() => {
+                          onView={async () => {
+                            setViewLoading(true);
+                            await new Promise(res => setTimeout(res, 1000)); // smooth delay
                             setSelectedTransitId(t.id);
                             setViewOpen(true);
+                            setViewLoading(false);
                           }}
+
                           onEdit={() => {
                             setSelectedTransitId(t.id);
                             setUpdateId(t.id);
@@ -271,6 +277,7 @@ export default function TransitPage() {
           setSelectedTransitId(null);
         }}
       />
+      {viewLoading && <ScreenLoader />}
     </div>
   );
 }
