@@ -386,11 +386,6 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   width={800}
                   height={400}
                   className="w-full h-56 md:h-60 rounded-[12px] object-cover"
-                // unoptimized // <-- stops /_next/image proxying
-                // // optional: if it expires, hide and show fallback
-                // onError={(e) =>
-                //   ((e.target as HTMLImageElement).style.display = 'none')
-                // }
                 />
               ) : (
                 <div className="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-500">
@@ -442,7 +437,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               {/* Text Content */}
               <div className="">
                 <p
-                  className="text-gray-700 text-[16px] mt-4 leading-relaxed"
+                  className="text-neutral-500 text-[16px] mt-4 leading-relaxed"
                   dangerouslySetInnerHTML={{
                     __html: content.description || "",
                   }}
@@ -455,7 +450,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                 {/* Packing Suggestions */}
                 {content.packingSuggestion && (
                   <div className="mt-6">
-                    <h3 className="text-base font-semibold text-gray-900 mb-3">
+                    <h3 className="text-base font-semibold text-black mb-3">
                       Packing Suggestions
                     </h3>
 
