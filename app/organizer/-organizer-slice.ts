@@ -71,7 +71,7 @@ export const initialOrganizerSliceState: OrganizerSliceState = {
   leaders: [],
   cityInput: '',
   formData: {
-    tripTitle: 'Himalayan group',
+    tripTitle: '',
     startDate: '',
     endDate: '',
     totalDays: 1,

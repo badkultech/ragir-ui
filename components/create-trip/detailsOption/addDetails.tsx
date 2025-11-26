@@ -264,7 +264,7 @@ export function DetailsOptions({
 
             return (
               <div
-                key={`${item.tripType}-${item.id || item.tripItemId || index}`}
+                key={`${item.tripType}-${(item.id || item.tripItemId)}-${index}`}
                 className={`rounded-xl border-l-4 ${colorClass} p-5 shadow-sm`}
               >
 

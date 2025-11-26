@@ -335,6 +335,7 @@ export function CreateTrip({ tripId }: Props) {
       console.log(" Validation failed");
       return;
     }
+    setTripSaving(true)
 
     try {
       const startDateObj = new Date(formData.startDate);
@@ -925,10 +926,7 @@ export function CreateTrip({ tripId }: Props) {
               onClick={async () => {
                 if (tripSaving) return;
                 setTripSaving(true);
-
                 await handleSaveTrip();
-
-                setTripSaving(false);
               }}
               disabled={tripSaving || createTripLoading || updateTripLoading}
               className={`
