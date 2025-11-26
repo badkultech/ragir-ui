@@ -448,7 +448,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                   }}
                 ></p>
 
-                <div className="flex justify-center flex-col text-gray-600 w-full gap-y-5 text-sm mt-4  border-b-1 border-[#E4E4E4] border-t-1 py-3">
+                <div className="flex justify-center flex-col text-neutral-500 w-full gap-y-5 text-sm mt-4  border-b-1 border-[#E4E4E4] border-t-1 py-3">
                   {returnStepContent()}
                 </div>
 
@@ -464,10 +464,10 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                         content.packingSuggestion as Record<string, string[]>
                       ).map(([key, list]) => (
                         <div key={key} className="mb-4">
-                          <p className="font-medium text-gray-600 capitalize mb-1">
+                          <p className="font-medium text-neutral-500 capitalize mb-1">
                             {key}
                           </p>
-                          <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                          <ul className="list-disc pl-5 text-sm text-neutral-500 space-y-1">
                             {list.map((item, i) => (
                               <li key={i}>{item}</li>
                             ))}
@@ -477,7 +477,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                     ) : (
                       <>
                         <p
-                          className="font-medium text-gray-600 capitalize"
+                          className="font-medium text-neutral-500 capitalize"
                           dangerouslySetInnerHTML={{
                             __html: content.packingSuggestion || "",
                           }}
