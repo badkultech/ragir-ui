@@ -174,34 +174,32 @@ export function AddStayForm({
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
-    setIsSaving(true);
+  if (!validateForm()) return;
 
+  setIsSaving(true);
 
-    const payload = {
-      title,
-      sharingType,
-      checkIn,
-      checkOut,
-      location,
-      description,
-      packing,
-      mode,
-      saveInLibrary,
-    };
-
-    try {
-      onSave(payload, documents);
-      showSuccess("Stay saved successfully!");
-    } catch (err) {
-      console.error("Save stay failed", err);
-      showApiError("Failed to save Stay");
-    } finally {
-      setIsSaving(false);
-    }
+  const payload = {
+    title,
+    sharingType,
+    checkIn,
+    checkOut,
+    location,
+    description,
+    packing,
+    mode,
+    saveInLibrary,
   };
+
+  try {
+    await onSave(payload, documents);  
+    showSuccess("Stay saved successfully!");
+  } catch (err) {
+    showApiError("Failed to save Stay");
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   return (
     <div className="flex flex-col gap-6" style={{ fontFamily: "var(--font-poppins)" }}>

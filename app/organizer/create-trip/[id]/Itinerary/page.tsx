@@ -229,6 +229,10 @@ export default function ItineraryPage() {
 
     return Object.keys(newErrors).length === 0;
   };
+  const clearFieldError = (field: "startingPoint" | "endPoint") => {
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
 
   const handleUpdateItinerary = async () => {
     if (!validateItinerary()) {
@@ -335,7 +339,10 @@ export default function ItineraryPage() {
                             <Input
                               type="text"
                               value={startingPoint}
-                              onChange={(e) => setStartingPoint(e.target.value)}
+                              onChange={(e) => {
+                                setStartingPoint(e.target.value);
+                                clearFieldError("startingPoint");
+                              }}
                               placeholder="Enter starting location"
                               className="w-full"
                             />
@@ -401,7 +408,10 @@ export default function ItineraryPage() {
                   <Input
                     type="text"
                     value={endPoint}
-                    onChange={(e) => setEndPoint(e.target.value)}
+                    onChange={(e) => {
+                      setEndPoint(e.target.value);
+                      clearFieldError("endPoint");
+                    }}
                     placeholder="Enter ending location"
                     className="w-full"
                   />
