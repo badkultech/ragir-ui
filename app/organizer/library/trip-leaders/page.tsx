@@ -16,6 +16,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ActionButtons } from "@/components/library/ActionButtons";
 import { DeleteConfirmDialog } from "@/components/library/DeleteConfirmDialog";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { LazyImage } from "@/components/ui/lazyImage";
 
 export default function TripLeadersPage() {
   const organizationId = useOrganizationId();
@@ -132,7 +133,7 @@ export default function TripLeadersPage() {
                   <div className="flex items-start gap-4 flex-1">
                     <div className="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                       {leader.documents && leader.documents[0]?.url ? (
-                        <img
+                        <LazyImage
                           src={leader.documents[0].url}
                           alt={leader.name}
                           className="w-full h-full object-cover rounded-lg"
