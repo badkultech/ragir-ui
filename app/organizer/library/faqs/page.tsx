@@ -191,7 +191,7 @@ export default function FAQsPage() {
             <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
               Full Answer
             </h4>
-            <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-line"
+            <p className="text-gray-700 prose prose-sm leading-relaxed text-sm whitespace-pre-line"
               dangerouslySetInnerHTML={{
                 __html: selectedFaq?.answer || "",
               }}

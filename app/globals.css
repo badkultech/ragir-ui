@@ -119,6 +119,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -139,3 +140,17 @@
 
 
 
+/* make sure lists show bullets/numbers inside the prose container */
+.prose ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  margin-left: 1.25rem;
+  padding-left: 0;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  list-style-position: inside;
+  margin-left: 1.25rem;
+  padding-left: 0;
+}

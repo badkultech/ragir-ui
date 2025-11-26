@@ -152,7 +152,7 @@ export default function TripLeadersPage() {
                         </p>
                       )}
                       <div
-                        className="text-xs text-gray-500 mt-1 max-w-xl prose prose-sm clamp-3"
+                        className="text-xs prose prose-sm text-gray-500 mt-1 max-w-xl prose prose-sm clamp-3"
                         dangerouslySetInnerHTML={{ __html: leader.bio || "" }}
                       />
                     </div>

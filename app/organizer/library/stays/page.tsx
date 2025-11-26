@@ -166,7 +166,7 @@ export default function StaysPage() {
                       {stay.location || "—"}
                     </div>
                     <p
-                      className="text-sm text-gray-500 mt-2 line-clamp-2"
+                      className="text-sm prose prose-sm text-gray-500 mt-2 line-clamp-2"
                       dangerouslySetInnerHTML={{
                         __html: stay.description || "",
                       }}

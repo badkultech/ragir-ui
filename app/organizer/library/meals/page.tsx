@@ -167,7 +167,7 @@ export default function MealsPage() {
                       <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                       {meal.location || "—"}
                     </div>
-                    <p className="text-sm text-gray-500 mt-2 line-clamp-2"
+                    <p className="text-sm prose prose-sm text-gray-500 mt-2 line-clamp-2"
                       dangerouslySetInnerHTML={{
                         __html: meal.description || "",
                       }}

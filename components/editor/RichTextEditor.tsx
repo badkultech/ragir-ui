@@ -1,17 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import {
-  Bold,
-  Italic,
-  Underline,
-  List,
-  ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Eye,
-} from "lucide-react";
+import { Bold, Italic, Underline, List, ListOrdered } from "lucide-react";
 
 interface RichTextEditorProps {
   value: string;
@@ -30,7 +20,6 @@ export default function RichTextEditor({
   const [wordCount, setWordCount] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-
   const [activeFormats, setActiveFormats] = useState({
     bold: false,
     italic: false,
@@ -43,7 +32,7 @@ export default function RichTextEditor({
   );
   const isTransformingRef = useRef(false);
 
-  // Sync editor from external value
+  // sync editor from external value (unless focused)
   useEffect(() => {
     const el = editorRef.current;
     if (!el) return;
@@ -54,7 +43,7 @@ export default function RichTextEditor({
     }
   }, [value, isFocused]);
 
-  // Update toolbar state (bold/italic/heading)
+  // update toolbar state
   const updateActiveFormats = useCallback(() => {
     const blockTag = (document.queryCommandValue("formatBlock") || "p")
       .toString()
@@ -83,7 +72,6 @@ export default function RichTextEditor({
       const el = editorRef.current;
       if (!el) return;
 
-      // ✅ Only update toolbar if THIS editor is focused or selection is inside it
       const selection = document.getSelection();
       if (!selection || !el.contains(selection.anchorNode)) return;
 
@@ -94,27 +82,123 @@ export default function RichTextEditor({
     return () => document.removeEventListener("selectionchange", handler);
   }, [updateActiveFormats]);
 
+  // normalize HTML while preserving lists and inline formats,
+  // trim empty blocks and remove whitespace-only blocks.
   const normalizeHTML = (html: string) => {
     if (!html) return "";
 
-    return html
-      .replace(/<p><br\s*\/?><\/p>/gi, "")
-      .replace(/<br\s*\/?>/gi, "")
-      .replace(/&nbsp;/gi, "")
-      .replace(/<[^>]+>/g, "")
-      .trim()
-      ? html
-      : "";
+    const container = document.createElement("div");
+    container.innerHTML = html;
+
+    // replace NBSP with normal spaces in text nodes
+    const replaceNbsp = (node: Node) => {
+      node.childNodes.forEach((c) => {
+        if (c.nodeType === Node.TEXT_NODE) {
+          c.textContent = (c.textContent || "").replace(/\u00A0/g, " ");
+        } else {
+          replaceNbsp(c);
+        }
+      });
+    };
+    replaceNbsp(container);
+
+    // Remove empty blocks (p, h1-3, li) and trim their inner text/HTML.
+    const blockSelectors = "p, h1, h2, h3, li";
+    const blocks = Array.from(container.querySelectorAll(blockSelectors));
+    blocks.forEach((b) => {
+      // For list items, preserve inline tags; only trim whitespace and remove if empty.
+      if (b.tagName === "LI") {
+        const inner = (b.innerHTML || "").replace(/\s*\n\s*/g, " ").trim();
+        if (!inner || inner.replace(/<br\s*\/?>/gi, "").trim() === "") {
+          b.remove();
+        } else {
+          b.innerHTML = inner;
+        }
+      } else {
+        // For other blocks, allow inline tags but collapse excessive whitespace/newlines.
+        const inner = (b.innerHTML || "")
+          .replace(/\s*\n\s*/g, "\n")
+          .replace(/^\s+|\s+$/g, "");
+        if (!inner || inner.replace(/<br\s*\/?>/gi, "").replace(/&nbsp;/gi, "").trim() === "") {
+          b.remove();
+        } else {
+          b.innerHTML = inner;
+        }
+      }
+    });
+
+    // Remove <br> used solely as empty-line markers if they are inside empty parents
+    container.querySelectorAll("br").forEach((br) => {
+      const parent = br.parentElement;
+      if (parent && parent.textContent?.trim() === "") {
+        br.remove();
+      }
+    });
+
+    // Sanitize: only allow a small set of tags, unwrap others but keep their content.
+    const allowed = new Set([
+      "P",
+      "BR",
+      "UL",
+      "OL",
+      "LI",
+      "H1",
+      "H2",
+      "H3",
+      "B",
+      "STRONG",
+      "I",
+      "EM",
+      "U",
+      "A",
+    ]);
+
+    const sanitize = (node: Node) => {
+      const children = Array.from(node.childNodes);
+      children.forEach((child) => {
+        if (child.nodeType === Node.ELEMENT_NODE) {
+          const el = child as HTMLElement;
+          if (!allowed.has(el.tagName)) {
+            // unwrap element but keep its children
+            while (el.firstChild) node.insertBefore(el.firstChild, el);
+            el.remove();
+          } else {
+            // strip attributes except href for anchors
+            if (el.tagName === "A") {
+              const href = el.getAttribute("href");
+              Array.from(el.attributes).forEach((attr) => {
+                if (attr.name !== "href") el.removeAttribute(attr.name);
+              });
+              if (!href) el.removeAttribute("href");
+            } else {
+              Array.from(el.attributes).forEach((attr) => el.removeAttribute(attr.name));
+            }
+            sanitize(el);
+          }
+        } else {
+          // text node — ok
+        }
+      });
+    };
+    sanitize(container);
+
+    // After sanitization, remove any empty UL/OL that have no LI children
+    container.querySelectorAll("ul,ol").forEach((list) => {
+      if (!list.querySelector("li")) list.remove();
+    });
+
+    // Final trim
+    const out = container.innerHTML.trim();
+    return out ? out : "";
   };
 
   const countWords = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return 0;
-    return trimmed.split(/\s+/).length;
+    return trimmed.split(/\s+/).filter(Boolean).length;
   };
 
-
-  // Handle input
+  // onInput handler
   const handleInput = useCallback(() => {
     const el = editorRef.current;
     if (!el) return;
@@ -127,18 +211,10 @@ export default function RichTextEditor({
     const normalized = normalizeHTML(html);
     onChange(normalized);
 
-    console.clear();
-    console.log(
-      "%c📤 HTML sent to backend:",
-      "color: orange; font-weight: bold;"
-    );
-    console.log(html);
-
     updateActiveFormats();
   }, [onChange, updateActiveFormats]);
 
-
-  // Markdown shortcut (safe delayed transform)
+  // Markdown shortcuts (headings, lists)
   const handleMarkdownKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== " " && e.key !== "Enter") return;
 
@@ -151,7 +227,7 @@ export default function RichTextEditor({
     const container = range.startContainer;
     const block =
       container.nodeType === 3
-        ? container.parentElement
+        ? (container.parentElement as HTMLElement)
         : (container as HTMLElement);
     if (!block) return;
 
@@ -184,7 +260,6 @@ export default function RichTextEditor({
     }, 0);
   };
 
-  // Helper: restore caret
   function placeCaretAtEnd(el: HTMLElement) {
     const range = document.createRange();
     const sel = window.getSelection();
@@ -194,7 +269,7 @@ export default function RichTextEditor({
     sel?.addRange(range);
   }
 
-  // Formatting commands
+  // formatting commands
   const applyFormat = (cmd: string) => {
     const el = editorRef.current;
     if (!el) return;
@@ -203,7 +278,6 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
-  // Block-level formatting
   const applyBlockFormat = (tag: "p" | "h1" | "h2" | "h3") => {
     const el = editorRef.current;
     if (!el) return;
@@ -212,7 +286,6 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
-  // Insert list
   const insertList = (type: "ul" | "ol") => {
     const el = editorRef.current;
     if (!el) return;
@@ -221,10 +294,26 @@ export default function RichTextEditor({
       type === "ul" ? "insertUnorderedList" : "insertOrderedList",
       false
     );
-    setTimeout(() => handleInput(), 50);
+    // After insertion, some browsers put cursor inside a DIV or insert extra nodes;
+    // normalize small inconsistencies and update state shortly after.
+    setTimeout(() => {
+      // Ensure we have proper <ul>/<ol> structure: if execCommand produced <div><ul>.. unwrap extra divs.
+      const container = editorRef.current!;
+      container.querySelectorAll("div").forEach((d) => {
+        // only unwrap empty divs that directly wrap lists
+        if (
+          d.childElementCount &&
+          (d.querySelector("ul") || d.querySelector("ol")) &&
+          d.childElementCount === 1
+        ) {
+          while (d.firstChild) container.insertBefore(d.firstChild, d);
+          d.remove();
+        }
+      });
+      handleInput();
+    }, 50);
   };
 
-  // Alignment
   const setAlign = (align: "left" | "center" | "right") => {
     const el = editorRef.current;
     if (!el) return;
@@ -239,7 +328,7 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
-  // Max length enforcement
+  // word limit enforcement
   const handleBeforeInput = (e: InputEvent) => {
     const el = editorRef.current;
     if (!el) return;
@@ -250,19 +339,17 @@ export default function RichTextEditor({
     const selection = document.getSelection();
     const selectedText = selection?.toString() || "";
 
-    // Remove selected text (will be replaced by incoming)
     const baseText = selectedText ? text.replace(selectedText, "") : text;
 
     const simulated = (baseText + " " + incoming).trim();
     const newWordCount = countWords(simulated);
 
-    if (newWordCount > maxWords) {
+    if (newWordCount > (maxWords ?? 800)) {
       e.preventDefault();
     }
   };
 
-
-  // Paste event
+  // paste handling - plain text, limit words
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
 
@@ -285,14 +372,13 @@ export default function RichTextEditor({
 
     const newWordCount = baseWords + pasteWordsCount;
 
-    if (newWordCount > maxWords) {
-      const allowedWords = maxWords - baseWords;
+    if (newWordCount > (maxWords ?? 800)) {
+      const allowedWords = (maxWords ?? 800) - baseWords;
 
       if (allowedWords > 0) {
         const partialPaste = pasteWordsArray.slice(0, allowedWords).join(" ");
         document.execCommand("insertText", false, partialPaste + " ");
       }
-      // If no words allowed, just block
       return;
     }
 
@@ -300,14 +386,12 @@ export default function RichTextEditor({
     setTimeout(() => handleInput(), 0);
   };
 
-
-  // Attach listeners
+  // attach listeners
   useEffect(() => {
     const el = editorRef.current;
     if (!el) return;
 
-    const beforeInputHandler = (e: Event) =>
-      handleBeforeInput(e as InputEvent);
+    const beforeInputHandler = (e: Event) => handleBeforeInput(e as InputEvent);
     const pasteHandler = (e: Event) => handlePaste(e as ClipboardEvent);
 
     el.addEventListener("beforeinput", beforeInputHandler);
@@ -317,14 +401,12 @@ export default function RichTextEditor({
       el.removeEventListener("beforeinput", beforeInputHandler);
       el.removeEventListener("paste", pasteHandler);
     };
-  }, [handleBeforeInput, handlePaste]);
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden focus-within:border-orange-400 transition">
-      {/* Toolbar */}
       <div className="flex items-center flex-wrap gap-2 px-3 py-2 border-b border-gray-100 text-gray-600 text-sm bg-white">
-        {/* Basic formatting */}
         <ToolbarButton
           active={activeFormats.bold}
           onClick={() => applyFormat("bold")}
@@ -343,26 +425,6 @@ export default function RichTextEditor({
 
         <div className="h-4 w-px bg-gray-200 mx-1" />
 
-        {/* Heading buttons with active highlight */}
-        {/* <ToolbarButton
-          active={activeHeading === "h1"}
-          onClick={() => applyBlockFormat("h1")}
-          icon={<span className="text-xs font-bold">H1</span>}
-        />
-        <ToolbarButton
-          active={activeHeading === "h2"}
-          onClick={() => applyBlockFormat("h2")}
-          icon={<span className="text-xs font-bold">H2</span>}
-        />
-        <ToolbarButton
-          active={activeHeading === "h3"}
-          onClick={() => applyBlockFormat("h3")}
-          icon={<span className="text-xs font-bold">H3</span>}
-        /> */}
-
-        <div className="h-4 w-px bg-gray-200 mx-1" />
-
-        {/* Lists */}
         <ToolbarButton
           active={activeFormats.ul}
           onClick={() => insertList("ul")}
@@ -373,30 +435,8 @@ export default function RichTextEditor({
           onClick={() => insertList("ol")}
           icon={<ListOrdered className="w-4 h-4" />}
         />
-
-        {/* <div className="h-4 w-px bg-gray-200 mx-1" /> */}
-
-        {/* Alignment */}
-        {/* <ToolbarButton
-          onClick={() => setAlign("left")}
-          icon={<AlignLeft className="w-4 h-4" />}
-        />
-        <ToolbarButton
-          onClick={() => setAlign("center")}
-          icon={<AlignCenter className="w-4 h-4" />}
-        />
-        <ToolbarButton
-          onClick={() => setAlign("right")}
-          icon={<AlignRight className="w-4 h-4" />}
-        />
-
-        <ToolbarButton
-          onClick={() => setShowPreview(true)}
-          icon={<Eye className="w-4 h-4" />}
-        /> */}
       </div>
 
-      {/* Editable Area */}
       <div className="relative bg-white">
         <div
           ref={editorRef}
@@ -415,7 +455,6 @@ export default function RichTextEditor({
               const normalized = normalizeHTML(el.innerHTML);
               onChange(normalized);
             }
-
             updateActiveFormats();
           }}
           className="w-full px-3 py-3 text-sm text-gray-800 focus:outline-none min-h-[120px] max-h-[250px] overflow-y-auto prose prose-sm max-w-none"
@@ -424,8 +463,8 @@ export default function RichTextEditor({
         <span className="absolute bottom-2 right-3 text-xs text-orange-500">
           {wordCount}/{maxWords} Words
         </span>
-
       </div>
+
       {showPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-2xl w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto p-6 relative">
@@ -457,7 +496,6 @@ export default function RichTextEditor({
           pointer-events: none;
         }
 
-        /* ✅ Distinct heading styles */
         :global(.prose h1) {
           font-size: 1.5rem;
           font-weight: 700;
@@ -477,13 +515,17 @@ export default function RichTextEditor({
           color: #374151;
         }
 
-        /* ✅ Lists */
-        :global(.prose ul),
-        :global(.prose ol) {
+        /* ensure bullets / numbers are visible */
+        :global(.prose ul) {
+          list-style-type: disc;
           margin-left: 1.5rem;
           padding-left: 0.5rem;
         }
-
+        :global(.prose ol) {
+          list-style-type: decimal;
+          margin-left: 1.5rem;
+          padding-left: 0.5rem;
+        }
         :global(.prose li) {
           margin-bottom: 0.25rem;
         }
@@ -496,7 +538,6 @@ export default function RichTextEditor({
   );
 }
 
-// === Toolbar Button Component ===
 function ToolbarButton({
   icon,
   onClick,

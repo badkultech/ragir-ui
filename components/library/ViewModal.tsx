@@ -435,15 +435,16 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
               )}
 
               {/* Text Content */}
-              <div className="">
-                <p
-                  className="text-neutral-500 text-[16px] mt-4 leading-relaxed"
+              <div>
+                {/* Use a block container and typography utilities so lists render with bullets/numbers */}
+                <div
+                  className="prose prose-sm max-w-none text-neutral-500 mt-4 leading-relaxed"
                   dangerouslySetInnerHTML={{
                     __html: content.description || "",
                   }}
-                ></p>
+                />
 
-                <div className="flex justify-center flex-col text-neutral-500 w-full gap-y-5  mt-4  border-b-1 border-[#E4E4E4] border-t-1 py-3">
+                <div className="flex justify-center flex-col text-neutral-500 w-full gap-y-5 mt-4 border-t border-b border-[#E4E4E4] py-3">
                   {returnStepContent()}
                 </div>
 
@@ -462,7 +463,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                           <p className="font-medium text-neutral-500 capitalize mb-1">
                             {key}
                           </p>
-                          <ul className="list-disc pl-5  text-neutral-500 space-y-1">
+                          <ul className="list-disc pl-5 prose prose-sm text-neutral-500 space-y-1">
                             {list.map((item, i) => (
                               <li key={i}>{item}</li>
                             ))}
@@ -472,7 +473,7 @@ export function ViewModal({ open, onClose, step, data }: ViewModalProps) {
                     ) : (
                       <>
                         <p
-                          className="font-medium text-neutral-500 capitalize"
+                          className="font-medium prose prose-sm text-neutral-500 capitalize"
                           dangerouslySetInnerHTML={{
                             __html: content.packingSuggestion || "",
                           }}
