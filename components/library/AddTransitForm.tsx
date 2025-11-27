@@ -204,10 +204,7 @@ export function AddTransitForm({
       { key: "vehicleTypes", label: "Vehicle", value: vehicle },
     ]);
 
-    if (isEditorEmpty(description)) {
-      newErrors.description = "Description is required";
-    }
-
+  
     if (!vehicle || vehicle.length === 0) {
       newErrors.vehicleTypes = "Select at least 1 vehicle";
     }
