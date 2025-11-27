@@ -145,7 +145,7 @@ export function AddDayDescriptionForm({
         docsManager.documents
       );
 
-      showSuccess("day description saved successfully!");
+      showSuccess("Day description saved successfully!");
       console.log("📸 Uploaded documents:", docsManager.documents);
     } catch {
       showApiError("Failed to save day description");

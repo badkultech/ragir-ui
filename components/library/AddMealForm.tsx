@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
@@ -16,8 +15,6 @@ import {
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetMealByIdQuery } from "@/lib/services/organizer/trip/library/meal";
-import { slice } from "lodash";
-import { boolean } from "zod";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -47,18 +44,10 @@ export function AddMealForm({
   const [location, setLocation] = useState("Mumbai, India");
   const [description, setDescription] = useState("");
   const [packing, setPacking] = useState("");
-  const [images, setImages] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [existingImages, setExistingImages] = useState<
-    { id: number; url: string }[]
-  >([]);
-  const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
 
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState("");
-  const { userData } = useSelector(selectAuthState);
   const [usegetbyid] = useLazyGetMealByIdQuery();
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
@@ -85,15 +74,29 @@ export function AddMealForm({
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
-    if (initialData.documents && Array.isArray(initialData.documents)) {
-      const existing = initialData.documents
-        .filter((doc: any) => doc.url)
-        .map((doc: any) => ({ id: doc.id, url: doc.url }));
-      setExistingImages(existing);
-      setPreviewUrls(
-        existing.map((img: { id: number; url: string }) => img.url)
-      );
+    const mappedDocs = (
+      Array.isArray(initialData.documents) ? initialData.documents : []
+    ).map((d: any) => ({
+      id: d.id ?? null,
+      url: d.url ?? d.fileUrl ?? d.path ?? d.s3Url ?? null,
+      type: d.type ?? "IMAGE",
+      file: null,
+      markedForDeletion: !!d.markedForDeletion,
+    }));
+
+    // ✅ Pad to 6 slots (or whatever capacity you use)
+    while (mappedDocs.length < 6) {
+      mappedDocs.push({
+        id: null,
+        url: null,
+        type: null,
+        file: null,
+        markedForDeletion: false,
+      });
     }
+
+    docsManager.setDocuments(mappedDocs);
+
   }, [initialData]);
 
   const handleLibrarySelect = async (item: any) => {
@@ -158,8 +161,6 @@ export function AddMealForm({
       { key: "title", label: "Title", value: title },
       { key: "time", label: "Meal Time", value: time },
       { key: "mealType", label: "Meal Type", value: mealType },
-      { key: "location", label: "Location", value: location },
-      { key: "description", label: "Description", value: description },
     ]);
 
     setErrors(newErrors);
@@ -184,7 +185,6 @@ export function AddMealForm({
           description,
           packing,
           saveInLibrary,
-          deletedImageIds,
           mode,
         },
         docsManager.documents
@@ -249,7 +249,7 @@ export function AddMealForm({
             <option value="">Select</option>
             <option value="BREAKFAST">Breakfast</option>
             <option value="LUNCH">Lunch</option>
-            <option value="SNACK">Snack</option>
+            <option value="SNACKS">Snacks</option>
             <option value="DINNER">Dinner</option>
           </select>
 
@@ -291,24 +291,18 @@ export function AddMealForm({
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter location"
         />
-        {errors.location && (
-          <p className="text-xs text-red-500 mt-1">{errors.location}</p>
-        )}
       </div>
 
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description <RequiredStar />
+          Description
         </label>
         <RichTextEditor
           placeholder="Enter description"
           value={description}
           onChange={setDescription}
         />
-        {errors.description && (
-          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
-        )}
       </div>
 
       {/* Packing Suggestions */}

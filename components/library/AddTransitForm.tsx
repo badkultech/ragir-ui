@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
-import { useToast } from "@/components/ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 import { MultiUploader } from "../common/UploadFieldShortcuts";
 import {
@@ -14,8 +13,6 @@ import {
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 import { useLazyGetOrganizerTransitByIdQuery } from "@/lib/services/organizer/trip/library/transit";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -60,11 +57,9 @@ export function AddTransitForm({
   const [description, setDescription] = useState("");
   const [packingSuggestion, setPackingSuggestion] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
-  const { toast } = useToast();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [getTransitByIdTrigger] = useLazyGetOrganizerTransitByIdQuery();
-  const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
@@ -198,19 +193,6 @@ export function AddTransitForm({
     setLibraryOpen(false);
   };
 
-  const isEditorEmpty = (html: string) => {
-    if (!html) return true;
-
-    const cleaned = html
-      .replace(/<p><br[^>]*?><\/p>/gi, "")
-      .replace(/<br[^>]*?>/gi, "")
-      .replace(/<[^>]+>/g, "")
-      .replace(/&nbsp;/gi, "")
-      .replace(/\s+/g, "")
-      .trim();
-
-    return cleaned.length === 0;
-  };
 
   const handleSubmit = async () => {
     const newErrors = validateRequiredFields([
@@ -219,7 +201,6 @@ export function AddTransitForm({
       { key: "to", label: "Destination", value: to },
       { key: "departure", label: "Departure time", value: departure },
       { key: "arrival", label: "Arrival time", value: arrival },
-      { key: "description", label: "Description", value: description },
       { key: "vehicleTypes", label: "Vehicle", value: vehicle },
     ]);
 
@@ -464,6 +445,14 @@ export function AddTransitForm({
           placeholder="Other (Specify)"
           className="mt-2"
         />
+        {errors.vehicleTypes && (
+          <p
+            id="vehicle-error"
+            className="text-xs text-red-500 mt-1"
+          >
+            {errors.vehicleTypes}
+          </p>
+        )}
       </div>
 
       {/* Arrangement */}
@@ -491,7 +480,7 @@ export function AddTransitForm({
       {/* Description */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Description <RequiredStar />
+          Description
         </label>
         <RichTextEditor
           value={description}
