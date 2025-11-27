@@ -182,8 +182,6 @@ export function AddActivityForm({
     const stringFieldErrors = validateRequiredFields([
       { key: "title", label: "Title", value: title },
       { key: "priceType", label: "Price Type", value: priceType },
-      { key: "description", label: "Description", value: description },
-      { key: "location", label: "Location", value: location },
     ]);
 
     // Custom validation for non-string fields
@@ -345,16 +343,13 @@ export function AddActivityForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">
-            Location <RequiredStar />
+            Location
           </label>
           <Input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location"
           />
-          {errors.location && (
-            <p className="text-xs text-red-500 mt-1">{errors.location}</p>
-          )}
         </div>
         <div>
           <label className="block text-[0.95rem] font-medium mb-2">Time</label>
@@ -369,7 +364,7 @@ export function AddActivityForm({
       {/* Description */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-1">
-          Description <RequiredStar />
+          Description
         </label>
         <RichTextEditor
           value={description}

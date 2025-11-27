@@ -57,7 +57,7 @@ export function AddDayDescriptionForm({
   const [getbyid] = useLazyGetDayDescriptionByIdQuery();
   const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
-      const organizationId = useOrganizationId();
+  const organizationId = useOrganizationId();
 
 
 
@@ -147,7 +147,7 @@ export function AddDayDescriptionForm({
         docsManager.documents
       );
 
-      showSuccess("day description saved successfully!");
+      showSuccess("Day description saved successfully!");
       console.log("📸 Uploaded documents:", docsManager.documents);
     } catch {
       showApiError("Failed to save day description");

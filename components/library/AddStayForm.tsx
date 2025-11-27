@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
@@ -8,17 +8,13 @@ import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { useToast } from "../ui/use-toast";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
-import Image from "next/image";
 
 import {
   useDocumentsManager,
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 import { MultiUploader } from "../common/UploadFieldShortcuts";
-import { set } from "lodash";
 import { useLazyGetStayByIdQuery } from "@/lib/services/organizer/trip/library/stay";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -55,7 +51,6 @@ export function AddStayForm({
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [usegetbyid] = useLazyGetStayByIdQuery();
-  const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
 
@@ -109,8 +104,6 @@ export function AddStayForm({
       { key: "sharingType", label: "Sharing Type", value: sharingType },
       { key: "checkIn", label: "Check In Time", value: checkIn },
       { key: "checkOut", label: "Check Out Time", value: checkOut },
-      { key: "location", label: "Location", value: location },
-      { key: "description", label: "Description", value: description },
     ]);
 
     setErrors(newErrors);
@@ -174,31 +167,31 @@ export function AddStayForm({
   };
 
   const handleSubmit = async () => {
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  setIsSaving(true);
+    setIsSaving(true);
 
-  const payload = {
-    title,
-    sharingType,
-    checkIn,
-    checkOut,
-    location,
-    description,
-    packing,
-    mode,
-    saveInLibrary,
+    const payload = {
+      title,
+      sharingType,
+      checkIn,
+      checkOut,
+      location,
+      description,
+      packing,
+      mode,
+      saveInLibrary,
+    };
+
+    try {
+      await onSave(payload, documents);
+      showSuccess("Stay saved successfully!");
+    } catch (err) {
+      showApiError("Failed to save Stay");
+    } finally {
+      setIsSaving(false);
+    }
   };
-
-  try {
-    await onSave(payload, documents);  
-    showSuccess("Stay saved successfully!");
-  } catch (err) {
-    showApiError("Failed to save Stay");
-  } finally {
-    setIsSaving(false);
-  }
-};
 
 
   return (
@@ -269,14 +262,12 @@ export function AddStayForm({
       {/* Location */}
       <div>
         <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" />
-        {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description <RequiredStar /></label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Description </label>
         <RichTextEditor placeholder="Enter description" value={description} onChange={setDescription} />
-        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
       </div>
 
       {/* Packing Suggestions */}
