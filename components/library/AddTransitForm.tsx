@@ -67,8 +67,7 @@ export function AddTransitForm({
   const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
-
-
+  const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
@@ -92,8 +91,6 @@ export function AddTransitForm({
     setArrival(normalizeTime(initialData.endTime ?? initialData.arrival ?? ""));
     setDescription(initialData.description ?? "");
     setPackingSuggestion(initialData.packingSuggestion ?? "");
-
-    // ✅ handle both single and multiple vehicle types
     setVehicle(
       Array.isArray(initialData.vehicleTypes)
         ? initialData.vehicleTypes
@@ -101,10 +98,7 @@ export function AddTransitForm({
           ? [initialData.vehicleType]
           : []
     );
-
-    // ✅ fix: populate custom vehicle type
     setCustomVehicleType(initialData.customVehicleType ?? "");
-
     setArrangement(
       (initialData.arrangedBy ?? "").toString().toUpperCase() === "SELF"
         ? "SELF"
@@ -112,8 +106,6 @@ export function AddTransitForm({
     );
 
     setSaveInLibrary(!!initialData.addedToLibrary);
-
-    // ✅ reset documents
     const mappedDocs = (
       Array.isArray(initialData.documents) ? initialData.documents : []
     ).map((d: any) => ({
@@ -129,10 +121,8 @@ export function AddTransitForm({
     } else if (typeof docsManager.setDocuments === "function") {
       docsManager.setDocuments(mappedDocs);
     } else {
-      // @ts-ignore
       docsManager.documents = mappedDocs;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData?.id, initialData]);
 
   const toggleVehicle = (v: string) => {
@@ -142,29 +132,20 @@ export function AddTransitForm({
   };
 
   const handleLibrarySelect = async (item: any) => {
-
     if (!item.id) return;
-
-
+    setIsLibraryLoading(true);
     try {
       const full = await getTransitByIdTrigger({
         organizationId,
         transitId: Number(item.id),
       }).unwrap();
-
-      console.log("FULL TRANSIT FROM DB => ", full);
-
-      // Now full object contains: fromLocation, toLocation, times, vehicles etc.
       setTitle(full.name ?? "");
       setFrom(full.fromLocation ?? "");
       setTo(full.toLocation ?? "");
-
       setDeparture(full.startTime?.slice(0, 5) ?? "");
       setArrival(full.endTime?.slice(0, 5) ?? "");
-
       setDescription(full.description ?? "");
       setPackingSuggestion(full.packingSuggestion ?? "");
-
       setVehicle(
         Array.isArray(full.vehicleTypes)
           ? full.vehicleTypes
@@ -173,7 +154,6 @@ export function AddTransitForm({
             : []
       );
       setCustomVehicleType(full.customVehicleType ?? "");
-
       setArrangement(
         (full.arrangedBy ?? "").toUpperCase() === "SELF"
           ? "SELF"
@@ -185,7 +165,7 @@ export function AddTransitForm({
           if (d.url) {
             const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
             return {
-              id: null,                // new file → no ID
+              id: null,
               url: URL.createObjectURL(file),
               type: file.type,
               file,
@@ -214,6 +194,8 @@ export function AddTransitForm({
     } catch (err) {
       console.error("Failed to load full transit", err);
     }
+    setIsLibraryLoading(false);
+    setLibraryOpen(false);
   };
 
   const isEditorEmpty = (html: string) => {
@@ -230,7 +212,6 @@ export function AddTransitForm({
     return cleaned.length === 0;
   };
 
-
   const handleSubmit = async () => {
     const newErrors = validateRequiredFields([
       { key: "title", label: "Title", value: title },
@@ -241,6 +222,15 @@ export function AddTransitForm({
       { key: "description", label: "Description", value: description },
       { key: "vehicleTypes", label: "Vehicle", value: vehicle },
     ]);
+
+    if (isEditorEmpty(description)) {
+      newErrors.description = "Description is required";
+    }
+
+    if (!vehicle || vehicle.length === 0) {
+      newErrors.vehicleTypes = "Select at least 1 vehicle";
+    }
+
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -268,7 +258,7 @@ export function AddTransitForm({
 
       showSuccess("Transit saved successfully!");
 
-      onCancel(); 
+      onCancel();
     } catch (e) {
       showApiError("Failed to save Transit");
     } finally {
@@ -447,7 +437,10 @@ export function AddTransitForm({
       {/* Vehicle */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-2">
-          Vehicle <RequiredStar />
+          Vehicle <RequiredStar />{errors.vehicleTypes && (
+            <span className="text-xs text-red-500 mt-1">({errors.vehicleTypes})</span>
+          )}
+
         </label>
         <div className="flex flex-wrap gap-2">
           {VEHICLES.map((v) => (
@@ -504,6 +497,10 @@ export function AddTransitForm({
           value={description}
           onChange={setDescription}
         />
+        {errors.description && (
+          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
+        )}
+
       </div>
 
       {/* Packing Suggestion */}
@@ -516,18 +513,12 @@ export function AddTransitForm({
           onChange={setPackingSuggestion}
         />
       </div>
-
-      {/* Upload area: uses MultiUploader and shares docsManager */}
       <div>
-        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
         <MultiUploader documentsManager={docsManager} label="Images" />
-
-        {/* Show any manager-level error */}
         {docsManager.error && (
           <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>
         )}
       </div>
-      {/* Save in Library (Trip Mode Only) */}
 
       {isTripMode && (
         <div className="flex flex-col items-end gap-2">
@@ -565,6 +556,7 @@ export function AddTransitForm({
           Cancel
         </Button>
         <Button
+          disabled={isSaving || isLibraryLoading}
           onClick={handleSubmit}
           className="rounded-full px-6 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >

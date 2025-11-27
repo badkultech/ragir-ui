@@ -62,8 +62,7 @@ export function AddMealForm({
   const [usegetbyid] = useLazyGetMealByIdQuery();
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
-
-
+  const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
@@ -86,8 +85,6 @@ export function AddMealForm({
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
-
-    // ✅ Show existing backend images
     if (initialData.documents && Array.isArray(initialData.documents)) {
       const existing = initialData.documents
         .filter((doc: any) => doc.url)
@@ -98,18 +95,9 @@ export function AddMealForm({
       );
     }
   }, [initialData]);
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
-      setImages((prev) => [...prev, ...selectedFiles]);
-      const newUrls = selectedFiles.map((file) => URL.createObjectURL(file));
-      setPreviewUrls((prev) => [...prev, ...newUrls]);
-    }
-  };
-
 
   const handleLibrarySelect = async (item: any) => {
-
+    setIsLibraryLoading(true);
     try {
       const fd = await usegetbyid({
         organizationId,
@@ -131,7 +119,7 @@ export function AddMealForm({
           if (d.url) {
             const file = await urlToFile(d.url, `library_doc_${index}.jpg`);
             return {
-              id: null,                // new file → no ID
+              id: null,
               url: URL.createObjectURL(file),
               type: file.type,
               file,
@@ -161,6 +149,7 @@ export function AddMealForm({
       showApiError("Failed to load Meal from library");
       console.error("Failed to fetch meal:", error);
     }
+    setIsLibraryLoading(false);
     setLibraryOpen(false);
   };
 
@@ -177,7 +166,7 @@ export function AddMealForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Save handler
+
   const handleSubmit = async () => {
     const isValid = validateForm();
     if (!isValid) return;
@@ -295,7 +284,7 @@ export function AddMealForm({
       {/* Location */}
       <div>
         <label className="block text-[0.95rem] font-medium mb-1">
-          Location
+          Location<RequiredStar />
         </label>
         <Input
           value={location}
@@ -337,10 +326,7 @@ export function AddMealForm({
 
       {/* Image Upload */}
       <div>
-        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
         <MultiUploader documentsManager={docsManager} label="Images" />
-
-        {/* Show any manager-level error */}
         {docsManager.error && (
           <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>
         )}
@@ -384,6 +370,7 @@ export function AddMealForm({
           Cancel
         </Button>
         <Button
+          disabled={isSaving || isLibraryLoading}
           onClick={handleSubmit}
           className="rounded-full px-6 gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]  hover:opacity-90 text-white"
         >

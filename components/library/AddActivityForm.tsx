@@ -64,6 +64,7 @@ export function AddActivityForm({
   const isTripMode = mode === "trip";
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
+  const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
@@ -114,6 +115,7 @@ export function AddActivityForm({
   }, [initialData]);
 
   const handleLibrarySelect = async (item: any) => {
+    setIsLibraryLoading(true);
     try {
       const fd = await getbyid({
         organizationId,
@@ -174,27 +176,22 @@ export function AddActivityForm({
     } catch (error) {
       console.error("Failed to fetch activity:", error);
     }
+    setIsLibraryLoading(false);
     setLibraryOpen(false);
   };
 
   const validateForm = () => {
-    // Validate all string fields
     const stringFieldErrors = validateRequiredFields([
       { key: "title", label: "Title", value: title },
       { key: "priceType", label: "Price Type", value: priceType },
       { key: "description", label: "Description", value: description },
       { key: "location", label: "Location", value: location },
     ]);
-
-    // Custom validation for non-string fields
     const customErrors: { [key: string]: string } = {};
     if (!moodTags || moodTags.length === 0) {
       customErrors.moodTags = "Mood Tags are required";
     }
-
-    // Merge
     const newErrors = { ...stringFieldErrors, ...customErrors };
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -202,7 +199,6 @@ export function AddActivityForm({
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
     setIsSaving(true);
     const moods = moodTags
       .map((t) => (t?.value ?? "").toString().trim())
@@ -376,6 +372,10 @@ export function AddActivityForm({
           onChange={setDescription}
           placeholder="Enter here"
         />
+        {errors.description && (
+          <p className="text-xs text-red-500 mt-1">{errors.description}</p>
+        )}
+
       </div>
 
       {/* Packing */}
@@ -392,10 +392,7 @@ export function AddActivityForm({
 
       {/* Image Upload */}
       <div>
-        {/* MultiUploader uses the docsManager so form can read docsManager.documents on submit */}
         <MultiUploader documentsManager={docsManager} label="Images" />
-
-        {/* Show any manager-level error */}
         {docsManager.error && (
           <p className="text-xs text-red-500 mt-2">{docsManager.error}</p>
         )}
@@ -436,6 +433,7 @@ export function AddActivityForm({
           Cancel
         </Button>
         <Button
+          disabled={isSaving || isLibraryLoading}
           onClick={handleSubmit}
           className="rounded-full px-6 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >

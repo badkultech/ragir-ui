@@ -57,13 +57,9 @@ export function AddDayDescriptionForm({
   const [getbyid] = useLazyGetDayDescriptionByIdQuery();
   const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
-      const organizationId = useOrganizationId();
+  const organizationId = useOrganizationId();
+  const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
-
-
-
-
-  // ✅ Prefill when editing
   useEffect(() => {
     if (!initialData) return;
     setTitle(initialData.name || initialData.title || "");
@@ -75,9 +71,11 @@ export function AddDayDescriptionForm({
     docsManager.setDocuments(initialData.documents);
   };
   }, [initialData]);
-  const handleLibrarySelect = async (item: any) => {
-    try {
 
+  const handleLibrarySelect = async (item: any) => {
+    setIsLibraryLoading(true);
+
+    try {
       const fd = await getbyid({
         organizationId,
         dayDescriptionId: item.id,
@@ -119,12 +117,12 @@ export function AddDayDescriptionForm({
       }
 
       docsManager.setDocuments(mappedDocs);
-
-
     } catch (error) {
       console.error("Failed to fetch day description:", error);
     }
+    setIsLibraryLoading(false);
     setLibraryOpen(false);
+
   };
 
   const validateForm = () => {
@@ -138,12 +136,9 @@ export function AddDayDescriptionForm({
   };
 
   const handleSubmit = async (replace = false) => {
-    // Run validation
     const isValid = validateForm();
     if (!isValid) return;
     setIsSaving(true);
-
-    //  Trigger save
     try {
       await onSave(
         { title, description, location, time, packing, saveInLibrary, mode },
@@ -173,7 +168,7 @@ export function AddDayDescriptionForm({
       {isTripMode ? (
         <ChooseFromLibraryButton onClick={() => setLibraryOpen(true)} />
       ) : (
-        <div className="mt-2" /> // ✅ Keeps consistent spacing when no button
+        <div className="mt-2" />
       )}
 
       {/* Title */}
@@ -299,6 +294,7 @@ export function AddDayDescriptionForm({
           Cancel
         </Button>
         <Button
+        disabled={isSaving || isLibraryLoading}
           onClick={() => handleSubmit(false)}
           className="rounded-full px-6 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >
