@@ -71,6 +71,9 @@ export function AddDayDescriptionForm({
     setLocation(initialData.location || "");
     setTime(initialData.time || "");
     setPacking(initialData.packingSuggestion || initialData.packing || "");
+     if (initialData?.documents) {
+    docsManager.setDocuments(initialData.documents);
+  };
   }, [initialData]);
   const handleLibrarySelect = async (item: any) => {
     try {

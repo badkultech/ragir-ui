@@ -62,7 +62,7 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
               data.time.minute
             ).padStart(2, "0")}`
           : "",
-      documents: normalizeDocuments(data.documents ?? []),
+            documents: data.documents || [],
     };
 
     setInitialData(mapped);
