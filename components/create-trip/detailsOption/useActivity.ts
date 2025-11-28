@@ -1,6 +1,6 @@
   "use client";
 
-  import { useState } from "react";
+  import { useRef, useState } from "react";
   import {
     useLazyGetTripActivityByIdQuery,
     useCreateTripActivityMutation,
@@ -35,12 +35,17 @@
     dayDetailId,
   }: any) {
     const [initialActivityData, setInitialActivityData] = useState<any>(null);
+      const cacheRef = useRef<Record<string, any>>({});
     const [getActivityById] = useLazyGetTripActivityByIdQuery();
     const [createActivity] = useCreateTripActivityMutation();
     const [updateActivity] = useUpdateTripActivityMutation();
     const [deleteActivity] = useDeleteTripActivityMutation();
 
     const handleActivityEdit = async (itemId: number) => {
+      if (cacheRef.current[itemId]) {
+      setInitialActivityData(cacheRef.current[itemId]);
+      return cacheRef.current[itemId];
+    }
       const res = await getActivityById({
         organizationId,
         tripPublicId,
@@ -61,7 +66,7 @@
         priceType: data.priceCharge === "CHARGEABLE" ? "CHARGEABLE" : "INCLUDED",
         documents: normalizeDocuments(data.documents ?? []),
       };
-
+    cacheRef.current[itemId] = mapped;
       setInitialActivityData(mapped);
       return mapped;
     };
@@ -107,6 +112,7 @@
     itemId: String(correctId),
     data: form
   }).unwrap();
+      delete cacheRef.current[String(itemId)];
 }
 else {
     res = await createActivity({
@@ -116,7 +122,6 @@ else {
       data: form,
     }).unwrap();
   }
-
   return {
   ...res, 
   documents: res.documents || [],
@@ -132,7 +137,7 @@ else {
         dayDetailId,
         itemId: String(id),
       }).unwrap();
-
+      delete cacheRef.current[String(id)];
       return { id };
     };
 

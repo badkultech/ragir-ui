@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   useCreateTripStayMutation,
   useUpdateTripStayMutation,
@@ -24,13 +24,17 @@ function normalizeDocuments(docs: any[]) {
 
 export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
   const [initialStayData, setInitialStayData] = useState<any>(null);
-
+  const cacheRef = useRef<Record<string, any>>({});
   const [getStayById] = useLazyGetTripStayByIdQuery();
   const [createStay] = useCreateTripStayMutation();
   const [updateStay] = useUpdateTripStayMutation();
   const [deleteStay] = useDeleteTripStayMutation();
 
   const handleStayEdit = async (itemId: number) => {
+    if (cacheRef.current[itemId]) {
+      setInitialStayData(cacheRef.current[itemId]);
+      return cacheRef.current[itemId];
+    }
     const res = await getStayById({
       organizationId,
       tripPublicId,
@@ -51,7 +55,7 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
       sharingType: data.sharingType || "",
       documents: normalizeDocuments(data.documents ?? []),
     };
-
+    cacheRef.current[itemId] = mapped;
     setInitialStayData(mapped);
     return mapped;
   };
@@ -69,6 +73,7 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
         itemId: String(itemId),
         data: form,
       }).unwrap();
+      delete cacheRef.current[String(itemId)];
     } else {
       res = await createStay({
         organizationId,
@@ -92,7 +97,7 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
       dayDetailId,
       itemId: String(id),
     }).unwrap();
-
+      delete cacheRef.current[String(id)];
     return { id };
   };
 

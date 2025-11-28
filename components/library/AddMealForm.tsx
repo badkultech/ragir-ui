@@ -147,7 +147,15 @@ export function AddMealForm({
           markedForDeletion: false,
         });
       }
-      docsManager.setDocuments(mappedDocs);
+      const updatedDocs = mappedDocs.map((doc, index) => {
+        return {
+          ...doc,
+          id: docsManager.documents?.[index]?.id ?? null,
+          markedForDeletion: docsManager.documents?.[index]?.id ? true : false,
+        };
+      });
+
+      docsManager.setDocuments(updatedDocs);
     } catch (error) {
       showApiError("Failed to load Meal from library");
       console.error("Failed to fetch meal:", error);

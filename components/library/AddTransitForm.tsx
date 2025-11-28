@@ -185,7 +185,15 @@ export function AddTransitForm({
           markedForDeletion: false,
         });
       }
-      docsManager.setDocuments(mappedDocs);
+      const updatedDocs = mappedDocs.map((doc, index) => {
+        return {
+          ...doc,
+          id: docsManager.documents?.[index]?.id ?? null,
+          markedForDeletion: docsManager.documents?.[index]?.id ? true : false,
+        };
+      });
+
+      docsManager.setDocuments(updatedDocs);
     } catch (err) {
       console.error("Failed to load full transit", err);
     }

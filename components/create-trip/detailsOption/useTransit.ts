@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   useLazyGetTransitByIdQuery,
   useCreateTransitMutation,
@@ -13,7 +13,7 @@ import { mapTransitToFormData } from "@/lib/services/organizer/trip/library/comm
 export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
   const [editingTransit, setEditingTransit] = useState<any>(null);
   const [initialTransitData, setInitialTransitData] = useState<any>(null);
-
+  const cacheRef = useRef<Record<string, any>>({});
   const [getTransitById] = useLazyGetTransitByIdQuery();
   const [createTransit] = useCreateTransitMutation();
   const [updateTransit] = useUpdateTransitMutation();
@@ -22,6 +22,10 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
   const [createLibraryTransit] = useCreateOrganizerTransitMutation();
 
   const handleTransitEdit = async (itemId: string | number) => {
+    if (cacheRef.current[itemId]) {
+      setInitialTransitData(cacheRef.current[itemId]);
+      return cacheRef.current[itemId];
+    }
     const res = await getTransitById({
       organizationId,
       tripPublicId,
@@ -45,7 +49,7 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
       packingSuggestion: data.packingSuggestion || "",
       documents: data.documents || []
     };
-
+    cacheRef.current[itemId] = mapped;
     setEditingTransit({ id: itemId });
     setInitialTransitData(mapped);
 
@@ -76,7 +80,7 @@ const handleTransitSave = async (
         itemId: String(itemId),
         data: form,
       }).unwrap();
-
+      delete cacheRef.current[String(itemId)];
       const updated = res;
 
       return {
@@ -117,7 +121,7 @@ const handleTransitSave = async (
         dayDetailId,
         itemId: String(id),
       }).unwrap();
-
+      delete cacheRef.current[String(id)];
       return { id };
     } catch (err) {
       console.error("Transit delete error:", err);

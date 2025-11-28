@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   useCreateTripDayDescriptionMutation,
   useUpdateTripDayDescriptionMutation,
@@ -29,6 +29,7 @@ function normalizeDocuments(docs: any[]) {
 /* ------------------------- HOOK --------------------------- */
 export function useDayDescription({ organizationId, tripPublicId, dayDetailId }: any) {
   const [initialData, setInitialData] = useState<any | null>(null);
+  const cacheRef = useRef<Record<string, any>>({});
 
   const [getDayDescById] = useLazyGetTripDayDescriptionByIdQuery();
   const [createDesc] = useCreateTripDayDescriptionMutation();
@@ -38,6 +39,11 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
   /* ---------------------- EDIT ---------------------- */
   const handleEdit = async (item: any) => {
     const itemId = item.id || item.tripItemId;
+
+    if (cacheRef.current[itemId]) {
+      setInitialData(cacheRef.current[itemId]);
+      return cacheRef.current[itemId];
+    }
 
     const res = await getDayDescById({
       organizationId,
@@ -64,7 +70,7 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
           : "",
             documents: data.documents || [],
     };
-
+    cacheRef.current[itemId] = mapped;
     setInitialData(mapped);
     return mapped;
   };
@@ -93,6 +99,8 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
         itemId: String(itemId),
         data: form,
       }).unwrap();
+
+      delete cacheRef.current[String(itemId)];
     } else {
       res = await createDesc({
         organizationId,
@@ -122,7 +130,7 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
       dayDetailId,
       itemId: String(id),
     }).unwrap();
-
+    delete cacheRef.current[String(id)];
     return { id };
   };
 
