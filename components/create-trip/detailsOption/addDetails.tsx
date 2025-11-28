@@ -93,7 +93,6 @@ export function DetailsOptions({
       console.error("❌ No valid item id found for deletion");
       return;
     }
-
     try {
       switch (item.tripType) {
         case "DAY_DESCRIPTION":

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   useCreateTripMealMutation,
   useUpdateTripMealMutation,
@@ -23,7 +23,7 @@ function normalizeDocuments(docs: any[]) {
 
 export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
   const [initialMealData, setInitialMealData] = useState<any>(null);
-
+  const cacheRef = useRef<Record<string, any>>({});
   const [getMealById] = useLazyGetTripMealByIdQuery();
   const [createMeal] = useCreateTripMealMutation();
   const [updateMeal] = useUpdateTripMealMutation();
@@ -31,6 +31,10 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
 
   /* ------------------------- EDIT -------------------------- */
   const handleMealEdit = async (itemId: number) => {
+    if (cacheRef.current[itemId]) {
+      setInitialMealData(cacheRef.current[itemId]);
+      return cacheRef.current[itemId];
+    }
     const res = await getMealById({
       organizationId,
       tripPublicId,
@@ -51,7 +55,7 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
       packingSuggestion :data.packingSuggestion??"",
       documents: normalizeDocuments(data.documents ?? []),
     };
-
+    cacheRef.current[itemId] = mapped;
     setInitialMealData(mapped);
     return mapped;
   };
@@ -75,6 +79,7 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
         itemId: String(itemId),
         data: form,
       }).unwrap();
+      delete cacheRef.current[String(itemId)];
     } else {
       res = await createMeal({
         organizationId,
@@ -99,7 +104,7 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
       dayDetailId,
       itemId: String(id),
     }).unwrap();
-
+      delete cacheRef.current[String(id)];
     return { id };
   };
 

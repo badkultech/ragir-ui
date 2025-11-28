@@ -30,7 +30,6 @@ export const itineraryAPI = baseAPI.injectEndpoints({
         body: data,
       }),
       transformResponse: (response: ApiResponse<ItineraryResponse>) => response.data,
-      invalidatesTags: [TAGS.itinerary],
     }),
 
     // ✅ DELETE Itinerary
