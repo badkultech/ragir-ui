@@ -49,9 +49,11 @@ export default function FAQsPage() {
   const organizationId = useOrganizationId();
 
   const [createFaq] = useCreateFaqMutation();
+  const shouldSkip = !organizationId || !isChooseFromLibrary;
   const { data: faqsLibraryData = [] } = useGetOrganizerFaqsQuery(
-    organizationId ? { organizationId } : skipToken,
-  );
+  shouldSkip ? skipToken : { organizationId }
+);
+
 
   const {
     data: faqsData,

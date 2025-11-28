@@ -16,9 +16,7 @@ import {
   useLazyGetItineraryByTripIdQuery,
   useUpdateItineraryMutation,
 } from "@/lib/services/organizer/trip/itinerary";
-import {
-  useLazyGetItineraryDayDetailsQuery,
-} from "@/lib/services/organizer/trip/itinerary/day-details";
+
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type Day = { day: number; date: string };
@@ -54,15 +52,12 @@ export default function ItineraryPage() {
   const totalDaysParam = parseInt(searchParams.get("totalDays") || "1", 10);
 
   const [triggerGetItineraryByTripId] = useLazyGetItineraryByTripIdQuery();
-  const [triggerGetItineraryDayDetails] = useLazyGetItineraryDayDetailsQuery();
   const [updateItinerary] = useUpdateItineraryMutation();
   const [isSavingNext, setIsSavingNext] = useState(false);
   const [errors, setErrors] = useState({
     startingPoint: "",
     endPoint: "",
   });
-
-
 
   useEffect(() => {
     const fetch = async () => {
@@ -94,11 +89,6 @@ export default function ItineraryPage() {
             markedForDeletion: false,
           });
         }
-
-
-
-
-        // Generate days by totalDays or fallback to totalDaysParam
         const totalDays = payload.totalDays ?? totalDaysParam ?? 1;
         const baseDateStr = payload.startDate ?? new Date().toISOString();
         const generatedDays: Day[] = Array.from({ length: totalDays }, (_, i) => {
@@ -124,14 +114,7 @@ export default function ItineraryPage() {
         (payload.dayDetailResponseList ?? []).forEach((d: any) => {
           if (d.dayNumber && d.id) idsMap[d.dayNumber] = String(d.id);
         });
-        setDayDetailIds((prev) => ({ ...prev, ...idsMap }));
-        const dayDetailsResp = await triggerGetItineraryDayDetails({
-          organizationId,
-          tripPublicId: tripId as string,
-        }).unwrap();
-
-        const ddData = (dayDetailsResp as any)?.data ?? dayDetailsResp ?? [];
-
+        const ddData = payload.dayDetailResponseList ?? [];
         const map: Record<number, TripItem[] | null> = {};
         ddData.forEach((d: any) => {
           map[d.dayNumber] = Array.isArray(d.tripItems) ? d.tripItems : null;
@@ -140,8 +123,6 @@ export default function ItineraryPage() {
             idsMap[d.dayNumber] = String(d.id);
           }
         });
-
-        // 🔥 AUTO OPEN DAYS THAT ALREADY HAVE ITEMS
         const initialShowDetails = generatedDays.map((day) => {
           const items = map[day.day];
           return Array.isArray(items) && items.length > 0;

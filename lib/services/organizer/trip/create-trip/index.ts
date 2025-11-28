@@ -17,7 +17,6 @@ export const tripAPI = baseAPI.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: [TAGS.trip],
     }),
 
     // ✅ Get all Trips
@@ -53,7 +52,6 @@ export const tripAPI = baseAPI.injectEndpoints({
         body: data,
       }),
       transformResponse: (response: ApiResponse<TripResponse>) => response.data,
-      invalidatesTags: [TAGS.trip],
     }),
 
     // ✅ Delete Trip

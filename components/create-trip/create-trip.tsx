@@ -72,6 +72,7 @@ import { useSaveGroupLeaderMutation } from '@/lib/services/organizer/trip/librar
 import { useOrganizationId } from '@/hooks/useOrganizationId';
 import { validateRequiredFields } from '@/lib/utils/validateRequiredFields';
 import RequiredStar from '../common/RequiredStar';
+import { toast } from 'sonner';
 
 interface Props {
   tripId?: string;
@@ -278,7 +279,7 @@ export function CreateTrip({ tripId }: Props) {
       { key: "endDate", label: "End Date", value: formData.endDate },
       { key: "moodTags", label: "Mood Tags", value: selectedTags },
       { key: "cityTags", label: "City Tags", value: cityTags },
-  
+
     ]);
 
     const newErrors: any = { ...baseErrors };
@@ -287,16 +288,16 @@ export function CreateTrip({ tripId }: Props) {
       const start = new Date(formData.startDate).getTime();
       const end = new Date(formData.endDate).getTime();
 
-        if (end < start) {
-    newErrors.endDate = "End date cannot be before start date";
-  }
+      if (end < start) {
+        newErrors.endDate = "End date cannot be before start date";
+      }
 
       if (start === end) {
         newErrors.endDate = "End date & time cannot be same as start date & time";
       }
     }
 
-  
+
 
     if (Number(formData.minGroupSize) <= 0) {
       newErrors.minGroupSize = "Minimum group size must be greater than 0";
@@ -381,7 +382,7 @@ export function CreateTrip({ tripId }: Props) {
         if (tripId) {
           router.push(`/organizer/create-trip/${tripId}/Itinerary`);
         } else {
-          console.warn('⚠️ No tripId returned from backend');
+          console.warn(' No tripId returned from backend');
         }
       } else {
         const response = await createTrip({
@@ -398,8 +399,9 @@ export function CreateTrip({ tripId }: Props) {
       }
 
     } catch (error) {
-      console.error('❌ Trip creation failed:', error);
-      alert('Failed to create trip. Please try again.');
+      toast('Failed to create trip. Please try again.');
+    } finally {
+      setTripSaving(false);
     }
   };
 
@@ -520,7 +522,7 @@ export function CreateTrip({ tripId }: Props) {
                   onChange={(val) => {
                     handleInputChange('startDate', val);
                     clearError("startDate");
-                    
+
                   }}
                   placeholder="Select start date & time"
                   className="w-full"
@@ -767,7 +769,7 @@ export function CreateTrip({ tripId }: Props) {
                     }
                   />
                 ))}
-                
+
 
               </div>
             </div>

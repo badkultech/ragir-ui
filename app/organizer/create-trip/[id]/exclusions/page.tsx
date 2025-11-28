@@ -18,7 +18,6 @@ import {
   useGetAllExclusionsQuery,
 } from "@/lib/services/organizer/trip/exclusion";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { useLazyGetItineraryByTripIdQuery } from "@/lib/services/organizer/trip/itinerary";
 
 const DEFAULT_OPTIONS = [
   "Personal Expenses",
@@ -39,8 +38,6 @@ export default function ExclusionsPage() {
   });
 
   const [createExclusion] = useCreateExclusionMutation();
-  const [triggerGetItineraryByTripId] = useLazyGetItineraryByTripIdQuery();
-
   const [options, setOptions] = useState<string[]>(DEFAULT_OPTIONS);
   const [selected, setSelected] = useState<string[]>([]);
   const [custom, setCustom] = useState("");
@@ -104,14 +101,6 @@ export default function ExclusionsPage() {
       const orgId = organizationId;
 
       if (!orgId || !tripId) return;
-
-      console.log("🔄 Fetching itinerary before going back...");
-
-      await triggerGetItineraryByTripId({
-        organizationId: orgId,
-        tripPublicId: tripId as string,
-      }).unwrap();
-
       // Now navigate back
       router.push(`/organizer/create-trip/${tripId}/Itinerary`);
     } catch (error) {

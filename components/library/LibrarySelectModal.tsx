@@ -67,7 +67,7 @@ export function LibrarySelectModal({
 
   const organizationId = useOrganizationId();
 
-  const shouldSkip = !organizationId;
+  const shouldSkip = !organizationId || !open;
 
   const {
     data: itemsData,
