@@ -116,7 +116,15 @@ export function AddDayDescriptionForm({
         });
       }
 
-      docsManager.setDocuments(mappedDocs);
+      const updatedDocs = mappedDocs.map((doc, index) => {
+        return {
+          ...doc,
+          id: docsManager.documents?.[index]?.id ?? null,
+          markedForDeletion: docsManager.documents?.[index]?.id ? true : false,
+        };
+      });
+
+      docsManager.setDocuments(updatedDocs);
     } catch (error) {
       console.error("Failed to fetch day description:", error);
     }
