@@ -100,6 +100,8 @@ export const ENDPOINTS = {
       `/org/${organizationId}/trip/${tripPublicId}/queries`,
     TRIP_ORG_QUERIES: (organizationId: string) =>
       `/org/${organizationId}/org-trip-queries`,
+    TRIP_ORG_QUERIES_COUNT: (organizationId: string) =>
+      `/org/${organizationId}/org-trip-queries/count`,
     TRIP_QUERY_COMMENTS: (
       organizationId: string,
       tripPublicId: string,

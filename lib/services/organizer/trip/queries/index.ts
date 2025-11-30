@@ -64,6 +64,15 @@ export const tripQueryAPI = baseAPI.injectEndpoints({
       providesTags: [{ type: TAGS.tripQueries }],
     }),
 
+     getAllTripQueriesCount: builder.query<number, string>({
+      query: (organizationId) => ({
+        url: ENDPOINTS.ORGANIZER.TRIP_ORG_QUERIES_COUNT(organizationId),
+        method: "GET",
+      }),
+      transformResponse: (res: ApiResponse<number>) => res.data,
+      providesTags: [{ type: TAGS.tripQueries }],
+    }),
+
     deleteTripQuery: builder.mutation<
       { success: boolean; message?: string },
       { organizationId: string; tripPublicId: string; queryId: number | string }
@@ -139,6 +148,7 @@ export const {
   useCreateTripQueryMutation,
   useGetAllTripQueriesQuery,
   useDeleteTripQueryMutation,
+  useGetAllTripQueriesCountQuery,
 
   useGetTripQueryCommentsQuery,
   useCreateTripQueryCommentMutation,

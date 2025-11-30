@@ -20,11 +20,13 @@ import { AppHeader } from "@/components/app-header";
 import { LibraryIcon } from "@/components/library/SvgComponents/Icons";
 import { CreateTripModal } from "@/components/trip/CreateTripModal";
 import Link from "next/link";
+import { useGetAllTripQueriesCountQuery } from "@/lib/services/organizer/trip/queries";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 export default function DashboardMainContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-
+  const organizationId = useOrganizationId();
   const activities = [
     { message: 'Sarah joined “Himalayan Adventure”', time: "2 hours ago" },
     { message: "Desert Safari Expedition started", time: "5 hours ago" },
@@ -55,6 +57,14 @@ export default function DashboardMainContent() {
         "Traditional music and dance performances with local artisans and cultural workshops",
     },
   ];
+
+    const {
+      data: orgQueriesCount,
+      isLoading: isOrgLoading,
+      isError: isOrgError,
+    } = useGetAllTripQueriesCountQuery(organizationId, {
+      skip: !organizationId,
+    });
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -106,7 +116,7 @@ export default function DashboardMainContent() {
                   <MessageSquare className="w-5 h-5 text-gray-700" />
                 </div>
                 <p className="text-sm text-muted-foreground">All Queries</p>
-                <h2 className="text-2xl font-bold">42</h2>
+                <h2 className="text-2xl font-bold">{orgQueriesCount ?? 0 }</h2>
               </CardContent>
             </Card>
             </Link>
