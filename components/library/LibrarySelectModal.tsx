@@ -22,9 +22,8 @@ import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
 import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
 import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import {useGetDayDescriptionsQuery } from "@/lib/services/organizer/trip/library/day-description";
+import { useGetDayDescriptionsQuery } from "@/lib/services/organizer/trip/library/day-description";
 import { LazyImage } from "../ui/lazyImage";
-
 
 export type LibraryItem = {
   id: string;
@@ -37,7 +36,6 @@ export type LibraryItem = {
   profileImageUrl?: string;
   tagline?: string;
   name?: string;
-
 };
 
 type Category =
@@ -73,48 +71,42 @@ export function LibrarySelectModal({
     data: itemsData,
     isLoading,
     isError,
-  } =
-    category === "faqs"
-      ? useGetOrganizerFaqsQuery(
+  } = category === "faqs"
+    ? useGetOrganizerFaqsQuery(
         { organizationId },
         { skip: shouldSkip, refetchOnMountOrArgChange: true }
       )
-      : category === "transit"
-        ? useGetOrganizerTransitsQuery(
-          { organizationId },
-          { skip: shouldSkip, refetchOnMountOrArgChange: true }
-        )
-        : category === "trip-leaders"
-          ? useGetGroupLeadersQuery(organizationId ?? "", {
-            skip: shouldSkip,
-            refetchOnMountOrArgChange: true,
-          })
-
-
-          : category === "stays"
-            ? useGetStaysQuery(organizationId ?? "", {
-              skip: shouldSkip,
-              refetchOnMountOrArgChange: true,
-            })
-            : category === "meals"
-              ? useGetMealsQuery(organizationId ?? "", {
-                skip: shouldSkip,
-                refetchOnMountOrArgChange: true,
-              })
-              : category === "activities"
-                ? useGetActivitiesQuery(organizationId ?? "", {
-                  skip: shouldSkip,
-                  refetchOnMountOrArgChange: true,
-                })
-              : category === 'day-description'
-              ? useGetDayDescriptionsQuery(organizationId ?? '', {
-                  skip: shouldSkip,
-                  refetchOnMountOrArgChange: true,
-                })
-              : { data: [], isLoading: false, isError: false };
-
-
-
+    : category === "transit"
+    ? useGetOrganizerTransitsQuery(
+        { organizationId },
+        { skip: shouldSkip, refetchOnMountOrArgChange: true }
+      )
+    : category === "trip-leaders"
+    ? useGetGroupLeadersQuery(organizationId ?? "", {
+        skip: shouldSkip,
+        refetchOnMountOrArgChange: true,
+      })
+    : category === "stays"
+    ? useGetStaysQuery(organizationId ?? "", {
+        skip: shouldSkip,
+        refetchOnMountOrArgChange: true,
+      })
+    : category === "meals"
+    ? useGetMealsQuery(organizationId ?? "", {
+        skip: shouldSkip,
+        refetchOnMountOrArgChange: true,
+      })
+    : category === "activities"
+    ? useGetActivitiesQuery(organizationId ?? "", {
+        skip: shouldSkip,
+        refetchOnMountOrArgChange: true,
+      })
+    : category === "day-description"
+    ? useGetDayDescriptionsQuery(organizationId ?? "", {
+        skip: shouldSkip,
+        refetchOnMountOrArgChange: true,
+      })
+    : { data: [], isLoading: false, isError: false };
 
   const items: LibraryItem[] =
     itemsData?.map((item: any) => ({
@@ -184,10 +176,11 @@ export function LibrarySelectModal({
                         onSelect(item);
                         onClose();
                       }}
-                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${selected === item.id
+                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
+                        selected === item.id
                           ? "border-orange-500 shadow"
                           : "border-gray-200 hover:border-orange-400"
-                        }`}
+                      }`}
                     >
                       <LazyImage
                         src={item.image || "/default-avatar.png"}
@@ -223,10 +216,11 @@ export function LibrarySelectModal({
                         onSelect(item);
                         onClose();
                       }}
-                      className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${selected === item.id
+                      className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
+                        selected === item.id
                           ? "border-orange-500 shadow"
                           : "border-gray-200 hover:border-orange-400"
-                        }`}
+                      }`}
                     >
                       <div className="font-medium text-gray-900">
                         {item.title}
@@ -238,12 +232,20 @@ export function LibrarySelectModal({
                       )}
                       {item.description && (
                         <div className="text-xs text-gray-500 line-clamp-2">
-                          {item.description}
+                          <div
+                            className="prose prose-sm text-gray-500"
+                            dangerouslySetInnerHTML={{
+                              __html: item.description,
+                            }}
+                          />
                         </div>
                       )}
                       {item.answer && (
-                        <div className="text-sm text-gray-600">
-                          {item.answer}
+                        <div className="text-xs text-gray-500 line-clamp-2">
+                          <div
+                            className="prose prose-sm text-gray-500"
+                            dangerouslySetInnerHTML={{ __html: item.answer }}
+                          />
                         </div>
                       )}
                     </button>
