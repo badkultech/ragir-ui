@@ -34,7 +34,11 @@ import RichTextEditor from '@/components/editor/RichTextEditor';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
 
 // Local FAQ type with UI state
-type LocalFAQ = FAQ & { checked?: boolean };
+type LocalFAQ = FAQ & {
+  checked?: boolean;
+  isMaster?: boolean;
+};
+
 
 export default function FAQsPage() {
   const router = useRouter();
@@ -53,7 +57,7 @@ export default function FAQsPage() {
   const { data: faqsLibraryData = [] } = useGetOrganizerFaqsQuery(
     shouldSkip ? skipToken : { organizationId }
   );
-
+  const [errorMsg, setErrorMsg] = useState("");
 
   const {
     data: faqsData,
@@ -64,9 +68,9 @@ export default function FAQsPage() {
     tripPublicId: tripId as string,
   });
   useEffect(() => {
-   if (!isSaving) {
-    setDraftDisabled(false);
-  }
+    if (!isSaving) {
+      setDraftDisabled(false);
+    }
   }, [faqs, newQuestion, newAnswer]);
 
 
@@ -74,18 +78,27 @@ export default function FAQsPage() {
     if (faqsData?.data?.masterData) {
       const selectedFaqs =
         faqsData?.data?.details.map((f: FAQ) => f.question) ?? [];
-      // ensure local checked flag is present
+
       setFaqs([
-        ...faqsData.data.masterData.filter(
-          (f: FAQ) => !selectedFaqs.includes(f.question),
-        ),
-        ...faqsData?.data?.details.map((f: FAQ) => ({
+        // ⭐ MASTER DATA → read-only
+        ...faqsData.data.masterData
+          .filter((f: FAQ) => !selectedFaqs.includes(f.question))
+          .map((f: FAQ) => ({
+            ...f,
+            isMaster: true,     // <-- THIS WAS MISSING
+            isSelected: false,
+          })),
+
+        // ⭐ DETAILS → editable
+        ...faqsData.data.details.map((f: FAQ) => ({
           ...f,
+          isMaster: false,      // <-- CUSTOM / DETAILS
           isSelected: true,
         })),
       ]);
     }
   }, [faqsData]);
+
 
   const handleAddFromLibrary = (item: any) => {
     // Map library FAQ shape to local FAQ shape and close dialog
@@ -101,20 +114,17 @@ export default function FAQsPage() {
     setChooseFromLibrary(false);
   };
 
-  const updateAnswer = (id: string, answer: string | undefined) => {
+  const updateAnswer = (question: string, answer: string | undefined) => {
     setFaqs((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, answer: answer ?? '' } : f)),
+      prev.map((f) =>
+        f.question === question ? { ...f, answer: answer ?? '' } : f
+      )
     );
   };
+
 
   const handleRemoveFaq = (question: string) => {
     setFaqs((prev) => prev.filter((f) => f.question !== question));
-  };
-
-  const toggleFaqChecked = (id: string) => {
-    setFaqs((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, checked: !f.checked } : f)),
-    );
   };
 
   const handleAddFaq = () => {
@@ -134,6 +144,16 @@ export default function FAQsPage() {
   };
 
   const handleSave = async (isDraft: boolean = false) => {
+
+    const selectedFaqs = faqs.filter((faq) => faq.isSelected);
+
+    if (selectedFaqs.length === 0) {
+      setErrorMsg("Please select at least one FAQ before saving.");
+      return;
+    }
+
+    setErrorMsg("");
+
     if (isDraft) {
       setDraftDisabled(true);
     } else {
@@ -253,65 +273,75 @@ export default function FAQsPage() {
 
         <SectionCard title='Trip Preparation & FAQs'>
           <div className='space-y-6'>
+            {errorMsg && (
+              <div className="p-3 mb-3 text-red-600 bg-red-100 border border-red-300 rounded">
+                {errorMsg}
+              </div>
+            )}
+
             {/* FAQ LIST */}
             <Accordion type='single' collapsible className='w-full space-y-2'>
-              {faqs.map((faq) => (
-                <AccordionItem
-                  key={faq.question}
-                  value={faq.question ?? ''}
-                  className={`relative group rounded-lg border bg-background px-2 sm:px-4 ${faq.isSelected ? 'bg-sky-50' : ''
-                    }`}
-                >
-                  <div className=' flex justify-between items-center'>
-                    <div className='flex items-center gap-2'>
-                      <Input
-                        className='w-4 h-4'
-                        size={10}
-                        type='checkbox'
-                        checked={faq.isSelected ?? false}
-                        onChange={(e) => {
-                          const updatedFaq = faqs.map((f) => {
-                            if (f.question === faq.question) {
-                              return {
-                                ...f,
-                                isSelected: e.target.checked,
-                              };
-                            }
-                            return f;
-                          });
-                          setFaqs(updatedFaq);
-                        }}
-                      />
-                      {faq.question}
-                    </div>
-                    <AccordionTrigger></AccordionTrigger>
-                  </div>
-
-                  {/* Remove (X) icon in the top-right of the item */}
-                  <button
-                    type='button'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFaq(faq.question ?? '');
-                    }}
-                    aria-label={`Remove ${faq.question}`}
-                    className='absolute top-[-10px] right-[-9px] p-1 rounded hover:bg-red-50 text-gray-500 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-100 opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto'
+              {faqs.map((faq) => {
+                const isMaster = faqsData?.data?.masterData?.some(
+                  (m: any) => m.question === faq.question
+                );
+                return (
+                  <AccordionItem
+                    key={faq.question}
+                    value={faq.question}
+                    className={`relative group rounded-lg border bg-background px-2 sm:px-4 ${faq.isSelected ? "bg-sky-50" : ""
+                      }`}
                   >
-                    <X className='h-4 w-4' />
-                  </button>
+                    <div className="flex justify-between items-center py-2">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          className="w-4 h-4"
+                          type="checkbox"
+                          checked={faq.isSelected}
+                          onChange={(e) => {
+                            const updatedFaqs = faqs.map((f) =>
+                              f.question === faq.question
+                                ? { ...f, isSelected: e.target.checked }
+                                : f
+                            );
+                            setFaqs(updatedFaqs);
+                            if (e.target.checked) setErrorMsg("");
+                          }}
+                        />
 
-                  <AccordionContent className='pt-2 pb-4'>
-                    <div className='border border-gray-200 rounded-lg p-2'>
-                      <RichTextEditor
-                        value={faq.answer}
-                        onChange={(val) =>
-                          updateAnswer(faq.question ?? '', val)
-                        }
-                      />
+                        <span className="font-medium">{faq.question}</span>
+                      </div>
+
+                      <AccordionTrigger />
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFaq(faq.question);
+                      }}
+                      className="absolute top-[-10px] right-[-9px] p-1 rounded hover:bg-red-50 text-gray-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <AccordionContent className="pt-2 pb-4">
+                      {isMaster ? (
+                        <div className="border border-gray-300 bg-gray-50 rounded-lg p-3 text-sm text-gray-700">
+                          <div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                        </div>
+                      ) : (
+                        <div className="border border-gray-200 rounded-lg p-2">
+                          <RichTextEditor
+                            value={faq.answer}
+                            onChange={(val) => updateAnswer(faq.question, val)}
+                          />
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+
             </Accordion>
 
             {/* ADD NEW FAQ */}
