@@ -128,35 +128,35 @@ export function OrganizerSidebar({
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className='fixed inset-0 bg-black/40 z-40 md:hidden'
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`bg-[#F3F3F3] fixed md:static top-0 left-0 z-50 min-h-screen md:w-[18.2%] max-w-[320px] border-r border-gray-200 flex flex-col transform transition-transform duration-300
+        className={`bg-[#F3F3F3] fixed md:static top-0 left-0 z-50 min-h-screen md:w-[16%] max-w-[280px] border-r border-gray-200 flex flex-col transform transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         {/* Mobile close button */}
-        <div className='flex items-center justify-between p-4 md:hidden'>
-          {showLogo && <img src='/logo.png' alt='Ragir' className='h-8' />}
+        <div className="flex items-center justify-between p-3 md:hidden">
+          {showLogo && <img src="/logo.png" alt="Ragir" className="h-7" />}
           <button
             onClick={onClose}
-            className='p-2 rounded-md hover:bg-gray-100'
+            className="p-2 rounded-md hover:bg-gray-100"
           >
-            <X className='w-6 h-6 text-gray-600' />
+            <X className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
         {/* Logo (desktop) */}
         {showLogo && (
-          <div className='hidden md:block p-6 border-b border-gray-100'>
-            <img src='/logo.png' alt='Ragir' className='h-8' />
+          <div className="hidden md:block p-4 border-b border-gray-100">
+            <img src="/logo.png" alt="Ragir" className="h-7" />
           </div>
         )}
 
         {/* Navigation */}
-        <nav className='p-3 space-y-3 overflow-y-auto'>
+        <nav className="p-2 space-y-2 overflow-y-auto">
           {nav.map(({ label, href, icon: Icon, children }) => {
             const active = isActive(href);
             const hasChildren = !!children;
@@ -178,46 +178,44 @@ export function OrganizerSidebar({
                 >
                   {/* Label Section */}
                   {hasChildren ? (
-                    <div className='flex flex-1 items-center gap-3 px-4 py-3'>
-                      <Icon
-                        className={[
-                          'w-5 h-5',
-                          active ? 'text-white' : 'text-gray-700',
-                        ].join(' ')}
-                      />
-                      <span className='font-medium text-[1rem]'>{label}</span>
-                    </div>
-                  ) : (
                     <Link
                       href={href || '#'}
-                      className='group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all'
+                      className="flex flex-1 items-center gap-2.5 px-3 py-2.5"
                     >
                       <Icon
                         className={[
-                          'w-5 h-5',
-                          active
-                            ? 'text-white'
-                            : 'text-gray-700 group-hover:text-gray-900',
+                          'w-4 h-4',
+                          active ? 'text-white' : 'text-gray-700',
                         ].join(' ')}
                       />
-                      <span className='font-medium text-[1rem]'>{label}</span>
+                      <span className="font-medium text-[0.875rem]">{label}</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href={href || '#'}
+                      className="group relative flex flex-1 items-center gap-2.5 rounded-lg px-3 py-2.5 transition-all"
+                    >
+                      <Icon
+                        className={[
+                          'w-4 h-4',
+                          active ? 'text-white' : 'text-gray-700 group-hover:text-gray-900',
+                        ].join(' ')}
+                      />
+                      <span className="font-medium text-[0.875rem]">{label}</span>
                     </Link>
                   )}
-
                   {/* Chevron for expandable items */}
                   {hasChildren && (
-                    <div className='pr-3 transition-transform duration-200'>
+                    <div className="pr-3 transition-transform duration-200">
                       {open[label] ? (
                         <ChevronDown
-                          className={`w-5 h-5 ${
-                            active ? 'text-white' : 'text-gray-700'
-                          }`}
+                          className={`w-4 h-4 ${active ? 'text-white' : 'text-gray-700'
+                            }`}
                         />
                       ) : (
                         <ChevronRight
-                          className={`w-5 h-5 ${
-                            active ? 'text-white' : 'text-gray-700'
-                          }`}
+                          className={`w-4 h-4 ${active ? 'text-white' : 'text-gray-700'
+                            }`}
                         />
                       )}
                     </div>
@@ -226,8 +224,8 @@ export function OrganizerSidebar({
 
                 {/* Submenu Section */}
                 {hasChildren && open[label] && (
-                  <div className='bg-gray-100 rounded-[8px] mt-1'>
-                    <div className='mx-2 py-2 space-y-2'>
+                  <div className="bg-gray-100 rounded-[8px] mt-1">
+                    <div className="mx-2 py-2 space-y-1.5">
                       {children.map(({ label, href, icon: ChildIcon }) => {
                         const childActive = isActive(href);
                         return (
@@ -235,13 +233,13 @@ export function OrganizerSidebar({
                             key={href}
                             href={href || '#'}
                             className={[
-                              'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all',
+                              'flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[0.8rem] transition-all',
                               childActive
                                 ? 'bg-gray-50 text-gray-900 font-medium'
                                 : 'text-gray-600 hover:bg-gray-50',
                             ].join(' ')}
                           >
-                            <ChildIcon className='w-4 h-4' />
+                            <ChildIcon className="w-3.5 h-3.5" />
                             <span>{label}</span>
                           </Link>
                         );
@@ -254,7 +252,7 @@ export function OrganizerSidebar({
           })}
         </nav>
 
-        <div className='mt-auto p-6'>
+        <div className="mt-auto p-4">
           <LogoutButton />
         </div>
       </aside>
