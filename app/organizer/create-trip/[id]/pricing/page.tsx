@@ -20,14 +20,10 @@ import { AppHeader } from '@/components/app-header';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 
 import {
-  useLazyGetPricingQuery,
   useCreatePricingMutation,
   useUpdatePricingMutation,
   useGetPricingQuery,
 } from '@/lib/services/organizer/trip/pricing';
-import { tr } from 'date-fns/locale';
-import { useSelector } from 'react-redux';
-import { selectAuthState } from '@/lib/slices/auth';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
 import { CustomDateTimePicker } from '@/components/ui/date-time-picker';
 
@@ -41,7 +37,8 @@ type Row = {
 export default function PricingPage() {
   const router = useRouter();
   const params = useParams();
-const tripId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const tripId = Array.isArray(params.id) ? params.id[0] : params.id;
+
   const [gst, setGst] = useState<GstValue>('excludes');
   const [credit, setCredit] = useState({ card: true, emi: false });
   const [mode, setMode] = useState<PricingMode>('simple');
@@ -64,86 +61,102 @@ const tripId = Array.isArray(params.id) ? params.id[0] : params.id;
     { particular: 'Price Particular', values: ['600', '900'] },
     { particular: 'Price Particular', values: ['800', '1100'] },
   ]);
-        const organizationId = useOrganizationId();
-      
+
+  const organizationId = useOrganizationId();
+
   const [createPricing] = useCreatePricingMutation();
   const [updatePricing] = useUpdatePricingMutation();
-  const  {data : pricingData}= useGetPricingQuery({
+  const { data: pricingData } = useGetPricingQuery({
     organizationId,
     tripPublicId: tripId as string,
   });
-// apply pricingData to UI
-useEffect(() => {
-  if (!pricingData) return;
-console.log(pricingData)
-  setPrice(String(pricingData.basePrice ?? ''));
-  setDiscount(String(pricingData.discountPercent ?? ''));
-  setDiscountUntil(pricingData.discountValidUntil || '');
+  const [isSavingNext, setIsSavingNext] = useState(false);
+  const [draftDisabled, setDraftDisabled] = useState(false);
 
-  setGst(pricingData.includesGst ? 'includes' : 'excludes');
+  useEffect(() => {
+    if (!isSavingNext) {
+      setDraftDisabled(false);
+    }
+  }, [price, discount, discountUntil, depositPercent, gst, credit, policy, addOns, mode, rows, columns, isSavingNext]);
 
-  setDepositPercent(String(pricingData.depositRequiredPercent ?? ''));
+  useEffect(() => {
+    if (!pricingData) return;
+    console.log(pricingData);
 
-  setCredit({
-    card: pricingData.creditOptions === 'CREDIT_CARD',
-    emi: pricingData.creditOptions === 'EMI',
-  });
+    setPrice(String(pricingData.basePrice ?? ''));
+    setDiscount(String(pricingData.discountPercent ?? ''));
+    setDiscountUntil(pricingData.discountValidUntil || '');
 
-  setPolicy(pricingData.cancellationPolicy || '');
+    setGst(pricingData.includesGst ? 'includes' : 'excludes');
 
-  setAddOns(
-    (pricingData.addOns || []).map((a: any) => ({
-      id: String(a.id),
-      name: a.name,
-      charge: Number(a.charge),
-    }))
-  );
+    setDepositPercent(String(pricingData.depositRequiredPercent ?? ''));
 
-}, [pricingData]);
-
-
-
- const handleSavePricing = async () => {
-  if (!tripId) return;
-
-  try {
-    const fd = new FormData();
-
-    fd.append("discountPercent", String(Number(discount || 0)));
-    fd.append("discountValidUntil", discountUntil || "");
-    fd.append("includesGst", gst === "includes" ? "true" : "false");
-    fd.append("depositRequiredPercent", String(Number(depositPercent || 0)));
-    fd.append("creditOptions", credit.card ? "CREDIT_CARD" : "EMI");
-    fd.append("cancellationPolicy", policy || "");
-    fd.append("basePrice", String(Number(price || 0)));
-    addOns.forEach((addon, index) => {
-      fd.append(`addOns[${index}].id`, addon.id);
-      fd.append(`addOns[${index}].name`, addon.name);
-      fd.append(`addOns[${index}].charge`, String(addon.charge));
+    setCredit({
+      card: pricingData.creditOptions === 'CREDIT_CARD',
+      emi: pricingData.creditOptions === 'EMI',
     });
 
-    if (!pricingData) {
-      await createPricing({
-        organizationId,
-        tripPublicId: tripId,
-        data: fd as any,
+    setPolicy(pricingData.cancellationPolicy || '');
+
+    setAddOns(
+      (pricingData.addOns || []).map((a: any) => ({
+        id: String(a.id),
+        name: a.name,
+        charge: Number(a.charge),
+      })),
+    );
+  }, [pricingData]);
+
+  const handleSavePricing = async (isDraft: boolean = false) => {
+    if (!tripId) return;
+
+    try {
+      if (isDraft) {
+        setDraftDisabled(true);
+      } else {
+        setIsSavingNext(true);
+      }
+
+      const fd = new FormData();
+
+      fd.append('discountPercent', String(Number(discount || 0)));
+      fd.append('discountValidUntil', discountUntil || '');
+      fd.append('includesGst', gst === 'includes' ? 'true' : 'false');
+      fd.append('depositRequiredPercent', String(Number(depositPercent || 0)));
+      fd.append('creditOptions', credit.card ? 'CREDIT_CARD' : 'EMI');
+      fd.append('cancellationPolicy', policy || '');
+      fd.append('basePrice', String(Number(price || 0)));
+
+      addOns.forEach((addon, index) => {
+        fd.append(`addOns[${index}].id`, addon.id);
+        fd.append(`addOns[${index}].name`, addon.name);
+        fd.append(`addOns[${index}].charge`, String(addon.charge));
       });
-    } else {
-      await updatePricing({
-        organizationId,
-        tripPublicId: tripId,
-        data: fd as any,
-      });
+
+      if (!pricingData) {
+        await createPricing({
+          organizationId,
+          tripPublicId: tripId,
+          data: fd as any,
+        }).unwrap();
+      } else {
+        await updatePricing({
+          organizationId,
+          tripPublicId: tripId,
+          data: fd as any,
+        }).unwrap();
+      }
+      if (!isDraft) {
+        router.push(`/organizer/create-trip/${tripId}/review`);
+      }
+    } catch (e) {
+      console.error('Pricing save error', e);
+      if (isDraft) setDraftDisabled(false);
+    } finally {
+      if (!isDraft) setIsSavingNext(false);
     }
+  };
 
-    router.push(`/organizer/create-trip/${tripId}/review`);
-  } catch (e) {
-    console.error("Pricing save error", e);
-  }
-};
-
-
-  // Dynamic Handlers
   const addRow = () => {
     setRows([
       ...rows,
@@ -269,10 +282,10 @@ console.log(pricingData)
                   {/* ADD ONS */}
                   <AddOnsFieldset value={addOns} onChange={setAddOns} />
 
-                  {/* Dynamic Pricing (unchanged) */}
+                  {/* Dynamic Pricing (placeholder) */}
                   {mode === 'dynamic' && (
                     <div className='mb-6 overflow-x-auto'>
-                      {/* TABLE CODE UNCHANGED */}
+                      {/* yahan tum apna dynamic pricing table rakhoge (abhi unchanged) */}
                     </div>
                   )}
                 </CardContent>
@@ -284,11 +297,12 @@ console.log(pricingData)
             </div>
           </div>
 
-          {/* NEXT → POST/PUT PRICING */}
           <WizardFooter
             onPrev={() => router.push(`/organizer/create-trip/${tripId}/faqs`)}
-            onDraft={() => console.log('Draft saved')}
-            onNext={handleSavePricing}
+            onDraft={() => handleSavePricing(true)}
+            onNext={() => handleSavePricing(false)}
+            loading={isSavingNext}
+            draftDisabled={draftDisabled}
           />
         </main>
       </div>

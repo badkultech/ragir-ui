@@ -45,14 +45,14 @@ export default function FAQsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isChooseFromLibrary, setChooseFromLibrary] = useState(false);
   const [selectedFaq, setSelectedFaq] = useState<any>(null);
-
+  const [draftDisabled, setDraftDisabled] = useState(false);
   const organizationId = useOrganizationId();
-
+  const [isSaving, setIsSaving] = useState(false);
   const [createFaq] = useCreateFaqMutation();
   const shouldSkip = !organizationId || !isChooseFromLibrary;
   const { data: faqsLibraryData = [] } = useGetOrganizerFaqsQuery(
-  shouldSkip ? skipToken : { organizationId }
-);
+    shouldSkip ? skipToken : { organizationId }
+  );
 
 
   const {
@@ -63,6 +63,12 @@ export default function FAQsPage() {
     organizationId,
     tripPublicId: tripId as string,
   });
+  useEffect(() => {
+   if (!isSaving) {
+    setDraftDisabled(false);
+  }
+  }, [faqs, newQuestion, newAnswer]);
+
 
   useEffect(() => {
     if (faqsData?.data?.masterData) {
@@ -127,31 +133,41 @@ export default function FAQsPage() {
     setNewAnswer('');
   };
 
-  const handleNext = async () => {
+  const handleSave = async (isDraft: boolean = false) => {
+    if (isDraft) {
+      setDraftDisabled(true);
+    } else {
+      setIsSaving(true);
+    }
+
     try {
       const fd = new FormData();
-      console.log(
-        faqs.filter((faq) => faq.isSelected),
-        'selected faqa',
-      );
       faqs
         .filter((faq) => faq.isSelected)
         .forEach((faq, index) => {
           fd.append(`details[${index}].question`, faq.question);
           fd.append(`details[${index}].answer`, faq.answer);
-          fd.append(`details[${index}].category`, 'DEFAULT');
+          fd.append(`details[${index}].category`, "DEFAULT");
         });
+
       await createFaq({
         organizationId: organizationId,
         tripPublicId: tripId as string,
         data: fd,
       });
 
-      router.push(`/organizer/create-trip/${tripId}/pricing`);
-    } catch (error) {
-      console.error('Error saving FAQs:', error);
+      if (!isDraft) {
+        router.push(`/organizer/create-trip/${tripId}/pricing`);
+      }
+
+    } catch (err) {
+      console.error("Error saving FAQs:", err);
+      if (isDraft) setDraftDisabled(false);
+    } finally {
+      if (!isDraft) setIsSaving(false);
     }
   };
+
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -339,12 +355,13 @@ export default function FAQsPage() {
         </SectionCard>
 
         <WizardFooter
-          onPrev={() =>
-            router.push(`/organizer/create-trip/${tripId}/exclusions`)
-          }
-          onDraft={() => console.log('Draft saved')}
-          onNext={handleNext}
+          onPrev={() => router.push(`/organizer/create-trip/${tripId}/exclusions`)}
+          onDraft={() => handleSave(true)}
+          onNext={() => handleSave(false)}
+          draftDisabled={draftDisabled}
+          loading={isSaving}
         />
+
       </div>
     </div>
   );

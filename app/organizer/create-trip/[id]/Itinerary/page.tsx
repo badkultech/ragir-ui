@@ -58,6 +58,11 @@ export default function ItineraryPage() {
     startingPoint: "",
     endPoint: "",
   });
+  const [saveDraftDisabled, setSaveDraftDisabled] = useState(false);
+
+  useEffect(() => {
+    setSaveDraftDisabled(false);
+  }, [startingPoint, endPoint, startDate, endDate, pdfFile, dayItemsMap]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -215,14 +220,17 @@ export default function ItineraryPage() {
   };
 
 
-  const handleUpdateItinerary = async () => {
-    if (!validateItinerary()) {
-      console.log("❌ Itinerary validation failed");
-      return;
+  const handleUpdateItinerary = async (isDraft: boolean = false) => {
+    if (!isDraft) {
+      if (!validateItinerary()) return;
     }
+
     if (!organizationId || !tripId) return;
+
     try {
-      setIsSavingNext(true);
+      if (!isDraft) setIsSavingNext(true);
+      else setSaveDraftDisabled(true);
+
       const fd = new FormData();
       fd.append("startPoint", startingPoint);
       fd.append("endPoint", endPoint);
@@ -231,8 +239,8 @@ export default function ItineraryPage() {
       fd.append("startTime", formatTime(new Date(startDate)));
       fd.append("endTime", formatTime(new Date(endDate)));
 
+      // 👍 Your existing PDF logic (unchanged)
       if (pdfFile) {
-
         if (itineraryMeta?.id && itineraryMeta?.markedForDeletion) {
           fd.append("itineraryPdf.id", itineraryMeta.id?.toString() ?? "");
           fd.append("itineraryPdf.markedForDeletion", "true");
@@ -246,25 +254,34 @@ export default function ItineraryPage() {
       else if (itineraryMeta?.markedForDeletion) {
         fd.append("itineraryPdf.id", itineraryMeta.id?.toString() ?? "");
         fd.append("itineraryPdf.markedForDeletion", "true");
-
-      } else if (itineraryMeta?.url) {
+      }
+      else if (itineraryMeta?.url) {
         fd.append("itineraryPdf.id", itineraryMeta.id?.toString() ?? "");
         fd.append("itineraryPdf.type", itineraryMeta.type ?? "PDF");
         fd.append("itineraryPdf.url", itineraryMeta.url ?? "");
         fd.append("itineraryPdf.markedForDeletion", "false");
-
       } else {
         fd.append("itineraryPdf.id", "");
       }
 
-      await updateItinerary({ organizationId, tripPublicId: tripId as string, data: fd as unknown as any }).unwrap();
-      router.push(`/organizer/create-trip/${tripId}/exclusions`);
+      await updateItinerary({
+        organizationId,
+        tripPublicId: tripId as string,
+        data: fd as unknown as any,
+      }).unwrap();
+
+      if (!isDraft) {
+        router.push(`/organizer/create-trip/${tripId}/exclusions`);
+      }
+
     } catch (err) {
-      console.error("❌ Failed to update itinerary:", err);
+      console.error("❌ Failed:", err);
+      if (isDraft) setSaveDraftDisabled(false);
     } finally {
-      setIsSavingNext(false);
+      if (!isDraft) setIsSavingNext(false);
     }
   };
+
 
   return (
     <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
@@ -420,7 +437,14 @@ export default function ItineraryPage() {
             </div>
           </div>
           <div className="pr-9">
-            <WizardFooter onPrev={handlePrevClick} onDraft={() => console.log("Draft itinerary saved")} onNext={handleUpdateItinerary} loading={isSavingNext} />
+            <WizardFooter
+              onPrev={handlePrevClick}
+              onDraft={() => handleUpdateItinerary(true)}
+              onNext={() => handleUpdateItinerary(false)}
+              loading={isSavingNext}
+              draftDisabled={saveDraftDisabled}
+            />
+
           </div>
         </div>
       </div>

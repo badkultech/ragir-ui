@@ -45,8 +45,11 @@ export default function ExclusionsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const mergedOptions = Array.from(new Set([...options, ...customOptions]));
   const [isSaving, setIsSaving] = useState(false);
+  const [draftDisabled, setDraftDisabled] = useState(false);
 
-
+  useEffect(() => {
+  setDraftDisabled(false);
+}, [selected, customOptions, options, custom]);
 
   useEffect(() => {
     if (apiExclusions?.masterData) {
@@ -71,8 +74,9 @@ export default function ExclusionsPage() {
     setCustom("");
   };
 
-  const handleSave = async () => {
-    setIsSaving(true); 
+  const handleSave = async (isDraft: boolean = false) => {
+     if (isDraft) setDraftDisabled(true);
+    setIsSaving(true);
 
     const fd = new FormData();
     selected.forEach((value, index) => {
@@ -87,11 +91,14 @@ export default function ExclusionsPage() {
         data: fd,
       }).unwrap();
 
-      router.push(`/organizer/create-trip/${tripId}/faqs`);
+      if (!isDraft) {
+        router.push(`/organizer/create-trip/${tripId}/faqs`);
+      }
+
     } catch (err) {
       console.error("Error saving exclusions:", err);
     } finally {
-      setIsSaving(false); 
+      setIsSaving(false);
     }
   };
 
@@ -105,7 +112,6 @@ export default function ExclusionsPage() {
       router.push(`/organizer/create-trip/${tripId}/Itinerary`);
     } catch (error) {
       console.error("❌ Failed fetching itinerary:", error);
-      router.push(`/organizer/create-trip/${tripId}/Itinerary`);
     }
   };
 
@@ -156,10 +162,12 @@ export default function ExclusionsPage() {
           </div>
           <WizardFooter
             onPrev={handlePrev}
-            onDraft={() => console.log("Draft exclusions:", selected)}
-            onNext={handleSave}
-            loading={isSaving}
+            onDraft={() => handleSave(true)} 
+            onNext={() => handleSave(false)}
+            draftDisabled={draftDisabled}
+            loading={isSaving}  
           />
+
         </div>
       </div>
     </div>
