@@ -72,7 +72,7 @@ import { useSaveGroupLeaderMutation } from '@/lib/services/organizer/trip/librar
 import { useOrganizationId } from '@/hooks/useOrganizationId';
 import { validateRequiredFields } from '@/lib/utils/validateRequiredFields';
 import RequiredStar from '../common/RequiredStar';
-import { toast } from 'sonner';
+import { toast } from "@/hooks/use-toast";
 
 interface Props {
   tripId?: string;
@@ -96,6 +96,8 @@ export function CreateTrip({ tripId }: Props) {
   const [leaderSaving, setLeaderSaving] = useState(false);
   const [tripSaving, setTripSaving] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [saveDraftDisabled, setSaveDraftDisabled] = useState(false);
+
 
 
 
@@ -202,6 +204,9 @@ export function CreateTrip({ tripId }: Props) {
     useLazyGetTripByIdQuery();
   const [saveLeader] = useSaveGroupLeaderMutation();
 
+  useEffect(() => {
+    setSaveDraftDisabled(false);
+  }, [formData, selectedTags, cityTags, leaders]);
 
   useEffect(() => {
     if (!tripId || !organizationId) return;
@@ -330,13 +335,12 @@ export function CreateTrip({ tripId }: Props) {
 
 
 
-  const handleSaveTrip = async () => {
-
+  const handleSaveTrip = async (isDraft = false) => {
     if (!validateForm()) {
-      console.log(" Validation failed");
+      setTripSaving(false);
       return;
     }
-    setTripSaving(true)
+    setTripSaving(true);
 
     try {
       const startDateObj = new Date(formData.startDate);
@@ -367,39 +371,40 @@ export function CreateTrip({ tripId }: Props) {
       data.append('minAge', formData.minAge.toString());
       data.append('maxAge', formData.maxAge.toString());
       data.append('highlights', formData.tripHighlights);
-      data.append('moodTags', JSON.stringify(selectedTags));
-      data.append('cityTags', JSON.stringify(cityTags));
-      // data.append('groupLeaderId', selectedGroupLeaderId);
+      selectedTags.forEach(tag => {
+        data.append("moodTags[]", tag);
+      });
+      cityTags.forEach(city => {
+        data.append("cityTags[]", city);
+      });
       leaders.forEach((leader) => {
         data.append("groupLeaderIds", leader.id.toString());
       });
-      if (tripId) {
-        await updateTrip({
-          organizationId,
-          tripId,
-          data,
-        }).unwrap();
-        if (tripId) {
-          router.push(`/organizer/create-trip/${tripId}/Itinerary`);
-        } else {
-          console.warn(' No tripId returned from backend');
-        }
-      } else {
-        const response = await createTrip({
-          organizationId,
-          data,
-        }).unwrap();
-        const tripId = response?.data.publicId;
+      
+      let createdTripId = tripId;
 
-        if (tripId) {
-          router.push(`/organizer/create-trip/${tripId}/Itinerary`);
-        } else {
-          console.warn('⚠️ No tripId returned from backend');
-        }
+      if (tripId) {
+        await updateTrip({ organizationId, tripId, data }).unwrap();
+      } else {
+        const response = await createTrip({ organizationId, data }).unwrap();
+        createdTripId = response?.data?.publicId;
+      }
+      if (!isDraft && createdTripId) {
+        router.push(`/organizer/create-trip/${createdTripId}/Itinerary`);
       }
 
-    } catch (error) {
-      toast('Failed to create trip. Please try again.');
+    } catch (err: any) {
+      const backendMessage =
+        err?.data?.message ||
+        err?.data?.error ||
+        err?.error ||
+        "Something went wrong.";
+
+      toast({
+        toastType: "error",
+        title: "Error",
+        description: backendMessage,
+      });
     } finally {
       setTripSaving(false);
     }
@@ -801,10 +806,8 @@ export function CreateTrip({ tripId }: Props) {
                     {cityTags.map((tag) => (
                       <span
                         key={tag}
-                        onClick={() => {
-                          dispatch(setCityInput(tag));
-                        }}
-                        className='inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-sm cursor-pointer hover:bg-blue-100 transition'
+                        className='inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 
+               text-blue-700 rounded-full text-sm cursor-default hover:bg-blue-100 transition'
                       >
                         {tag}
                         <button
@@ -812,12 +815,13 @@ export function CreateTrip({ tripId }: Props) {
                             e.stopPropagation();
                             removeCityTag(tag);
                           }}
-                          className='ml-1 text-blue-500 hover:text-blue-700'
+                          className='ml-1 text-blue-500 hover:text-blue-700 cursor-pointer'
                         >
                           ×
                         </button>
                       </span>
                     ))}
+
                   </div>
                 )}
                 {errors.cityTags && (
@@ -921,29 +925,41 @@ export function CreateTrip({ tripId }: Props) {
           </div>
 
           <div className='flex items-center gap-4 mt-10 justify-end-safe'>
-            <Button className='px-8 py-2 rounded-full border border-gray-300 text-gray-500 font-medium bg-white hover:bg-gray-50 transition'>
+            <Button
+              onClick={async () => {
+                if (saveDraftDisabled) return;
+
+                setSaveDraftDisabled(true);
+
+                if (tripSaving) return;
+                setTripSaving(true);
+
+                await handleSaveTrip(true);
+              }}
+
+              disabled={saveDraftDisabled}
+              className='px-8 py-2 rounded-full border border-gray-300 text-gray-500 font-medium bg-white hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed'
+            >
               Save as Draft
             </Button>
             <Button
               onClick={async () => {
                 if (tripSaving) return;
                 setTripSaving(true);
-                await handleSaveTrip();
+                await handleSaveTrip(false);
               }}
               disabled={tripSaving || createTripLoading || updateTripLoading}
               className={`
-    px-8 py-2 rounded-full font-medium text-white 
-    bg-gradient-to-r from-orange-400 to-pink-500 shadow
-    flex items-center gap-2 transition
-    ${tripSaving || createTripLoading || updateTripLoading
+                          px-8 py-2 rounded-full font-medium text-white 
+                          bg-gradient-to-r from-orange-400 to-pink-500 shadow
+                          flex items-center gap-2 transition
+                          ${tripSaving || createTripLoading || updateTripLoading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:from-orange-500 hover:to-pink-600"
                 }
-  `}
+                        `}
             >
-              {tripSaving || createTripLoading || updateTripLoading
-                ? "Saving..."
-                : "Save & Next"}
+              {tripSaving || createTripLoading || updateTripLoading ? "Saving..." : "Save & Next"}
 
               <svg
                 className='w-5 h-5'
@@ -959,7 +975,6 @@ export function CreateTrip({ tripId }: Props) {
                 />
               </svg>
             </Button>
-
           </div>
         </div>
         {/* ✅ Add Leader Modal */}
@@ -1004,7 +1019,7 @@ export function CreateTrip({ tripId }: Props) {
 
                     dispatch(
                       setLeaders([
-                        ...leaders.filter(l => String(l.id) !== String(savedLeader.id)), // ❌ remove old if exists
+                        ...leaders.filter(l => String(l.id) !== String(savedLeader.id)),
                         {
                           id: String(savedLeader.id),
                           title: savedLeader.name || "Untitled",
