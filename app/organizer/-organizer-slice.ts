@@ -27,7 +27,7 @@ export interface TripFormData {
   maxAge: number;
   tripHighlights: string;
 }
- 
+
 export interface OrganizerSliceState {
   // Organizer Profile State
   profile: Profile;
@@ -81,11 +81,7 @@ export const initialOrganizerSliceState: OrganizerSliceState = {
     maxAge: 50,
     tripHighlights: '',
   },
-  cityTags: [
-    'Jaipur',
-    'Mumbai',
-    'Pune',
-  ],
+  cityTags: [],
 };
 
 export const organizerSlice = createSlice({
