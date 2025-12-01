@@ -1,5 +1,6 @@
 // lib/services/index.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { API_BASE_URL } from "@/lib/config/apiConfig";
 import { TAGS } from './tags';
 import type {
   BaseQueryFn,
@@ -13,8 +14,7 @@ import { withFullLoader } from '@/lib/utils/withFullLoader';
 import type { RootState } from '../slices/store';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://ragir.badkultech.com/ragir/api',
-  // baseUrl: 'http://localhost:8085/ragir/api',
+  baseUrl: API_BASE_URL,
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.accessToken;
     if (token) headers.set('Authorization', `Bearer ${token}`);
@@ -88,8 +88,7 @@ export const baseAPI = createApi({
 
 // Public API (no token)
 const publicBaseQuery = fetchBaseQuery({
-  baseUrl: 'https://ragir.badkultech.com/ragir/api',
-    // baseUrl: 'http://localhost:8085/ragir/api',
+  baseUrl: API_BASE_URL,
 });
 export const publicBaseAPI = createApi({
   reducerPath: 'publicBaseAPI',
