@@ -46,10 +46,11 @@ export default function ExclusionsPage() {
   const mergedOptions = Array.from(new Set([...options, ...customOptions]));
   const [isSaving, setIsSaving] = useState(false);
   const [draftDisabled, setDraftDisabled] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-  setDraftDisabled(false);
-}, [selected, customOptions, options, custom]);
+    setDraftDisabled(false);
+  }, [selected, customOptions, options, custom]);
 
   useEffect(() => {
     if (apiExclusions?.masterData) {
@@ -75,7 +76,13 @@ export default function ExclusionsPage() {
   };
 
   const handleSave = async (isDraft: boolean = false) => {
-     if (isDraft) setDraftDisabled(true);
+    if (selected.length === 0) {
+      setErrorMsg("Please select at least one exclusion before saving.");
+      return;
+    }
+
+    setErrorMsg("");
+    if (isDraft) setDraftDisabled(true);
     setIsSaving(true);
 
     const fd = new FormData();
@@ -130,10 +137,19 @@ export default function ExclusionsPage() {
           <div className={isSaving ? "pointer-events-none opacity-50" : ""}>
             <SectionCard title="Exclusions">
               <div className="space-y-6">
+                {errorMsg && (
+                  <p className="text-red-500 text-sm mb-3">{errorMsg}</p>
+                )}
+
                 <PillCheckboxGroup
                   options={mergedOptions}
                   value={selected ?? []}
-                  onChange={setSelected}
+                  onChange={(val) => {
+                    setSelected(val);
+                    if (val.length > 0) {
+                      setErrorMsg("");
+                    }
+                  }}
                 />
 
                 <div className="space-y-2">
@@ -162,10 +178,10 @@ export default function ExclusionsPage() {
           </div>
           <WizardFooter
             onPrev={handlePrev}
-            onDraft={() => handleSave(true)} 
+            onDraft={() => handleSave(true)}
             onNext={() => handleSave(false)}
             draftDisabled={draftDisabled}
-            loading={isSaving}  
+            loading={isSaving}
           />
 
         </div>
