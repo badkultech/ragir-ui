@@ -277,6 +277,13 @@ export function CreateTrip({ tripId }: Props) {
 
   }, [tripData]);
 
+  const getTodayStr = () => {
+    const t = new Date()
+    // t.setDate(t.getDate() + 1) // disable today as well
+    const pad = (n: number) => n.toString().padStart(2, "0")
+    return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`
+  }
+
   const validateForm = () => {
     const baseErrors = validateRequiredFields([
       { key: "tripTitle", label: "Trip Title", value: formData.tripTitle },
@@ -380,7 +387,7 @@ export function CreateTrip({ tripId }: Props) {
       leaders.forEach((leader) => {
         data.append("groupLeaderIds", leader.id.toString());
       });
-      
+
       let createdTripId = tripId;
 
       if (tripId) {
@@ -524,9 +531,14 @@ export function CreateTrip({ tripId }: Props) {
                 </Label>
                 <CustomDateTimePicker
                   value={formData.startDate}
+                  stepMinutes={15}
+                  minDate={getTodayStr()}
                   onChange={(val) => {
                     handleInputChange('startDate', val);
                     clearError("startDate");
+                    if (!formData.endDate) {
+                      handleInputChange("endDate", val);
+                    }
 
                   }}
                   placeholder="Select start date & time"
@@ -549,6 +561,8 @@ export function CreateTrip({ tripId }: Props) {
                     handleInputChange('endDate', val);
                     clearError("endDate");
                   }}
+                  minDate={formData.startDate || getTodayStr()}
+                  stepMinutes={15}
                   placeholder="Select end date & time"
                   className="w-full"
                 />

@@ -13,14 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton"; // for loading state
 import { useGetOrganizerFaqsQuery } from "@/lib/services/organizer/trip/library/faq";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import { useGetOrganizerTransitsQuery } from "@/lib/services/organizer/trip/library/transit";
 import { useGetGroupLeadersQuery } from "@/lib/services/organizer/trip/library/leader";
 import { useGetStaysQuery } from "@/lib/services/organizer/trip/library/stay";
 import { useGetMealsQuery } from "@/lib/services/organizer/trip/library/meal";
 import { useGetActivitiesQuery } from "@/lib/services/organizer/trip/library/activity";
-import { useLazyGetItineraryDayDetailsQuery } from "@/lib/services/organizer/trip/itinerary/day-details";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useGetDayDescriptionsQuery } from "@/lib/services/organizer/trip/library/day-description";
 import { LazyImage } from "../ui/lazyImage";
@@ -72,41 +69,41 @@ export function LibrarySelectModal({
     isLoading,
     isError,
   } = category === "faqs"
-    ? useGetOrganizerFaqsQuery(
+      ? useGetOrganizerFaqsQuery(
         { organizationId },
         { skip: shouldSkip, refetchOnMountOrArgChange: true }
       )
-    : category === "transit"
-    ? useGetOrganizerTransitsQuery(
-        { organizationId },
-        { skip: shouldSkip, refetchOnMountOrArgChange: true }
-      )
-    : category === "trip-leaders"
-    ? useGetGroupLeadersQuery(organizationId ?? "", {
-        skip: shouldSkip,
-        refetchOnMountOrArgChange: true,
-      })
-    : category === "stays"
-    ? useGetStaysQuery(organizationId ?? "", {
-        skip: shouldSkip,
-        refetchOnMountOrArgChange: true,
-      })
-    : category === "meals"
-    ? useGetMealsQuery(organizationId ?? "", {
-        skip: shouldSkip,
-        refetchOnMountOrArgChange: true,
-      })
-    : category === "activities"
-    ? useGetActivitiesQuery(organizationId ?? "", {
-        skip: shouldSkip,
-        refetchOnMountOrArgChange: true,
-      })
-    : category === "day-description"
-    ? useGetDayDescriptionsQuery(organizationId ?? "", {
-        skip: shouldSkip,
-        refetchOnMountOrArgChange: true,
-      })
-    : { data: [], isLoading: false, isError: false };
+      : category === "transit"
+        ? useGetOrganizerTransitsQuery(
+          { organizationId },
+          { skip: shouldSkip, refetchOnMountOrArgChange: true }
+        )
+        : category === "trip-leaders"
+          ? useGetGroupLeadersQuery(organizationId ?? "", {
+            skip: shouldSkip,
+            refetchOnMountOrArgChange: true,
+          })
+          : category === "stays"
+            ? useGetStaysQuery(organizationId ?? "", {
+              skip: shouldSkip,
+              refetchOnMountOrArgChange: true,
+            })
+            : category === "meals"
+              ? useGetMealsQuery(organizationId ?? "", {
+                skip: shouldSkip,
+                refetchOnMountOrArgChange: true,
+              })
+              : category === "activities"
+                ? useGetActivitiesQuery(organizationId ?? "", {
+                  skip: shouldSkip,
+                  refetchOnMountOrArgChange: true,
+                })
+                : category === "day-description"
+                  ? useGetDayDescriptionsQuery(organizationId ?? "", {
+                    skip: shouldSkip,
+                    refetchOnMountOrArgChange: true,
+                  })
+                  : { data: [], isLoading: false, isError: false };
 
   const items: LibraryItem[] =
     itemsData?.map((item: any) => ({
@@ -132,23 +129,28 @@ export function LibrarySelectModal({
       onClose();
     }
   };
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-2xl max-h-[90vh] overflow-y-auto sm:rounded-2xl">
-        <DialogHeader>
-          <DialogTitle>Add from Library</DialogTitle>
-        </DialogHeader>
+      {/* DialogContent: constrained height + flex column so footer stays visible */}
+      <DialogContent className="w-full max-w-2xl sm:rounded-2xl rounded-2xl overflow-hidden max-h-[90vh] flex flex-col p-0">
+        {/* HEADER + SEARCH (not sticky now — layout handles scroll) */}
+        <div className="px-4 pt-4 pb-3 bg-white/95 dark:bg-slate-900/95 border-b border-gray-200 z-20">
+          <DialogHeader>
+            <DialogTitle>Add from Library</DialogTitle>
+          </DialogHeader>
 
-        <div className="flex flex-col gap-4">
-          {/* 🔍 Search */}
-          <Input
-            placeholder="Search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="mt-3">
+            <Input
+              placeholder="Search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
 
-          {/* Loading state */}
+        {/* SCROLLABLE LIST: flex-1 so it takes remaining space and scrolls */}
+        <div className="flex-1 overflow-y-auto px-4 py-6">
+          {/* Loading */}
           {isLoading && (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -157,12 +159,10 @@ export function LibrarySelectModal({
             </div>
           )}
 
-          {/* Error state */}
-          {isError && (
-            <p className="text-sm text-red-500">Failed to load items</p>
-          )}
+          {/* Error */}
+          {isError && <p className="text-sm text-red-500">Failed to load items</p>}
 
-          {/* Items list */}
+          {/* Items */}
           {!isLoading && !isError && (
             <>
               {category === "trip-leaders" ? (
@@ -176,11 +176,10 @@ export function LibrarySelectModal({
                         onSelect(item);
                         onClose();
                       }}
-                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
-                        selected === item.id
-                          ? "border-orange-500 shadow"
-                          : "border-gray-200 hover:border-orange-400"
-                      }`}
+                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${selected === item.id
+                        ? "border-orange-500 shadow"
+                        : "border-gray-200 hover:border-orange-400"
+                        }`}
                     >
                       <LazyImage
                         src={item.image || "/default-avatar.png"}
@@ -188,18 +187,12 @@ export function LibrarySelectModal({
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <div>
-                        <div className="font-medium text-gray-900">
-                          {item.title}
-                        </div>
+                        <div className="font-medium text-gray-900">{item.title}</div>
                         {item.description && (
-                          <div className="text-sm text-gray-600">
-                            "{item.description}"
-                          </div>
+                          <div className="text-sm text-gray-600">"{item.description}"</div>
                         )}
                         {item.answer && (
-                          <div className="text-sm text-gray-600">
-                            "{item.answer}"
-                          </div>
+                          <div className="text-sm text-gray-600">"{item.answer}"</div>
                         )}
                       </div>
                     </button>
@@ -216,27 +209,18 @@ export function LibrarySelectModal({
                         onSelect(item);
                         onClose();
                       }}
-                      className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
-                        selected === item.id
-                          ? "border-orange-500 shadow"
-                          : "border-gray-200 hover:border-orange-400"
-                      }`}
+                      className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${selected === item.id
+                        ? "border-orange-500 shadow"
+                        : "border-gray-200 hover:border-orange-400"
+                        }`}
                     >
-                      <div className="font-medium text-gray-900">
-                        {item.title}
-                      </div>
-                      {item.location && (
-                        <div className="text-sm text-gray-600">
-                          {item.location}
-                        </div>
-                      )}
+                      <div className="font-medium text-gray-900">{item.title}</div>
+                      {item.location && <div className="text-sm text-gray-600">{item.location}</div>}
                       {item.description && (
                         <div className="text-xs text-gray-500 line-clamp-2">
                           <div
                             className="prose prose-sm text-gray-500"
-                            dangerouslySetInnerHTML={{
-                              __html: item.description,
-                            }}
+                            dangerouslySetInnerHTML={{ __html: item.description }}
                           />
                         </div>
                       )}
@@ -250,16 +234,18 @@ export function LibrarySelectModal({
                       )}
                     </button>
                   ))}
-                  {filteredItems.length === 0 && (
-                    <p className="text-sm text-gray-500">No items found</p>
-                  )}
+                  {filteredItems.length === 0 && <p className="text-sm text-gray-500">No items found</p>}
                 </div>
               )}
             </>
           )}
+
+          {/* small spacer so final item doesn't butt up to footer */}
+          <div className="h-4" />
         </div>
 
-        <DialogFooter>
+        {/* FOOTER — outside the scroll area so it remains visible */}
+        <DialogFooter className="px-4 py-3 border-t bg-white">
           <DialogClose asChild>
             <Button variant="outline" className="rounded-full px-6">
               Cancel

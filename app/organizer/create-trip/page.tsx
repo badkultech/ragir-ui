@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import { AppHeader } from '@/components/app-header';
-import { useParams } from 'next/navigation';
 import { TripStepperHeader } from '@/components/create-trip/tripStepperHeader';
 
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
@@ -14,10 +13,10 @@ export default function Page() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
   const state = useSelector(organizerState);
-  const {cityTags} = state;
+  const { cityTags } = state;
 
-useEffect(() => {
-  
+  useEffect(() => {
+
     dispatch(setFormData({
       tripTitle: "",
       startDate: "",
@@ -33,8 +32,8 @@ useEffect(() => {
     dispatch(setCityTags(cityTags));
     dispatch(setLeaders([]));
     dispatch(setSelectedGroupLeaderId(""));
-  
-}, []);  
+
+  }, []);
   return (
     <div className='flex min-h-screen bg-gray-50'>
       {/* Sidebar */}
@@ -45,7 +44,7 @@ useEffect(() => {
       <div className='flex-1'>
         <AppHeader title='Organizers' />
         <TripStepperHeader activeStep={1} />
-       <CreateTrip />
+        <CreateTrip />
       </div>
     </div>
   );

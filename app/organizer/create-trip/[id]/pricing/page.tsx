@@ -256,6 +256,7 @@ export default function PricingPage() {
                         mode='date'
                         value={discountUntil}
                         onChange={setDiscountUntil}
+                        stepMinutes={15}
                       />
 
                       <Label>GST Status *</Label>

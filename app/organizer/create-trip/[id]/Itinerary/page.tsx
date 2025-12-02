@@ -358,6 +358,7 @@ export default function ItineraryPage() {
                               <CustomDateTimePicker
                                 value={startDate}
                                 onChange={setStartDate}
+                                stepMinutes={15}
                                 placeholder="Select start date & time"
                                 className="w-full"
                               />
@@ -425,6 +426,7 @@ export default function ItineraryPage() {
                     <CustomDateTimePicker
                       value={endDate}
                       onChange={setEndDate}
+                      stepMinutes={15}
                       placeholder="Select end date & time"
                       className="w-full"
                     />
