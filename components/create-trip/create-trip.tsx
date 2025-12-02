@@ -321,8 +321,8 @@ export function CreateTrip({ tripId }: Props) {
       newErrors.minGroupSize = "Minimum group size cannot exceed maximum";
       newErrors.maxGroupSize = "Maximum group size must be greater than minimum";
     }
-    if (Number(formData.minAge) <= 0) {
-      newErrors.minAge = "Minimum age must be greater than 0";
+    if (Number(formData.minAge) < 18) {
+      newErrors.minAge = "Minimum age must be 18 or above";
     }
     if (Number(formData.maxAge) <= 0) {
       newErrors.maxAge = "Maximum age must be greater than 0";
@@ -429,10 +429,15 @@ export function CreateTrip({ tripId }: Props) {
       : currentValue - 1;
 
     if (field === "minAge") {
-      newValue = Math.max(18, newValue);
-    } else {
-      newValue = Math.max(0, newValue);
+      newValue = Math.max(18, Math.min(100, newValue));
     }
+    else if (field === "maxAge") {
+      newValue = Math.max(0, Math.min(100, newValue));
+    }
+    else if (field === "minGroupSize" || field === "maxGroupSize") {
+      newValue = Math.max(0, Math.min(100, newValue));
+    }
+
 
     dispatch(setFormData({ ...formData, [field]: newValue }));
   };
@@ -600,31 +605,30 @@ export function CreateTrip({ tripId }: Props) {
                 <div className='relative'>
                   <Input
                     value={formData.minGroupSize.toString().padStart(2, '0')}
-                    readOnly
+                    min={2}
+                    max={100}
+                    onChange={(e) => {
+                      let val = Number(e.target.value);
+                      if (val > 100) val = 100;
+                      handleInputChange('minGroupSize', val);
+                      clearError("minGroupSize");
+                      clearError("maxGroupSize");
+                    }}
                     className='pr-8 text-center'
                   />
 
                   <div className='absolute right-2 top-1/2 -translate-y-1/2 flex flex-col'>
                     <button
-                      onClick={() => {
-                        handleNumberChange('minGroupSize', true);
-                        clearError("minGroupSize");
-                        clearError("maxGroupSize");
-                      }}
-
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+                      onClick={() => handleNumberChange('minGroupSize', true)}
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▲
+                      <span className="scale-[0.9]">▲</span>
                     </button>
                     <button
-                      onClick={() => {
-                        handleNumberChange('minGroupSize', false);
-                        clearError("minGroupSize");
-                        clearError("maxGroupSize");
-                      }}
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+                      onClick={() => handleNumberChange('minGroupSize', false)}
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▼
+                      <span className="scale-[0.9]">▼</span>
                     </button>
                   </div>
 
@@ -641,30 +645,30 @@ export function CreateTrip({ tripId }: Props) {
                 <div className='relative'>
                   <Input
                     value={formData.maxGroupSize.toString().padStart(2, '0')}
-                    readOnly
+                    min={formData.minGroupSize}
+                    max={100}
+                    onChange={(e) => {
+                      let val = Number(e.target.value);
+                      if (val > 100) val = 100;
+                      handleInputChange('maxGroupSize', val);
+                      clearError("maxGroupSize");
+                      clearError("minGroupSize");
+                    }}
                     className='pr-8 text-center'
                   />
 
                   <div className='absolute right-2 top-1/2 -translate-y-1/2 flex flex-col'>
                     <button
-                      onClick={() => {
-                        handleNumberChange('maxGroupSize', true);
-                        clearError("maxGroupSize");
-                        clearError("minGroupSize");
-                      }}
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+                      onClick={() => handleNumberChange('maxGroupSize', true)}
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▲
+                      <span className="scale-[0.9]">▲</span>
                     </button>
                     <button
-                      onClick={() => {
-                        handleNumberChange('maxGroupSize', false);
-                        clearError("maxGroupSize");
-                        clearError("minGroupSize");
-                      }}
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+                      onClick={() => handleNumberChange('maxGroupSize', false)}
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▼
+                      <span className="scale-[0.9]">▼</span>
                     </button>
                   </div>
 
@@ -685,7 +689,15 @@ export function CreateTrip({ tripId }: Props) {
                 <div className='relative'>
                   <Input
                     value={formData.minAge.toString().padStart(2, '0')}
-                    readOnly
+                    min={18}
+                    max={100}
+                    onChange={(e) => {
+                      let val = Number(e.target.value);
+                      if (val > 100) val = 100;
+                      handleInputChange("minAge", val);
+                      clearError("minAge");
+                      clearError("maxAge");
+                    }}
                     className='pr-8 text-center'
                   />
 
@@ -693,24 +705,20 @@ export function CreateTrip({ tripId }: Props) {
                     <button
                       onClick={() => {
                         handleNumberChange('minAge', true);
-                        clearError("minAge");
-                        clearError("maxAge");
                       }}
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▲
+                      <span className="scale-[0.9]">▲</span>
                     </button>
                     <button
                       onClick={() => {
                         handleNumberChange('minAge', false);
-                        clearError("minAge");
-                        clearError("maxAge");
                       }}
 
                       disabled={formData.minAge <= 18}
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▼
+                      <span className="scale-[0.9]">▼</span>
                     </button>
                   </div>
                 </div>
@@ -726,7 +734,15 @@ export function CreateTrip({ tripId }: Props) {
                 <div className='relative'>
                   <Input
                     value={formData.maxAge.toString().padStart(2, '0')}
-                    readOnly
+                    min={formData.minAge}
+                    max={100}
+                    onChange={(e) => {
+                      let val = Number(e.target.value);
+                      if (val > 100) val = 100;
+                      handleInputChange("maxAge", val);
+                      clearError("minAge");
+                      clearError("maxAge");
+                    }}
                     className='pr-8 text-center'
                   />
 
@@ -734,23 +750,20 @@ export function CreateTrip({ tripId }: Props) {
                     <button
                       onClick={() => {
                         handleNumberChange('maxAge', true);
-                        clearError("maxAge");
-                        clearError("minAge");
                       }}
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▲
+                      <span className="scale-[0.9]">▲</span>
                     </button>
                     <button
                       onClick={() => {
                         handleNumberChange('maxAge', false);
-                        clearError("maxAge");
-                        clearError("minAge");
                       }}
-                      disabled={formData.maxAge <= formData.minAge}
-                      className='h-3 w-3 flex items-center justify-center hover:bg-gray-100 rounded text-xs'
+
+                      disabled={formData.maxAge <= 18}
+                      className="h-4 flex items-center justify-center hover:bg-gray-100 rounded text-xs cursor-pointer"
                     >
-                      ▼
+                      <span className="scale-[0.9]">▼</span>
                     </button>
                   </div>
                 </div>
