@@ -236,6 +236,8 @@ export function AddStayForm({
           <option value="SINGLE">Single Occupancy</option>
           <option value="DOUBLE">Double Occupancy</option>
           <option value="TRIPLE">Triple Occupancy</option>
+          <option value="DORMITORY">Dormitory</option>
+
         </select>
 
         {errors.sharingType && <p className="text-xs text-red-500 mt-1">{errors.sharingType}</p>}
