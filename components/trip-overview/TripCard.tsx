@@ -20,7 +20,8 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
       // UPCOMING / ACTIVE TRIPS
       case "upcoming":
         return (
-          <>
+          <div className="flex items-center gap-2 w-full">
+
             <Button
               variant="outline"
               size="sm"
@@ -29,13 +30,18 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
               <PlusCircle size={16} />
               Create Similar Trip
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 border-gray-200 text-gray-800 hover:bg-gray-50 h-10 px-4 rounded-lg"
-            >
-              <Edit size={15} /> Edit
-            </Button>
+
+            <Link href={`/organizer/create-trip/${trip.id}`}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 border-gray-200 text-gray-800 hover:bg-gray-50 h-10 px-4 rounded-lg"
+              >
+                <Edit size={15} />
+                Edit
+              </Button>
+            </Link>
+
             <Button
               variant="outline"
               size="sm"
@@ -44,6 +50,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
             >
               <Archive size={15} /> Archive
             </Button>
+
             <Button
               variant="outline"
               size="sm"
@@ -52,7 +59,9 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
             >
               <Trash2 size={18} />
             </Button>
-          </>
+
+          </div>
+
         );
 
       // PAST TRIPS
@@ -84,14 +93,14 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
           <>
             {/* Continue Editing — full width button */}
             <Link href={`/organizer/create-trip/${trip.id}`}
-            className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg"
-            >
-              <Edit size={15} /> Continue Editing
-            </Button>
+              className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg"
+              >
+                <Edit size={15} /> Continue Editing
+              </Button>
             </Link>
 
             {/* Delete — icon-only button */}
@@ -154,17 +163,16 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
             {trip.title}
           </h2>
           <span
-            className={`text-xs font-medium px-3 py-1 rounded-md ${
-              trip.status === "Published"
-                ? "bg-green-50 text-green-600"
-                : trip.status === "Under Review"
+            className={`text-xs font-medium px-3 py-1 rounded-md ${trip.status === "Published"
+              ? "bg-green-50 text-green-600"
+              : trip.status === "Under Review"
                 ? "bg-yellow-50 text-yellow-600"
                 : trip.status === "Requires Modification"
-                ? "bg-red-50 text-red-600"
-                : trip.status === "Draft"
-                ? "bg-gray-100 text-gray-600"
-                : "bg-gray-100 text-gray-600"
-            }`}
+                  ? "bg-red-50 text-red-600"
+                  : trip.status === "Draft"
+                    ? "bg-gray-100 text-gray-600"
+                    : "bg-gray-100 text-gray-600"
+              }`}
           >
             {trip.status}
           </span>
