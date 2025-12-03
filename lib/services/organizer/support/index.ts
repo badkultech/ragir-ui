@@ -38,9 +38,12 @@ export interface ApiResponse<T> {
 export const ticketAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 Get all tickets for user
-    getAllTickets: builder.query<TicketDTO[], string>({
-      query: (userId) => ({
-        url: `${ENDPOINTS.ORGANIZER.TICKETS(userId)}/all`,
+    getAllTickets: builder.query<
+      TicketDTO[],
+      { userId: string; organizationId: string }
+    >({
+      query: ({userId, organizationId}) => ({
+        url: `${ENDPOINTS.ORGANIZER.TICKETS(userId, organizationId)}/all`,
         method: "GET",
       }),
       transformResponse: (res: ApiResponse<TicketDTO[]>) => res.data,
@@ -60,10 +63,10 @@ export const ticketAPI = baseAPI.injectEndpoints({
     // 🔹 Create new ticket
     createTicket: builder.mutation<
       TicketDTO,
-      { userId: string; data: TicketDTO }
+      { userId: string; organizationId: string; data: TicketDTO }
     >({
-      query: ({ userId, data }) => ({
-        url: `${ENDPOINTS.ORGANIZER.TICKETS(userId)}`,
+      query: ({ userId, organizationId, data }) => ({
+        url: `${ENDPOINTS.ORGANIZER.TICKETS(userId, organizationId)}`,
         method: "POST",
         body: data,
       }),
@@ -72,10 +75,7 @@ export const ticketAPI = baseAPI.injectEndpoints({
     }),
 
     // 🔹 Update ticket
-    updateTicket: builder.mutation<
-      TicketDTO,
-      { id: number; data: TicketDTO }
-    >({
+    updateTicket: builder.mutation<TicketDTO, { id: number; data: TicketDTO }>({
       query: ({ id, data }) => ({
         url: `${ENDPOINTS.ORGANIZER.TICKET_BY_ID(id)}`,
         method: "PUT",
@@ -100,10 +100,7 @@ export const ticketAPI = baseAPI.injectEndpoints({
     }),
 
     // 🔹 Delete ticket
-    deleteTicket: builder.mutation<
-      { success: boolean },
-      { id: number }
-    >({
+    deleteTicket: builder.mutation<{ success: boolean }, { id: number }>({
       query: ({ id }) => ({
         url: `${ENDPOINTS.ORGANIZER.TICKET_BY_ID(id)}`,
         method: "DELETE",

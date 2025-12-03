@@ -109,7 +109,7 @@ export const ENDPOINTS = {
     ) => `/org/${organizationId}/trip/${tripPublicId}/queries/${queryId}/comments`,
     TRIP_ORG_LEADS: (organizationId: string) =>
       `/org/${organizationId}/org-trip-leads`,
-    TICKETS: (userId: string) => `/org/${userId}/ticket`,
+    TICKETS: (userId: string, organizationId: string) => `/org/${organizationId}/user/${userId}/ticket`,
     TICKET_BY_ID: (id: number | string) => `/org/ticket/${id}`,
     TICKET_COMMENT: (ticketId: number | string) =>
       `/org/ticket/${ticketId}/comment`,
