@@ -25,6 +25,8 @@ export interface TicketDTO {
   raisedBy?: UserDTO;
   assignedTo?: UserDTO;
   ticketComments?: TicketCommentDTO[];
+  createdDate?: string;
+  updatedDate?: string;
 }
 
 export interface ApiResponse<T> {
