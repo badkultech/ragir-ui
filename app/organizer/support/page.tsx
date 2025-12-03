@@ -13,10 +13,15 @@ import { useSelector } from "react-redux"
 import { selectAuthState } from "@/lib/slices/auth"
 import { useAddCommentMutation, useGetAllTicketsQuery } from "@/lib/services/organizer/support"
 import { TicketIcon } from "@/components/library/SvgComponents/Icons"
+import { useOrganizationId } from "@/hooks/useOrganizationId"
 
 export default function SupportCenter() {
+  const organizationId = useOrganizationId();
   const { userData } = useSelector(selectAuthState)
-  const { data: tickets = [], isLoading } = useGetAllTicketsQuery(userData?.userPublicId || "")
+  const { data: tickets = [], isLoading } = useGetAllTicketsQuery({
+    userId: userData?.userPublicId ?? "",
+    organizationId: organizationId ?? ""
+  })
   const [filter, setFilter] = useState<"All" | "Open" | "In Progress" | "Resolved">("All")
   const [SidebarOpen, setSidebarOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
