@@ -20,7 +20,7 @@ export default function SupportCenter() {
   const { userData } = useSelector(selectAuthState)
   const { data: tickets = [], isLoading } = useGetAllTicketsQuery({
     userId: userData?.userPublicId ?? "",
-    organizationId: organizationId ?? ""
+    organizationId: organizationId ?? ""    sdfsdf
   })
   const [filter, setFilter] = useState<"All" | "Open" | "In Progress" | "Resolved">("All")
   const [SidebarOpen, setSidebarOpen] = useState(false)
