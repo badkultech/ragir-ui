@@ -1,7 +1,6 @@
-// components/ui/date-time-picker.tsx
 "use client"
 
-import React, { forwardRef, useEffect, useRef, useState, useImperativeHandle } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Calendar, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
@@ -15,28 +14,16 @@ interface Props {
   minDate?: string // Format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM"
 }
 
-// The type of methods exposed by the picker ref
-export type DateTimePickerHandle = {
-  open: () => void
-  close: () => void
-  focus: () => void
-  isOpen: () => boolean
-}
-
-export const CustomDateTimePicker = forwardRef<DateTimePickerHandle, Props>(function CustomDateTimePicker(
-  {
-    value,
-    onChange,
-    placeholder = "Select date & time",
-    className = "",
-    mode = "datetime",
-    stepMinutes = 15,
-    minDate,
-  },
-  ref,
-) {
+export function CustomDateTimePicker({
+  value,
+  onChange,
+  placeholder = "Select date & time",
+  className = "",
+  mode = "datetime",
+  stepMinutes = 15,
+  minDate,
+}: Props) {
   const wrapperRef = useRef<HTMLDivElement | null>(null)
-  const inputRef = useRef<HTMLInputElement | null>(null)
   const [open, setOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [hourDropdownOpen, setHourDropdownOpen] = useState(false)
@@ -112,20 +99,6 @@ export const CustomDateTimePicker = forwardRef<DateTimePickerHandle, Props>(func
     document.addEventListener("mousedown", onDoc)
     return () => document.removeEventListener("mousedown", onDoc)
   }, [])
-
-  // Expose imperative methods
-  useImperativeHandle(ref, () => ({
-    open: () => setOpen(true),
-    close: () => {
-      setOpen(false)
-      setHourDropdownOpen(false)
-      setMinuteDropdownOpen(false)
-    },
-    focus: () => {
-      inputRef.current?.focus()
-    },
-    isOpen: () => open,
-  }), [open])
 
   const hours = Array.from({ length: 24 }, (_, i) => pad(i))
   const minutes = Array.from({ length: Math.ceil(60 / Math.max(1, stepMinutes)) }, (_, i) =>
@@ -225,51 +198,46 @@ export const CustomDateTimePicker = forwardRef<DateTimePickerHandle, Props>(func
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-  // Helper: format selected date/time to show dd/mm/yyyy hh:mm AM/PM (12-hour)
-  const formatTo12HourDisplay = () => {
+  const formatted = (() => {
     if (!selectedDate) return ""
     if (mode === "date") {
       const [y, mo, da] = selectedDate.split("-")
       const d = new Date(Number(y), Number(mo) - 1, Number(da))
       return d.toLocaleDateString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit" })
     }
-    const year = Number(selectedDate.slice(0, 4))
-    const month = Number(selectedDate.slice(5, 7))
-    const day = Number(selectedDate.slice(8, 10))
-    const hour24 = Number(selectedHour)
-    const minute = Number(selectedMinute)
-
-    const dateObj = new Date(year, month - 1, day, hour24, minute)
-
-    const dd = pad(dateObj.getDate())
-    const mm = pad(dateObj.getMonth() + 1)
-    const yyyy = dateObj.getFullYear()
-
-    let hh = dateObj.getHours()
-    const ampm = hh >= 12 ? "PM" : "AM"
-    hh = hh % 12
-    if (hh === 0) hh = 12
-    const hhStr = pad(hh)
-    const minStr = pad(dateObj.getMinutes())
-
-    return `${dd}/${mm}/${yyyy} ${hhStr}:${minStr} ${ampm}`
-  }
+    const d = new Date(
+      Number(selectedDate.slice(0, 4)),
+      Number(selectedDate.slice(5, 7)) - 1,
+      Number(selectedDate.slice(8, 10)),
+      Number(selectedHour),
+      Number(selectedMinute),
+    )
+    return d.toLocaleString("en-GB", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+  })()
 
   const calendarDays = generateCalendarDays()
 
   const isDateDisabled = (dateStr: string): boolean => {
     if (!minDate) return false
+
+    // Extract just the date part from minDate if it contains time
     const minDateOnly = minDate.includes("T") ? minDate.split("T")[0] : minDate
+
+    // Compare dates as strings (YYYY-MM-DD format sorts correctly)
     return dateStr <= minDateOnly
   }
-
-  const formatted = formatTo12HourDisplay()
 
   return (
     <div ref={wrapperRef} className={`relative ${className}`}>
       <div className="relative flex items-center">
         <Input
-          ref={inputRef}
           type="text"
           value={formatted}
           placeholder={placeholder}
@@ -408,7 +376,4 @@ export const CustomDateTimePicker = forwardRef<DateTimePickerHandle, Props>(func
       )}
     </div>
   )
-})
-
-CustomDateTimePicker.displayName = "CustomDateTimePicker"
-export default CustomDateTimePicker
+}
