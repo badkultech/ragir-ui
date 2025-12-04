@@ -13,6 +13,7 @@ export const MountainIcon = ({
     width={width}
     height={height}
     fill='none'
+    viewBox="0 0 24 24"
   >
     <path
       d='M7 1L11 9L16 4L21 19H1L7 1Z'
