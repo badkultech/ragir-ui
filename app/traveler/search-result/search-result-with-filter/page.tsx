@@ -191,34 +191,43 @@ export default function SearchResultsWithFilters() {
                             </>
                         )}
                     </div>
+                    {/* Filter Highlight Section - stays inline, not centered */}
+                    <div className="flex-1 flex items-center justify-between bg-[#fff6f2] rounded-xl px-4 py-3">
 
-                    {/* Divider */}
-                    <div className="h-6 w-px bg-[#e5e3e0]" />
-
-                    {/* Showing Results For */}
-                    <span className="text-sm text-[#6b6b6b]">Showing results for:</span>
-
-                    {/* Active Filters */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                        {filters.map((filter) => (
-                            <span
-                                key={filter.id}
-                                className="inline-flex items-center gap-1 px-3 py-1 bg-[#f5f3f0] rounded-full text-xs font-medium text-[#4d4d4d]"
-                            >
-                                {filter.label}
-                                <button onClick={() => removeFilter(filter.id)} className="hover:text-[#e07a5f] transition-colors">
-                                    <X className="w-3 h-3" />
-                                </button>
+                        {/* Left Side */}
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <span className="text-sm text-[#6b6b6b] font-medium">
+                                Showing results for:
                             </span>
-                        ))}
-                    </div>
 
-                    {/* Clear All */}
-                    {filters.length > 0 && (
-                        <button onClick={clearAllFilters} className="text-xs font-medium text-[#e07a5f] hover:underline ml-auto">
-                            Clear all filters
-                        </button>
-                    )}
+                            <div className="flex items-center gap-2 flex-wrap">
+                                {filters.map((filter) => (
+                                    <span
+                                        key={filter.id}
+                                        className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-[#e5e3e0] rounded-full text-xs font-medium text-[#4d4d4d]"
+                                    >
+                                        {filter.label}
+                                        <button
+                                            onClick={() => removeFilter(filter.id)}
+                                            className="hover:text-[#e07a5f] transition-colors"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Clear All */}
+                        {filters.length > 0 && (
+                            <button
+                                onClick={clearAllFilters}
+                                className="text-xs font-medium text-[#e07a5f] hover:underline whitespace-nowrap"
+                            >
+                                Clear all filters
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 

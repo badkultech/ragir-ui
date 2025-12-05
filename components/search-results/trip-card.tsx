@@ -14,7 +14,9 @@ interface TripCardProps {
   price: number | null
   badge: string
   badgeColor: string
+  badgeIcon?: React.ComponentType<any>  // ⭐ Add this
   image: string
+  
 }
 
 export function TripCard({
@@ -27,12 +29,13 @@ export function TripCard({
   price,
   badge,
   badgeColor,
+  badgeIcon: BadgeIcon,  // ⭐ Destructure icon
   image,
 }: TripCardProps) {
   return (
     <div className="bg-card rounded-2xl overflow-hidden border border-border min-w-[260px] md:min-w-0 flex-shrink-0 hover:shadow-lg transition cursor-pointer">
       
-      {/* Image Section */}
+      {/* Image */}
       <div className="relative h-36 md:h-40">
         <Image
           src={image || "/darjeeling-tea-gardens.png"}
@@ -41,20 +44,22 @@ export function TripCard({
           className="object-cover"
         />
 
-        {/* Badge */}
+        {/* Badge with ICON */}
         <div
-          className={`absolute bottom-3 left-3 px-3 py-1 rounded-full text-xs font-medium text-white ${badgeColor}`}
+          className={`absolute bottom-3 left-3 px-3 py-1 rounded-full text-xs font-medium text-white flex items-center gap-1 ${badgeColor}`}
         >
+          {BadgeIcon && <BadgeIcon className="w-3.5 h-3.5 text-white" />} 
           {badge}
         </div>
       </div>
 
       {/* Content */}
       <div className="p-4">
-
-        {/* ⭐ Title + Rating in SAME LINE */}
+        {/* Title + Rating */}
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-semibold text-foreground text-sm line-clamp-1">{title}</h4>
+          <h4 className="font-semibold text-foreground text-sm line-clamp-1">
+            {title}
+          </h4>
 
           {rating && (
             <div className="flex items-center gap-1 bg-[#fff7ec] px-2 py-1 rounded-full border border-[#f4a261]/40">
@@ -66,8 +71,8 @@ export function TripCard({
 
         {/* Location */}
         <div className="flex items-start gap-1.5 mb-2">
-          <MapPin className="w-3.5 h-3.5 mt-0.5 text-[#d95531]  " />
-          <p className="text-xs  text-black">
+          <MapPin className="w-3.5 h-3.5 mt-0.5 text-[#d95531]" />
+          <p className="text-xs text-black">
             {location}
             <span className="text-primary"> {subLocation}</span>
           </p>
@@ -75,13 +80,13 @@ export function TripCard({
 
         {/* Days */}
         <div className="flex items-center gap-1.5 mb-2">
-          <Calendar className="w-3.5 h-3.5 text-[#d95531] " />
+          <Calendar className="w-3.5 h-3.5 text-[#d95531]" />
           <span className="text-xs text-black">{days}</span>
         </div>
 
         {/* Dates */}
         <div className="flex items-center gap-1.5 mb-3">
-          <Calendar className="w-3.5 h-3.5 text-[#d95531] " />
+          <Calendar className="w-3.5 h-3.5 text-[#d95531]" />
           <span className="text-xs text-black">{dates}</span>
         </div>
 

@@ -58,6 +58,7 @@ const skygazeTrips = [
     dates: "15 Dec - 20 Dec",
     price: 12999,
     badge: "Skygaze",
+    badgeIcon: Sun,
     badgeColor: "bg-[#3d5a4c]",
     image: "/hampi-ruins-temples.png",
   },
@@ -72,6 +73,7 @@ const skygazeTrips = [
     price: 12999,
     badge: "Skygaze",
     badgeColor: "bg-[#3d5a4c]",
+    badgeIcon: Sun,
     image: "/stargazing-camping-night.jpg",
   },
   {
@@ -85,6 +87,7 @@ const skygazeTrips = [
     price: null,
     badge: "Skygaze",
     badgeColor: "bg-[#3d5a4c]",
+    badgeIcon: Sun,
     image: "/mountain-night-sky-milky-way.jpg",
   },
 ]
@@ -101,6 +104,7 @@ const adventureTrips = [
     price: 12999,
     badge: "Adventure",
     badgeColor: "bg-[#e07a5f]",
+    badgeIcon: Compass,
     image: "/himalayan-trekking-adventure-mountains.jpg",
   },
   {
@@ -114,6 +118,7 @@ const adventureTrips = [
     price: 12999,
     badge: "Adventure",
     badgeColor: "bg-[#e07a5f]",
+    badgeIcon: Compass,
     image: "/mountain-climbing-adventure.png",
   },
   {
@@ -127,6 +132,7 @@ const adventureTrips = [
     price: null,
     badge: "Adventure",
     badgeColor: "bg-[#e07a5f]",
+    badgeIcon: Compass,
     image: "/adventure-camping-trekking.jpg",
   },
 ]
@@ -143,6 +149,7 @@ const weekendTrips = [
     price: 12999,
     badge: "Weekend",
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
+    badgeIcon: Calendar,
     image: "/goa-beach-sunset-weekend-getaway.jpg",
   },
   {
@@ -156,6 +163,7 @@ const weekendTrips = [
     price: 12999,
     badge: "Weekend",
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
+    badgeIcon: Calendar,
     image: "/beach-resort-weekend-trip.jpg",
   },
   {
@@ -168,6 +176,7 @@ const weekendTrips = [
     dates: "15 Dec - 20 Dec",
     price: null,
     badge: "Weekend",
+    badgeIcon: Calendar,
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
     image: "/weekend-beach-vacation.jpg",
   },
@@ -310,6 +319,7 @@ export default function SearchByMoodPage() {
 interface TripSectionProps {
   title: string
   trips: typeof skygazeTrips
+  
 }
 
 function TripSection({ title, trips }: TripSectionProps) {

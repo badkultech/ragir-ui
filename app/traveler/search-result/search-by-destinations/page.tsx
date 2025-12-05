@@ -307,7 +307,7 @@ export default function SearchByDestinationPage() {
 
                         {/* Search Button */}
                         <button onClick={() => router.push("/traveler/search-result/search-result-with-filter")}
-                            className="w-full py-3 bg-gradient-to-r from-[#f4a261] to-[#e07a5f] text-white font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                            className="w-full py-3 bg-gradient-to-r from-[#d4663a] to-[#da532e] text-white font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                             <Search className="w-4 h-4" />
                             Search
                         </button>
