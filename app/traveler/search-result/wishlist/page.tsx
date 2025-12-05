@@ -1,12 +1,13 @@
 "use client"
 
-import { ChevronLeft, Heart, MapPin, Calendar, Clock, Users, Plane, Star } from "lucide-react"
+import { ChevronLeft, Heart, MapPin, Calendar, Clock, Users, Plane, Star, Sun } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { moodMap } from "@/components/search-results/mood-tag"
 
 interface WishlistTrip {
     id: number
@@ -21,6 +22,7 @@ interface WishlistTrip {
     badges: string[]
     image: string
     route: string
+    badgeIcon?: any
 }
 
 const wishlistTrips: WishlistTrip[] = [
@@ -51,6 +53,8 @@ const wishlistTrips: WishlistTrip[] = [
         badges: ["Skygaze", "Skygaze"],
         image: "/himalayan-trekking-adventure-mountains.jpg",
         route: "Delhi → Delhi",
+        badgeIcon: Sun,
+
     },
     {
         id: 3,
@@ -63,6 +67,7 @@ const wishlistTrips: WishlistTrip[] = [
         dates: "15 Dec - 20 Dec",
         price: 12999,
         badges: ["Skygaze", "Skygaze"],
+        badgeIcon: Calendar,
         image: "/himalayan-trekking-adventure-mountains.jpg",
         route: "Delhi → Delhi",
     },
@@ -79,6 +84,7 @@ const wishlistTrips: WishlistTrip[] = [
         badges: ["Skygaze", "Skygaze"],
         image: "/himalayan-trekking-adventure-mountains.jpg",
         route: "Delhi → Delhi",
+        badgeIcon: Calendar,
     },
 ]
 
@@ -94,12 +100,42 @@ function WishlistTripCard({ trip }: { trip: WishlistTrip }) {
 
                 {/* Badges */}
                 <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-                    {trip.badges.map((badge, index) => (
-                        <span key={index} className="px-2.5 py-1 rounded-full text-[10px] font-medium text-white bg-[#3d5a4c]">
-                            {badge}
-                        </span>
-                    ))}
-                </div>
+  {trip.badges.map((badge, index) => {
+    const mood = moodMap[badge] || {};
+    const Icon = mood.icon;
+    const GradientBG = mood.bg;
+
+    return (
+      <div
+        key={index}
+        className="relative px-3 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 overflow-hidden"
+        style={{
+          backgroundColor: "white",
+          border: "1px solid #FFA77C",
+          color: "#FFA77C",
+        }}
+      >
+        {/* Optional Gradient (if available)
+        {GradientBG && (
+          <div className="absolute inset-0 opacity-30">
+            <GradientBG width="120" height="40" />
+          </div>
+        )} */}
+
+        {/* ICON */}
+        {Icon && (
+          <Icon
+            className="w-3.5 h-3.5 relative z-10"
+            fill="#FFA77C"
+          />
+        )}
+
+        {/* TEXT */}
+        <span className="relative z-10">{badge}</span>
+      </div>
+    );
+  })}
+</div>
 
                 {/* Favorite Button - Always filled red for wishlist */}
                 <button
@@ -133,7 +169,7 @@ function WishlistTripCard({ trip }: { trip: WishlistTrip }) {
                         <span>{trip.location}</span>
                         {showMore && <span>, {trip.subLocation}</span>}
                         <button onClick={() => setShowMore(!showMore)} className="text-[#e07a5f] ml-1 hover:underline">
-                            {showMore ? "show less" : "show less"}
+                            {showMore ? "show less" : "show more"}
                         </button>
                     </div>
                 </div>

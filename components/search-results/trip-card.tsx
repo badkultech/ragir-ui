@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Star, MapPin, Calendar } from "lucide-react";
 import { moodMap } from "./mood-tag"; 
+import { useState } from "react";
 
 interface TripCardProps {
   id: number;
@@ -32,6 +33,8 @@ export function TripCard({
   const mood = moodMap[badge] || {};  
   const BadgeIcon = mood.icon;
   const GradientBG = mood.bg;
+  const [showMore, setShowMore] = useState(false)
+  
 
   return (
     <div className="bg-card rounded-2xl overflow-hidden border border-border min-w-[260px] hover:shadow-lg transition cursor-pointer">
@@ -74,14 +77,16 @@ export function TripCard({
             </div>
           )}
         </div>
-
-        <div className="flex items-start gap-1.5 mb-2">
-          <MapPin className="w-3.5 h-3.5 text-[#d95531]" />
-          <p className="text-xs text-black">
-            {location}
-            <span className="text-primary"> {subLocation}</span>
-          </p>
-        </div>
+      <div className="flex items-start gap-1.5 mb-2">
+                    <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                    <div className="text-xs text-muted-foreground">
+                        <span>{location}</span>
+                        {showMore && <span>, {subLocation}</span>}
+                        <button onClick={() => setShowMore(!showMore)} className="text-[#e07a5f] ml-1 hover:underline">
+                            {showMore ? "show less" : "show more"}
+                        </button>
+                    </div>
+                </div>
 
         <div className="flex items-center gap-1.5 mb-2">
           <Calendar className="w-3.5 h-3.5 text-[#d95531]" />
