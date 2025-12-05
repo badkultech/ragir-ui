@@ -40,12 +40,11 @@ import {
 } from "@/components/library/SvgComponents/GradientsOfMoods";
 
 import { CampingGradient } from "@/components/library/SvgComponents/GradientsOfMoods/campingGradient";
-import { SpiritualGradient } from "@/components/library/SvgComponents/GradientsOfMoods/spiritualGradient";
 
 interface MoodTagProps {
   name: string;
   icon: any
-  isActive?: boolean;
+  isActive?: boolean; 
   onClick?: () => void;
 }
 
@@ -67,7 +66,7 @@ export function MoodTag({ name, isActive = false, onClick }: MoodTagProps) {
     Parties: { icon: PartiesIcon, bg: PartyGradient },
     Learning: { icon: LearningIcon, bg: LearningGradient },
     Camping: { icon: CampingIcon, bg: CampingGradient },
-    Spiritual: { icon: FemaleIcon, bg: SpiritualGradient },
+    Spiritual: { icon: FemaleIcon, bg: WomenOnlyGradient },
   };
 
   const data = moodMap[name] || {};
@@ -106,3 +105,22 @@ export function MoodTag({ name, isActive = false, onClick }: MoodTagProps) {
     </button>
   );
 }
+
+export const moodMap: any = {
+  Mountain: { icon: MountainIcon, bg: MountainGradient },
+  Skygaze: { icon: NightIcon, bg: SkygazyGradient },
+  Beach: { icon: BeachIcon, bg: BeachGradient },
+  Desert: { icon: DesertIcon, bg: DesertGradient },
+  Jungle: { icon: ForestIcon, bg: JungleGradient },
+  Wellness: { icon: WellnessIcon, bg: WellnessGradient },
+  Heritage: { icon: HeritageIcon, bg: HeritageGradient },
+  Adventure: { icon: CompassIcon, bg: AdventureGradient },
+  Trekking: { icon: Hiking1Icon, bg: TrekkingGradient },
+  Motorsports: { icon: MotorSportsIcon, bg: MotorSportsGradient },
+  Weekend: { icon: CalenderIcon, bg: WeekendGradient },
+  "Women-Only": { icon: FemaleIcon, bg: WomenOnlyGradient },
+  Parties: { icon: PartiesIcon, bg: PartyGradient },
+  Learning: { icon: LearningIcon, bg: LearningGradient },
+  Camping: { icon: CampingIcon, bg: CampingGradient },
+  Spiritual: { icon: FemaleIcon, bg: WomenOnlyGradient },
+};

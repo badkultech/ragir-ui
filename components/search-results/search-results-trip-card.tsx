@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { Heart, MapPin, Calendar, Clock, Users, Star } from "lucide-react"
 import { useState } from "react"
+import { moodMap } from "@/components/search-results/mood-tag"   // ⭐ moods data
 
 interface SearchResultsTripCardProps {
   id: number
@@ -19,7 +20,7 @@ interface SearchResultsTripCardProps {
   isFavorite?: boolean
 }
 
-export  function SearchResultsTripCard({
+export function SearchResultsTripCard({
   title,
   provider,
   location,
@@ -32,38 +33,42 @@ export  function SearchResultsTripCard({
   image,
   isFavorite = false,
 }: SearchResultsTripCardProps) {
+  
   const [favorite, setFavorite] = useState(isFavorite)
-
-  const getBadgeColor = (badge: string) => {
-    switch (badge.toLowerCase()) {
-      case "skygaze":
-        return "bg-[#3d5a4c]"
-      case "adventure":
-        return "bg-[#e07a5f]"
-      case "weekend":
-      case "weekends":
-        return "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]"
-      default:
-        return "bg-[#3d5a4c]"
-    }
-  }
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e3e0] hover:shadow-lg transition-shadow cursor-pointer">
+      
       {/* Image */}
       <div className="relative h-40 md:h-44">
-        <Image src={image || "/placeholder.svg"} alt={title} fill className="object-cover" />
+        <Image src={image} alt={title} fill className="object-cover" />
 
-        {/* Badges */}
+        {/* BADGES */}
         <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-          {badges.map((badge, index) => (
-            <span
-              key={index}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-medium text-white ${getBadgeColor(badge)}`}
-            >
-              {badge}
-            </span>
-          ))}
+          {badges.map((badge, index) => {
+            const mood = moodMap[badge] || {};
+            const Icon = mood.icon;
+            const colors = mood.colors || {
+              bg: "white",
+              border: "#FFA77C",
+              text: "#FFA77C",
+            };
+
+            return (
+              <span
+                key={index}
+                className="px-2.5 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 border"
+                style={{
+                  backgroundColor: colors.bg,
+                  borderColor: colors.border,
+                  color: colors.text,
+                }}
+              >
+                {Icon && <Icon width="10" height="10" fill={colors.text} />}
+                {badge}
+              </span>
+            );
+          })}
         </div>
 
         {/* Favorite Button */}
@@ -74,21 +79,23 @@ export  function SearchResultsTripCard({
           }}
           className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
         >
-          <Heart className={`w-4 h-4 ${favorite ? "fill-[#e07a5f] text-[#e07a5f]" : "text-[#6b6b6b]"}`} />
+          <Heart
+            className={`w-4 h-4 ${
+              favorite ? "fill-[#e07a5f] text-[#e07a5f]" : "text-[#6b6b6b]"
+            }`}
+          />
         </button>
-
-        
       </div>
 
       {/* Content */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-semibold text-foreground text-sm line-clamp-1">{title}</h4>
+          <h4 className="font-semibold text-sm line-clamp-1">{title}</h4>
 
           {rating && (
             <div className="flex items-center gap-1 bg-[#fff7ec] px-2 py-1 rounded-full border border-[#f4a261]/40">
               <Star className="w-3 h-3 text-[#f4a261] fill-[#f4a261]" />
-              <span className="text-xs font-medium text-[#2d2d2d]">{rating}</span>
+              <span className="text-xs font-medium">{rating}</span>
             </div>
           )}
         </div>
@@ -101,9 +108,9 @@ export  function SearchResultsTripCard({
 
         {/* Location */}
         <div className="flex items-start gap-1.5 mb-2">
-          <MapPin className="w-3.5 h-3.5 text-[#6b6b6b] flex-shrink-0 mt-0.5" />
+          <MapPin className="w-3.5 h-3.5 text-[#6b6b6b]" />
           <div className="text-xs text-[#6b6b6b]">
-            <span>{location}</span>
+            {location}
             <span className="text-[#e07a5f]"> {subLocation}</span>
           </div>
         </div>
@@ -120,21 +127,22 @@ export  function SearchResultsTripCard({
           <span className="text-xs text-[#6b6b6b]">{dates}</span>
         </div>
 
-        {/* Price and Compare */}
+        {/* Price & Compare */}
         <div className="flex items-end justify-between pt-3 border-t border-[#e5e3e0]">
           <div>
             <span className="text-[10px] text-[#6b6b6b]">Starting from</span>
             {price ? (
-              <p className="text-lg font-bold text-[#2d2d2d]">₹{price.toLocaleString()}</p>
+              <p className="text-lg font-bold">₹{price.toLocaleString()}</p>
             ) : (
               <p className="text-sm text-[#6b6b6b]">Starting Soon</p>
             )}
           </div>
-          <button className="px-4 py-1.5 border border-[#e07a5f] text-[#e07a5f] text-xs font-medium rounded-full hover:bg-[#e07a5f]/5 transition-colors">
+
+          <button className="px-4 py-1.5 border border-[#e07a5f] text-[#e07a5f] text-xs font-medium rounded-full hover:bg-[#e07a5f]/5 transition">
             Compare
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
