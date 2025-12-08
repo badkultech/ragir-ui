@@ -418,6 +418,7 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const handleInputChange = (field: string, value: string | number) => {
+    console.log("🔄 Input Change:", field, value);
     dispatch(setFormData({ ...formData, [field]: value }));
   };
 
@@ -541,10 +542,6 @@ export function CreateTrip({ tripId }: Props) {
                   onChange={(val) => {
                     handleInputChange('startDate', val);
                     clearError("startDate");
-                    if (!formData.endDate) {
-                      handleInputChange("endDate", val);
-                    }
-
                   }}
                   placeholder="Select start date & time"
                   className="w-full"
