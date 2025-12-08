@@ -7,7 +7,7 @@ import TripCard from "./TripCard";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { format } from "date-fns";
-import { useGetTripsQuery } from "@/lib/services/organizer/trip/my-trips";
+import { useGetFilteredTripsQuery, TripListItem } from "@/lib/services/organizer/trip/my-trips";
 
 export default function TripOverviewPage() {
   const organizationId = useOrganizationId();
@@ -39,7 +39,7 @@ export default function TripOverviewPage() {
     deleted: "DELETED",
   } as const;
 
-  const { data, isFetching } = useGetTripsQuery(
+  const { data, isFetching } = useGetFilteredTripsQuery(
     {
       organizationId,
       filters: {
@@ -97,7 +97,7 @@ export default function TripOverviewPage() {
           <div className="text-center text-gray-500 py-6">No trips found.</div>
         )}
 
-        {trips.map((trip) => (
+        {trips.map((trip: TripListItem) => (
           <TripCard
             key={trip.tripPublicId}
             tab={activeTab}
@@ -117,8 +117,8 @@ export default function TripOverviewPage() {
                 trip.status === "PUBLISHED"
                   ? "Published"
                   : trip.status === "UNDER_REVIEW"
-                  ? "Under Review"
-                  : "Requires Modification",
+                    ? "Under Review"
+                    : "Requires Modification",
               views: trip.viewsCount ?? 0,
               queries: trip.queriesCount ?? 0,
               leads: trip.leadsCount ?? 0,
