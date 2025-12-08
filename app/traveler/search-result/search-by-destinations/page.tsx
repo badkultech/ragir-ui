@@ -1,14 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import Image from "next/image"
 import { ChevronLeft, Heart, ChevronDown, AlertCircle, Search } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { TripCard } from "@/components/search-results/trip-card"
-import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import SearchResultsWithFilters from "../search-result-with-filter/page"
 import { Footer } from "@/components/search-results/footer"
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -297,7 +294,7 @@ export default function SearchByDestinationPage() {
                                         onClick={() => setSelectedMonth(month)}
                                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedMonth === month
                                             ? "bg-[#FF804C] text-white border-[#FF804C]"
-                                               : "bg-white text-[#6b6b6b] border-[#3d3d3d] hover:border-[#c0c0c0] hover:bg-[#fafafa]"
+                                            : "bg-white text-[#6b6b6b] border-[#3d3d3d] hover:border-[#c0c0c0] hover:bg-[#fafafa]"
                                             }`}
                                     >
                                         {month}
@@ -389,4 +386,4 @@ function TripSection({ title, trips }: TripSectionProps) {
     )
 }
 
-<Footer/>
+<Footer />
