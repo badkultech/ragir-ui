@@ -36,6 +36,12 @@ export default function SwitchOrganization() {
 
   const { data, isLoading } = useGetOrganizationsQuery({ page: 0, size: 200 });
   const organizations = data?.content || [];
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredOrgs = organizations.filter((org) =>
+    org.entityName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
 
   const handleApply = () => {
     if (!selectedOrg) return;
@@ -78,10 +84,16 @@ export default function SwitchOrganization() {
               Select Organization
             </label>
 
+            {/* Dropdown with Search */}
             {isLoading ? (
               <div className='animate-pulse w-full h-12 bg-gray-200 rounded-lg' />
             ) : (
-              <DropdownMenu>
+              <DropdownMenu
+                modal={false}
+                onOpenChange={(open) => {
+                  setSearchTerm("");
+                }}
+              >
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant='outline'
@@ -91,19 +103,37 @@ export default function SwitchOrganization() {
                     <ChevronDown className='w-4 h-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align='end' className='w-[600px'>
+
+                <DropdownMenuContent align='end' className='w-[600px] max-h-[350px] overflow-y-auto'
+                  onFocusCapture={(e) => e.stopPropagation()}>
+
+                  <div className='p-2 sticky top-0 bg-white border-b'>
+                    <input
+                      type='text'
+                      placeholder='Search organization...'
+                      className='w-full border rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500'
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                  </div>
+
                   <DropdownMenuLabel>Select Organization</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {organizations.map((org) => (
-                    <DropdownMenuItem
-                      key={org.publicId}
-                      onClick={() => {
-                        setSelectedOrg(org);
-                      }}
-                    >
-                      {org.entityName} ({org.status})
-                    </DropdownMenuItem>
-                  ))}
+
+                  {/* FILTERED LIST */}
+                  {filteredOrgs.length > 0 ? (
+                    filteredOrgs.map((org) => (
+                      <DropdownMenuItem
+                        key={org.publicId}
+                        onClick={() => setSelectedOrg(org)}
+                      >
+                        {org.entityName} ({org.status})
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                    <div className="p-3 text-gray-500 text-sm">No results found.</div>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}

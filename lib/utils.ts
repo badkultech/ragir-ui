@@ -75,8 +75,8 @@ export const ENDPOINTS = {
   ORGANIZATION_PROFILE: (organizationId: string) =>
     `/org/${organizationId}/profile`,
   ORGANIZER: {
-    TRIP:(organizationId:string)=>
-     `/org/${organizationId}/trip`,
+    TRIP: (organizationId: string) =>
+      `/org/${organizationId}/trip`,
     LIBRARY: {
       DAY_DESCRIPTION: (organizationId: string) =>
         `/org/${organizationId}/library/day-description`,
@@ -106,13 +106,14 @@ export const ENDPOINTS = {
       organizationId: string,
       tripPublicId: string,
       queryId: number,
-    ) =>`/org/${organizationId}/trip/${tripPublicId}/queries/${queryId}/comments`,
+    ) => `/org/${organizationId}/trip/${tripPublicId}/queries/${queryId}/comments`,
     TRIP_ORG_LEADS: (organizationId: string) =>
       `/org/${organizationId}/org-trip-leads`,
-    TICKETS: (userId: string) => `/organizer/${userId}/ticket`,
-    TICKET_BY_ID: (id: number | string) => `/organizer/ticket/${id}`,
+    TICKETS: (userId: string, organizationId: string) => `/org/${organizationId}/user/${userId}/ticket`,
+    TICKET_BY_ID: (id: number | string) => `/org/ticket/${id}`,
     TICKET_COMMENT: (ticketId: number | string) =>
       `/organizer/ticket/${ticketId}/comment`,
+    DASHBOARD: (orgId: string) => `/org/${orgId}/dashboard`,
 
   },
 } as const;
