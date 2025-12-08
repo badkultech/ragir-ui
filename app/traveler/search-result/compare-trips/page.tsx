@@ -37,7 +37,7 @@ const tripsToCompare: TripData[] = [
         rating: 4.8,
         avgGroupSize: "~15 people",
         startingPrice: 12999,
-        image: "/himalayan-trekking-adventure-mountains.jpg",
+        image:"/hampi-ruins-temples.png",
     },
     {
         id: 2,

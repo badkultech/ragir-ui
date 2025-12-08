@@ -81,7 +81,7 @@ export function SearchResultsTripCard({
         >
           <Heart
             className={`w-4 h-4 ${
-              favorite ? "fill-[#e07a5f] text-[#e07a5f]" : "text-[#6b6b6b]"
+              favorite ? "fill-[#FF5F5E] text-[#FF5F5E]" : "text-[#6b6b6b]"
             }`}
           />
         </button>
