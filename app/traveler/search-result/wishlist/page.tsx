@@ -37,7 +37,7 @@ const wishlistTrips: WishlistTrip[] = [
         dates: "15 Dec - 20 Dec",
         price: 12999,
         badges: ["Skygaze", "Skygaze"],
-        image: "/himalayan-trekking-adventure-mountains.jpg",
+        image:"/hampi-ruins-temples.png",
         route: "Delhi → Delhi",
     },
     {
@@ -100,49 +100,49 @@ function WishlistTripCard({ trip }: { trip: WishlistTrip }) {
 
                 {/* Badges */}
                 <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-  {trip.badges.map((badge, index) => {
-    const mood = moodMap[badge] || {};
-    const Icon = mood.icon;
-    const GradientBG = mood.bg;
+                    {trip.badges.map((badge, index) => {
+                        const mood = moodMap[badge] || {};
+                        const Icon = mood.icon;
+                        const GradientBG = mood.bg;
 
-    return (
-      <div
-        key={index}
-        className="relative px-3 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 overflow-hidden"
-        style={{
-          backgroundColor: "white",
-          border: "1px solid #FFA77C",
-          color: "#FFA77C",
-        }}
-      >
-        {/* Optional Gradient (if available)
+                        return (
+                            <div
+                                key={index}
+                                className="relative px-3 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 overflow-hidden"
+                                style={{
+                                    backgroundColor: "white",
+                                    border: "1px solid #FFA77C",
+                                    color: "#FFA77C",
+                                }}
+                            >
+                                {/* Optional Gradient (if available)
         {GradientBG && (
           <div className="absolute inset-0 opacity-30">
             <GradientBG width="120" height="40" />
           </div>
         )} */}
 
-        {/* ICON */}
-        {Icon && (
-          <Icon
-            className="w-3.5 h-3.5 relative z-10"
-            fill="#FFA77C"
-          />
-        )}
+                                {/* ICON */}
+                                {Icon && (
+                                    <Icon
+                                        className="w-3.5 h-3.5 relative z-10"
+                                        fill="#FFA77C"
+                                    />
+                                )}
 
-        {/* TEXT */}
-        <span className="relative z-10">{badge}</span>
-      </div>
-    );
-  })}
-</div>
+                                {/* TEXT */}
+                                <span className="relative z-10">{badge}</span>
+                            </div>
+                        );
+                    })}
+                </div>
 
                 {/* Favorite Button - Always filled red for wishlist */}
                 <button
                     onClick={() => setIsFavorite(!isFavorite)}
                     className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
                 >
-                    <Heart className={`w-4 h-4 ${isFavorite ? "fill-[#e07a5f] text-[#e07a5f]" : "text-muted-foreground"}`} />
+                    <Heart className={`w-4 h-4 ${isFavorite ? "fill-[#FF5F5E] text-[#FF5F5E]" : "text-muted-foreground"}`} />
                 </button>
             </div>
 
@@ -151,9 +151,9 @@ function WishlistTripCard({ trip }: { trip: WishlistTrip }) {
                 <div className="flex items-start justify-between mb-1">
                     <h4 className="font-semibold text-foreground text-sm line-clamp-1">{trip.title}</h4>
                     <div className="flex items-center gap-1 bg-[#fff7ec] px-2 py-1 rounded-full border border-[#f4a261]/40">
-              <Star className="w-3 h-3 text-[#f4a261] fill-[#f4a261]" />
-              <span className="text-xs font-medium text-[#2d2d2d]">{trip.rating}</span>
-            </div>
+                        <Star className="w-3 h-3 text-[#f4a261] fill-[#f4a261]" />
+                        <span className="text-xs font-medium text-[#2d2d2d]">{trip.rating}</span>
+                    </div>
                 </div>
 
                 {/* Provider */}

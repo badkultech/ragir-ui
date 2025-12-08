@@ -20,7 +20,7 @@ const trips = [
         dates: "15 Dec - 20 Dec",
         price: 12999,
         badges: ["Skygaze", "Skygaze", "Skygaze"],
-        image: "/himalayan-trekking-adventure-mountains.jpg",
+        image: "/hampi-ruins-temples.png",
         isFavorite: false,
     },
     {
