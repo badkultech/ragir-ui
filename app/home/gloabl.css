@@ -10,19 +10,21 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.7361 0.1685 41.9)
+  /* Updated primary to coral/orange for Ragir brand */
+  --primary: oklch(0.65 0.2 25);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.97 0.01 50);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: oklch(0.97 0.01 50);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.97 0.01 50);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* Updated ring to match primary */
+  --ring: oklch(0.65 0.2 25);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -37,8 +39,6 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --font-barlow: 'Barlow', sans-serif;
-  --font-poppins: 'Poppins', sans-serif;
 }
 
 .dark {
@@ -48,8 +48,9 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  /* Updated dark mode primary */
+  --primary: oklch(0.7 0.2 25);
+  --primary-foreground: oklch(0.145 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -60,7 +61,7 @@
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --ring: oklch(0.7 0.2 25);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -76,7 +77,53 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+/* Added marquee and float animations for Ragir */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+}
+
 @theme inline {
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+
+  /* Added peach colors for Ragir theme */
+  --color-peach-50: oklch(0.98 0.02 50);
+  --color-peach-100: oklch(0.95 0.04 50);
+  --color-peach-200: oklch(0.9 0.06 50);
+
+  /* Added custom animations */
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-marquee-slow: marquee 45s linear infinite;
+  --animate-marquee-fast: marquee 20s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 30s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-delayed: float 6s ease-in-out 2s infinite;
+  --animate-float-slow: float 8s ease-in-out 1s infinite;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -119,60 +166,7 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Add this to your globals.css or component CSS */
-.admin-register * {
-  font-family: 'Poppins', sans-serif !important;
-}
-
-.font-barlow {
-  font-family: var(--font-barlow);
-}
-
-.font-poppins {
-  font-family: var(--font-poppins);
-}
-
-
-
-/* make sure lists show bullets/numbers inside the prose container */
-.prose ul {
-  list-style-type: disc;
-  list-style-position: inside;
-  margin-left: 1.25rem;
-  padding-left: 0;
-}
-
-.prose ol {
-  list-style-type: decimal;
-  list-style-position: inside;
-  margin-left: 1.25rem;
-  padding-left: 0;
-}
-
-/* Make the inner scroll track rounded (webkit browsers) */
-.dialog-scroll::-webkit-scrollbar {
-  width: 12px;
-}
-
-.dialog-scroll::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 12px;
-}
-
-.dialog-scroll::-webkit-scrollbar-thumb {
-  background-clip: padding-box;
-  border-radius: 12px;
-  border: 3px solid transparent;
-  /* gives thumb padding so it doesn't touch edges */
-}
-
-/* If you want a subtle shadow on the container edge to hide any tiny artifact */
-.dialog-scroll {
-  -webkit-overflow-scrolling: touch;
 }
