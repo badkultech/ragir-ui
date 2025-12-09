@@ -11,7 +11,7 @@ interface PartnerCardProps {
 export function PartnerCard({ id, name, logo }: PartnerCardProps) {
   return (
     <Link
-      href={`/partners/${id}`}
+      href={`/home/partners/${id}`}
       className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-shadow"
     >
       <div className="flex items-center gap-4">
