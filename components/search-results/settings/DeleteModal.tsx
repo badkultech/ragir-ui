@@ -6,28 +6,34 @@ export default function DeleteModal({ open, onClose }: any) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-card p-6 rounded-2xl w-full max-w-sm text-center">
-        <div className="w-12 h-12 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
-          <Trash2 className="w-6 h-6 text-red-500" />
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+      <div className="bg-white p-8 rounded-2xl w-full max-w-md text-center shadow-xl">
+        <div className="w-16 h-16 mx-auto rounded-full  flex items-center justify-center mb-4">
+          <Trash2 className="w-8 h-8 text-[#FF4B4B]" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">Delete Account?</h3>
-
-        <p className="text-sm text-muted-foreground mb-6">
-          This action cannot be undone.
+        <h3 className="text-xl font-semibold text-foreground mb-2">
+          Delete Account?
+        </h3>
+        <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+          Are you sure you want to delete your account? This action is permanent
+          and all your data will be lost.
         </p>
-
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-center">
           <button
             onClick={onClose}
-            className="flex-1 border rounded-lg py-3 hover:bg-muted"
+            className="flex-1 py-3 border border-border rounded-lg text-sm font-medium hover:bg-muted transition"
           >
             Cancel
           </button>
 
-          <button className="flex-1 bg-red-500 text-white py-3 rounded-lg hover:bg-red-600">
+          {/* DELETE BUTTON */}
+          <button
+            className="flex-1 py-3 rounded-lg bg-[#FF4B4B] text-white font-medium flex items-center justify-center gap-2 hover:bg-[#e04343] transition"
+          >
+            <Trash2 className="w-4 h-4" />
             Delete
           </button>
+
         </div>
       </div>
     </div>

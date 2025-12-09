@@ -63,7 +63,7 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
         </div>
 
         {/* Input Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
           <InputField
             name="firstName"
             value={formData.firstName}
@@ -101,7 +101,7 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-muted border border-border rounded-lg"
+              className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E4E4E4] rounded-lg"
             >
               <option>Male</option>
               <option>Female</option>
@@ -122,7 +122,7 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
                 value={formData.dateOfBirth}
                 onChange={handleChange}
                 placeholder="dd/mm/yyyy"
-                className="w-full px-4 py-3 bg-muted border border-border rounded-lg"
+                className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E4E4E4] rounded-lg"
               />
               <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 text-muted-foreground" />
             </div>
@@ -135,14 +135,14 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
             Bio / About me (Optional)
           </label>
 
-          <div className="relative">
+          <div className="relative ">
             <textarea
               name="bio"
               rows={4}
               maxLength={500}
               value={formData.bio}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-muted border border-border rounded-lg resize-none"
+              className="w-full px-4 py-3 bg-white border border-[#E4E4E4] rounded-lg resize-none"
             />
 
             <span className="absolute bottom-3 right-3 text-xs text-primary">
@@ -153,7 +153,7 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
 
         {/* Save Button */}
         <div className="mt-8">
-          <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-[#f4a261] text-primary-foreground rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+          <button className="inline-flex items-center gap-2 px-6 py-3 bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)] text-primary-foreground rounded-full hover:opacity-90 transition-opacity text-sm font-medium">
             Save Changes
           </button>
         </div>
@@ -183,7 +183,7 @@ function InputField({
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full px-4 py-3 bg-muted border border-border rounded-lg"
+        className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E4E4E4] rounded-lg"
       />
     </div>
   );
