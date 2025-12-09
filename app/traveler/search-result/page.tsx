@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Clock,
   Calendar,
+  MessageCircleQuestion,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -35,6 +36,7 @@ const menuItems = [
 
 const userMenuItems = [
   { icon: Bell, label: "Trip Invitations Sent", href: "search-result/invitations" },
+  { icon: MessageCircleQuestion, label: "My Queries", href: "search-result/my-queries" },
   { icon: Bookmark, label: "Saved Trips", href: "/saved" },
   { icon: Settings, label: "Settings", href: "search-result/settings" },
 ]
