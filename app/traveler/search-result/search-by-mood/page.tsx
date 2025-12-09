@@ -28,6 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoodTag } from "@/components/search-results/mood-tag"
 import { TripCard } from "@/components/search-results/trip-card"
 import { Footer } from "@/components/search-results/footer"
+import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
 
 const moods = [
   { name: "Mountain", icon: Mountain, active: false },
@@ -188,8 +189,8 @@ export default function SearchByMoodPage() {
   const [selectedMoods, setSelectedMoods] = useState<string[]>(
     moods.filter((m) => m.active).map((m) => m.name),
   )
-  const [selectedMonth, setSelectedMonth] = useState("Oct")
-  const [selectedYear] = useState(2025)
+  const [selectedYear, setSelectedYear] = useState(2026);
+  const [selectedMonth, setSelectedMonth] = useState<'Jan' | string>('Jan');
   const router = useRouter()
 
   const toggleMood = (name: string) => {
@@ -256,41 +257,18 @@ export default function SearchByMoodPage() {
             </div>
 
             {/* Date Selection */}
-            <div className="mb-6">
-              <p className="text-sm text-[#6b6b6b] mb-3">
-                When do you want to go?
-              </p>
-
-              {/* Year Selector */}
-              <div className="flex items-center justify-between mb-4">
-                <button className="p-1 rounded-full hover:bg-[#f3f3f3]">
-                  <ChevronLeft className="w-4 h-4 text-[#6b6b6b]" />
-                </button>
-                <span className="text-sm font-medium text-[#2d2d2d]">
-                  {selectedYear}
-                </span>
-                <button className="p-1 rounded-full hover:bg-[#f3f3f3] rotate-90">
-                  <ChevronRight className="w-4 h-4 text-[#6b6b6b]" />
-                </button>
-              </div>
-
-              {/* Month Pills */}
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {months.map((month) => (
-                  <button
-                    key={month}
-                    onClick={() => setSelectedMonth(month)}
-                    className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap border ${selectedMonth === month
-                        ? "bg-[#FF804C] text-white border-[#FF804C]"
-                        : "bg-white text-[#6b6b6b] border-[#e0e0e0] hover:border-[#c0c0c0] hover:bg-[#fafafa]"
-                      }`}
-                  >
-                    {month}
-                  </button>
-                ))}
-              </div>
+            <div className="p-6">
+              <MonthYearSelector
+                year={selectedYear}
+                month={selectedMonth}
+                minYear={2024}
+                maxYear={2030}
+                onChange={({ year, month }) => {
+                  setSelectedYear(year);
+                  setSelectedMonth(month);
+                }}
+              />
             </div>
-
             {/* Search Button */}
             <button
               onClick={() =>
@@ -346,4 +324,4 @@ function TripSection({ title, trips }: TripSectionProps) {
   )
 }
 
-<Footer/>
+<Footer />

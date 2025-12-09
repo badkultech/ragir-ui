@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Menu, X, Search, MapPin, Bell, Bookmark, Settings, LogOut, Users, Gift, Scale, Heart } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
 
 const menuItems = [
   { icon: Search, label: "Search by Mood", href: "search-result/search-by-mood" },
@@ -23,6 +24,8 @@ const userMenuItems = [
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [selectedYear, setSelectedYear] = useState(2026);
+  const [selectedMonth, setSelectedMonth] = useState<'Jan' | string>('Jan');
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
@@ -173,16 +176,17 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      <div>
-                        <label className="text-xs text-gray-500 block mb-2">When do you want to go?</label>
-                        <div className="flex gap-2">
-                          <button className="px-4 py-2 bg-black text-white text-xs font-medium rounded-full">
-                            Jan
-                          </button>
-                          <button className="px-4 py-2 bg-gray-200 text-gray-600 text-xs font-medium rounded-full">
-                            Feb
-                          </button>
-                        </div>
+                      <div className="p-6">
+                        <MonthYearSelector
+                          year={selectedYear}
+                          month={selectedMonth}
+                          minYear={2024}
+                          maxYear={2030}
+                          onChange={({ year, month }) => {
+                            setSelectedYear(year);
+                            setSelectedMonth(month);
+                          }}
+                        />
                       </div>
                     </div>
                   </div>

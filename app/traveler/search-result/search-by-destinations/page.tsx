@@ -7,8 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { TripCard } from "@/components/search-results/trip-card"
 import { useRouter } from "next/navigation"
 import { Footer } from "@/components/search-results/footer"
+import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
 
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 const popularDestinations = [
     {
@@ -166,8 +166,8 @@ const keralaTrips = [
 export default function SearchByDestinationPage() {
     const [destination, setDestination] = useState("")
     const [region, setRegion] = useState<"domestic" | "international">("domestic")
-    const [selectedMonth, setSelectedMonth] = useState("Jan")
-    const [selectedYear] = useState(2026)
+    const [selectedYear, setSelectedYear] = useState(2026);
+    const [selectedMonth, setSelectedMonth] = useState<'Jan' | string>('Jan');
     const router = useRouter();
 
     return (
@@ -256,11 +256,11 @@ export default function SearchByDestinationPage() {
                                 <button
                                     onClick={() => setRegion("international")}
                                     className={`
-        flex-1 flex flex-col items-center justify-center rounded-xl border p-4 transition-all
-        ${region === "international"
+                                     flex-1 flex flex-col items-center justify-center rounded-xl border p-4 transition-all
+                                       ${region === "international"
                                             ? "border-[#e07a5f] bg-[#fff8f5] shadow-sm"
                                             : "border-[#e0e0e0] bg-white hover:bg-muted/70"}
-      `}
+                                       `}
                                 >
                                     <Image
                                         src="/images/world-map.png"
@@ -273,35 +273,20 @@ export default function SearchByDestinationPage() {
                                 </button>
                             </div>
                         </div>
+                    </div>
 
-
-                        {/* Date Selection */}
-                        <div className="mb-6">
-                            <p className="text-sm text-muted-foreground mb-3">When do you want to go?</p>
-
-                            {/* Year Selector */}
-                            <div className="flex items-center gap-2 mb-4">
-                                <ChevronLeft className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                                <span className="text-sm font-medium text-foreground">{selectedYear}</span>
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                            </div>
-
-                            {/* Month Pills */}
-                            <div className="flex flex-wrap gap-2">
-                                {months.slice(0, 4).map((month) => (
-                                    <button
-                                        key={month}
-                                        onClick={() => setSelectedMonth(month)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedMonth === month
-                                            ? "bg-[#FF804C] text-white border-[#FF804C]"
-                                            : "bg-white text-[#6b6b6b] border-[#3d3d3d] hover:border-[#c0c0c0] hover:bg-[#fafafa]"
-                                            }`}
-                                    >
-                                        {month}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                    {/* Date Selection */}
+                    <div className="p-6">
+                        <MonthYearSelector
+                            year={selectedYear}
+                            month={selectedMonth}
+                            minYear={2024}
+                            maxYear={2030}
+                            onChange={({ year, month }) => {
+                                setSelectedYear(year);
+                                setSelectedMonth(month);
+                            }}
+                        />
 
                         {/* Search Button */}
                         <button onClick={() => router.push("/traveler/search-result/search-result-with-filter")}
