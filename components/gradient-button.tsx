@@ -14,11 +14,11 @@ const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>(
         ref={ref}
         {...props}
         className={cn(
-          "w-full py-4 px-6 rounded-full font-semibold transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed",
+          "rounded-full px-6 py-2 font-semibold transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed",
           variant === "primary" &&
-            "text-white bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90",
+          "text-white bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90",
           variant === "secondary" &&
-            "bg-transparent border-2 border-[#FD6E34] text-[#FD6E34] hover:bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:text-white",
+          "bg-transparent border-2 border-[#FD6E34] text-[#FD6E34] hover:bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:text-white",
           className
         )}
       >

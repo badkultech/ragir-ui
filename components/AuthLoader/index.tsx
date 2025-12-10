@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
 import { getDashboardPath, PublicRoutes, isAllowedRoutes } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { Loader } from "@/components/common/Loader";
 
 export default function HydratedAuth({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
@@ -40,7 +41,9 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
     );
 
     setHydrated(true);
-  }, [dispatch]); // run ONLY once
+    // Reset redirecting flag on mount
+    redirecting.current = false;
+  }, [dispatch]); // Only run once on mount - getValue is stable
 
   /** STEP 2 — ROUTE GUARD */
   useEffect(() => {
@@ -50,25 +53,62 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
     const isAuthenticated = Boolean(accessToken) && !accessTokenExpired;
     const isLogin = pathname === "/" || pathname.includes("/login");
 
-    // LOGIN PAGES
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AuthLoader] Route Guard:', {
+        pathname,
+        isAuthenticated,
+        userType,
+        accessToken: accessToken ? 'present' : 'null',
+      });
+    }
+
+    // LOGIN PAGES - Allow access without authentication
     if (isLogin) {
       if (isAuthenticated && userType) {
         const redirect = getDashboardPath(userType);
         if (pathname !== redirect) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[AuthLoader] Authenticated user on login page, redirecting to dashboard');
+          }
           redirecting.current = true;
-          startTransition(() => router.replace(redirect));
+          startTransition(() => {
+            router.replace(redirect);
+            setTimeout(() => redirecting.current = false, 100);
+          });
         }
       }
+      // Allow unauthenticated users to stay on login pages
       return;
     }
 
-    // PUBLIC ROUTES
-    if (PublicRoutes.some((r) => pathname.startsWith(r))) return;
+    // PUBLIC ROUTES - Use exact match to prevent false positives
+    const isPublicRoute = PublicRoutes.some((r) => {
+      // Exact match
+      if (pathname === r) return true;
+
+      // Allow /prelaunch/* and /home/* patterns
+      if (r === '/prelaunch' && pathname.startsWith('/prelaunch/')) return true;
+      if (r === '/home' && pathname.startsWith('/home/')) return true;
+
+      return false;
+    });
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AuthLoader] Public route check:', { pathname, isPublicRoute });
+    }
+
+    if (isPublicRoute) return;
 
     // PROTECTED
     if (!isAuthenticated || !userType) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AuthLoader] Redirecting unauthenticated user to /');
+      }
       redirecting.current = true;
-      startTransition(() => router.replace("/"));
+      startTransition(() => {
+        router.replace("/");
+        setTimeout(() => redirecting.current = false, 100);
+      });
       return;
     }
 
@@ -76,11 +116,31 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
     if (!isAllowedRoutes(pathname, userType)) {
       const redirect = getDashboardPath(userType);
       redirecting.current = true;
-      startTransition(() => router.replace(redirect));
+      startTransition(() => {
+        router.replace(redirect);
+        setTimeout(() => redirecting.current = false, 100);
+      });
     }
-  }, [hydrated, pathname, accessToken, accessTokenExpired, userType]);
+  }, [hydrated, pathname, accessToken, accessTokenExpired, userType, router]);
 
+  // Don't render anything until hydrated
   if (!hydrated) return null;
+
+  // Show loading for protected routes while checking auth
+  const isAuthenticated = Boolean(accessToken) && !accessTokenExpired;
+  const isLogin = pathname === "/" || pathname.includes("/login");
+  const isPublicRoute = PublicRoutes.some((r) => {
+    if (pathname === r) return true;
+    if (r === '/prelaunch' && pathname.startsWith('/prelaunch/')) return true;
+    if (r === '/home' && pathname.startsWith('/home/')) return true;
+    return false;
+  });
+
+  // If not authenticated and trying to access protected route, show loading during redirect
+  if (!isLogin && !isPublicRoute && !isAuthenticated) {
+    return <Loader message="Checking authentication..." variant="default" />;
+  }
+
   return <>{children}</>;
 }
 

@@ -28,18 +28,17 @@ export const LogoutButton = ({
   const router = useRouter();
 
   const handleConfirmLogout = () => {
-    // ✅ Clear Redux
+    // ✅ Step 1: Clear localStorage FIRST
+    localStorage.clear();
+
+    // ✅ Step 2: Clear Redux state
     dispatch(logout());
 
-    // ✅ Remove tokens
-    localStorage.clear();
-    
-
-    // ✅ Redirect to login/root
-    router.push("/");
-
-    // ✅ Close modal
+    // ✅ Step 3: Close modal
     setShowLogoutModal(false);
+
+    // ✅ Step 4: Redirect (use replace to prevent back button)
+    router.replace("/");
   };
 
   const handleOpenModal = () => {

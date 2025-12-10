@@ -49,7 +49,12 @@ const authSlice = createSlice({
       }
     },
     logout: (state) => {
-      return initialState;
+      // Clear all auth state
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.userData = null;
+      state.isTokenExpired = false;
+      state.focusedOrganizationId = null;
     },
 
     setFocusedOrganizationId: (state, action: PayloadAction<string>) => {
