@@ -12,7 +12,7 @@ export function PartnerCard({ id, name, logo }: PartnerCardProps) {
   return (
     <Link
       href={`/home/partners/${id}`}
-      className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-shadow"
+      className="flex items-start flex-col justify-between gap-y-8 p-4 bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-shadow"
     >
       <div className="flex items-center gap-4">
         <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
