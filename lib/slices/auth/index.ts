@@ -1,11 +1,9 @@
 // lib/features/authSlice.ts
 import { AuthTokenPayload } from '@/hooks/useDecodedToken';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { RootState } from '@/lib/slices/store';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 
-const localStorage = useLocalStorage();
 type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
@@ -44,9 +42,9 @@ const authSlice = createSlice({
       }
     },
     logout: (state) => {
-     state = initialState;
+      return initialState;
     },
-    
+
     setFocusedOrganizationId: (state, action: PayloadAction<string>) => {
       state.focusedOrganizationId = action.payload;
     },

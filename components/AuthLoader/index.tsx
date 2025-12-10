@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo, useRef, startTransition } from "re
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
-import { getDashboardPath, PublicRoutes, ROLE_ROUTE_ACCESS, ROLES, RoleType } from "@/lib/utils";
+import { getDashboardPath, PublicRoutes, isAllowedRoutes } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function HydratedAuth({ children }: { children: React.ReactNode }) {
@@ -74,7 +74,7 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
 
     // ROLE ACCESS
     if (!isAllowedRoutes(pathname, userType)) {
-      const redirect = getDashboardPath(userType) + "/dashboard";
+      const redirect = getDashboardPath(userType);
       redirecting.current = true;
       startTransition(() => router.replace(redirect));
     }
@@ -94,12 +94,4 @@ function tokenExpired(token: string | null | undefined) {
   } catch {
     return true;
   }
-}
-
-/* Route Permission Checker */
-function isAllowedRoutes(route: string, role: RoleType): boolean {
-  if (!role) return false;
-  if (role === ROLES.SYSTEM_ADMIN) return true;
-  const allowed = ROLE_ROUTE_ACCESS[role] ?? [];
-  return allowed.some((r) => route === r || route.startsWith(r));
 }
