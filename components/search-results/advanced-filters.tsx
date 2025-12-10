@@ -21,12 +21,13 @@ import {
   Tent,
   Moon,
 } from "lucide-react"
-import {MoodTag} from "./mood-tag"
+import { MoodTag } from "./mood-tag"
 
 interface AdvancedFiltersProps {
   isOpen: boolean
   onClose: () => void
   isMobile?: boolean
+  onApplyFilters?: (filters: any) => void
 }
 
 const filterSections = [
@@ -75,7 +76,14 @@ const moods = [
   { name: "Spiritual", icon: Moon },
 ]
 
-export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: AdvancedFiltersProps) {
+
+export function AdvancedFilters({
+  isOpen,
+  onClose,
+  isMobile = false,
+  onApplyFilters
+}: AdvancedFiltersProps) 
+ {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     Object.fromEntries(filterSections.map((s) => [s.id, s.defaultOpen])),
   )
@@ -85,6 +93,8 @@ export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: Advanced
   const [selectedGroupType, setSelectedGroupType] = useState("Exclusive Group")
   const [selectedMoods, setSelectedMoods] = useState(["Skygaze"])
   const [emiAvailable, setEmiAvailable] = useState(false)
+  const [_, setForceUpdate] = useState(0);
+
 
   const toggleSection = (id: string) => {
     setExpandedSections((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -93,6 +103,17 @@ export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: Advanced
   const toggleMood = (name: string) => {
     setSelectedMoods((prev) => (prev.includes(name) ? prev.filter((m) => m !== name) : [...prev, name]))
   }
+  const getSelectedFilters = () => ({
+    duration: selectedDuration,
+    budget: budgetRange,
+    occupancy: selectedOccupancy,
+    groupType: selectedGroupType,
+    moods: selectedMoods,
+    emi: emiAvailable,
+    destinations: destinations.filter(d => d.checked).map(d => d.name),
+    departureCities: departureCities.filter(c => c.checked).map(c => c.name),
+  })
+
 
   const containerClass = isMobile
     ? `fixed inset-0 z-50 bg-white transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`
@@ -149,11 +170,10 @@ export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: Advanced
                 <button
                   key={duration}
                   onClick={() => setSelectedDuration(duration)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                    selectedDuration === duration
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedDuration === duration
                       ? "bg-[#e07a5f] text-white border-[#e07a5f]"
                       : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
-                  }`}
+                    }`}
                 >
                   {duration}
                 </button>
@@ -252,7 +272,12 @@ export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: Advanced
                 <label key={dest.name} className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    defaultChecked={dest.checked}
+                    checked={dest.checked}
+                    onChange={(e) => {
+                      dest.checked = e.target.checked;
+                      setForceUpdate(x => x + 1); // force re-render
+                    }}
+
                     className="w-4 h-4 rounded border-[#e5e3e0] text-[#e07a5f] focus:ring-[#e07a5f]"
                   />
                   <span className="text-xs text-[#4d4d4d]">{dest.name}</span>
@@ -306,11 +331,10 @@ export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: Advanced
                 <button
                   key={type}
                   onClick={() => setSelectedOccupancy(type)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                    selectedOccupancy === type
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedOccupancy === type
                       ? "bg-[#e07a5f] text-white border-[#e07a5f]"
                       : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
-                  }`}
+                    }`}
                 >
                   {type}
                 </button>
@@ -335,11 +359,10 @@ export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: Advanced
                 <button
                   key={type}
                   onClick={() => setSelectedGroupType(type)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                    selectedGroupType === type
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedGroupType === type
                       ? "bg-[#e07a5f] text-white border-[#e07a5f]"
                       : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
-                  }`}
+                    }`}
                 >
                   {type}
                 </button>
@@ -371,11 +394,15 @@ export  function AdvancedFilters({ isOpen, onClose, isMobile = false }: Advanced
           Clear All
         </button>
         <button
-          onClick={onClose}
+          onClick={() => {
+            onApplyFilters?.(getSelectedFilters());
+            onClose();
+          }}
           className="flex-1 py-2.5 text-sm font-medium text-white bg-[#e07a5f] rounded-full hover:bg-[#d06a4f] transition-colors"
         >
           Apply Filters
         </button>
+
       </div>
     </>
   )

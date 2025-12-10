@@ -1,11 +1,9 @@
 "use client"
 
-import { ChevronLeft, Heart } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { Header } from "@/components/search-results/header"
 
 interface TripData {
     id: number
@@ -37,7 +35,7 @@ const tripsToCompare: TripData[] = [
         rating: 4.8,
         avgGroupSize: "~15 people",
         startingPrice: 12999,
-        image:"/hampi-ruins-temples.png",
+        image: "/hampi-ruins-temples.png",
     },
     {
         id: 2,
@@ -91,25 +89,7 @@ export default function CompareTripsPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3 md:px-6">
-                <div className="max-w-6xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => router.back()} className="p-1 hover:bg-[#e5e3e0] rounded-full">
-                            <ChevronLeft className="w-5 h-5 text-[#3d3d3d]" />
-                        </button>
-                        <h1 className="text-lg font-semibold text-foreground">Compare Trips</h1>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <button className="p-2 hover:bg-muted rounded-full transition-colors hidden md:block">
-                            <Heart className="w-5 h-5 text-muted-foreground" />
-                        </button>
-                        <Avatar className="w-8 h-8">
-                            <AvatarImage src="/man-profile.png" />
-                            <AvatarFallback className="bg-primary text-primary-foreground text-xs">DR</AvatarFallback>
-                        </Avatar>
-                    </div>
-                </div>
-            </header>
+            <Header title="Compare Trips" />
 
             {/* Comparison Table */}
             <main className="max-w-6xl mx-auto p-4 md:p-6 overflow-x-auto">
