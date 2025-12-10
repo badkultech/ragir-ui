@@ -15,9 +15,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Eye, EyeOff, Upload, CheckCircle2, XCircle } from "lucide-react";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { AppHeader } from "@/components/app-header";
-import { toast } from "sonner";
 import { useChangePasswordMutation } from "@/lib/services/login";
-import { showApiError } from "@/lib/utils/toastHelpers";
+import { showApiError, showSuccess, showError } from "@/lib/utils/toastHelpers";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 
@@ -35,7 +34,7 @@ export default function SettingsPage() {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     const [changePassword, { isLoading }] = useChangePasswordMutation();
-    const {userData} = useSelector(selectAuthState);
+    const { userData } = useSelector(selectAuthState);
     const email = userData?.email ?? "";
 
     // 🧠 password rule checks
@@ -67,12 +66,16 @@ export default function SettingsPage() {
                 email
             }).unwrap();
 
-            toast.success("Password updated successfully!");
+            showSuccess("Password updated successfully!");
             setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
         } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to update password");
+            if (error?.data?.message) {
+                showError(error.data.message);
+            } else {
+                showApiError(error);
+            }
         }
     };
 
@@ -361,8 +364,8 @@ export default function SettingsPage() {
                                     onClick={handlePasswordUpdate}
                                     disabled={!allValid || isLoading}
                                     className={`${allValid
-                                            ? "bg-orange-500 hover:bg-orange-600 text-white"
-                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        ? "bg-orange-500 hover:bg-orange-600 text-white"
+                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                         }`}
                                 >
                                     {isLoading ? "Updating..." : "Update Password"}

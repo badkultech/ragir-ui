@@ -12,7 +12,6 @@ import {
 } from "@/lib/services/superadmin";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { useToast } from "@/hooks/use-toast";
 import { useResendInviteMutation } from "@/lib/services/setup-password";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";

@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
 import { getDashboardPath } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { showApiError } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
 import { jwtDecode } from "jwt-decode";
@@ -26,7 +25,6 @@ export default function AdminRegister() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const dispatch = useDispatch();
   const router = useRouter();
   const [setupPassword] = useSetupPasswordMutation();
@@ -100,7 +98,7 @@ export default function AdminRegister() {
   return (
     <div className="min-h-screen flex flex-col font-poppins">
       {/* Header */}
-      <AppHeader showAvatar={false} showLogo={true}/>
+      <AppHeader showAvatar={false} showLogo={true} />
 
       {/* Background */}
       <div
@@ -159,7 +157,7 @@ export default function AdminRegister() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {showInstructions && <p className="text-[#FF804C] text-sm mt-1">For a strong password, includes:</p> }
+            {showInstructions && <p className="text-[#FF804C] text-sm mt-1">For a strong password, includes:</p>}
             {/* Password Strength */}
             {showInstructions && (
               <div className="mt-4 space-y-1">
@@ -228,7 +226,7 @@ export default function AdminRegister() {
           </div>
 
           {/* Submit Button */}
-          <GradientButton  type="submit" disabled={!isFormValid || isLoading}>
+          <GradientButton type="submit" disabled={!isFormValid || isLoading}>
             Create Admin Account
           </GradientButton>
         </form>

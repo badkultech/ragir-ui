@@ -7,7 +7,6 @@ import { GradientButton } from "@/components/gradient-button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
-import { useToast } from "@/components/ui/use-toast";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import Select from "react-select";
 import {
@@ -56,7 +55,6 @@ export function AddActivityForm({
   const [packing, setPacking] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { toast } = useToast();
   const [saveInLibrary, setSaveInLibrary] = useState(false);
   const [saveAsName, setSaveAsName] = useState("");
   const [moodTags, setMoodTags] = useState<OptionType[]>([]);
