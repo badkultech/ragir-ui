@@ -23,6 +23,7 @@ import {
   MessageCircleQuestion,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
 
 const menuItems = [
   { icon: Search, label: "Search by Mood", href: "search-result/search-by-mood" },
@@ -112,6 +113,8 @@ export default function HomePage() {
         return <Bell className="w-4 h-4 text-white" />
     }
   }
+  const [selectedYear, setSelectedYear] = useState(2026);
+  const [selectedMonth, setSelectedMonth] = useState<'Jan' | string>('Jan');
 
   return (
     <div className="min-h-screen bg-[#3d5a4c] relative overflow-hidden">
@@ -321,16 +324,17 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      <div>
-                        <label className="text-xs text-muted-foreground block mb-2">When do you want to go?</label>
-                        <div className="flex gap-2">
-                          <button className="px-4 py-2 bg-primary text-primary-foreground text-xs font-medium rounded-full">
-                            Jan
-                          </button>
-                          <button className="px-4 py-2 bg-muted text-muted-foreground text-xs font-medium rounded-full">
-                            Feb
-                          </button>
-                        </div>
+                      <div className="p-6">
+                        <MonthYearSelector
+                          year={selectedYear}
+                          month={selectedMonth}
+                          minYear={2024}
+                          maxYear={2030}
+                          onChange={({ year, month }) => {
+                            setSelectedYear(year);
+                            setSelectedMonth(month);
+                          }}
+                        />
                       </div>
                     </div>
                   </div>

@@ -6,7 +6,7 @@ import { TAGS } from "@/lib/services/tags";
 
 export const tripAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
-    getTrips: builder.query<
+    getFilteredTrips: builder.query<
       TripFilterResponse,
       { organizationId: string; filters: TripFilterRequest }
     >({
@@ -21,4 +21,5 @@ export const tripAPI = baseAPI.injectEndpoints({
   }),
 });
 
-export const { useGetTripsQuery } = tripAPI;
+export const { useGetFilteredTripsQuery } = tripAPI;
+export type { TripListItem } from "./types";
