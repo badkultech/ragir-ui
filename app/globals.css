@@ -176,3 +176,13 @@
 .dialog-scroll {
   -webkit-overflow-scrolling: touch;
 }
+
+/* globals.css */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

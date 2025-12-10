@@ -112,7 +112,8 @@ export const ENDPOINTS = {
     TICKETS: (userId: string, organizationId: string) => `/org/${organizationId}/user/${userId}/ticket`,
     TICKET_BY_ID: (id: number | string) => `/org/ticket/${id}`,
     TICKET_COMMENT: (ticketId: number | string) =>
-      `/org/ticket/${ticketId}/comment`,
+      `/organizer/ticket/${ticketId}/comment`,
+    DASHBOARD: (orgId: string) => `/org/${orgId}/dashboard`,
 
   },
 } as const;
