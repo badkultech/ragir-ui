@@ -10,7 +10,7 @@ export const TAGS = {
   admins: 'admins',
   organizations: 'organizations',
   orgs: 'org',
-  trip:'trip',
+  trip: 'trip',
   myTrips: 'myTrips',
   itinerary: 'itinerary',
   itineraryDayDetails: 'itineraryDayDetails',
@@ -34,6 +34,8 @@ export const TAGS = {
   tripLibraryActivity: 'tripLibraryActivity',
   tripLeads: 'tripLeads',
   tickets: "tickets",
-  tripQueries :'tripQueries',
+  tripQueries: 'tripQueries',
   tripQueryComments: 'tripQueryComments',
+  organizerDashboard: "OrganizerDashboard",
+  trips: "Trips",
 } as const;

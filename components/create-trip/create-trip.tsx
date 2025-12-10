@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -55,7 +55,7 @@ import {
   useLazyGetTripByIdQuery,
   useUpdateTripMutation,
 } from '@/lib/services/organizer/trip/create-trip';
-import { CustomDateTimePicker, DateTimePickerHandle } from '@/components/ui/date-time-picker';
+import { CustomDateTimePicker } from '@/components/ui/date-time-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   organizerState,
@@ -79,10 +79,6 @@ interface Props {
 }
 
 export function CreateTrip({ tripId }: Props) {
-  // at top of CreateTrip component (inside function, before JSX)
-  const startPickerRef = useRef<DateTimePickerHandle | null>(null)
-  const endPickerRef = useRef<DateTimePickerHandle | null>(null)
-
   const dispatch = useDispatch();
   const state = useSelector(organizerState);
   const {
@@ -422,6 +418,7 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const handleInputChange = (field: string, value: string | number) => {
+    console.log("🔄 Input Change:", field, value);
     dispatch(setFormData({ ...formData, [field]: value }));
   };
 
@@ -539,46 +536,16 @@ export function CreateTrip({ tripId }: Props) {
                   Start Date<RequiredStar />
                 </Label>
                 <CustomDateTimePicker
-                  ref={startPickerRef}
                   value={formData.startDate}
                   stepMinutes={15}
                   minDate={getTodayStr()}
                   onChange={(val) => {
-                    // update form state
                     handleInputChange('startDate', val);
                     clearError("startDate");
-
-                    // if end not selected, populate it with same value (existing behaviour)
-                    const wasEndEmpty = !formData.endDate;
-                    if (wasEndEmpty) {
-                      handleInputChange("endDate", val);
-                    }
-
-                    // Close the start picker (imperative) and open the end picker
-                    // Use rAF to ensure close completes before open so there is no overlap
-                    try {
-                      startPickerRef.current?.close();
-                      requestAnimationFrame(() => {
-                        endPickerRef.current?.open();
-                        // focus end input so keyboard/UX nice
-                        endPickerRef.current?.focus();
-                      });
-                    } catch (e) {
-                      // fallback: attempt DOM focus/click if imperative API fails
-                      requestAnimationFrame(() => {
-                        const endInput = document.querySelector<HTMLInputElement>('input[placeholder="Select end date & time"]');
-                        if (endInput) {
-                          endInput.focus();
-                          endInput.click();
-                        }
-                      });
-                    }
                   }}
                   placeholder="Select start date & time"
                   className="w-full"
                 />
-
-
                 {errors.startDate && (
                   <p className="text-red-500 text-sm absolute left-0 -bottom-2">
                     {errors.startDate}
@@ -591,7 +558,6 @@ export function CreateTrip({ tripId }: Props) {
                   End Date<RequiredStar />
                 </Label>
                 <CustomDateTimePicker
-                  ref={endPickerRef}
                   value={formData.endDate}
                   onChange={(val) => {
                     handleInputChange('endDate', val);
