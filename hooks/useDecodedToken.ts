@@ -21,13 +21,17 @@ export function useDecodedToken(token?: string | null) {
 
       // Optional: Check expiration
       if (payload.exp && Date.now() >= payload.exp * 1000) {
-        console.warn('Token has expired');
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Token has expired');
+        }
         return null;
       }
 
       return payload;
     } catch (error) {
-      console.error('Invalid token', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Invalid token', error);
+      }
       return null;
     }
   }, [token]);

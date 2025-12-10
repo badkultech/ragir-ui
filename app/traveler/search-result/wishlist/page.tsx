@@ -2,7 +2,6 @@
 
 import { Heart, MapPin, Calendar, Clock, Users, Plane, Star, Sun } from "lucide-react"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Header } from "@/components/search-results/header"
 import { WishlistTrip, WishlistTripCard } from "@/components/search-results/wishlist-tripcard"
 
@@ -20,7 +19,7 @@ const wishlistTrips: WishlistTrip[] = [
         dates: "15 Dec - 20 Dec",
         price: 12999,
         badges: ["Skygaze", "Skygaze"],
-        image:"/hampi-ruins-temples.png",
+        image: "/hampi-ruins-temples.png",
         route: "Delhi → Delhi",
     },
     {
@@ -74,7 +73,6 @@ const wishlistTrips: WishlistTrip[] = [
 
 
 export default function WishlistPage() {
-    const router = useRouter();
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}

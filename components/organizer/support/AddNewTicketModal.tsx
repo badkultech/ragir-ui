@@ -55,7 +55,6 @@ export function AddNewTicketModal({ open, onClose }: AddNewTicketModalProps) {
   const description = watch("description") || "";
 
   const onSubmit = (data: TicketFormData) => {
-    console.log("✅ New Ticket Submitted:", data);
     onClose();
   };
 

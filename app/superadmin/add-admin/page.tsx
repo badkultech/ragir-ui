@@ -1,6 +1,5 @@
 "use client";
 
-import type React from "react";
 import { ChevronLeft, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

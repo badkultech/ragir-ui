@@ -124,7 +124,7 @@ export default function TripOverviewPage() {
               leads: trip.leadsCount ?? 0,
             }}
             onDelete={() => setOpenDelete(true)}
-            onArchive={() => console.log("Archive", trip.tripPublicId)}
+            onArchive={() => {/* Archive functionality to be implemented */ }}
           />
         ))}
       </div>

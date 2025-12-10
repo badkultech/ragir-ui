@@ -59,7 +59,7 @@ export function AddFromLibraryModal({ isOpen, onClose }: AddFromLibraryModalProp
   }
 
   const handleSaveEvent = () => {
-    console.log("Selected activities:", selectedActivities)
+    // Activities selected from library
     onClose()
   }
 
@@ -129,9 +129,8 @@ export function AddFromLibraryModal({ isOpen, onClose }: AddFromLibraryModalProp
                 <div
                   key={activity.id}
                   onClick={() => toggleActivity(activity.id)}
-                  className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                    isSelected ? "border-orange-500 bg-orange-50" : "border-gray-200 bg-white hover:border-gray-300"
-                  }`}
+                  className={`p-4 rounded-lg border cursor-pointer transition-all ${isSelected ? "border-orange-500 bg-orange-50" : "border-gray-200 bg-white hover:border-gray-300"
+                    }`}
                 >
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl">

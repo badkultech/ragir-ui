@@ -23,6 +23,13 @@ type AppHeaderProps = {
   onMenuClick?: () => void; // 👈 new prop
 };
 
+// Define props interface outside component to avoid conflicts
+interface NotificationDropdownProps {
+  organizationId?: string;
+  userId?: string;
+  role?: string;
+}
+
 export function AppHeader({
   title,
   showAvatar = true,
@@ -31,37 +38,22 @@ export function AppHeader({
 }: AppHeaderProps) {
   const { userData } = useSelector(selectAuthState);
   const organizationId = useOrganizationId();
-  // choose ProfileDropdown
-  let ProfileDropdown: React.FC = DefaultProfileDropdown;
-  switch (userData?.userType) {
-    case "SYSTEM_ADMIN":
-      ProfileDropdown = SuperAdminProfileDropdown;
-      break;
-    case "USER":
-      ProfileDropdown = UserProfileDropdown;
-      break;
-    case "ORGANIZATION_ADMIN":
-      ProfileDropdown = ManagerProfileDropdown;
-      break;
-    default:
-      ProfileDropdown = DefaultProfileDropdown;
-  }
 
-  // choose NotificationDropdown
-  let NotificationDropdown: React.FC<any> = DefaultNotificationDropdown;
-  switch (userData?.userType) {
-    case "SYSTEM_ADMIN":
-      NotificationDropdown = SuperAdminNotificationDropdown;
-      break;
-    case "USER":
-      NotificationDropdown = UserNotificationDropdown;
-      break;
-    case "ORGANIZATION_ADMIN":
-      NotificationDropdown = ManagerNotificationDropdown;
-      break;
-    default:
-      NotificationDropdown = DefaultNotificationDropdown;
-  }
+  // Lookup objects for role-based components
+  const PROFILE_DROPDOWNS: Record<string, React.FC> = {
+    SYSTEM_ADMIN: SuperAdminProfileDropdown,
+    USER: UserProfileDropdown,
+    ORGANIZATION_ADMIN: ManagerProfileDropdown,
+  };
+
+  const NOTIFICATION_DROPDOWNS: Record<string, React.FC<any>> = {
+    SYSTEM_ADMIN: SuperAdminNotificationDropdown,
+    USER: UserNotificationDropdown,
+    ORGANIZATION_ADMIN: ManagerNotificationDropdown,
+  };
+
+  const ProfileDropdown = PROFILE_DROPDOWNS[userData?.userType ?? ''] ?? DefaultProfileDropdown;
+  const NotificationDropdown = NOTIFICATION_DROPDOWNS[userData?.userType ?? ''] ?? DefaultNotificationDropdown;
 
   return (
     <header className="w-full bg-white border-b border-gray-200  flex items-center justify-between px-4 md:px-6 py-3">

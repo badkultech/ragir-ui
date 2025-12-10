@@ -31,14 +31,21 @@ const authSlice = createSlice({
         const decodedData = jwtDecode<AuthTokenPayload>(
           action.payload.accessToken,
         );
+
+        // Check if token is expired
+        if (decodedData.exp && Date.now() >= decodedData.exp * 1000) {
+          // Token is expired - reset to initial state
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Token has expired - logging out');
+          }
+          return initialState;
+        }
+
         state.userData = decodedData;
         state.focusedOrganizationId =
           action.payload.focusedOrganizationId ??
           decodedData.organizationPublicId;
-        if (decodedData.exp && Date.now() >= decodedData.exp * 1000) {
-          console.warn('Token has expired');
-          state.isTokenExpired = true;
-        }
+        state.isTokenExpired = false;
       }
     },
     logout: (state) => {

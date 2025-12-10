@@ -96,7 +96,7 @@ export function GroupLeaders() {
 
   const handleSaveLeader = () => {
     // Add validation and save logic here
-    console.log("Saving leader:", newLeader)
+    // Saving leader data
     setIsModalOpen(false)
     setNewLeader({ name: "", motto: "", description: "", avatar: "" })
   }

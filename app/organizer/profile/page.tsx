@@ -3,7 +3,6 @@
 import { AppHeader } from '@/components/app-header';
 import { OrganizerSidebar } from '@/components/organizer/organizer-sidebar';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -26,6 +25,7 @@ import { LazyImage } from '@/components/ui/lazyImage';
 import { Certificate } from '@/components/library/SvgComponents/Icons/certificate';
 import { Check } from 'lucide-react';
 import { useOrganizationId } from '@/hooks/useOrganizationId';
+import { Button } from '@/components/ui/button';
 
 const hasProfile = true;
 

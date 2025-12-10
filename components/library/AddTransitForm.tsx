@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/gradient-button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
@@ -212,7 +213,7 @@ export function AddTransitForm({
       { key: "vehicleTypes", label: "Vehicle", value: vehicle },
     ]);
 
-  
+
     if (!vehicle || vehicle.length === 0) {
       newErrors.vehicleTypes = "Select at least 1 vehicle";
     }
@@ -549,13 +550,12 @@ export function AddTransitForm({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
+        <GradientButton
           disabled={isSaving || isLibraryLoading}
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >
           Save
-        </Button>
+        </GradientButton>
       </div>
 
       {/* Library Modal */}

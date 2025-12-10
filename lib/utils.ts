@@ -131,12 +131,18 @@ export const PublicRoutes = [
   '/',
   '/login',
   '/superadmin/login',
+  '/superadmin/register',
+  '/superadmin/forgot-password',
+  '/organizer/login',
+  '/organizer/register',
+  '/organizer/join-as-partner',
   '/register',
   '/user/landing',
   '/admin/forgot-password',
   '/verify-otp',
-  '/organizer/register',
-  '/join-as-partner',
+  '/prelaunch',
+  '/home',
+  '/not-found',
 ];
 
 // ✅ Always arrays. Use ["*"] to mean unrestricted access.
@@ -151,17 +157,25 @@ export const ROLE_ROUTE_ACCESS: Record<RoleType, string[]> = {
   ],
 
   [ROLES.ORGANIZER]: [
+    '/organizer/dashboard',
     '/organizer/notifications',
     '/organizer/team',
     '/organizer/settings',
+    '/organizer/billing',
+    '/organizer/support',
     '/organizer/create-trip',
-    '/organizer/trips', // base
-    '/organizer/trips/*', // dynamic children
+    '/organizer/create-trip/*',
+    '/organizer/trips',
+    '/organizer/trips/*',
     '/organizer/queries',
     '/organizer/queries/*',
+    '/organizer/leads',
+    '/organizer/leads/*',
+    '/organizer/library',
+    '/organizer/library/*',
     '/organizer/profile',
+    '/organizer/profile/*',
     ...PublicRoutes,
-    '/organizer/profile/edit',
   ],
 };
 

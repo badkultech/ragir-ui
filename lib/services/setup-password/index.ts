@@ -19,6 +19,14 @@ export const adminAPI = baseAPI.injectEndpoints({
       }),
       transformResponse: (response: ApiResponse<LoginDTO>) => response.data,
     }),
+    setupOrganizerPassword: builder.mutation<LoginDTO, SetupPasswordRequest>({
+      query: (body) => ({
+        url: `${ENDPOINTS.SETUP_ORGANIZER_PASSWORD}`,
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiResponse<LoginDTO>) => response.data,
+    }),
     resendInvite: builder.mutation<void, { email: string }>({
       query: ({ email }) => ({
         url: ENDPOINTS.RESEND_INVITE,
@@ -27,7 +35,7 @@ export const adminAPI = baseAPI.injectEndpoints({
       }),
       transformResponse: (response: ApiResponse<void>) => response.data,
     }),
-    ForgotPassword : builder.mutation<void, { email: string }>({
+    ForgotPassword: builder.mutation<void, { email: string }>({
       query: ({ email }) => ({
         url: ENDPOINTS.FORGOT_PASSWORD,
         method: 'POST',
@@ -38,4 +46,9 @@ export const adminAPI = baseAPI.injectEndpoints({
   }),
 });
 
-export const { useSetupPasswordMutation ,useResendInviteMutation, useForgotPasswordMutation } = adminAPI;
+export const {
+  useSetupPasswordMutation,
+  useSetupOrganizerPasswordMutation,
+  useResendInviteMutation,
+  useForgotPasswordMutation
+} = adminAPI;

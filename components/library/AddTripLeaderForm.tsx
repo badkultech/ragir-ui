@@ -2,9 +2,10 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/gradient-button";
 import RichTextEditor from "../editor/RichTextEditor";
 import { SingleUploader } from "../common/UploadFieldShortcuts";
 import { useDocumentsManager, Document as DocShape } from "@/hooks/useDocumentsManager";
@@ -128,19 +129,12 @@ export function AddTripLeaderForm({
       {/* Footer */}
       <div className="flex justify-end items-center gap-4 mt-6">
         <Button variant="outline" className="rounded-full" onClick={onCancel}>Cancel</Button>
-        <Button
+        <GradientButton
           onClick={handleSubmit}
           disabled={loading || parentLoading}
-
-          className={`rounded-full px-6 gap-2 text-white bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]
-               ${(loading || parentLoading)
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:opacity-90"
-            }
-              `}
         >
           {(loading || parentLoading) ? "Saving..." : "Save"}
-        </Button>
+        </GradientButton>
 
       </div>
     </div>

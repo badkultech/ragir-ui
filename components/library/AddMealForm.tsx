@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/gradient-button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
@@ -12,8 +13,6 @@ import {
   useDocumentsManager,
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import { useLazyGetMealByIdQuery } from "@/lib/services/organizer/trip/library/meal";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
@@ -371,13 +370,12 @@ export function AddMealForm({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
+        <GradientButton
           disabled={isSaving || isLibraryLoading}
           onClick={handleSubmit}
-          className="rounded-full px-6 gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]  hover:opacity-90 text-white"
         >
           Save
-        </Button>
+        </GradientButton>
       </div>
 
       {/* Library Modal */}

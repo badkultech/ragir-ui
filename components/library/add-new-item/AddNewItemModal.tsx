@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Calendar,
@@ -68,15 +68,15 @@ function SaveStatusBar({
     status === "saving"
       ? "Saving..."
       : status === "success"
-      ? "Saved ✓"
-      : "Failed to save";
+        ? "Saved ✓"
+        : "Failed to save";
 
   const color =
     status === "saving"
       ? "bg-blue-50 text-blue-600 border-blue-200"
       : status === "success"
-      ? "bg-green-50 text-green-600 border-green-200"
-      : "bg-red-50 text-red-600 border-red-200";
+        ? "bg-green-50 text-green-600 border-green-200"
+        : "bg-red-50 text-red-600 border-red-200";
 
   return (
     <div
@@ -171,56 +171,56 @@ export function AddNewItemModal({
     const actions: Record<Step, any> = {
       "day-description": updateId
         ? () =>
-            updateDayDescription({
-              organizationId,
-              dayDescriptionId: String(updateId),
-              data: fd,
-            }).unwrap()
+          updateDayDescription({
+            organizationId,
+            dayDescriptionId: String(updateId),
+            data: fd,
+          }).unwrap()
         : () => createDayDescription({ organizationId, data: fd }).unwrap(),
       stay: updateId
         ? () =>
-            updateStay({ organizationId, stayId: updateId, data: fd }).unwrap()
+          updateStay({ organizationId, stayId: updateId, data: fd }).unwrap()
         : () => createStay({ organizationId, data: fd }).unwrap(),
       transit: updateId
         ? () =>
-            updateTransit({
-              organizationId,
-              transitId: updateId,
-              data: fd,
-            }).unwrap()
+          updateTransit({
+            organizationId,
+            transitId: updateId,
+            data: fd,
+          }).unwrap()
         : () => createTransit({ organizationId, data: fd }).unwrap(),
       meal: updateId
         ? () =>
-            updateMeal({ organizationId, mealId: updateId, data: fd }).unwrap()
+          updateMeal({ organizationId, mealId: updateId, data: fd }).unwrap()
         : () => createMeal({ organizationId, data: fd }).unwrap(),
       activity: updateId
         ? () =>
-            updateActivity({
-              organizationId,
-              activityId: updateId,
-              data: fd,
-            }).unwrap()
+          updateActivity({
+            organizationId,
+            activityId: updateId,
+            data: fd,
+          }).unwrap()
         : () => createActivity({ organizationId, data: fd }).unwrap(),
       "trip-leader": updateId
         ? () =>
-            updateLeader({
-              organizationId,
-              LeaderId: updateId,
-              data: fd,
-            }).unwrap()
+          updateLeader({
+            organizationId,
+            LeaderId: updateId,
+            data: fd,
+          }).unwrap()
         : () => createLeader({ organizationId, data: fd }).unwrap(),
       faq: updateId
         ? () =>
-            updateFaq({
-              organizationId,
-              faqId: updateId,
-              data: fd,
-            }).unwrap()
+          updateFaq({
+            organizationId,
+            faqId: updateId,
+            data: fd,
+          }).unwrap()
         : () =>
-            createFaq({
-              organizationId,
-              data: fd,
-            }).unwrap(),
+          createFaq({
+            organizationId,
+            data: fd,
+          }).unwrap(),
 
       select: () => Promise.resolve(),
     };

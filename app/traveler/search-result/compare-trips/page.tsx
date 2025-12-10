@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { Header } from "@/components/search-results/header"
 
 interface TripData {
@@ -85,7 +84,6 @@ const attributes = [
 ]
 
 export default function CompareTripsPage() {
-    const router = useRouter();
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}

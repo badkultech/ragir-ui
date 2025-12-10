@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, Calendar } from "lucide-react";
+import { GradientButton } from "@/components/gradient-button";
 
 interface ProfileTabProps {
   formData: {
@@ -153,9 +154,9 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
 
         {/* Save Button */}
         <div className="mt-8">
-          <button className="inline-flex items-center gap-2 px-6 py-3 bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)] text-primary-foreground rounded-full hover:opacity-90 transition-opacity text-sm font-medium">
+          <GradientButton className="inline-flex items-center gap-2">
             Save Changes
-          </button>
+          </GradientButton>
         </div>
 
       </div>

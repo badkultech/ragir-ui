@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/gradient-button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "../editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
@@ -13,8 +14,6 @@ import {
   Document as DocShape,
 } from "@/hooks/useDocumentsManager";
 import { useLazyGetDayDescriptionByIdQuery } from "@/lib/services/organizer/trip/library/day-description";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
 import RequiredStar from "../common/RequiredStar";
 import { validateRequiredFields } from "@/lib/utils/validateRequiredFields";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
@@ -52,10 +51,8 @@ export function AddDayDescriptionForm({
   const [packing, setPacking] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveInLibrary, setSaveInLibrary] = useState(false);
-  const [saveAsName, setSaveAsName] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [getbyid] = useLazyGetDayDescriptionByIdQuery();
-  const { userData } = useSelector(selectAuthState);
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
@@ -67,9 +64,9 @@ export function AddDayDescriptionForm({
     setLocation(initialData.location || "");
     setTime(initialData.time || "");
     setPacking(initialData.packingSuggestion || initialData.packing || "");
-     if (initialData?.documents) {
-    docsManager.setDocuments(initialData.documents);
-  };
+    if (initialData?.documents) {
+      docsManager.setDocuments(initialData.documents);
+    };
   }, [initialData]);
 
   const handleLibrarySelect = async (item: any) => {
@@ -154,7 +151,7 @@ export function AddDayDescriptionForm({
       );
 
       showSuccess("Day description saved successfully!");
-      console.log("📸 Uploaded documents:", docsManager.documents);
+      // Documents uploaded successfully
     } catch {
       showApiError("Failed to save day description");
     } finally {
@@ -301,13 +298,12 @@ export function AddDayDescriptionForm({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-        disabled={isSaving || isLibraryLoading}
+        <GradientButton
+          disabled={isSaving || isLibraryLoading}
           onClick={() => handleSubmit(false)}
-          className="rounded-full px-6 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >
           Save
-        </Button>
+        </GradientButton>
       </div>
 
       {/* Library Modal */}

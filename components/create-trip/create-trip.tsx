@@ -211,7 +211,7 @@ export function CreateTrip({ tripId }: Props) {
   useEffect(() => {
     if (!tripId || !organizationId) return;
 
-    console.log("🔄 Fetching Trip...");
+    // Fetching trip data
     triggerGetTrip({
       organizationId,
       tripId,
@@ -418,7 +418,7 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const handleInputChange = (field: string, value: string | number) => {
-    console.log("🔄 Input Change:", field, value);
+    // Handle input change
     dispatch(setFormData({ ...formData, [field]: value }));
   };
 

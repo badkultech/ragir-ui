@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/gradient-button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import RichTextEditor from "../editor/RichTextEditor";
@@ -90,12 +91,11 @@ export function AddFAQForm({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
+        <GradientButton
           onClick={handleSubmit}
-          className="rounded-full px-6 gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >
           {updateId ? "Update" : "Save"}
-        </Button>
+        </GradientButton>
       </div>
 
       {mode === "trip" && (

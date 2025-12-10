@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/gradient-button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
@@ -235,12 +236,8 @@ export function AddActivityForm({
     }
   };
 
-  /** ---------- Render ---------- */
   return (
-    <div
-      className="flex flex-col gap-6"
-      style={{ fontFamily: "var(--font-poppins)" }}
-    >
+    <div className="flex flex-col gap-6 font-poppins">
       {/* Header */}
       {header && (
         <div className="text-lg font-semibold text-gray-800 pb-2">{header}</div>
@@ -435,13 +432,12 @@ export function AddActivityForm({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
+        <GradientButton
           disabled={isSaving || isLibraryLoading}
           onClick={handleSubmit}
-          className="rounded-full px-6 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 text-white"
         >
           Save
-        </Button>
+        </GradientButton>
       </div>
 
       {/* Library Modal */}

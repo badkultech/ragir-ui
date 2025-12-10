@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { ArrowLeft, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/gradient-button";
 
 type LibraryHeaderProps = {
   backHref?: string;
@@ -64,13 +65,13 @@ export function LibraryHeader({
         </div>
 
         {/* Add Button */}
-        <Button
+        <GradientButton
           onClick={onAddClick}
-          className="flex items-center gap-2 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] hover:opacity-90 hover:cursor-pointer text-white"
+          className="flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           {buttonLabel}
-        </Button>
+        </GradientButton>
       </div>
 
       {/* Search Bar */}
