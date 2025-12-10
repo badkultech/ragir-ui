@@ -11,6 +11,7 @@ import { DesktopFilterBar } from "@/components/search-results/desktop-filter-bar
 import { DesktopFilterSidebar } from "@/components/search-results/desktop-filter-sidebar";
 import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
 import { FilterTags } from "@/components/search-results/filter-tags";
+import NoTripsFound from "@/components/search-results/NoTripsFound";
 
 /* ---------------- SAMPLE TRIP DATA ---------------- */
 const trips = [
@@ -105,25 +106,52 @@ export default function SearchResultsWithFilters() {
 
   /* ---------------- FILTER LOGIC ---------------- */
   const filteredTrips = trips.filter((trip) => {
-    // 1️⃣ Destination filter
-    if (destinationFromUrl) {
-        if (!trip.location.toLowerCase().includes(destinationFromUrl.toLowerCase())) {
-            return false;
+
+  const tripBadges = trip.badges.map((b) => b.toLowerCase());
+
+  // ⭐ 1️⃣ URL Mood Filter (OR condition)
+  if (parsedMoods.length > 0) {
+    const hasAtLeastOneMood = parsedMoods.some((mood) =>
+      tripBadges.includes(mood.toLowerCase())
+    );
+
+    if (!hasAtLeastOneMood) return false;
+  }
+
+  // ⭐ 2️⃣ Destination Filter
+  if (destinationFromUrl) {
+    if (!trip.location.toLowerCase().includes(destinationFromUrl.toLowerCase())) {
+      return false;
+    }
+  }
+
+  // ⭐ 3️⃣ Filters from Custom Sidebar (ALSO OR condition)
+  if (filters.length > 0) {
+    let matchFound = false;
+
+    for (const f of filters) {
+      const label = f.label.toLowerCase();
+
+      // Destination from sidebar
+      if (label.includes("destination:")) {
+        const dest = label.replace("destination:", "").trim();
+        if (trip.location.toLowerCase().includes(dest)) {
+          matchFound = true;
         }
+      }
+
+      // Mood match
+      if (trip.badges.some((b) => label.includes(b.toLowerCase()))) {
+        matchFound = true;
+      }
     }
 
-    // 2️⃣ Mood filter (BADGES only)
-    if (parsedMoods.length > 0) {
-        const tripBadges = trip.badges.map((b) => b.toLowerCase());
-        const hasMood = parsedMoods.some((mood) =>
-            tripBadges.includes(mood.toLowerCase())
-        );
-        if (!hasMood) return false;
-    }
+    if (!matchFound) return false;
+  }
 
-    // 3️⃣ Year / Month (skip for now because static data)
-    return true;
+  return true;
 });
+
 
 
   /* ---------------- ACTIONS ---------------- */
@@ -148,9 +176,9 @@ export default function SearchResultsWithFilters() {
         onToggleSort={() => setShowSortDropdown(!showSortDropdown)}
       />
 
-      <main className="max-w-[1400px] mx-auto px-4 md:px-8 py-6">
-        <div className="flex gap-6">
-          
+      <main className="max-w-[1400px] bg-white mx-auto px-4 md:px-8 py-6">
+        <div className="flex gap-6 ">
+
           {/* DESKTOP SIDEBAR */}
           <DesktopFilterSidebar
             isOpen={showFilters}
@@ -175,7 +203,7 @@ export default function SearchResultsWithFilters() {
           />
 
           {/* RESULTS SECTION */}
-          <div className="flex-1">
+          <div className="flex-1 ">
             {/* Mobile Filter Tags */}
             <div className="md:hidden mb-3">
               <FilterTags filters={filters} onRemove={removeFilter} />
@@ -194,11 +222,16 @@ export default function SearchResultsWithFilters() {
               trips found
             </p>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredTrips.map((trip) => (
-                <SearchResultsTripCard key={trip.id} {...trip} />
-              ))}
-            </div>
+            {filteredTrips.length === 0 ? (
+              <NoTripsFound />
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredTrips.map((trip) => (
+                  <SearchResultsTripCard key={trip.id} {...trip} />
+                ))}
+              </div>
+            )}
+
           </div>
         </div>
       </main>

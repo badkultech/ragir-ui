@@ -129,7 +129,7 @@ const weekendTrips = [
     days: "5D/4N",
     dates: "15 Dec - 20 Dec",
     price: 12999,
-    badge: "Weekend",
+    badge: "Weekends",
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
     badgeIcon: Calendar,
     image: "/goa-beach-sunset-weekend-getaway.jpg",
@@ -143,7 +143,7 @@ const weekendTrips = [
     days: "5D/4N",
     dates: "15 Dec - 20 Dec",
     price: 12999,
-    badge: "Weekend",
+    badge: "Weekends",
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
     badgeIcon: Calendar,
     image: "/beach-resort-weekend-trip.jpg",
@@ -157,7 +157,7 @@ const weekendTrips = [
     days: "5D/4N",
     dates: "15 Dec - 20 Dec",
     price: null,
-    badge: "Weekend",
+    badge: "Weekends",
     badgeIcon: Calendar,
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
     image: "/weekend-beach-vacation.jpg",
@@ -165,9 +165,8 @@ const weekendTrips = [
 ]
 
 export default function SearchByMoodPage() {
-  const [selectedMoods, setSelectedMoods] = useState<string[]>(
-    moods.filter((m) => m.active).map((m) => m.name),
-  )
+  const [selectedMoods, setSelectedMoods] = useState<string[]>([])
+
   const [selectedYear, setSelectedYear] = useState(2026);
   const [selectedMonth, setSelectedMonth] = useState<'Jan' | string>('Jan');
   const router = useRouter()

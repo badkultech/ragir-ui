@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { Heart, MapPin, Calendar, Clock, Users, Star } from "lucide-react"
 import { useState } from "react"
-import { moodMap } from "@/components/search-results/mood-tag"   // ⭐ moods data
+import { moodMap } from "@/components/search-results/mood-tag"  
 
 interface SearchResultsTripCardProps {
   id: number
@@ -33,45 +33,56 @@ export function SearchResultsTripCard({
   image,
   isFavorite = false,
 }: SearchResultsTripCardProps) {
-  
+
   const [favorite, setFavorite] = useState(isFavorite)
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e3e0] hover:shadow-lg transition-shadow cursor-pointer">
-      
+
       {/* Image */}
       <div className="relative h-40 md:h-44">
         <Image src={image} alt={title} fill className="object-cover" />
-
         {/* BADGES */}
         <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
           {badges.map((badge, index) => {
-            const mood = moodMap[badge] || {};
-            const Icon = mood.icon;
-            const colors = mood.colors || {
+
+            const normalizedKey = Object.keys(moodMap).find(
+              (key) => key.toLowerCase() === badge.toLowerCase()
+            );
+
+            const mood = normalizedKey ? moodMap[normalizedKey] : {};
+            const Icon = (mood as any).icon;
+            const colors = (mood as any).colors || {
               bg: "white",
               border: "#FFA77C",
               text: "#FFA77C",
             };
 
+            const displayLabel = normalizedKey || badge;
             return (
               <span
                 key={index}
-                className="px-2.5 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 border"
+                className="px-2 py-1 rounded-full text-[11px] font-medium flex items-center gap-1 border leading-none"
                 style={{
                   backgroundColor: colors.bg,
                   borderColor: colors.border,
                   color: colors.text,
                 }}
               >
-                {Icon && <Icon width="10" height="10" fill={colors.text} />}
-                {badge}
+                {Icon && (
+                  <Icon
+                    className="w-[11px] h-[11px]"
+                    color={colors.text}   
+                    fill={colors.text}     
+                    stroke={colors.text}
+                  />
+                )}
+                <span className="capitalize">{displayLabel}</span>
               </span>
             );
           })}
         </div>
 
-        {/* Favorite Button */}
         <button
           onClick={(e) => {
             e.stopPropagation()
@@ -80,9 +91,8 @@ export function SearchResultsTripCard({
           className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
         >
           <Heart
-            className={`w-4 h-4 ${
-              favorite ? "fill-[#FF5F5E] text-[#FF5F5E]" : "text-[#6b6b6b]"
-            }`}
+            className={`w-4 h-4 ${favorite ? "fill-[#FF5F5E] text-[#FF5F5E]" : "text-[#6b6b6b]"
+              }`}
           />
         </button>
       </div>
@@ -144,5 +154,5 @@ export function SearchResultsTripCard({
         </div>
       </div>
     </div>
-  );
+  )
 }
