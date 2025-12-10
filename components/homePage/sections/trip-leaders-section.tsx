@@ -3,14 +3,14 @@ import { TripLeaderCard } from "@/components/homePage/shared/trip-leader-card"
 import { ChevronRight } from "lucide-react"
 
 const tripLeaders = [
-  { name: "Kyle May", image: "/travel-guide-portrait-professional-man.jpg" },
-  { name: "Sarah Johnson", image: "/travel-guide-portrait-professional-woman.jpg" },
-  { name: "Mike Chen", image: "/adventure-guide-portrait-man-outdoor.jpg" },
-  { name: "Emma Wilson", image: "/travel-guide-portrait-professional-woman.jpg" },
-  { name: "James Brown", image: "/travel-guide-portrait-professional-man.jpg" },
-  { name: "Olivia Davis", image: "/adventure-guide-portrait-man-outdoor.jpg" },
-  { name: "David Lee", image: "/travel-guide-portrait-professional-man.jpg" },
-  { name: "Lisa Park", image: "/travel-guide-portrait-professional-woman.jpg" },
+  { name: "Kyle May", image: "/tl-pfp.jpg" },
+  { name: "Sarah Johnson", image: "/tl-pfp.jpg" },
+  { name: "Mike Chen", image: "/tl-pfp.jpg" },
+  { name: "Emma Wilson", image: "/tl-pfp.jpg" },
+  { name: "James Brown", image: "/tl-pfp.jpg" },
+  { name: "Olivia Davis", image: "/tl-pfp.jpg" },
+  { name: "David Lee", image: "/tl-pfp.jpg" },
+  { name: "Lisa Park", image: "/tl-pfp.jpg" },
 ]
 
 export function TripLeadersSection() {
@@ -43,13 +43,13 @@ export function TripLeadersSection() {
       </div>
 
       {/* View All link */}
-      <div className="flex justify-center mt-8">
+      <div className="text-center my-8 ">
         <Link
           href="/home/leaders"
-          className="inline-flex items-center gap-1 text-orange-500 hover:text-orange-600 font-medium text-sm"
+          className="text-lg text-[#ff804c] flex items-center gap-2  justify-center font-semibold font-poppins  hover:text-primary/80 transition-colors"
         >
           View All
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-5 h-5" />
         </Link>
       </div>
     </section>
