@@ -1,34 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import {
-  ChevronLeft,
-  Heart,
-  Mountain,
-  Sun,
-  Umbrella,
-  TreePine,
-  Leaf,
-  Sparkles,
-  Castle,
-  Compass,
-  Flag,
-  Car,
-  Calendar,
-  PartyPopper,
-  GraduationCap,
-  Tent,
-  Moon,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react"
+import { Mountain, Sun, Umbrella, TreePine, Leaf, Sparkles, Castle, Compass, Flag, Car, Calendar, PartyPopper, GraduationCap, Tent, Moon, } from "lucide-react"
 import { useRouter } from "next/navigation"
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoodTag } from "@/components/search-results/mood-tag"
-import { TripCard } from "@/components/search-results/trip-card"
 import { Footer } from "@/components/search-results/footer"
 import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
+import { TripSection } from "@/components/search-results/trip-section"
+import { Header } from "@/components/search-results/header"
 
 const moods = [
   { name: "Mountain", icon: Mountain, active: false },
@@ -202,32 +181,7 @@ export default function SearchByMoodPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-[#e5e5e5]">
-        <div className="flex items-center justify-between px-4 py-3 md:px-8 md:py-4 max-w-[1400px] mx-auto">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-1 hover:bg-[#f3f3f3] rounded-full"
-            >
-              <ChevronLeft className="w-5 h-5 text-[#2d2d2d]" />
-            </button>
-            <h1 className="text-base md:text-lg font-semibold text-[#2d2d2d]">
-              Search by Mood
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-[#f3f3f3] rounded-full transition-colors hidden md:block">
-              <Heart className="w-5 h-5 text-[#2d2d2d]" />
-            </button>
-            <Avatar className="w-8 h-8 md:w-9 md:h-9">
-              <AvatarImage src="/woman-avatar-profile.jpg" />
-              <AvatarFallback className="bg-[#e07a5f] text-white">
-                U
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-      </header>
+      <Header title="Search By Mood" />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col md:flex-row max-w-[1400px] mx-auto w-full py-6 px-4 md:px-8 gap-6">
@@ -237,8 +191,6 @@ export default function SearchByMoodPage() {
             <h2 className="text-base font-semibold text-[#2d2d2d] mb-3 text-center">
               Search Trips
             </h2>
-
-            {/* Mood Selection */}
             <div className="mb-6">
               <p className="text-sm text-[#191818] mb-3">
                 What&apos;s your travel mood?
@@ -255,7 +207,6 @@ export default function SearchByMoodPage() {
                 ))}
               </div>
             </div>
-
             {/* Date Selection */}
             <div className="p-6">
               <MonthYearSelector
@@ -269,16 +220,21 @@ export default function SearchByMoodPage() {
                 }}
               />
             </div>
-            {/* Search Button */}
             <button
-              onClick={() =>
-                router.push("/traveler/search-result/search-result-with-filter")
-              } className="w-full mt-2 py-3 rounded-full text-sm font-semibold text-white shadow-sm 
-                  hover:opacity-95 transition-opacity 
-                  bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)]"
+              onClick={() => {
+                router.push(
+                  `/traveler/search-result/search-result-with-filter?moods=${encodeURIComponent(
+                    JSON.stringify(selectedMoods)
+                  )}&year=${selectedYear}&month=${selectedMonth}`
+                );
+              }}
+              className="w-full mt-2 py-3 rounded-full text-sm font-semibold text-white shadow-sm 
+    hover:opacity-95 transition-opacity 
+    bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)]"
             >
               Search
             </button>
+
           </div>
         </aside>
 
@@ -289,39 +245,9 @@ export default function SearchByMoodPage() {
           <TripSection title="Explore Weekend Trips" trips={weekendTrips} />
         </section>
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   )
 }
 
-interface TripSectionProps {
-  title: string
-  trips: typeof skygazeTrips
 
-}
-
-function TripSection({ title, trips }: TripSectionProps) {
-  return (
-    <section className="mb-2">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base md:text-lg font-semibold text-[#2d2d2d]">
-          {title}
-        </h3>
-        <button className="text-xs md:text-sm text-[#e07a5f] font-medium hover:underline">
-          See More &gt;
-        </button>
-      </div>
-
-      {/* Horizontal scroll on mobile, grid on desktop */}
-      <div className="flex gap-4 overflow-x-auto pb-4 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-3 scrollbar-hide">
-        {trips.map((trip) => (
-          <TripCard key={trip.id} {...trip} />
-        ))}
-      </div>
-    </section>
-  )
-}
-
-<Footer />

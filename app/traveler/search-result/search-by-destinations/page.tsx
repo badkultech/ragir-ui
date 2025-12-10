@@ -8,6 +8,8 @@ import { TripCard } from "@/components/search-results/trip-card"
 import { useRouter } from "next/navigation"
 import { Footer } from "@/components/search-results/footer"
 import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
+import { TripSection } from "@/components/search-results/trip-section"
+import { Header } from "@/components/search-results/header"
 
 
 const popularDestinations = [
@@ -173,25 +175,7 @@ export default function SearchByDestinationPage() {
     return (
         <div className="min-h-screen bg-background flex flex-col">
             {/* Header */}
-            <header className="sticky top-0 z-10 bg-background border-b border-border">
-                <div className="flex items-center justify-between px-4 py-3 md:px-8 md:py-4 max-w-[1400px] mx-auto">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => router.back()} className="p-1 hover:bg-[#e5e3e0] rounded-full">
-                            <ChevronLeft className="w-5 h-5 text-[#3d3d3d]" />
-                        </button>
-                        <h1 className="text-base md:text-lg font-semibold text-foreground">Search by Destination</h1>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <button className="p-2 hover:bg-muted rounded-full transition-colors hidden md:block">
-                            <Heart className="w-5 h-5 text-foreground" />
-                        </button>
-                        <Avatar className="w-8 h-8 md:w-9 md:h-9">
-                            <AvatarImage src="/woman-avatar-profile.jpg" />
-                            <AvatarFallback className="bg-primary text-primary-foreground">U</AvatarFallback>
-                        </Avatar>
-                    </div>
-                </div>
-            </header>
+            <Header title="Search By Destinations" />
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col md:flex-row max-w-[1400px] mx-auto w-full">
@@ -289,11 +273,20 @@ export default function SearchByDestinationPage() {
                         />
 
                         {/* Search Button */}
-                        <button onClick={() => router.push("/traveler/search-result/search-result-with-filter")}
-                            className="w-full py-3  bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)] text-white font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                            onClick={() =>
+                                router.push(
+                                    `/traveler/search-result/search-result-with-filter?destination=${encodeURIComponent(
+                                        destination
+                                    )}&region=${region}&year=${selectedYear}&month=${selectedMonth}`
+                                )
+                            }
+                          className="w-full py-3  bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)] text-white font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                        >
                             <Search className="w-4 h-4" />
                             Search
                         </button>
+
                     </div>
                 </aside>
 
@@ -330,14 +323,8 @@ export default function SearchByDestinationPage() {
                             ))}
                         </div>
                     </section>
-
-                    {/* Goa Beach Escape */}
                     <TripSection title="Goa Beach Escape" trips={goaTrips} />
-
-                    {/* Himachal Pradesh Adventure */}
                     <TripSection title="Himachal Pradesh Adventure" trips={himachalTrips} />
-
-                    {/* Kerala Backwaters & More */}
                     <TripSection title="Kerala Backwaters & More" trips={keralaTrips} />
                 </div>
             </main>
@@ -348,27 +335,3 @@ export default function SearchByDestinationPage() {
     )
 }
 
-interface TripSectionProps {
-    title: string
-    trips: typeof goaTrips
-}
-
-function TripSection({ title, trips }: TripSectionProps) {
-    return (
-        <section className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base md:text-lg font-semibold text-foreground">{title}</h3>
-                <button className="text-sm text-primary font-medium hover:underline">See More &gt;</button>
-            </div>
-
-            {/* Horizontal scroll on mobile, grid on desktop */}
-            <div className="flex gap-4 overflow-x-auto pb-4 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-3 scrollbar-hide">
-                {trips.map((trip) => (
-                    <TripCard key={trip.id} {...trip} />
-                ))}
-            </div>
-        </section>
-    )
-}
-
-<Footer />
