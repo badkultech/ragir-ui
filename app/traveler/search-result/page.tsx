@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
+import { NotificationsDropdown } from "@/components/search-results/NotificationsDropdown"
 
 const menuItems = [
   { icon: Search, label: "Search by Mood", href: "search-result/search-by-mood" },
@@ -31,7 +32,7 @@ const menuItems = [
   { icon: Users, label: "About us", href: "search-result/about" },
   { icon: Heart, label: "Popular Trips", href: "search-result/popular-trips" },
   { icon: Gift, label: "Biggest Discounts", href: "search-result/discounts" },
-  { icon: Scale, label: "Compare Trips", href: "search-result/compare" },
+  { icon: Scale, label: "Compare Trips", href: "search-result/compare-trips" },
   { icon: Bookmark, label: "Wishlist", href: "search-result/wishlist" },
 ]
 
@@ -126,68 +127,10 @@ export default function HomePage() {
             <button className="p-2 text-white/80 hover:text-white transition-colors hidden md:block">
               <Scale className="w-5 h-5" />
             </button>
-            <div className="relative hidden md:block" ref={notificationsRef}>
-              <button
-                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className="p-2 text-white/80 hover:text-white transition-colors relative"
-              >
-                <Bell className="w-5 h-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Notifications Dropdown */}
-              {isNotificationsOpen && (
-                <div className="absolute right-0 top-full mt-2 w-[360px] bg-white rounded-2xl shadow-2xl overflow-hidden z-50">
-                  {/* Header */}
-                  <div className="px-5 py-4 border-b border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-base font-semibold text-gray-900">Notifications</h3>
-                      <button
-                        onClick={markAllAsRead}
-                        className="text-sm text-[#f97316] hover:text-[#ea580c] font-medium flex items-center gap-1"
-                      >
-                        <Check className="w-4 h-4" />
-                        Mark all as read
-                      </button>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">{unreadCount} unread notifications</p>
-                  </div>
-
-                  {/* Notifications List */}
-                  <div className="max-h-[400px] overflow-y-auto">
-                    {notificationsList.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`px-5 py-4 border-b border-gray-50 hover:bg-gray-50 transition-colors ${!notification.read ? "bg-blue-50/30" : ""
-                          }`}
-                      >
-                        <div className="flex gap-3">
-                          <div className="flex-shrink-0 w-10 h-10 bg-[#2563eb] rounded-full flex items-center justify-center">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900">{notification.title}</p>
-                            <p className="text-sm text-gray-600 mt-0.5">{notification.description}</p>
-                            <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="px-5 py-3 border-t border-gray-100">
-                    <button className="w-full text-center text-sm text-[#f97316] hover:text-[#ea580c] font-medium">
-                      Show More
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <NotificationsDropdown
+              notifications={notificationsList}
+              onUpdateNotifications={setNotificationsList}
+            />
             <button
               onClick={() => setIsMenuOpen(true)}
               className="p-2 text-white/80 hover:text-white transition-colors"
