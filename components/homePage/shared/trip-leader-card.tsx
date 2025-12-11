@@ -17,40 +17,64 @@ export function TripLeaderCard({
   name,
   image,
   organization = "Organisation Name",
-  quote = "I believe the trail writes the best kind of story. Each journey leaves behind a chapter filled with footprints, laughter, and lessons from the wild.",
+  quote = "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
   className,
   onClick,
   variant = "compact",
 }: TripLeaderCardProps) {
   const isGrid = variant === "grid"
 
+  if (isGrid) {
+    return (
+      <div
+        onClick={onClick}
+        className={cn(
+          "bg-white rounded-[20px] p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col gap-6",
+          className
+        )}
+      >
+        {/* Top Header: Image + Info */}
+        <div className="flex items-center gap-4">
+          <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+            <Image src={image || "/placeholder.svg"} alt={name} fill className="object-cover" />
+          </div>
+          <div className="flex flex-col">
+            <h3 className="text-xl font-bold text-gray-900 leading-tight">{name}</h3>
+            <span className="text-[#FF804C] font-medium text-sm mt-0.5">{organization}</span>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px w-full bg-gray-100"></div>
+
+        {/* Quote */}
+        <p className="text-gray-500 text-sm leading-relaxed font-light">
+          "{quote}"
+        </p>
+      </div>
+    )
+  }
+
+  // Compact Variant (Home Page Slider)
   return (
     <div
       onClick={onClick}
       className={cn(
-        "flex items-center bg-white shadow-sm border border-gray-100 transition-all",
+        "flex items-center bg-white shadow-sm border border-gray-100 transition-all gap-4 rounded-full pl-2 pr-6 py-2 min-w-[340px] max-w-[480px]",
         onClick && "cursor-pointer hover:shadow-md",
-        isGrid
-          ? "gap-3 rounded-2xl p-4 flex-col sm:flex-row"
-          : "gap-4 rounded-full pl-2 pr-6 py-2 min-w-[340px] max-w-[480px] ",
         className,
       )}
     >
       {/* Circular profile image */}
-      <div
-        className={cn(
-          "relative rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-100",
-          isGrid ? "w-16 h-16" : "w-25 h-25",
-        )}
-      >
+      <div className="relative rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-100 w-12 h-12">
         <Image src={image || "/placeholder.svg"} alt={name} fill className="object-cover" />
       </div>
 
       {/* Text content */}
-      <div className={cn("flex flex-col gap-0.5 min-w-0", isGrid && "flex-1")}>
-        <span className={cn("font-medium font-poppins text-gray-900", isGrid ? "text-xs" : "text-[16px]")}>{name}</span>
-        <span className={cn("text-orange-500 font-poppins", isGrid ? "text-xs" : "text-[12px]")}>{organization}</span>
-        <p className={cn("text-gray-500 font-poppins leading-tight line-clamp-2 mt-1", isGrid ? "text-xs" : "text-[12px]")}>
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <span className="font-medium font-poppins text-gray-900 text-[16px]">{name}</span>
+        <span className="text-orange-500 font-poppins text-[12px]">{organization}</span>
+        <p className="text-gray-500 font-poppins leading-tight line-clamp-2 mt-1 text-[12px]">
           "{quote}"
         </p>
       </div>

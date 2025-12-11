@@ -10,7 +10,7 @@ const tripLeaders = [
     {
         id: 1,
         name: "Kyle May",
-        image: "/travel-guide-portrait-professional-man.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -18,7 +18,7 @@ const tripLeaders = [
     {
         id: 2,
         name: "Kyle May",
-        image: "/travel-guide-portrait-professional-woman.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -26,7 +26,7 @@ const tripLeaders = [
     {
         id: 3,
         name: "Kyle May",
-        image: "/adventure-guide-portrait-man-outdoor.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -34,7 +34,7 @@ const tripLeaders = [
     {
         id: 4,
         name: "Kyle May",
-        image: "/travel-guide-portrait-professional-man.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -42,7 +42,7 @@ const tripLeaders = [
     {
         id: 5,
         name: "Kyle May",
-        image: "/travel-guide-portrait-professional-woman.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -50,7 +50,7 @@ const tripLeaders = [
     {
         id: 6,
         name: "Kyle May",
-        image: "/adventure-guide-portrait-man-outdoor.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -58,7 +58,7 @@ const tripLeaders = [
     {
         id: 7,
         name: "Kyle May",
-        image: "/travel-guide-portrait-professional-man.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -66,7 +66,7 @@ const tripLeaders = [
     {
         id: 8,
         name: "Kyle May",
-        image: "/travel-guide-portrait-professional-woman.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -74,7 +74,7 @@ const tripLeaders = [
     {
         id: 9,
         name: "Kyle May",
-        image: "/adventure-guide-portrait-man-outdoor.jpg",
+        image: "/tl-pfp.jpg",
         organization: "Organisation Name",
         quote:
             "Adventure isn't just about reaching the summit—it's about the courage you build on the climb. Every step...",
@@ -110,7 +110,7 @@ export default function TripLeadersPage() {
                 </div>
 
                 {/* Grid of cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {tripLeaders.map((leader) => (
                         <TripLeaderCard
                             key={leader.id}

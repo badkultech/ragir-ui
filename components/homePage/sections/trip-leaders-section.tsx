@@ -24,8 +24,8 @@ export function TripLeadersSection() {
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-10">Meet Trip Leaders</h2>
 
       {/* Horizontally scrollable container */}
-      <div className="overflow-x-auto flex flex-col items-center pb-4 scrollbar-hide">
-        <div className="flex flex-col gap-8 px-4 md:px-8 ">
+      <div className="overflow-x-auto flex flex-col items-center pb-4 no-scrollbar">
+        <div className="flex flex-col gap-8 px-4 md:px-20 ">
           {/* Row 1 */}
           <div className="flex gap-4 pl-12">
             {row1.map((leader) => (

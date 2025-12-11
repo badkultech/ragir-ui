@@ -6,9 +6,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export function MainHeader({
-  onMenuOpen = () => {},
+  onMenuOpen = () => { },
   notifications = [],
-  onUpdateNotifications = () => {},
+  onUpdateNotifications = () => { },
   logoText = "",
   logoSrc = "/logo.png",
 }: {
@@ -22,7 +22,7 @@ export function MainHeader({
 
   return (
     <header className="relative z-20 bg-white border-b border-[#E5E7EB]">
-      <div className="flex items-center justify-between w-full px-4 md:px-10 lg:px-20 py-3">
+      <div className="container mx-auto flex items-center justify-between w-full px-4 md:px-20 py-3">
 
         {/* LEFT SECTION (Perfect left alignment) */}
         <div className="flex items-center gap-2 flex-shrink-0">
