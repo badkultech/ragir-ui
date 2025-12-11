@@ -18,7 +18,7 @@ const partners = [
 export function PartnersSection() {
   return (
     <section className="py-16 bg-muted/30">
-      <div className="container mx-auto px-4 mb-8">
+      <div className="container mx-auto px-4 md:px-20 mb-8">
         <SectionHeader
           title="Our Trusted Partners"
           className="justify-center"

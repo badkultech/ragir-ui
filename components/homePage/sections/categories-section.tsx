@@ -21,7 +21,7 @@ const categories = [
 export function CategoriesSection() {
   return (
     <section className="py-16 bg-background">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 md:px-20">
         <div className="grid md:grid-cols-3 gap-6">
           {categories.map((category) => (
             <CategoryCard

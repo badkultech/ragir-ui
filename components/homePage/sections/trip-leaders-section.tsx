@@ -19,24 +19,24 @@ export function TripLeadersSection() {
   const row2 = tripLeaders.slice(4, 8)
 
   return (
-    <section className="py-16 bg-gray-50/50">
+    <section className="py-20 bg-[#F5F5F5]">
       {/* Title */}
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-10">Meet Trip Leaders</h2>
+      <h2 className="text-3xl md:text-4xl font-bold italic text-gray-900 text-center mb-16">Meet Trip Leaders</h2>
 
       {/* Horizontally scrollable container */}
-      <div className="overflow-x-auto flex flex-col items-center pb-4 scrollbar-hide">
-        <div className="flex flex-col gap-8 px-4 md:px-8 ">
+      <div className="overflow-x-auto pb-8 no-scrollbar w-full">
+        <div className="w-max mx-auto md:mx-0 md:min-w-full flex flex-col gap-10 px-4 md:px-20">
           {/* Row 1 */}
-          <div className="flex gap-4 pl-12">
+          <div className="flex gap-8">
             {row1.map((leader) => (
-              <TripLeaderCard key={leader.name} name={leader.name} image={leader.image} />
+              <TripLeaderCard key={leader.name} name={leader.name} image={leader.image} variant="home-pill" />
             ))}
           </div>
 
           {/* Row 2 */}
-          <div className="flex gap-4">
+          <div className="flex gap-8 pl-12 md:pl-16">
             {row2.map((leader) => (
-              <TripLeaderCard key={leader.name} name={leader.name} image={leader.image} />
+              <TripLeaderCard key={leader.name} name={leader.name} image={leader.image} variant="home-pill" />
             ))}
           </div>
         </div>
