@@ -75,7 +75,7 @@ export default function TripInvitationsPage() {
     <div className="min-h-screen bg-background">
 
       {/* Header */}
-      <MainHeader logoText="Trip Invitations sent"/>
+      <MainHeader logoText="Trip Invitations sent" isLoggedIn={true}/>
 
       {/* Main Content */}
       <main className="max-w-[1200px] mx-auto px-4 md:px-8 py-6 md:py-10">

@@ -57,7 +57,9 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-background">
 
       {/* ✅ HEADER FIXED */}
-      <MainHeader logoText="Settings" />
+      <MainHeader logoText="Settings"
+        isLoggedIn={true}
+       />
 
       {/* MAIN CONTENT AREA */}
       <main className="max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-10">
