@@ -25,6 +25,7 @@ import {
   Tent,
   Flower2,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const moods = [
   { name: "Mountain", icon: Mountain, selected: true },
@@ -54,10 +55,28 @@ export function SearchTripsCard() {
   const [year, setYear] = useState(2026)
   const [destination, setDestination] = useState("")
   const [selectedRegion, setSelectedRegion] = useState<"domestic" | "international">("domestic")
+  const router = useRouter();
 
   const toggleMood = (moodName: string) => {
     setSelectedMoods((prev) => (prev.includes(moodName) ? prev.filter((m) => m !== moodName) : [...prev, moodName]))
   }
+
+  const handleSearch = () => {
+  const params = new URLSearchParams();
+  if (activeTab === "destination") {
+    if (destination.trim()) params.set("destination", destination);
+    params.set("region", selectedRegion);
+  }
+  if (activeTab === "moods") {
+    if (selectedMoods.length > 0) {
+      params.set("moods", JSON.stringify(selectedMoods));
+    }
+  }
+  params.set("year", year.toString());
+  params.set("month", selectedMonth);
+
+  router.push(`/home/search-result-with-filter?${params.toString()}`);
+};
 
 
 
@@ -215,7 +234,10 @@ export function SearchTripsCard() {
       </div>
 
       {/* Search Button */}
-      <GradientButton className="w-full mt-6 rounded-full py-2.5">
+      <GradientButton
+        className="w-full mt-6 rounded-full py-2.5"
+        onClick={handleSearch}
+      >
         <div className="flex items-center justify-center gap-2">
           <Search className="w-4 h-4 mr-2" />
           Search
