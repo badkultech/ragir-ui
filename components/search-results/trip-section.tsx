@@ -7,7 +7,7 @@ interface TripSectionProps {
     trips: typeof TripCard.prototype.props[]
 }
 
- export function TripSection({ title, trips }: TripSectionProps) {
+export function TripSection({ title, trips }: TripSectionProps) {
     return (
         <section className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -15,8 +15,8 @@ interface TripSectionProps {
                 <button className="text-sm text-primary font-medium hover:underline">See More &gt;</button>
             </div>
 
-            {/* Horizontal scroll on mobile, grid on desktop */}
-            <div className="flex gap-4 overflow-x-auto pb-4 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-3 scrollbar-hide">
+            {/* Horizontal scroll on all devices */}
+            <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                 {trips.map((trip) => (
                     <TripCard key={trip.id} {...trip} />
                 ))}
