@@ -10,7 +10,7 @@ interface TripLeaderCardProps {
   quote?: string
   className?: string
   onClick?: () => void
-  variant?: "compact" | "grid"
+  variant?: "compact" | "grid" | "home-pill"
 }
 
 export function TripLeaderCard({
@@ -23,6 +23,7 @@ export function TripLeaderCard({
   variant = "compact",
 }: TripLeaderCardProps) {
   const isGrid = variant === "grid"
+  const isHomePill = variant === "home-pill"
 
   if (isGrid) {
     return (
@@ -55,7 +56,35 @@ export function TripLeaderCard({
     )
   }
 
-  // Compact Variant (Home Page Slider)
+  if (isHomePill) {
+    return (
+      <div
+        onClick={onClick}
+        className={cn(
+          "flex items-center bg-white rounded-[100px] p-3 pr-10 gap-6 min-w-[500px] max-w-[550px]",
+          "shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] hover:shadow-[0_15px_50px_-10px_rgba(0,0,0,0.2)] transition-all duration-300",
+          onClick && "cursor-pointer",
+          className
+        )}
+      >
+        {/* Large Circular Image */}
+        <div className="relative w-28 h-28 rounded-full overflow-hidden flex-shrink-0 border-[3px] border-white shadow-sm">
+          <Image src={image || "/placeholder.svg"} alt={name} fill className="object-cover" />
+        </div>
+
+        {/* Text Content */}
+        <div className="flex flex-col gap-1">
+          <h3 className="text-xl font-bold text-gray-900">{name}</h3>
+          <span className="text-[#FF804C] font-semibold text-xs">{organization}</span>
+          <p className="text-gray-500 text-xs leading-relaxed mt-2 line-clamp-3">
+            "{quote}"
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Fallback Compact Variant (Used in maps or potentially deprecated later)
   return (
     <div
       onClick={onClick}
