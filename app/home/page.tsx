@@ -90,7 +90,7 @@
 //   );
 // }
 
-import { Header } from "@/components/homePage/sections/header";
+import { MainHeader } from "@/components/search-results/MainHeader";
 import { HeroSection } from "@/components/homePage/sections/hero-section";
 import { CategoriesSection } from "@/components/homePage/sections/categories-section";
 import { PartnersSection } from "@/components/homePage/sections/partners-section";
@@ -101,7 +101,7 @@ import { Footer } from "@/components/homePage/sections/footer";
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <Header />
+      <MainHeader />
       <HeroSection />
       <CategoriesSection />
       <PartnersSection />
