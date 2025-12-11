@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react"
+import Image from "next/image"
 
 export function Footer() {
   return (
@@ -9,7 +10,7 @@ export function Footer() {
           {/* Logo & Description */}
           <div className="md:col-span-2">
             <Link href="/" className="text-2xl font-bold text-primary">
-              Ragir
+              <Image src="/logo.png" alt="Logo" width={100} height={100} className=" h-11 w-auto" />
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               Join group trips and meet like-minded travelers from around the world.

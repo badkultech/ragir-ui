@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
+import { GradientButton } from "@/components/gradient-button"
 import {
   Mountain,
   Umbrella,
@@ -59,18 +61,18 @@ export function SearchTripsCard() {
   const visibleMonths = months.slice(0, 6)
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-6 w-full max-w-md">
+    <div className="bg-white rounded-3xl shadow-[0_0_15px_rgba(0,0,0,0.2)] p-6 w-full max-w-[600px]">
       {/* Header */}
       <h2 className="text-xl font-semibold text-center mb-4">Search Trips</h2>
 
       {/* Tabs */}
-      <div className="flex bg-gray-100 rounded-full p-1 mb-6">
+      <div className="flex bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] rounded-full p-1 mb-6">
         <button
           onClick={() => setActiveTab("destination")}
           className={cn(
             "flex-1 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
             activeTab === "destination"
-              ? "bg-gradient-to-r from-primary to-orange-400 text-white shadow-sm"
+              ? "bg-[rgba(255,128,76,1)] text-white"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
@@ -81,7 +83,7 @@ export function SearchTripsCard() {
           className={cn(
             "flex-1 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
             activeTab === "moods"
-              ? "bg-gradient-to-r from-primary to-orange-400 text-white shadow-sm"
+              ? "bg-[rgba(255,128,76,1)] text-white"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
@@ -93,21 +95,21 @@ export function SearchTripsCard() {
         <div className="space-y-4">
           {/* Destination Input */}
           <div>
-            <p className="text-sm text-muted-foreground mb-2">Where do you want to travel?</p>
-            <label className="text-sm font-medium text-foreground">Destination</label>
+            <p className="text-sm font-poppins font-semibold mb-4">Where do you want to travel?</p>
+            <label className="text-sm font-poppins font-semibold text-foreground">Destination</label>
             <input
               type="text"
               placeholder="Enter destination"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full mt-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full mt-1.5 px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
 
           {/* OR Divider */}
           <div className="flex items-center gap-4">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-muted-foreground">OR</span>
+            <span className="text-sm ">OR</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -119,53 +121,36 @@ export function SearchTripsCard() {
               <button
                 onClick={() => setSelectedRegion("domestic")}
                 className={cn(
-                  "flex-1 p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2",
+                  "flex-1 p-3 rounded-xl border-2 transition-all flex flex-col items-start gap-2",
                   selectedRegion === "domestic"
-                    ? "border-primary bg-primary/5"
+                    ? "border-orange-500 bg-primary/5"
                     : "border-gray-200 hover:border-gray-300",
                 )}
               >
                 {/* India Map Silhouette */}
-                <svg viewBox="0 0 100 120" className="w-16 h-16 text-gray-400">
-                  <path
-                    fill="currentColor"
-                    d="M50 5 L55 8 L60 6 L65 10 L70 8 L75 12 L78 18 L80 25 L82 35 L80 45 L78 55 L82 65 L80 75 L75 85 L70 95 L65 105 L55 115 L45 110 L35 105 L30 95 L25 85 L22 75 L20 65 L22 55 L25 45 L28 35 L30 25 L35 15 L40 10 L45 8 Z"
-                  />
-                </svg>
-                <span className="text-sm font-medium">Domestic</span>
+                <div className="flex items-center justify-start gap-2">
+                  <Image src="/india-outline.png" alt="India Map" width={30} height={25} className="w-30 h-25" />
+                  <span className="text-sm font-medium">Domestic</span>
+                </div>
+
+
               </button>
 
               {/* International Option */}
               <button
                 onClick={() => setSelectedRegion("international")}
                 className={cn(
-                  "flex-1 p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2",
+                  "flex-1 p-3 rounded-xl border-2 transition-all flex flex-col items-start gap-2",
                   selectedRegion === "international"
-                    ? "border-primary bg-primary/5"
+                    ? "border-orange-500 bg-primary/5"
                     : "border-gray-200 hover:border-gray-300",
                 )}
               >
+                <div className="flex items-center justify-start gap-2">
+                  <Image src="/world-outline.png" alt="World Map" width={40} height={25} className="w-auto h-20 mt-4" />
+                  <span className="text-sm font-poppins mt-3 font-medium">International</span>
+                </div>
                 {/* World Map Silhouette */}
-                <svg viewBox="0 0 120 80" className="w-16 h-16 text-gray-300">
-                  {/* Americas */}
-                  <path
-                    fill="currentColor"
-                    d="M15 20 L20 15 L25 18 L28 25 L25 35 L28 45 L25 55 L20 60 L15 55 L12 45 L15 35 L12 25 Z"
-                  />
-                  {/* Europe/Africa */}
-                  <path
-                    fill="currentColor"
-                    d="M50 15 L55 12 L60 15 L58 25 L55 35 L58 45 L55 55 L50 60 L48 50 L50 40 L48 30 L50 20 Z"
-                  />
-                  {/* Asia */}
-                  <path
-                    fill="currentColor"
-                    d="M70 10 L80 8 L90 12 L95 20 L92 30 L88 35 L90 40 L85 50 L78 55 L70 50 L68 40 L72 30 L68 20 Z"
-                  />
-                  {/* Australia */}
-                  <path fill="currentColor" d="M85 55 L95 52 L100 58 L98 65 L90 68 L85 62 Z" />
-                </svg>
-                <span className="text-sm font-medium">International</span>
               </button>
             </div>
           </div>
@@ -200,7 +185,7 @@ export function SearchTripsCard() {
 
       {/* Date Section */}
       <div className="mt-6 space-y-4">
-        <p className="text-sm text-muted-foreground">When do you want to go?</p>
+        <p className="text-sm font-semibold font-poppins">When do you want to go?</p>
 
         {/* Year Selector */}
         <div className="flex items-center justify-center gap-4">
@@ -220,15 +205,15 @@ export function SearchTripsCard() {
         </div>
 
         {/* Month Pills */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-between gap-2">
           {visibleMonths.map((month) => (
             <button
               key={month}
               onClick={() => setSelectedMonth(month)}
               className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-medium transition-all border",
+                "px-6 py-2.5 rounded-lg text-sm font-medium transition-all border",
                 selectedMonth === month
-                  ? "bg-primary text-white border-primary"
+                  ? "bg-orange-500 text-white "
                   : "bg-white text-foreground border-gray-200 hover:border-primary/50",
               )}
             >
@@ -239,10 +224,12 @@ export function SearchTripsCard() {
       </div>
 
       {/* Search Button */}
-      <Button className="w-full mt-6 rounded-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary/90 hover:to-orange-400/90 text-white py-6">
-        <Search className="w-4 h-4 mr-2" />
-        Search
-      </Button>
+      <GradientButton className="w-full mt-6 rounded-full py-2.5">
+        <div className="flex items-center justify-center gap-2">
+          <Search className="w-4 h-4 mr-2" />
+          Search
+        </div>
+      </GradientButton>
     </div>
   )
 }

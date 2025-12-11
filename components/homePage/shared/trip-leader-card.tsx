@@ -40,7 +40,7 @@ export function TripLeaderCard({
       <div
         className={cn(
           "relative rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-100",
-          isGrid ? "w-16 h-16" : "w-30 h-30",
+          isGrid ? "w-16 h-16" : "w-25 h-25",
         )}
       >
         <Image src={image || "/placeholder.svg"} alt={name} fill className="object-cover" />
@@ -48,7 +48,7 @@ export function TripLeaderCard({
 
       {/* Text content */}
       <div className={cn("flex flex-col gap-0.5 min-w-0", isGrid && "flex-1")}>
-        <span className={cn("font-medium font-poppins text-gray-900", isGrid ? "text-xs" : "text-[18px]")}>{name}</span>
+        <span className={cn("font-medium font-poppins text-gray-900", isGrid ? "text-xs" : "text-[16px]")}>{name}</span>
         <span className={cn("text-orange-500 font-poppins", isGrid ? "text-xs" : "text-[12px]")}>{organization}</span>
         <p className={cn("text-gray-500 font-poppins leading-tight line-clamp-2 mt-1", isGrid ? "text-xs" : "text-[12px]")}>
           "{quote}"
