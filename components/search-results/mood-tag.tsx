@@ -117,7 +117,7 @@ export const moodMap: any = {
   Adventure: { icon: CompassIcon, bg: AdventureGradient },
   Trekking: { icon: Hiking1Icon, bg: TrekkingGradient },
   Motorsports: { icon: MotorSportsIcon, bg: MotorSportsGradient },
-  Weekend: { icon: CalenderIcon, bg: WeekendGradient },
+  Weekends: { icon: CalenderIcon, bg: WeekendGradient },
   "Women-Only": { icon: FemaleIcon, bg: WomenOnlyGradient },
   Parties: { icon: PartiesIcon, bg: PartyGradient },
   Learning: { icon: LearningIcon, bg: LearningGradient },

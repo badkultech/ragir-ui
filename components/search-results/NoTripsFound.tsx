@@ -1,0 +1,128 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { moodMap } from "@/components/search-results/mood-tag";
+
+export default function NoTripsFound() {
+  const moodsList = [
+    "Mountain",
+    "Skygaze",
+    "Beach",
+    "Desert",
+    "Jungle",
+    "Wellness",
+    "Heritage",
+    "Adventure",
+    "Trekking",
+    "Motorsports",
+    "Weekends",
+    "Women-Only",
+    "Parties",
+    "Learning",
+    "Camping",
+    "Spiritual",
+  ];
+
+  // ⭐ Multiple selection support
+  const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
+
+  const toggleMood = (mood: string) => {
+    setSelectedMoods((prev) =>
+      prev.includes(mood)
+        ? prev.filter((m) => m !== mood) // remove
+        : [...prev, mood] // add
+    );
+  };
+
+  return (
+    <div className="w-full flex flex-col items-center justify-center py-16">
+
+      {/* Search Icon Circle */}
+      <div className="w-16 h-16 rounded-full bg-[#fff4ec] flex items-center justify-center mb-4">
+        <Image src="/vector.png" alt="search" width={28} height={28} />
+      </div>
+
+      <h2 className="text-lg md:text-xl font-semibold text-[#2d2d2d]">
+        No trips found
+      </h2>
+      <p className="text-sm text-[#6b6b6b] mt-1 mb-8 text-center">
+        We couldn't find any trips matching your search
+      </p>
+
+      {/* Explore Section */}
+      <div className="w-full max-w-[900px]">
+        <h3 className="text-base font-semibold text-[#2d2d2d] mb-3">Explore</h3>
+
+        {/* Dummy Explore Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { title: "Himachal Pradesh", trips: 12, img: "/explore-himachal.jpg" },
+            { title: "Rajasthan", trips: 12, img: "/explore-rajasthan.jpg" },
+            { title: "Kerala", trips: 12, img: "/explore-kerala.jpg" },
+            { title: "Goa", trips: 12, img: "/explore-goa.jpg" },
+          ].map((item, i) => (
+            <div key={i} className="rounded-xl overflow-hidden shadow bg-white cursor-pointer">
+              <div className="relative h-24 w-full">
+                <Image src={item.img} alt={item.title} fill className="object-cover" />
+              </div>
+              <div className="p-2">
+                <p className="text-sm font-semibold">{item.title}</p>
+                <p className="text-xs text-[#6b6b6b]">{item.trips} Trips</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Search by Mood */}
+        <h3 className="text-base font-semibold text-[#2d2d2d] mb-3">Search by Mood</h3>
+
+        <div className="flex flex-wrap gap-2">
+          {moodsList.map((mood, i) => {
+            const moodData = moodMap[mood] || {};
+            const Icon = moodData.icon;
+            const GradientBG = moodData.bg;
+
+            const isSelected = selectedMoods.includes(mood);
+
+            return (
+              <button
+                key={i}
+                onClick={() => toggleMood(mood)}
+                className={`
+                  relative px-4 py-2 rounded-full text-sm flex items-center gap-2 
+                  border cursor-pointer overflow-hidden transition-all
+                  ${isSelected ? "border-transparent text-white" : "bg-white border-[#e4e4e4] text-[#2d2d2d]"}
+                `}
+              >
+
+                {/* Gradient background WHEN selected */}
+                {isSelected && GradientBG && (
+                  <div className="absolute inset-0 opacity-90 pointer-events-none">
+                    <GradientBG width="200" height="60" />
+                  </div>
+                )}
+
+                {/* Icon */}
+                <span className="relative z-10 flex items-center">
+                  {Icon && (
+                    <Icon
+                      className="w-4 h-4"
+                      fill={isSelected ? "white" : "black"}
+                    />
+                  )}
+                </span>
+
+                {/* Label */}
+                <span className="relative z-10 font-medium">
+                  {mood}
+                </span>
+
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
