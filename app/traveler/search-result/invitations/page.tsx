@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ChevronLeft, Menu, Scale, Bell, Info, Send, X, Clock } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
+import { MainHeader } from "@/components/search-results/MainHeader"
 
 interface InvitationRequest {
   id: string
@@ -72,33 +73,13 @@ export default function TripInvitationsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      
+
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-card border-b border-border">
-        <div className="flex items-center justify-between px-4 md:px-8 py-4 max-w-[1200px] mx-auto">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-1 hover:bg-[#f3f3f3] rounded-full">
-              <ChevronLeft className="w-5 h-5 text-[#2d2d2d]" />
-            </button>
-            <h1 className="text-base md:text-lg font-semibold text-foreground">Trip Invitations Sent</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-muted rounded-full hidden md:block">
-              <Scale className="w-5 h-5 text-foreground" />
-            </button>
-            <button className="p-2 hover:bg-muted rounded-full hidden md:block">
-              <Bell className="w-5 h-5 text-foreground" />
-            </button>
-            <button className="p-2 hover:bg-muted rounded-full">
-              <Menu className="w-5 h-5 text-foreground" />
-            </button>
-          </div>
-        </div>
-      </header>
+      <MainHeader logoText="Trip Invitations sent"/>
 
       {/* Main Content */}
       <main className="max-w-[1200px] mx-auto px-4 md:px-8 py-6 md:py-10">
-        
+
         {/* Info Banner */}
         <div className="bg-orange-50 border border-primary/20 rounded-xl p-4 md:p-5 mb-6 md:mb-8 flex gap-3">
           <div className="flex-shrink-0 w-6 h-6 rounded-full  flex items-center justify-center">

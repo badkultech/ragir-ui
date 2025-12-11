@@ -1,7 +1,9 @@
 "use client"
 
+import Image from "next/image"
 
- export function Footer() {
+
+export function Footer() {
   return (
     <footer className="bg-white border-t border-[#e5e5e5] mt-auto">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -9,7 +11,7 @@
           {/* Brand */}
           <div className="max-w-xs">
             <h2 className="text-2xl font-bold text-[#ff6b35] italic mb-4">
-              Ragir
+              <Image src="/logo.png" alt="Ragir" width={96} height={36.98} className="w-[96px] h-[36.98px]" />
             </h2>
             <p className="text-sm text-[#6b6b6b] leading-relaxed">
               An all-in-one platform to plan, book, and share your adventures

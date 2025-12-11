@@ -44,7 +44,7 @@ export function NotificationsDropdown({
             {/* Notification bell */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-white/80 hover:text-white transition-colors relative"
+                className="p-2 text-black/80 hover:text-black transition-colors relative"
             >
                 <Bell className="w-5 h-5" />
 

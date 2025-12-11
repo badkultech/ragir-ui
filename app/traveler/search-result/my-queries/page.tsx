@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import GradientCheckbox from "@/components/ui/GradientCheckbox"
+import { MainHeader } from "@/components/search-results/MainHeader"
 
 type QuestionStatus = "responded" | "pending"
 
@@ -123,41 +124,7 @@ export default function MyQueriesPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => router.back()}
-                                className="p-1 hover:bg-[#f3f3f3] rounded-full"
-                            >
-                                <ChevronLeft className="w-5 h-5 text-[#2d2d2d]" />
-                            </button>
-                            <h1 className="text-lg font-semibold">My Queries</h1>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <button className="text-gray-600 hover:text-gray-900">
-                                <MessageSquare className="h-5 w-5" />
-                            </button>
-                            <button className="text-gray-600 hover:text-gray-900">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                                    />
-                                </svg>
-                            </button>
-                            <button className="text-gray-600 hover:text-gray-900">
-                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </header>
+           <MainHeader logoText="My Queries"/>
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
