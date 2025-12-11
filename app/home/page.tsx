@@ -1,96 +1,8 @@
 "use client";
 
-// import Card from "@/components/homePage/Card";
-// import Header from "@/components/homePage/Header";
-// import Section from "@/components/homePage/Section";
-// import Region from "@/components/homePage/Region";
-// import Slider from "@/components/homePage/Slider";
-// import Image from "next/image";
-// import { Marquee } from "@/components/homePage/shared/marquee";
-
-// import { ChevronRight } from "lucide-react";
-
-// export default function Home() {
-//   const logos = [
-//     "logo.png",
-//     "logo.png",
-//     "logo.png",
-//     "logo.png",
-//     "logo.png",
-//     "logo.png",
-//     "logo.png",
-//     "logo.png",
-//     "logo.png",
-//   ];
-//   return (
-//     <>
-//       <Header />
-//       <main className="min-h-screen max-w-[1500px] mx-auto p-8 md:p-16 md:px-20">
-//         <div className=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-//           <div className="flex flex-col gap-8">
-//             <h1 className="text-4xl md:text-6xl font-semibold font-barlow italic mb-4">
-//               Join Group Trips. Meet Like Minded Travelers.
-//               <br />
-//               Around the World!
-//             </h1>
-//           </div>
-//           <div></div>
-//         </div>
-
-//         {/* Explore Cards */}
-
-//         <Section
-//           child={
-//             <div className="flex gap-5 mx-auto justify-center ">
-//               <Card title="Winter-Specials" icon="Snowflake" />
-//               <Card title="Biggest Discounts" icon="Tag" />
-//               <Card title="Popular Trips" icon="Telescope" />
-//             </div>
-//           }
-//         />
-
-//         <Section
-//           heading="Our Trusted Partners"
-//           child={
-//             <>
-//               <Marquee
-//                 children={
-//                   <div className="flex flex-col gap-20">
-//                     <div className="brands flex justify-center gap-8">
-//                       {logos.map((l, i) => (
-//                         <Image
-//                           key={i}
-//                           src={l}
-//                           width={100}
-//                           height={100}
-//                           alt="logo"
-//                         />
-//                       ))}
-//                     </div>
-//                     <span className="text-[22px] cursor-pointer font-poppins text-center hover:text-gray-800 transition-transform duration-600 text-orange-600 font-medium">
-//                       View All
-//                       <ChevronRight
-//                         width={24}
-//                         height={24}
-//                         className="inline ml-4"
-//                       />
-//                     </span>
-//                   </div>
-//                 }
-//               />
-//             </>
-//           }
-//         />
-
-//         <Section heading="Explore Regions" child={<Region />} />
-
-//         <Slider />
-//       </main>
-//     </>
-//   );
-// }
-
+import { useState } from "react";
 import { MainHeader } from "@/components/search-results/MainHeader";
+import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { HeroSection } from "@/components/homePage/sections/hero-section";
 import { CategoriesSection } from "@/components/homePage/sections/categories-section";
 import { PartnersSection } from "@/components/homePage/sections/partners-section";
@@ -98,16 +10,72 @@ import { RegionsSection } from "@/components/homePage/sections/regions-section";
 import { TripLeadersSection } from "@/components/homePage/sections/trip-leaders-section";
 import { Footer } from "@/components/homePage/sections/footer";
 
+import {
+  Bell, Bookmark, Gift, Heart, MapPin, MessageCircleQuestion,
+  Scale, Search, Settings, Users
+} from "lucide-react";
+
+const menuItems = [
+  { icon: Search, label: "Search by Mood", href: "/home/search-by-mood" },
+  { icon: MapPin, label: "Search by Destinations", href: "/home/search-by-destinations" },
+  { icon: Users, label: "About us", href: "/home/about" },
+  { icon: Heart, label: "Popular Trips", href: "/home/popular-trips" },
+  { icon: Gift, label: "Biggest Discounts", href: "/home/discounts" },
+  { icon: Scale, label: "Compare Trips", href: "/home/compare-trips" },
+  { icon: Bookmark, label: "Wishlist", href: "/home//wishlist" },
+];
+
+const userMenuItems = [
+  { icon: Bell, label: "Trip Invitations Sent", href: "/home/invitations" },
+  { icon: MessageCircleQuestion, label: "My Queries", href: "/home/my-queries" },
+  { icon: Bookmark, label: "Saved Trips", href: "/saved" },
+  { icon: Settings, label: "Settings", href: "/home/settings" },
+];
+
+const notificationsData = [
+  {
+    id: 1,
+    type: "booking",
+    title: "Booking Confirmed!",
+    description: "Your booking for Ladakh Skygaze has been confirmed",
+    time: "2 hours ago",
+    read: false,
+  },
+  {
+    id: 2,
+    type: "message",
+    title: "New Message",
+    description: "Trip organizer replied to your query",
+    time: "2 hours ago",
+    read: false,
+  },
+];
+
 export default function Home() {
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [notificationsList, setNotificationsList] = useState(notificationsData);
+
   return (
     <main className="min-h-screen">
-      <MainHeader />
+      <MainHeader
+        onMenuOpen={() => setIsMenuOpen(true)}
+        notifications={notificationsList}
+        onUpdateNotifications={setNotificationsList}
+      />
       <HeroSection />
       <CategoriesSection />
       <PartnersSection />
       <RegionsSection />
       <TripLeadersSection />
       <Footer />
+      <SidebarMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+      />
+
     </main>
   );
 }
