@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { MoodTag } from "@/components/search-results/mood-tag"
 import Image from "next/image"
 import { GradientButton } from "@/components/gradient-button"
 import {
@@ -58,7 +59,7 @@ export function SearchTripsCard() {
     setSelectedMoods((prev) => (prev.includes(moodName) ? prev.filter((m) => m !== moodName) : [...prev, moodName]))
   }
 
-  const visibleMonths = months.slice(0, 6)
+
 
   return (
     <div className="bg-white rounded-3xl shadow-[0_0_15px_rgba(0,0,0,0.2)] p-6 w-full max-w-[600px]">
@@ -160,25 +161,15 @@ export function SearchTripsCard() {
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">What&apos;s your travel mood?</p>
           <div className="flex flex-wrap gap-2">
-            {moods.map((mood) => {
-              const Icon = mood.icon
-              const isSelected = selectedMoods.includes(mood.name)
-              return (
-                <button
-                  key={mood.name}
-                  onClick={() => toggleMood(mood.name)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
-                    isSelected
-                      ? "bg-primary text-white border-primary"
-                      : "bg-white text-foreground border-gray-200 hover:border-primary/50",
-                  )}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {mood.name}
-                </button>
-              )
-            })}
+            {moods.map((mood) => (
+              <MoodTag
+                key={mood.name}
+                name={mood.name}
+                icon={mood.icon}
+                isActive={selectedMoods.includes(mood.name)}
+                onClick={() => toggleMood(mood.name)}
+              />
+            ))}
           </div>
         </div>
       )}
@@ -205,13 +196,13 @@ export function SearchTripsCard() {
         </div>
 
         {/* Month Pills */}
-        <div className="flex flex-wrap justify-between gap-2">
-          {visibleMonths.map((month) => (
+        <div className="flex overflow-x-auto gap-2 pb-2 -mx-2 px-2 no-scrollbar">
+          {months.map((month) => (
             <button
               key={month}
               onClick={() => setSelectedMonth(month)}
               className={cn(
-                "px-6 py-2.5 rounded-lg text-sm font-medium transition-all border",
+                "flex-shrink-0 px-6 py-2.5 rounded-lg text-sm font-medium transition-all border",
                 selectedMonth === month
                   ? "bg-orange-500 text-white "
                   : "bg-white text-foreground border-gray-200 hover:border-primary/50",
