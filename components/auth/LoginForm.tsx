@@ -87,7 +87,7 @@ export function LoginForm({ title, forgotPasswordRoute }: LoginFormProps) {
     };
 
     return (
-        <div className="min-h-screen flex flex-col overflow-hidden !font-poppins">
+        <div className="min-h-screen flex flex-col overflow-hidden">
             <AppHeader showAvatar={false} showLogo={true} />
 
             <main className="relative flex-1">
