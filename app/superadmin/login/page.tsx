@@ -8,7 +8,7 @@ import { useLoginMutation } from "@/lib/services/login";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { getDashboardPath, ROUTES, MESSAGES } from "@/lib/utils";
+import { getDashboardPath, ROUTES, MESSAGES, VALIDATION_PATTERNS } from "@/lib/utils";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
@@ -23,7 +23,7 @@ export default function AdminLogin() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailValid = VALIDATION_PATTERNS.EMAIL.test(email);
   const dispatch = useDispatch();
   const router = useRouter();
   const { userData } = useSelector(selectAuthState);
