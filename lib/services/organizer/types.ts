@@ -1,90 +1,24 @@
-export interface PartnerRequest {
-  organizationId: string;
-  data: {
-    displayPicture: {
-      id: number;
-      type: string;
-      url: string;
-      file: string;
-      markedForDeletion: true;
-    };
-    organizerName: string;
-    bannerImage: {
-      id: number;
-      type: string;
-      url: string;
-      file: string;
-      markedForDeletion: true;
-    };
-    tagline: string;
-    description: string;
-    websiteUrl: string;
-    instagramHandle: string;
-    youtubeChannel: string;
-    googleBusiness: string;
-    testimonials: string;
-    testimonialScreenshot: {
-      id: number;
-      type: string;
-      url: string;
-      file: string;
-      markedForDeletion: true;
-    };
-    certifications: [
-      {
-        id: number;
-        type: string;
-        url: string;
-        file: string;
-        markedForDeletion: true;
-      },
-    ];
-  };
+import { ApiResponse, UploadedFile } from "../common-types";
+
+export interface PartnerData {
+  displayPicture: UploadedFile;
+  organizerName: string;
+  bannerImage: UploadedFile;
+  tagline: string;
+  description: string;
+  websiteUrl: string;
+  instagramHandle: string;
+  youtubeChannel: string;
+  googleBusiness: string;
+  testimonials: string;
+  testimonialScreenshot: UploadedFile;
+  certifications: UploadedFile[];
 }
 
-export interface PartnerResponse {
-  status: string;
-  message: string;
-  data: {
-    displayPicture: {
-      id: number;
-      type: string;
-      url: string;
-      file: string;
-      markedForDeletion: true;
-    };
-    organizerName: string;
-    bannerImage: {
-      id: number;
-      type: string;
-      url: string;
-      file: string;
-      markedForDeletion: true;
-    };
-    tagline: string;
-    description: string;
-    websiteUrl: string;
-    instagramHandle: string;
-    youtubeChannel: string;
-    googleBusiness: string;
-    testimonials: string;
-    testimonialScreenshot: {
-      id: number;
-      type: string;
-      url: string;
-      file: string;
-      markedForDeletion: true;
-    };
-    certifications: [
-      {
-        id: number;
-        type: string;
-        url: string;
-        file: string;
-        markedForDeletion: true;
-      },
-    ];
-  };
-  error: string;
-  timestamp: '2025-10-14';
+export interface PartnerRequest {
+  organizationId: string;
+  data: PartnerData;
 }
+
+export type PartnerResponse = ApiResponse<PartnerData>;
+
