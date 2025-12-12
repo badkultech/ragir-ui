@@ -3,22 +3,22 @@ import Image from "next/image";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[700px] overflow-hidden bg-white">
-      <div className="container mx-auto px-4 md:px-20 py-12 md:py-16">
+    <section className="relative min-h-[700px] bg-white">
+      <div className="container mx-auto px-4 md:px-20 py-8 md:py-16">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Left content */}
           <div className="space-y-6">
-            <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground leading-[1.1] tracking-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground leading-[1.2] md:leading-[1.1] tracking-tight">
               Join Group Trips. Meet Like Minded Travelers. Around the World!
             </h1>
-            <p className="text-muted-foreground text-base max-w-md leading-relaxed">
+            <p className="hidden md:block text-muted-foreground text-base max-w-md leading-relaxed">
               An all-in-one platform to discover the most incredible group
               trips, connect with like-minded travelers and be part of a
               thriving community that shares your passion for exploration and
               connection.
             </p>
 
-            <div className="pt-4">
+            <div className="pt-4 hidden lg:block">
               <Image
                 alt=""
                 width={240}

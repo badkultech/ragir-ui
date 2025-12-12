@@ -61,14 +61,14 @@ export function TripLeaderCard({
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center bg-white rounded-[100px] p-3 pr-10 gap-6 min-w-[500px] max-w-[550px]",
+          "flex items-center bg-white rounded-[100px] p-2 pr-6 md:p-3 md:pr-10 gap-3 md:gap-6 w-full md:w-auto md:min-w-[500px] md:max-w-[550px]",
           "shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] hover:shadow-[0_15px_50px_-10px_rgba(0,0,0,0.2)] transition-all duration-300",
           onClick && "cursor-pointer",
           className
         )}
       >
         {/* Large Circular Image */}
-        <div className="relative w-28 h-28 rounded-full overflow-hidden flex-shrink-0 border-[3px] border-white shadow-sm">
+        <div className="relative w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden flex-shrink-0 border-[3px] border-white shadow-sm">
           <Image src={image || "/placeholder.svg"} alt={name} fill className="object-cover" />
         </div>
 

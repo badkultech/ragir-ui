@@ -5,6 +5,7 @@ import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { MoodTag } from "@/components/search-results/mood-tag"
+import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
 import Image from "next/image"
 import { GradientButton } from "@/components/gradient-button"
 import {
@@ -46,7 +47,7 @@ const moods = [
   { name: "Spiritual", icon: Flower2, selected: false },
 ]
 
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+
 
 export function SearchTripsCard() {
   const [activeTab, setActiveTab] = useState<"destination" | "moods">("destination")
@@ -62,26 +63,26 @@ export function SearchTripsCard() {
   }
 
   const handleSearch = () => {
-  const params = new URLSearchParams();
-  if (activeTab === "destination") {
-    if (destination.trim()) params.set("destination", destination);
-    params.set("region", selectedRegion);
-  }
-  if (activeTab === "moods") {
-    if (selectedMoods.length > 0) {
-      params.set("moods", JSON.stringify(selectedMoods));
+    const params = new URLSearchParams();
+    if (activeTab === "destination") {
+      if (destination.trim()) params.set("destination", destination);
+      params.set("region", selectedRegion);
     }
-  }
-  params.set("year", year.toString());
-  params.set("month", selectedMonth);
+    if (activeTab === "moods") {
+      if (selectedMoods.length > 0) {
+        params.set("moods", JSON.stringify(selectedMoods));
+      }
+    }
+    params.set("year", year.toString());
+    params.set("month", selectedMonth);
 
-  router.push(`/home/search-result-with-filter?${params.toString()}`);
-};
+    router.push(`/home/search-result-with-filter?${params.toString()}`);
+  };
 
 
 
   return (
-    <div className="bg-white rounded-3xl shadow-[0_0_15px_rgba(0,0,0,0.2)] p-6 w-full max-w-[600px]">
+    <div className="bg-white rounded-[20px] md:rounded-3xl shadow-[0_0_15px_rgba(0,0,0,0.2)] p-3 md:p-6 w-full max-w-[600px] overflow-hidden">
       {/* Header */}
       <h2 className="text-xl font-semibold text-center mb-4">Search Trips</h2>
 
@@ -90,7 +91,7 @@ export function SearchTripsCard() {
         <button
           onClick={() => setActiveTab("destination")}
           className={cn(
-            "flex-1 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
+            "flex-1 py-2.5 px-2 md:px-4 rounded-full text-sm font-medium transition-all",
             activeTab === "destination"
               ? "bg-[rgba(255,128,76,1)] text-white"
               : "text-muted-foreground hover:text-foreground",
@@ -101,7 +102,7 @@ export function SearchTripsCard() {
         <button
           onClick={() => setActiveTab("moods")}
           className={cn(
-            "flex-1 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
+            "flex-1 py-2.5 px-2 md:px-4 rounded-full text-sm font-medium transition-all",
             activeTab === "moods"
               ? "bg-[rgba(255,128,76,1)] text-white"
               : "text-muted-foreground hover:text-foreground",
@@ -115,14 +116,14 @@ export function SearchTripsCard() {
         <div className="space-y-4">
           {/* Destination Input */}
           <div>
-            <p className="text-sm font-poppins font-semibold mb-4">Where do you want to travel?</p>
-            <label className="text-sm font-poppins font-semibold text-foreground">Destination</label>
+            <p className="text-xs md:text-sm font-poppins font-semibold mb-2 md:mb-4">Where do you want to travel?</p>
+            <label className="text-xs md:text-sm font-poppins font-semibold text-foreground">Destination</label>
             <input
               type="text"
               placeholder="Enter destination"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full mt-1.5 px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full mt-1.5 px-3 py-2 md:px-4 md:py-3 border border-gray-200 rounded-lg text-xs md:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
 
@@ -136,21 +137,21 @@ export function SearchTripsCard() {
           {/* Region Selection */}
           <div>
             <label className="text-sm font-medium text-foreground">Region</label>
-            <div className="flex gap-3 mt-2">
+            <div className="grid grid-cols-2 gap-2 md:gap-3 mt-2">
               {/* Domestic Option */}
               <button
                 onClick={() => setSelectedRegion("domestic")}
                 className={cn(
-                  "flex-1 p-3 rounded-xl border-2 transition-all flex flex-col items-start gap-2",
+                  "p-2 md:p-3 rounded-xl border-2 transition-all flex flex-col items-start gap-2",
                   selectedRegion === "domestic"
                     ? "border-orange-500 bg-primary/5"
                     : "border-gray-200 hover:border-gray-300",
                 )}
               >
                 {/* India Map Silhouette */}
-                <div className="flex items-center justify-start gap-2">
-                  <Image src="/india-outline.png" alt="India Map" width={30} height={25} className="w-30 h-25" />
-                  <span className="text-sm font-medium">Domestic</span>
+                <div className="flex flex-row items-center justify-start gap-1 md:gap-2">
+                  <Image src="/india-outline.png" alt="India Map" width={30} height={25} className="w-6 h-auto md:w-8" />
+                  <span className="text-xs md:text-sm font-medium">Domestic</span>
                 </div>
 
 
@@ -160,15 +161,15 @@ export function SearchTripsCard() {
               <button
                 onClick={() => setSelectedRegion("international")}
                 className={cn(
-                  "flex-1 p-3 rounded-xl border-2 transition-all flex flex-col items-start gap-2",
+                  "p-2 md:p-3 rounded-xl border-2 transition-all flex flex-col items-start gap-2",
                   selectedRegion === "international"
                     ? "border-orange-500 bg-primary/5"
                     : "border-gray-200 hover:border-gray-300",
                 )}
               >
-                <div className="flex items-center justify-start gap-2">
-                  <Image src="/world-outline.png" alt="World Map" width={40} height={25} className="w-auto h-20 mt-4" />
-                  <span className="text-sm font-poppins mt-3 font-medium">International</span>
+                <div className="flex flex-row items-center justify-start gap-1 md:gap-2">
+                  <Image src="/world-outline.png" alt="World Map" width={40} height={25} className="w-8 h-auto md:w-10" />
+                  <span className="text-xs md:text-sm font-poppins font-medium">International</span>
                 </div>
                 {/* World Map Silhouette */}
               </button>
@@ -194,43 +195,16 @@ export function SearchTripsCard() {
       )}
 
       {/* Date Section */}
-      <div className="mt-6 space-y-4">
-        <p className="text-sm font-semibold font-poppins">When do you want to go?</p>
-
-        {/* Year Selector */}
-        <div className="flex items-center justify-center gap-4">
-          <button
-            onClick={() => setYear((y) => y - 1)}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4 text-muted-foreground" />
-          </button>
-          <span className="font-semibold">{year}</span>
-          <button
-            onClick={() => setYear((y) => y + 1)}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </button>
-        </div>
-
-        {/* Month Pills */}
-        <div className="flex overflow-x-auto gap-2 pb-2 -mx-2 px-2 no-scrollbar">
-          {months.map((month) => (
-            <button
-              key={month}
-              onClick={() => setSelectedMonth(month)}
-              className={cn(
-                "flex-shrink-0 px-6 py-2.5 rounded-lg text-sm font-medium transition-all border",
-                selectedMonth === month
-                  ? "bg-orange-500 text-white "
-                  : "bg-white text-foreground border-gray-200 hover:border-primary/50",
-              )}
-            >
-              {month}
-            </button>
-          ))}
-        </div>
+      <div className="mt-6">
+        <MonthYearSelector
+          year={year}
+          month={selectedMonth}
+          onChange={({ year, month }) => {
+            setYear(year);
+            setSelectedMonth(month);
+          }}
+          className="p-0"
+        />
       </div>
 
       {/* Search Button */}
