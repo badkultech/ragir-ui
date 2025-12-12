@@ -150,7 +150,7 @@ export function SearchTripsCard() {
               >
                 {/* India Map Silhouette */}
                 <div className="flex flex-row items-center justify-start gap-1 md:gap-2">
-                  <Image src="/india-outline.png" alt="India Map" width={30} height={25} className="w-6 h-auto md:w-8" />
+                  <Image src="/india-outline.png" alt="India Map" width={30} height={25} className="w-6 h-auto md:w-20" />
                   <span className="text-xs md:text-sm font-medium">Domestic</span>
                 </div>
 
@@ -168,7 +168,7 @@ export function SearchTripsCard() {
                 )}
               >
                 <div className="flex flex-row items-center justify-start gap-1 md:gap-2">
-                  <Image src="/world-outline.png" alt="World Map" width={40} height={25} className="w-8 h-auto md:w-10" />
+                  <Image src="/world-outline.png" alt="World Map" width={40} height={25} className="w-8 h-auto md:w-20" />
                   <span className="text-xs md:text-sm font-poppins font-medium">International</span>
                 </div>
                 {/* World Map Silhouette */}
