@@ -260,10 +260,11 @@ export default function PricingPage() {
                   )}
 
                   {/* COMMON FIELDS (Shared between Simple & Dynamic) */}
+                  {/* ADD ONS */}
+                  <AddOnsFieldset value={addOns} onChange={setAddOns} />
                   <div className="space-y-5 pt-4 border-t border-gray-100">
                     <Label>GST Status *</Label>
                     <GstStatusToggle value={gst} onChange={setGst} />
-
                     <Label>Deposit Required</Label>
                     <Input
                       placeholder='Deposit %'
@@ -280,9 +281,6 @@ export default function PricingPage() {
                       onChange={(e) => setPolicy(e.target.value)}
                     />
                   </div>
-
-                  {/* ADD ONS */}
-                  <AddOnsFieldset value={addOns} onChange={setAddOns} />
                 </CardContent>
               </Card>
             </div>

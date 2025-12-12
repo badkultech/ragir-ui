@@ -7,6 +7,23 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Plus, X, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info, Trash2 } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogClose,
+} from "@/components/ui/dialog";
+
 
 export interface DynamicOption {
     id: string;
@@ -30,6 +47,21 @@ interface DynamicCategoryCardProps {
 }
 
 export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCategoryCardProps) {
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [optionToDelete, setOptionToDelete] = useState<{ idx: number; option: DynamicOption } | null>(null);
+
+    const handleDeleteClick = (idx: number, option: DynamicOption) => {
+        setOptionToDelete({ idx, option });
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (optionToDelete) {
+            removeOption(optionToDelete.idx);
+            setDeleteModalOpen(false);
+            setOptionToDelete(null);
+        }
+    };
 
     const updateField = (field: keyof DynamicCategory, value: any) => {
         onChange({ ...category, [field]: value });
@@ -62,8 +94,36 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-lg">Price Category</h3>
+
+                    {/* Info Tooltip */}
+                    <TooltipProvider delayDuration={100}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button className="text-gray-400 hover:text-orange-500 transition">
+                                    <Info className="w-4 h-4" />
+                                </button>
+                            </TooltipTrigger>
+
+                            <TooltipContent
+                                side="right"
+                                align="start"
+                                showArrow={false}
+                                className="max-w-xs bg-white text-gray-700 shadow-xl rounded-xl p-4 border"
+                            >
+                                <div className="space-y-1">
+                                    <p> <Info className="w-4 h-4 text-orange-500 mt-1" /></p>
+                                    <p className="text-sm leading-relaxed">
+                                        Allows you to create flexible pricing options based on
+                                        different categories. Each category can have multiple
+                                        price options.
+                                    </p>
+                                </div>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             </div>
+
 
             <div className="space-y-4">
                 {/* Basic Info */}
@@ -170,8 +230,8 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                 </div>
                             </div>
                             {category.type === 'multi' && category.options.length > 1 && (
-                                <div className="pt-7">
-                                    <Button variant="ghost" size="icon" onClick={() => removeOption(idx)} className="h-10 w-10 text-muted-foreground hover:text-destructive">
+                                <div className={idx === 0 ? "pt-7" : ""}>
+                                    <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(idx, option)} className="h-10 w-10 text-muted-foreground hover:text-destructive">
                                         <X className="w-4 h-4" />
                                     </Button>
                                 </div>
@@ -192,6 +252,36 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                     </Button>
                 )}
             </div>
+
+            <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Confirm Deletion</DialogTitle>
+                        <DialogDescription>
+                            You are about to delete:
+                        </DialogDescription>
+                    </DialogHeader>
+                    {optionToDelete && (
+                        <div className="border rounded-xl p-4 my-2">
+                            <div className="text-sm text-gray-500 mb-1">{optionToDelete.option.name || 'Untitled Option'}</div>
+                            <div className="text-xl font-bold">₹ {optionToDelete.option.price || '0'}</div>
+                        </div>
+                    )}
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <DialogClose asChild>
+                            <Button variant="outline" className="w-full sm:w-auto h-11">Cancel</Button>
+                        </DialogClose>
+                        <Button
+                            variant="destructive"
+                            onClick={confirmDelete}
+                            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 h-11"
+                        >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

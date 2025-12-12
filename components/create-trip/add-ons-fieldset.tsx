@@ -40,7 +40,13 @@ export function AddOnsFieldset({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={addRow}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addRow}
+          className="text-orange-500 border-orange-400 hover:text-orange-600 hover:border-orange-600 hover:bg-orange-50"
+        >
           + Add Ons
         </Button>
       </div>
