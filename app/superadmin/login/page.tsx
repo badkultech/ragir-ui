@@ -110,10 +110,10 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-xl border-0 bg-blue-50 px-4 py-3 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="input-primary"
                 />
                 {email.length > 0 && !emailValid && (
-                  <p className="text-[#FD6E34] text-xs mt-2">
+                  <p className="text-brand-orange text-xs mt-2">
                     {MESSAGES.VALIDATION.EMAIL_INVALID}
                   </p>
                 )}
@@ -130,7 +130,7 @@ export default function AdminLogin() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full rounded-xl border-0 bg-blue-50 px-4 py-3 pr-10 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    className="input-primary pr-10"
                   />
                   <button
                     type="button"
@@ -165,7 +165,8 @@ export default function AdminLogin() {
                 <button
                   type="submit"
                   disabled={!isFormValid || isLoading}
-                  className="w-full font-semibold text-sm sm:text-base py-3 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] text-white hover:opacity-90 hover:shadow-lg"
+                  disabled={!isFormValid || isLoading}
+                  className="btn-primary"
                 >
                   <span className="relative">Login to Dashboard</span>
                 </button>
@@ -175,7 +176,7 @@ export default function AdminLogin() {
               <div className="text-center">
                 <Link
                   href={ROUTES.SUPER_ADMIN.FORGOT_PASSWORD}
-                  className="text-[#FD6E34] text-sm hover:underline font-medium"
+                  className="text-brand-orange text-sm hover:underline font-medium"
                 >
                   Forgot password?
                 </Link>
