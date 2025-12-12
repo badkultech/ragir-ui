@@ -11,12 +11,14 @@ export function MainHeader({
   onUpdateNotifications = () => { },
   logoText = "",
   logoSrc = "/logo.png",
+  isLoggedIn = false, 
 }: {
   onMenuOpen?: () => void;
   notifications?: any[];
   onUpdateNotifications?: (list: any[]) => void;
   logoText?: string;
   logoSrc?: string;
+  isLoggedIn?: boolean; 
 }) {
   const router = useRouter();
 
@@ -24,10 +26,9 @@ export function MainHeader({
     <header className="relative z-20 bg-white border-b border-[#E5E7EB]">
       <div className="container mx-auto flex items-center justify-between w-full px-4 md:px-20 py-3">
 
-        {/* LEFT SECTION (Perfect left alignment) */}
+        {/* LEFT SECTION */}
         <div className="flex items-center gap-2 flex-shrink-0">
 
-          {/* Arrow if text mode */}
           {logoText && (
             <button
               onClick={() => router.back()}
@@ -37,7 +38,6 @@ export function MainHeader({
             </button>
           )}
 
-          {/* Logo if NO text */}
           {!logoText && (
             <Image
               src={logoSrc}
@@ -48,40 +48,59 @@ export function MainHeader({
             />
           )}
 
-          {/* Text (auto left aligned) */}
           {logoText && (
-            <h1 className="text-xl md:text-2xl font-semibold text-black leading-none">
+            <h3 className="text-xl md:text-xl font-semibold text-black leading-none">
               {logoText}
-            </h1>
+            </h3>
           )}
         </div>
 
-        {/* RIGHT SECTION (perfect right alignment always) */}
+        {/* RIGHT SECTION */}
         <div className="ml-auto flex items-center gap-4">
 
-          {/* Compare icon */}
-          <button className="p-2 hidden md:block text-black/80 hover:text-black">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M18 0H2C0.897 0 0 0.897 0 2V14C0 15.103 0.897 16 2 16H5V19.767L11.277 16H18C19.103 16 20 15.103 20 14V2C20 0.897 19.103 0 18 0ZM18 14H10.723L7 16.233V14H2V2H18V14Z"
-                fill="black"
+          {/* 👇 USER NOT LOGGED IN → Show Login/Register Button */}
+          {!isLoggedIn && (
+            <>
+              <button
+                onClick={() => router.push("/login")}
+                className="px-4 py-1.5 rounded-full text-white font-medium 
+                         bg-gradient-to-r from-orange-400 to-pink-500 
+                         hover:opacity-90 transition"
+              >
+                Log in / Register
+              </button>
+              <button>
+                <Menu className="w-6 h-6" />
+              </button>
+            </>
+          )}
+
+          {/* 👇 USER LOGGED IN → Show existing icons */}
+          {isLoggedIn && (
+            <>
+              <button className="p-2 hidden md:block text-black/80 hover:text-black">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M18 0H2C0.897 0 0 0.897 0 2V14C0 15.103 0.897 16 2 16H5V19.767L11.277 16H18C19.103 16 20 15.103 20 14V2C20 0.897 19.103 0 18 0ZM18 14H10.723L7 16.233V14H2V2H18V14Z"
+                    fill="black"
+                  />
+                </svg>
+              </button>
+
+              <NotificationsDropdown
+                notifications={notifications}
+                onUpdateNotifications={onUpdateNotifications}
               />
-            </svg>
-          </button>
 
-          {/* Notifications */}
-          <NotificationsDropdown
-            notifications={notifications}
-            onUpdateNotifications={onUpdateNotifications}
-          />
+              <button
+                onClick={onMenuOpen}
+                className="p-2 text-black/80 hover:text-black"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </>
+          )}
 
-          {/* Menu Icon */}
-          <button
-            onClick={onMenuOpen}
-            className="p-2 text-black/80 hover:text-black"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
         </div>
 
       </div>

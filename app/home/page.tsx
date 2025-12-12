@@ -59,6 +59,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <MainHeader
+        isLoggedIn={true}
         onMenuOpen={() => setIsMenuOpen(true)}
         notifications={notificationsList}
         onUpdateNotifications={setNotificationsList}
