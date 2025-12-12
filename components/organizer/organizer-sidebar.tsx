@@ -29,6 +29,8 @@ import {
 import { useState, useEffect } from 'react';
 import { LogoutButton } from '../common/LogoutButton';
 
+import { ROUTES } from '@/lib/utils';
+
 type NavItem = {
   label: string;
   href?: string;
@@ -38,54 +40,54 @@ type NavItem = {
 };
 
 const nav: NavItem[] = [
-  { label: 'Dashboard', href: '/organizer/dashboard', icon: LayoutGrid },
+  { label: 'Dashboard', href: ROUTES.ORGANIZER.DASHBOARD, icon: LayoutGrid },
   {
     label: 'Organizer Profile',
-    href: '/organizer/profile',
+    href: ROUTES.ORGANIZER.PROFILE,
     icon: CircleUser,
   },
-  { label: 'Trip', href: '/organizer/trip-overview', icon: TripIcon },
+  { label: 'Trip', href: ROUTES.ORGANIZER.TRIP_OVERVIEW, icon: TripIcon },
   {
     label: 'Library',
-    href: '/organizer/library',
+    href: ROUTES.ORGANIZER.LIBRARY,
     icon: LibraryIcon,
     children: [
       {
         label: 'Day Description',
-        href: '/organizer/library/daydescription',
+        href: ROUTES.ORGANIZER.LIBRARY_DAY_DESCRIPTION,
         icon: Calendar,
       },
-      { label: 'Transit', href: '/organizer/library/transits', icon: Car },
-      { label: 'Stays', href: '/organizer/library/stays', icon: House },
+      { label: 'Transit', href: ROUTES.ORGANIZER.LIBRARY_TRANSITS, icon: Car },
+      { label: 'Stays', href: ROUTES.ORGANIZER.LIBRARY_STAYS, icon: House },
 
       {
         label: 'Meals',
-        href: '/organizer/library/meals',
+        href: ROUTES.ORGANIZER.LIBRARY_MEALS,
         icon: UtensilsCrossed,
       },
       {
         label: 'Activities',
-        href: '/organizer/library/activities',
+        href: ROUTES.ORGANIZER.LIBRARY_ACTIVITIES,
         icon: PersonStanding,
       },
       {
         label: 'Trip Leaders',
-        href: '/organizer/library/trip-leaders',
+        href: ROUTES.ORGANIZER.LIBRARY_TRIP_LEADERS,
         icon: UserRoundCog,
       },
       {
         label: 'FAQs',
-        href: '/organizer/library/faqs',
+        href: ROUTES.ORGANIZER.LIBRARY_FAQS,
         icon: MessageCircleQuestion,
       },
     ],
   },
-  { label: 'Team Members', href: '/organizer/team', icon: UserRoundPlus },
-  { label: 'Support Center', href: '/organizer/support', icon: Headphones },
-  { label: 'Leads', href: '/organizer/leads/all', icon: Users },
-  { label: 'Queries', href: '/organizer/queries/all', icon: TextSearch },
-  { label: 'Billing', href: '/organizer/billing', icon: CreditCard },
-  { label: 'Settings', href: '/organizer/settings', icon: Settings },
+  { label: 'Team Members', href: ROUTES.ORGANIZER.TEAM, icon: UserRoundPlus },
+  { label: 'Support Center', href: ROUTES.ORGANIZER.SUPPORT, icon: Headphones },
+  { label: 'Leads', href: ROUTES.ORGANIZER.LEADS_ALL, icon: Users },
+  { label: 'Queries', href: ROUTES.ORGANIZER.QUERIES_ALL, icon: TextSearch },
+  { label: 'Billing', href: ROUTES.ORGANIZER.BILLING, icon: CreditCard },
+  { label: 'Settings', href: ROUTES.ORGANIZER.SETTINGS, icon: Settings },
 ];
 
 type OrganizerSidebarProps = {

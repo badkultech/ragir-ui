@@ -3,6 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { PartnerCard } from "@/components/homePage/shared/partner-card";
 import { Header } from "@/components/homePage/sections/header";
 import { Footer } from "@/components/homePage/sections/footer";
+import { ROUTES } from "@/lib/utils";
 
 const partners = [
   { id: "the-lalit", name: "The Lalit", logo: "/tp-logo1.jpg" },
@@ -25,7 +26,7 @@ export default function PartnersPage() {
           {/* Header with back button */}
           <div className="flex items-center gap-4 mb-8">
             <Link
-              href="/home"
+              href={ROUTES.COMMON.HOME_NAV}
               className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600" />

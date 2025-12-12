@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import RequiredStar from "@/components/common/RequiredStar";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { ROUTES, MESSAGES } from "@/lib/utils";
 
 export default function AddAdmin() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -43,8 +44,8 @@ export default function AddAdmin() {
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) return "Email address is required";
-    if (!emailRegex.test(email)) return "Please enter a valid email address";
+    if (!email) return MESSAGES.VALIDATION.EMAIL_REQUIRED;
+    if (!emailRegex.test(email)) return MESSAGES.VALIDATION.EMAIL_INVALID;
     return "";
   };
 
@@ -62,7 +63,7 @@ export default function AddAdmin() {
       return;
     }
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      alert("Please fill in all required fields");
+      alert(MESSAGES.VALIDATION.REQUIRED_FIELDS);
       return;
     }
 
@@ -78,8 +79,9 @@ export default function AddAdmin() {
       };
 
       await createSuperAdmin({ organizationId, payload }).unwrap();
-      showSuccess("Admin invitation sent successfully!");
-      router.push("/superadmin/admins");
+      await createSuperAdmin({ organizationId, payload }).unwrap();
+      showSuccess(MESSAGES.SUPER_ADMIN.INVITE_SENT);
+      router.push(ROUTES.SUPER_ADMIN.ADMINS);
     } catch (err) {
       showApiError(err as any);
     } finally {
@@ -99,8 +101,9 @@ export default function AddAdmin() {
             {/* Back Button + Title */}
             <div className="flex items-center mb-6">
               <Link
-                href="/superadmin/admins"
+                href={ROUTES.SUPER_ADMIN.ADMINS}
                 className="mr-3 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Back to Admins"
               >
                 <ChevronLeft className="w-5 h-5 text-gray-600" />
               </Link>

@@ -5,6 +5,7 @@ import { TestimonialCard } from "@/components/homePage/shared/testimonial-card";
 import { CertificationItem } from "@/components/homePage/shared/certification-item";
 import { CheckCircle } from "lucide-react";
 import { Footer } from "@/components/homePage/sections/footer";
+import { ROUTES } from "@/lib/utils";
 
 const partnersData: Record<
   string,
@@ -70,7 +71,7 @@ export default async function PartnerDetailPage({
           {/* Header with back button */}
           <div className="flex items-center gap-4 mb-6">
             <Link
-              href="/home/partners"
+              href={ROUTES.COMMON.HOME_PARTNERS}
               className=" hover:bg-gray-100 transition-colors"
             >
               <ChevronLeft className="w-6 h-6 text-gray-400 font-bold" />

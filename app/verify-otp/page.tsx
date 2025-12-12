@@ -194,11 +194,10 @@ export default function VerifyOTPPage() {
                 <GradientButton
                   onClick={handleVerify}
                   disabled={otp.some((digit) => !digit)} // disables if any digit is empty
-                  className={`flex items-center justify-center gap-2 ${
-                    otp.some((digit) => !digit)
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }`}
+                  className={`flex items-center justify-center gap-2 ${otp.some((digit) => !digit)
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                    }`}
                 >
                   Verify and Continue
                   <ArrowRight className="h-5 w-5" />

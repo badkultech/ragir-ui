@@ -5,6 +5,7 @@ import React from "react";
 import Image from "next/image";
 import { MoveRight } from "lucide-react";
 import { GradientButton } from "../gradient-button";
+import { ROUTES } from "@/lib/utils";
 
 /**
  * Header Component
@@ -17,7 +18,7 @@ export default function Header(): React.JSX.Element {
       className={` p-4 md:py-[1.2rem] md:px-[4rem] border-b border-gray-200`}
     >
       <nav className="flex justify-between items-center">
-        <Link href="/" className="font-bold">
+        <Link href={ROUTES.COMMON.HOME} className="font-bold">
           <Image
             src="/prelaunch-page-imgs/logo-ragir.svg"
             width={100}
