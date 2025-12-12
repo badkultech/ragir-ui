@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useGetAllTripQueriesCountQuery } from "@/lib/services/organizer/trip/queries";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useGetOrganizationDashboardQuery } from "@/lib/services/organizer/dashboard";
+import { ROUTES } from "@/lib/utils";
 
 
 export default function DashboardMainContent() {
@@ -151,7 +152,7 @@ export default function DashboardMainContent() {
             </Card>
 
             {/* All Leads */}
-            <Link href="/organizer/leads/all">
+            <Link href={ROUTES.ORGANIZER.LEADS_ALL}>
               <Card>
                 <CardContent className="flex flex-col items-center justify-center h-32 space-y-2">
                   <div className="bg-gray-100 p-2 rounded-full">
@@ -164,7 +165,7 @@ export default function DashboardMainContent() {
             </Link>
 
             {/* All Queries */}
-            <Link href="/organizer/queries/all">
+            <Link href={ROUTES.ORGANIZER.QUERIES_ALL}>
               <Card>
                 <CardContent className="flex flex-col items-center justify-center h-32 space-y-2">
                   <div className="bg-gray-100 p-2 rounded-full">
@@ -179,7 +180,7 @@ export default function DashboardMainContent() {
             </Link>
 
             {/* Library */}
-            <Link href="/organizer/library">
+            <Link href={ROUTES.ORGANIZER.LIBRARY}>
               <Card>
                 <CardContent className="flex flex-col items-center justify-center h-32 space-y-3">
                   <div className="bg-gray-100 p-4 rounded-full">
@@ -196,7 +197,7 @@ export default function DashboardMainContent() {
           <Card>
             <CardHeader className="flex items-center justify-between border-b pb-2">
               <CardTitle>Recent Activity</CardTitle>
-              <Link href="/organizer/trips/activities">
+              <Link href={ROUTES.ORGANIZER.TRIPS_ACTIVITIES}>
                 <Button
                   size="sm"
                   className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
@@ -231,7 +232,7 @@ export default function DashboardMainContent() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold">This Month</h2>
-              <Link href="/organizer/trips" className="">
+              <Link href={ROUTES.ORGANIZER.TRIPS} className="">
                 <Button
                   size="sm"
                   className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"

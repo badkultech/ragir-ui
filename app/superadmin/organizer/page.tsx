@@ -15,6 +15,7 @@ import {
 } from "@/lib/services/superadmin/organizations";
 import { AppHeader } from "@/components/app-header";
 import { AddCircle } from "@/components/common/AddCircle";
+import { ROUTES } from "@/lib/utils";
 
 // Modal Component (same as in Admins page)
 interface ActionModalProps {
@@ -185,7 +186,7 @@ export default function OrganizationsPage() {
               {/* Add Organizer Card */}
               <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center text-center">
                 <div className="mb-6 flex justify-center">
-                 <AddCircle href="/superadmin/add-organizer"/>
+                  <AddCircle href={ROUTES.SUPER_ADMIN.ADD_ORGANIZER} />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Add Organizer
@@ -194,7 +195,7 @@ export default function OrganizationsPage() {
                   Manage event organizers and assign responsibilities
                 </p>
                 <Link
-                  href="/superadmin/add-organizer"
+                  href={ROUTES.SUPER_ADMIN.ADD_ORGANIZER}
                   className="inline-flex items-center justify-center px-6 py-2 rounded-full font-medium text-white shadow hover:shadow-md transition"
                   style={{
                     background:
@@ -368,29 +369,29 @@ export default function OrganizationsPage() {
           modalState.type === "activate"
             ? "Activate Organizer"
             : modalState.type === "deactivate"
-            ? "Deactivate Organizer"
-            : "Resend Invite"
+              ? "Deactivate Organizer"
+              : "Resend Invite"
         }
         message={
           modalState.type === "activate"
             ? "Are you sure you want to activate this Organizer?"
             : modalState.type === "deactivate"
-            ? "Are you sure you want to deactivate this Organizer?"
-            : "Resend invitation email to this Organizer?"
+              ? "Are you sure you want to deactivate this Organizer?"
+              : "Resend invitation email to this Organizer?"
         }
         confirmText={
           modalState.type === "activate"
             ? "Activate"
             : modalState.type === "deactivate"
-            ? "Deactivate"
-            : "Resend"
+              ? "Deactivate"
+              : "Resend"
         }
         confirmColor={
           modalState.type === "activate"
             ? "bg-green-600 hover:bg-green-700"
             : modalState.type === "deactivate"
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-blue-600 hover:bg-blue-700"
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-blue-600 hover:bg-blue-700"
         }
       />
     </div>

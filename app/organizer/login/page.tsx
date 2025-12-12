@@ -8,7 +8,7 @@ import { useLoginMutation } from "@/lib/services/login";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { getDashboardPath } from "@/lib/utils";
+import { getDashboardPath, ROUTES, MESSAGES } from "@/lib/utils";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
@@ -54,7 +54,7 @@ export default function AdminLogin() {
         );
 
         const dashboardPath = getDashboardPath(decodedData?.userType);
-        showSuccess("Login successful!");
+        showSuccess(MESSAGES.AUTH.LOGIN_SUCCESS);
         router.replace(dashboardPath);
       }
     } catch (error) {
@@ -106,7 +106,7 @@ export default function AdminLogin() {
                 />
                 {email.length > 0 && !emailValid && (
                   <p className="text-[#FD6E34] text-xs mt-2">
-                    Enter a valid email address
+                    {MESSAGES.VALIDATION.EMAIL_INVALID}
                   </p>
                 )}
               </div>
@@ -166,7 +166,7 @@ export default function AdminLogin() {
               {/* Forgot Password */}
               <div className="text-center">
                 <Link
-                  href="/superadmin/forgot-password"
+                  href={ROUTES.SUPER_ADMIN.FORGOT_PASSWORD}
                   className="text-[#FD6E34] text-sm hover:underline font-medium"
                 >
                   Forgot password?

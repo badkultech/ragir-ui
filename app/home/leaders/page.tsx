@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 import { TripLeaderCard } from "@/components/homePage/shared/trip-leader-card"
 import { TripLeaderModal } from "@/components/homePage/shared/trip-leader-modal"
+import { ROUTES } from "@/lib/utils"
 
 const tripLeaders = [
     {
@@ -101,7 +102,7 @@ export default function TripLeadersPage() {
             <div className="px-4 md:px-8 lg:px-16 py-8">
                 <div className="flex items-center gap-4 mb-8">
                     <Link
-                        href="/"
+                        href={ROUTES.COMMON.HOME}
                         className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
                     >
                         <ChevronLeft className="w-5 h-5 text-gray-600" />

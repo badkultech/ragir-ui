@@ -10,6 +10,7 @@ import { GradientButton } from "@/components/gradient-button";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
 import RequiredStar from "@/components/common/RequiredStar";
+import { ROUTES } from "@/lib/utils";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -77,7 +78,7 @@ export default function ForgotPasswordPage() {
               <div className="flex items-center mb-6">
                 <button
                   type="button"
-                  onClick={() => router.replace("/superadmin/login")}
+                  onClick={() => router.replace(ROUTES.SUPER_ADMIN.LOGIN)}
                   className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -123,8 +124,8 @@ export default function ForgotPasswordPage() {
                   <span className="text-sm text-gray-600 !font-poppins">
                     Remember your password?{" "}
                     <Link
-                      href="/superadmin/login"
-                      className="text-[#FF804C] hover:underline font-medium"
+                      href={ROUTES.SUPER_ADMIN.LOGIN}
+                      className="text-[#FD6E34] hover:underline font-medium"
                     >
                       Sign in here
                     </Link>

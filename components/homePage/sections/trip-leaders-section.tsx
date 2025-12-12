@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { TripLeaderCard } from "@/components/homePage/shared/trip-leader-card"
 import { ChevronRight } from "lucide-react"
+import { ROUTES } from "@/lib/utils"
 
 const tripLeaders = [
   { name: "Kyle May", image: "/tl-pfp.jpg" },
@@ -45,7 +46,7 @@ export function TripLeadersSection() {
       {/* View All link */}
       <div className="text-center my-8 ">
         <Link
-          href="/home/leaders"
+          href={ROUTES.COMMON.HOME_LEADERS}
           className="text-lg text-[#ff804c] flex items-center gap-2  justify-center font-semibold font-poppins  hover:text-primary/80 transition-colors"
         >
           View All

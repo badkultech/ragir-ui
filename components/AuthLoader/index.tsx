@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo, useRef, startTransition } from "re
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
 import { selectAuthState, setCredentials } from "@/lib/slices/auth";
-import { getDashboardPath, PublicRoutes, isAllowedRoutes } from "@/lib/utils";
+import { getDashboardPath, PublicRoutes, isAllowedRoutes, ROUTES } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Loader } from "@/components/common/Loader";
 
@@ -51,7 +51,7 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
     if (redirecting.current) return;
 
     const isAuthenticated = Boolean(accessToken) && !accessTokenExpired;
-    const isLogin = pathname === "/" || pathname.includes("/login");
+    const isLogin = pathname === ROUTES.COMMON.HOME || pathname.includes(ROUTES.COMMON.LOGIN);
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[AuthLoader] Route Guard:', {
@@ -87,8 +87,8 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
       if (pathname === r) return true;
 
       // Allow /prelaunch/* and /home/* patterns
-      if (r === '/prelaunch' && pathname.startsWith('/prelaunch/')) return true;
-      if (r === '/home' && pathname.startsWith('/home/')) return true;
+      if (r === ROUTES.COMMON.PRELAUNCH && pathname.startsWith(`${ROUTES.COMMON.PRELAUNCH}/`)) return true;
+      if (r === ROUTES.COMMON.HOME_NAV && pathname.startsWith(`${ROUTES.COMMON.HOME_NAV}/`)) return true;
 
       return false;
     });
@@ -106,7 +106,7 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
       }
       redirecting.current = true;
       startTransition(() => {
-        router.replace("/");
+        router.replace(ROUTES.COMMON.HOME);
         setTimeout(() => redirecting.current = false, 100);
       });
       return;
@@ -128,11 +128,11 @@ export default function HydratedAuth({ children }: { children: React.ReactNode }
 
   // Show loading for protected routes while checking auth
   const isAuthenticated = Boolean(accessToken) && !accessTokenExpired;
-  const isLogin = pathname === "/" || pathname.includes("/login");
+  const isLogin = pathname === ROUTES.COMMON.HOME || pathname.includes(ROUTES.COMMON.LOGIN);
   const isPublicRoute = PublicRoutes.some((r) => {
     if (pathname === r) return true;
-    if (r === '/prelaunch' && pathname.startsWith('/prelaunch/')) return true;
-    if (r === '/home' && pathname.startsWith('/home/')) return true;
+    if (r === ROUTES.COMMON.PRELAUNCH && pathname.startsWith(`${ROUTES.COMMON.PRELAUNCH}/`)) return true;
+    if (r === ROUTES.COMMON.HOME_NAV && pathname.startsWith(`${ROUTES.COMMON.HOME_NAV}/`)) return true;
     return false;
   });
 

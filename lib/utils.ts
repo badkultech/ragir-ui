@@ -127,22 +127,130 @@ export const ROLES = {
 
 export type RoleType = (typeof ROLES)[keyof typeof ROLES];
 
+// Application Messages
+export const MESSAGES = {
+  AUTH: {
+    LOGIN_SUCCESS: 'Login successful!',
+    LOGIN_ERROR: 'Login failed. Please check your credentials.',
+  },
+  VALIDATION: {
+    EMAIL_REQUIRED: 'Email address is required',
+    EMAIL_INVALID: 'Please enter a valid email address',
+    PHONE_INVALID: 'Enter a valid phone number',
+    REQUIRED_FIELDS: 'Please fill in all required fields',
+    NAME_ALPHA: 'Name can only contain letters and spaces',
+    NAME_LENGTH_MIN: 'Name must be at least 3 characters long',
+    NAME_LENGTH_MAX: 'Name cannot exceed 70 characters',
+    BUSINESS_TYPE_REQUIRED: 'Select business type',
+  },
+  SUPER_ADMIN: {
+    INVITE_SENT: 'Admin invitation sent successfully!',
+    ORGANIZER_REGISTERED: 'Organizer registered successfully!',
+    ORGANIZER_REGISTER_FAIL: 'Failed to register organizer. Please try again.',
+    ORGANIZER_NAME_REQUIRED: 'Organizer name is required',
+  },
+  OTP: {
+    RESENT: 'OTP resent successfully',
+  },
+  PARTNER: {
+    NAME_REQUIRED: 'Please enter your name.',
+    NAME_LENGTH_MAX: 'Name cannot exceed 50 characters.',
+    PHONE_INVALID_10: 'Please enter a valid 10-digit phone number.',
+    REGISTER_SUCCESS: '🎉 Successfully registered as a partner!',
+    GENERIC_ERROR: 'Something went wrong. Please try again.',
+  },
+} as const;
+
+// Route Constants
+export const ROUTES = {
+  COMMON: {
+    HOME: '/',
+    LOGIN: '/login',
+    REGISTER: '/register',
+    VERIFY_OTP: '/verify-otp',
+    PRELAUNCH: '/prelaunch',
+    PRELAUNCH_TRAVELERS: '/prelaunch/travelers',
+    HOME_NAV: '/home',
+    NOT_FOUND: '/not-found',
+    TRIPS: '/trips',
+    DESTINATIONS: '/destinations',
+    ABOUT: '/about',
+    HOME_PARTNERS: '/home/partners',
+    HOME_LEADERS: '/home/leaders',
+    LEADERS: '/leaders',
+    HELP: '/help',
+    CONTACT: '/contact',
+    FAQ: '/faq',
+    TERMS: '/terms',
+  },
+  SUPER_ADMIN: {
+    LOGIN: '/superadmin/login',
+    REGISTER: '/superadmin/register',
+    FORGOT_PASSWORD: '/superadmin/forgot-password',
+    DASHBOARD: '/superadmin',
+    ADD_ADMIN: '/superadmin/add-admin',
+    ADD_ORGANIZER: '/superadmin/add-organizer',
+    ADMINS: '/superadmin/admins',
+    ORGANIZERS: '/superadmin/organizer',
+  },
+  ORGANIZER: {
+    LOGIN: '/organizer/login',
+    REGISTER: '/organizer/register',
+    JOIN_AS_PARTNER: '/organizer/join-as-partner',
+    CREATE_TRIP: '/organizer/create-trip',
+    DASHBOARD: '/organizer/dashboard',
+    PROFILE: '/organizer/profile',
+    PROFILE_EDIT: '/organizer/profile/edit',
+    TRIP_OVERVIEW: '/organizer/trip-overview',
+    TRIPS: '/organizer/trips',
+    TRIPS_ACTIVITIES: '/organizer/trips/activities',
+    LIBRARY: '/organizer/library',
+    LIBRARY_DAY_DESCRIPTION: '/organizer/library/daydescription',
+    LIBRARY_TRANSITS: '/organizer/library/transits',
+    LIBRARY_STAYS: '/organizer/library/stays',
+    LIBRARY_MEALS: '/organizer/library/meals',
+    LIBRARY_ACTIVITIES: '/organizer/library/activities',
+    LIBRARY_TRIP_LEADERS: '/organizer/library/trip-leaders',
+    LIBRARY_FAQS: '/organizer/library/faqs',
+    TEAM: '/organizer/team',
+    SUPPORT: '/organizer/support',
+    LEADS: '/organizer/leads',
+    LEADS_ALL: '/organizer/leads/all',
+    QUERIES_ALL: '/organizer/queries/all',
+    BILLING: '/organizer/billing',
+    SETTINGS: '/organizer/settings',
+    ROOT_WILDCARD: '/organizer/*',
+    PRIVACY_POLICY: '/organizer/privacy-policy',
+  },
+  USER: {
+    LANDING: '/user/landing',
+    DASHBOARD: '/user/dashboard',
+    SEARCH: '/user/search',
+  },
+  TRAVELER: {
+    PROFILE: '/traveler/profile',
+  },
+  ADMIN: {
+    FORGOT_PASSWORD: '/admin/forgot-password',
+  },
+} as const;
+
 export const PublicRoutes = [
-  '/',
-  '/login',
-  '/superadmin/login',
-  '/superadmin/register',
-  '/superadmin/forgot-password',
-  '/organizer/login',
-  '/organizer/register',
-  '/organizer/join-as-partner',
-  '/register',
-  '/user/landing',
-  '/admin/forgot-password',
-  '/verify-otp',
-  '/prelaunch',
-  '/home',
-  '/not-found',
+  ROUTES.COMMON.HOME,
+  ROUTES.COMMON.LOGIN,
+  ROUTES.SUPER_ADMIN.LOGIN,
+  ROUTES.SUPER_ADMIN.REGISTER,
+  ROUTES.SUPER_ADMIN.FORGOT_PASSWORD,
+  ROUTES.ORGANIZER.LOGIN,
+  ROUTES.ORGANIZER.REGISTER,
+  ROUTES.ORGANIZER.JOIN_AS_PARTNER,
+  ROUTES.COMMON.REGISTER,
+  ROUTES.USER.LANDING,
+  ROUTES.ADMIN.FORGOT_PASSWORD,
+  ROUTES.COMMON.VERIFY_OTP,
+  ROUTES.COMMON.PRELAUNCH,
+  ROUTES.COMMON.HOME_NAV,
+  ROUTES.COMMON.NOT_FOUND,
 ];
 
 // ✅ Always arrays. Use ["*"] to mean unrestricted access.
@@ -150,14 +258,14 @@ export const ROLE_ROUTE_ACCESS: Record<RoleType, string[]> = {
   [ROLES.SYSTEM_ADMIN]: ['*'],
 
   [ROLES.USER]: [
-    '/user/dashboard',
-    '/traveler/profile',
-    '/user/search',
+    ROUTES.USER.DASHBOARD,
+    ROUTES.TRAVELER.PROFILE,
+    ROUTES.USER.SEARCH,
     ...PublicRoutes,
   ],
 
   [ROLES.ORGANIZER]: [
-    '/organizer/*',
+    ROUTES.ORGANIZER.ROOT_WILDCARD,
     ...PublicRoutes,
   ],
 };
@@ -190,12 +298,12 @@ export function isAllowedRoutes(route: string, role?: RoleType): boolean {
 export const getDashboardPath = (role?: string) => {
   switch (role) {
     case ROLES.SYSTEM_ADMIN:
-      return '/superadmin';
+      return ROUTES.SUPER_ADMIN.DASHBOARD;
     case ROLES.ORGANIZER:
-      return '/organizer/dashboard';
+      return ROUTES.ORGANIZER.DASHBOARD;
     case ROLES.USER:
-      return '/traveler/profile'; // adjust to your actual path
+      return ROUTES.TRAVELER.PROFILE; // adjust to your actual path
     default:
-      return '/user/landing';
+      return ROUTES.USER.LANDING;
   }
 };
