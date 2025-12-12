@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import styles from "../prelaunch.module.css";
+import { ROUTES } from "@/lib/utils";
 export default function Hero(): React.JSX.Element {
   return (
     <>
@@ -52,7 +53,7 @@ export default function Hero(): React.JSX.Element {
               our Day 1s
             </h2>
             <div className="max-lg:justify-center flex">
-              <Link href="/organizer/join-as-partner" className="max-md:w-full">
+              <Link href={ROUTES.ORGANIZER.JOIN_AS_PARTNER} className="max-md:w-full">
                 {/* Intentionaly left empty, content set by css for that gradeint text*/}
                 <button
                   className={`${styles.btn} text-[1rem] md:text-[1.5rem] rounded-full font-[500] max-md:flex-1 w-full px-6 py-3 mt-8 poppins`}

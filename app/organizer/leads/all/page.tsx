@@ -18,6 +18,7 @@ import { TripLeadsStatus } from "@/lib/services/organizer/trip/leads/types";
 import { LeadFilters } from "@/components/leads/LeadFilters";
 import { set } from "lodash";
 import { Trash2 } from "lucide-react";
+import { ROUTES } from "@/lib/utils";
 
 export default function AllLeadsPage() {
   const organizationId = useOrganizationId();
@@ -111,7 +112,7 @@ export default function AllLeadsPage() {
         <div className="p-6">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-            <Link href="/organizer/leads" className="hover:underline">
+            <Link href={ROUTES.ORGANIZER.LEADS} className="hover:underline">
               Leads
             </Link>
             <span>{">"}</span>

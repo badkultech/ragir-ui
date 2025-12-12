@@ -4,6 +4,7 @@ import { AppHeader } from "@/components/app-header";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/lib/utils";
 
 export default function OrganizerProfileEmptyPage() {
   return (
@@ -19,7 +20,7 @@ export default function OrganizerProfileEmptyPage() {
             Add your details to showcase your identity and manage your events
             seamlessly.
           </p>
-          <Link href="/organizer/profile/edit">
+          <Link href={ROUTES.ORGANIZER.PROFILE_EDIT}>
             <Button className="bg-gradient-to-r from-orange-500 to-pink-500 text-white">
               Add Details +
             </Button>

@@ -26,6 +26,7 @@ import {
 import { AppHeader } from "@/components/app-header";
 import RequiredStar from "@/components/common/RequiredStar";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { ROUTES } from "@/lib/utils";
 
 type FormFields = {
   organizerId: string;
@@ -98,7 +99,7 @@ export default function RegisterOrganizer() {
       };
 
       await createOrganization({ payload }).unwrap();
-      router.push("/superadmin/organizer");
+      router.push(ROUTES.SUPER_ADMIN.ORGANIZERS);
       showSuccess("Organizer registered successfully!");
     } catch (error) {
       console.error("Error registering organizer:", error);
@@ -127,8 +128,9 @@ export default function RegisterOrganizer() {
               {/* Header */}
               <div className="flex items-center mb-2 w-3/4">
                 <Link
-                  href="/superadmin/organizer"
+                  href={ROUTES.SUPER_ADMIN.ORGANIZERS}
                   className="mr-3 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Back to Organizers"
                 >
                   <ChevronLeft className="w-5 h-5 text-gray-600" />
                 </Link>

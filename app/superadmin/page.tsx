@@ -7,6 +7,7 @@ import { AppHeader } from "@/components/app-header";
 import { useGetTenantStatsQuery } from "@/lib/services/superadmin";
 import { useState } from "react";
 import { AddCircle } from "@/components/common/AddCircle";
+import { ROUTES } from "@/lib/utils";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,28 +27,32 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 {
-                  href: "/superadmin/admins",
+                  role: "admins",
+                  href: ROUTES.SUPER_ADMIN.ADMINS,
                   label: "Active Admins",
                   value: tenantStatsData?.activeAdmins ?? 0,
                   icon: <UserCheck className="w-5 h-5 text-green-600" />,
                   bg: "bg-green-100",
                 },
                 {
-                  href: "/superadmin/admins",
+                  role: "admins-pending",
+                  href: ROUTES.SUPER_ADMIN.ADMINS,
                   label: "Pending Admins",
                   value: tenantStatsData?.pendingAdmins ?? 0,
                   icon: <Clock className="w-5 h-5 text-orange-600" />,
                   bg: "bg-orange-100",
                 },
                 {
-                  href: "/superadmin/organizer",
+                  role: "organizers",
+                  href: ROUTES.SUPER_ADMIN.ORGANIZERS,
                   label: "Active Organizers",
                   value: tenantStatsData?.activeOrganizations ?? 0,
                   icon: <Building2 className="w-5 h-5 text-blue-600" />,
                   bg: "bg-blue-100",
                 },
                 {
-                  href: "/superadmin/organizer",
+                  role: "organizers-pending",
+                  href: ROUTES.SUPER_ADMIN.ORGANIZERS,
                   label: "Pending Organizers",
                   value: tenantStatsData?.pendingOrganizations ?? 0,
                   icon: <TrendingUp className="w-5 h-5 text-purple-600" />,
@@ -75,7 +80,7 @@ export default function Dashboard() {
               {/* Add Admin */}
               <div className="bg-white rounded-lg border p-4 sm:p-6 text-center shadow-sm hover:shadow-md transition">
                 <div className="mb-4 flex justify-center">
-                  <AddCircle href="/superadmin/add-admin" size={56} />
+                  <AddCircle href={ROUTES.SUPER_ADMIN.ADD_ADMIN} size={56} />
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold mb-2">
                   Add Admin
@@ -84,7 +89,7 @@ export default function Dashboard() {
                   Assign roles and grant secure access to your dashboard
                 </p>
                 <Link
-                  href="/superadmin/add-admin"
+                  href={ROUTES.SUPER_ADMIN.ADD_ADMIN}
                   className="inline-flex items-center justify-center px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm font-medium shadow hover:shadow-md transition"
                   style={{
                     background:
@@ -100,7 +105,7 @@ export default function Dashboard() {
               {/* Add Organizer */}
               <div className="bg-white rounded-lg border p-4 sm:p-6 text-center shadow-sm hover:shadow-md transition">
                 <div className="mb-4 flex justify-center">
-                  <AddCircle href="/superadmin/add-organizer" size={56} />
+                  <AddCircle href={ROUTES.SUPER_ADMIN.ADD_ORGANIZER} size={56} />
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold mb-2">
                   Add Organizer
@@ -109,7 +114,7 @@ export default function Dashboard() {
                   Manage event organizers and assign responsibilities
                 </p>
                 <Link
-                  href="/superadmin/add-organizer"
+                  href={ROUTES.SUPER_ADMIN.ADD_ORGANIZER}
                   className="inline-flex items-center justify-center px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm font-medium shadow hover:shadow-md transition"
                   style={{
                     background:

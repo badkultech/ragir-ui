@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { ROUTES } from "@/lib/utils";
 
 export default function TripTabs({ activeTab, setActiveTab }: any) {
   const tabs = [
@@ -36,7 +37,7 @@ export default function TripTabs({ activeTab, setActiveTab }: any) {
           })}
         </div>
 
-        <Link href="/organizer/create-trip">
+        <Link href={ROUTES.ORGANIZER.CREATE_TRIP}>
           <button className="flex items-center gap-2 px-5 h-12 rounded-lg bg-[#FF6B00]/10 text-[#FF6B00] border border-[#FF6B00] hover:bg-[#FF6B00] hover:text-white">
             <Plus size={16} />
             Create Trip
