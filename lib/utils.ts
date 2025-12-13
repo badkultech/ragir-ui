@@ -127,6 +127,13 @@ export const ROLES = {
 
 export type RoleType = (typeof ROLES)[keyof typeof ROLES];
 
+// Regex Patterns
+export const VALIDATION_PATTERNS = {
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  PHONE_DIGITS: /^\d*$/, // Only digits
+  NAME_ALPHA: /^[a-zA-Z\s]+$/, // Only letters and spaces
+} as const;
+
 // Application Messages
 export const MESSAGES = {
   AUTH: {
