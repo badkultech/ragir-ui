@@ -290,6 +290,7 @@ export default function PricingPage() {
                 mode={mode}
                 simplePrice={price}
                 dynamicCategories={dynamicCategories}
+                addOns={addOns}
               />
             </div>
           </div>
