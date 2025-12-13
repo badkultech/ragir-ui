@@ -4,7 +4,9 @@ header.shadow_box_bottom {
 }
 
 button.theme_btn_1 {
-  @apply bg-brand-gradient text-white font-poppins;
+  background: linear-gradient(90deg, var(--color-brand-yellow) 0%, var(--color-brand-orange) 33%, var(--color-brand-pink) 66%, var(--color-brand-red) 100%);
+  color: white;
+  font-family: var(--font-poppins);
 }
 
 
@@ -63,7 +65,7 @@ button.theme_btn_1 {
 }
 
 .grad_txt {
-  background: linear-gradient(90deg, #FEA901 0%, #FD6E34 33%, #FE336A 66%, #FD401A 100%);
+  background: linear-gradient(90deg, var(--color-brand-yellow) 0%, var(--color-brand-orange) 33%, var(--color-brand-pink) 66%, var(--color-brand-red) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
