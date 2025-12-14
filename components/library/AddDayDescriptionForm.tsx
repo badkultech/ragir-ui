@@ -57,17 +57,32 @@ export function AddDayDescriptionForm({
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
+  const normalizeTime = (t: any) => {
+    if (Array.isArray(t) && t.length >= 2) {
+      const hh = String(t[0]).padStart(2, "0");
+      const mm = String(t[1]).padStart(2, "0");
+      return `${hh}:${mm}`;
+    }
+    if (typeof t === "string") {
+      return t.length > 5 ? t.slice(0, 5) : t;
+    }
+    return t || "";
+  };
+
   useEffect(() => {
     if (!initialData) return;
     setTitle(initialData.name || initialData.title || "");
     setDescription(initialData.description || "");
     setLocation(initialData.location || "");
-    setTime(initialData.time || "");
+    setTime(normalizeTime(initialData.time));
     setPacking(initialData.packingSuggestion || initialData.packing || "");
-    if (initialData?.documents) {
-      docsManager.setDocuments(initialData.documents);
-    };
-  }, [initialData]);
+
+    try {
+      docsManager.resetDocuments();
+    } catch (e) {
+      console.error("Failed to reset documents", e);
+    }
+  }, [initialData?.id]);
 
   const handleLibrarySelect = async (item: any) => {
     setIsLibraryLoading(true);
@@ -80,7 +95,7 @@ export function AddDayDescriptionForm({
       setTitle(fd.name || "");
       setLocation(fd.location || "");
       setDescription(fd.description || "");
-      setTime(fd.time || "");
+      setTime(normalizeTime(fd.time));
       setPacking(fd.packingSuggestion || "");
       const mappedDocs = await Promise.all(
         (fd.documents ?? []).map(async (d: any, index: number) => {

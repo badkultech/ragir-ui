@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/gradient-button";
 import { LibrarySelectModal } from "@/components/library/LibrarySelectModal";
-import RichTextEditor from "../editor/RichTextEditor";
+import RichTextEditor from "@/components/editor/RichTextEditor";
 import { ChooseFromLibraryButton } from "./ChooseFromLibraryButton";
 import { showSuccess, showApiError } from "@/lib/utils/toastHelpers";
 import { MultiUploader } from "../common/UploadFieldShortcuts";
@@ -78,8 +78,17 @@ export function AddTransitForm({
     setFrom(initialData.fromLocation ?? initialData.from ?? "");
     setTo(initialData.toLocation ?? initialData.to ?? "");
 
-    const normalizeTime = (t: string | null | undefined) =>
-      typeof t === "string" && t.length >= 5 ? t.slice(0, 5) : t ?? "";
+    const normalizeTime = (t: any) => {
+      if (Array.isArray(t) && t.length >= 2) {
+        const hh = String(t[0]).padStart(2, "0");
+        const mm = String(t[1]).padStart(2, "0");
+        return `${hh}:${mm}`;
+      }
+      if (typeof t === "string") {
+        return t.length > 5 ? t.slice(0, 5) : t;
+      }
+      return t || "";
+    };
 
     setDeparture(
       normalizeTime(initialData.startTime ?? initialData.departure ?? "")
