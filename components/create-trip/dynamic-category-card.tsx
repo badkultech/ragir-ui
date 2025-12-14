@@ -195,49 +195,79 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
 
                 {/* Options List */}
                 <div className="space-y-3">
-                    {category.options.map((option, idx) => (
-                        <div key={option.id} className="flex gap-2 items-start">
+                    {category.type === 'single' ? (
+                        // Single Type Layout - No Option Name
+                        <div className="flex gap-4 items-end">
                             <div className="flex-1 space-y-1">
-                                {idx === 0 && <Label className="text-xs text-muted-foreground">Option Name</Label>}
-                                <Input
-                                    placeholder={category.type === 'single' ? "Standard" : "e.g. Economy, Sedan"}
-                                    value={option.name}
-                                    onChange={(e) => updateOption(idx, 'name', e.target.value)}
-                                    disabled={category.type === 'single'}
-                                />
-                            </div>
-                            <div className="w-28 space-y-1">
-                                {idx === 0 && <Label className="text-xs text-muted-foreground">Price (₹)</Label>}
+                                <Label className="text-xs text-muted-foreground">Price (₹)</Label>
                                 <Input
                                     type="number"
                                     placeholder="0"
-                                    value={option.price}
-                                    onChange={(e) => updateOption(idx, 'price', e.target.value)}
+                                    value={category.options[0]?.price || ''}
+                                    onChange={(e) => updateOption(0, 'price', e.target.value)}
+                                    className="h-11"
                                 />
                             </div>
-                            <div className="w-32 space-y-1">
-                                {idx === 0 && <Label className="text-xs text-muted-foreground">Discount</Label>}
+                            <div className="w-1/3 space-y-1">
+                                <Label className="text-xs text-muted-foreground">Discount</Label>
                                 <div className="relative">
                                     <Input
                                         placeholder="0"
-                                        value={option.discount}
-                                        onChange={(e) => updateOption(idx, 'discount', e.target.value)}
-                                        className="pr-8"
+                                        value={category.options[0]?.discount || ''}
+                                        onChange={(e) => updateOption(0, 'discount', e.target.value)}
+                                        className="h-11 pr-8"
                                     />
-                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                        <span className="text-xs">%</span>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                        <span className="text-sm">%</span>
                                     </div>
                                 </div>
                             </div>
-                            {category.type === 'multi' && category.options.length > 1 && (
-                                <div className={idx === 0 ? "pt-7" : ""}>
-                                    <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(idx, option)} className="h-10 w-10 text-muted-foreground hover:text-destructive">
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            )}
                         </div>
-                    ))}
+                    ) : (
+                        // Multi Type Layout - Standard List
+                        category.options.map((option, idx) => (
+                            <div key={option.id} className="flex gap-2 items-start">
+                                <div className="flex-1 space-y-1">
+                                    {idx === 0 && <Label className="text-xs text-muted-foreground">Option Name</Label>}
+                                    <Input
+                                        placeholder="e.g. Economy, Sedan"
+                                        value={option.name}
+                                        onChange={(e) => updateOption(idx, 'name', e.target.value)}
+                                    />
+                                </div>
+                                <div className="w-28 space-y-1">
+                                    {idx === 0 && <Label className="text-xs text-muted-foreground">Price (₹)</Label>}
+                                    <Input
+                                        type="number"
+                                        placeholder="0"
+                                        value={option.price}
+                                        onChange={(e) => updateOption(idx, 'price', e.target.value)}
+                                    />
+                                </div>
+                                <div className="w-32 space-y-1">
+                                    {idx === 0 && <Label className="text-xs text-muted-foreground">Discount</Label>}
+                                    <div className="relative">
+                                        <Input
+                                            placeholder="0"
+                                            value={option.discount}
+                                            onChange={(e) => updateOption(idx, 'discount', e.target.value)}
+                                            className="pr-8"
+                                        />
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                            <span className="text-xs">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {category.options.length > 1 && (
+                                    <div className={idx === 0 ? "pt-7" : ""}>
+                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(idx, option)} className="h-10 w-10 text-muted-foreground hover:text-destructive">
+                                            <X className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 {/* Add Option Button */}

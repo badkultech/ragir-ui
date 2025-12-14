@@ -291,6 +291,9 @@ export default function PricingPage() {
                 simplePrice={price}
                 dynamicCategories={dynamicCategories}
                 addOns={addOns}
+                gstMode={gst}
+                depositPercent={depositPercent}
+                creditOptions={credit}
               />
             </div>
           </div>
