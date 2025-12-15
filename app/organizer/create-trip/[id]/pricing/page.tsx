@@ -187,20 +187,111 @@ export default function PricingPage() {
 
                 <CardContent className='space-y-6'>
                   {/* Mode Buttons */}
-                  <div className='grid grid-cols-1 gap-3 md:grid-cols-2 '>
-                    <Button
-                      variant={mode === 'simple' ? 'default' : 'outline'}
-                      onClick={() => setMode('simple')}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                    {/* Simple Pricing */}
+                    <div
+                      onClick={() => setMode("simple")}
+                      className={`
+      flex flex-col items-center justify-center gap-3
+      px-6 py-4 rounded-xl border cursor-pointer transition-all
+      ${mode === "simple"
+                          ? "border-orange-400 bg-orange-50 shadow-sm"
+                          : "border-gray-200 bg-white"
+                        }
+    `}
                     >
-                      Simple Pricing
-                    </Button>
-                    <Button
-                      variant={mode === 'dynamic' ? 'default' : 'outline'}
-                      onClick={() => setMode('dynamic')}
+                      {/* RADIO BUTTON TOP */}
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center"
+                        style={
+                          mode === "simple"
+                            ? {
+                              border: "2px solid transparent",
+                              background: `
+            linear-gradient(white, white) padding-box,
+            linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
+          `,
+                            }
+                            : {
+                              border: "2px solid #D1D5DB",
+                              background: "white",
+                            }
+                        }
+                      >
+                        {mode === "simple" && (
+                          <div
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{
+                              background:
+                                "linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                            }}
+                          ></div>
+                        )}
+                      </div>
+
+
+                      {/* TEXT BELOW */}
+                      <span
+                        className={`text-sm font-medium ${mode === "simple" ? "text-black" : "text-gray-600"
+                          }`}
+                      >
+                        Simple Pricing
+                      </span>
+                    </div>
+
+                    {/* Dynamic Pricing */}
+                    <div
+                      onClick={() => setMode("dynamic")}
+                      className={`
+      flex flex-col items-center justify-center gap-3
+      px-6 py-4 rounded-xl border cursor-pointer transition-all
+      ${mode === "dynamic"
+                          ? "border-orange-400 bg-orange-50 shadow-sm"
+                          : "border-gray-200 bg-white"
+                        }
+    `}
                     >
-                      Dynamic Pricing
-                    </Button>
+                      {/* RADIO BUTTON TOP */}
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center"
+                        style={
+                          mode === "dynamic"
+                            ? {
+                              border: "2px solid transparent",
+                              background: `
+            linear-gradient(white, white) padding-box,
+            linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
+          `,
+                            }
+                            : {
+                              border: "2px solid #D1D5DB",
+                            }
+                        }
+                      >
+                        {mode === "dynamic" && (
+                          <div
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{
+                              background:
+                                "linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                            }}
+                          ></div>
+                        )}
+                      </div>
+
+
+                      {/* TEXT BELOW */}
+                      <span
+                        className={`text-sm font-medium ${mode === "dynamic" ? "text-black" : "text-gray-600"
+                          }`}
+                      >
+                        Dynamic Pricing
+                      </span>
+                    </div>
+
                   </div>
+
 
                   {/* SIMPLE PRICING */}
                   {mode === 'simple' && (
