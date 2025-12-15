@@ -210,7 +210,7 @@ export default function PricingPage() {
                               border: "2px solid transparent",
                               background: `
             linear-gradient(white, white) padding-box,
-            linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
+            linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
           `,
                             }
                             : {
@@ -224,7 +224,7 @@ export default function PricingPage() {
                             className="w-2.5 h-2.5 rounded-full"
                             style={{
                               background:
-                                "linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                                "linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
                             }}
                           ></div>
                         )}
@@ -261,7 +261,7 @@ export default function PricingPage() {
                               border: "2px solid transparent",
                               background: `
             linear-gradient(white, white) padding-box,
-            linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
+            linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
           `,
                             }
                             : {
@@ -274,7 +274,7 @@ export default function PricingPage() {
                             className="w-2.5 h-2.5 rounded-full"
                             style={{
                               background:
-                                "linear-gradient(135deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                                "linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
                             }}
                           ></div>
                         )}

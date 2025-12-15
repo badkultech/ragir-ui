@@ -9,17 +9,14 @@ export function CreditOptions({
   value: { card: boolean; emi: boolean }
   onChange: (v: { card: boolean; emi: boolean }) => void
 }) {
-  // exclusive selection logic
   const handleSelect = (option: "card" | "emi") => {
-    if (option === "card") {
-      onChange({ card: true, emi: false })
-    } else {
-      onChange({ card: false, emi: true })
-    }
+    if (option === "card") onChange({ card: true, emi: false })
+    else onChange({ card: false, emi: true })
   }
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      
       {/* Credit Card Option */}
       <label
         onClick={() => handleSelect("card")}
@@ -28,13 +25,19 @@ export function CreditOptions({
             value.card ? "bg-orange-50 border-orange-200" : "bg-white"
           }`}
       >
+        {/* GRADIENT BOX */}
         <div
           className={`w-5 h-5 rounded border flex items-center justify-center transition-all duration-200 overflow-hidden
-            ${
-              value.card
-                ? "bg-gradient-to-r from-[#FF7A00] via-[#FF8A3C] to-[#FF2C93] border-transparent"
-                : "border-gray-300 bg-white"
-            }`}
+            ${value.card ? "border-transparent" : "border-gray-300 bg-white"}
+          `}
+          style={
+            value.card
+              ? {
+                  background:
+                    "linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                }
+              : {}
+          }
         >
           {value.card && (
             <svg
@@ -51,6 +54,7 @@ export function CreditOptions({
             </svg>
           )}
         </div>
+
         <Label className="m-0">Credit Card</Label>
       </label>
 
@@ -62,13 +66,19 @@ export function CreditOptions({
             value.emi ? "bg-orange-50 border-orange-200" : "bg-white"
           }`}
       >
+        {/* GRADIENT BOX */}
         <div
           className={`w-5 h-5 rounded border flex items-center justify-center transition-all duration-200 overflow-hidden
-            ${
-              value.emi
-                ? "bg-gradient-to-r from-[#FF7A00] via-[#FF8A3C] to-[#FF2C93] border-transparent"
-                : "border-gray-300 bg-white"
-            }`}
+            ${value.emi ? "border-transparent" : "border-gray-300 bg-white"}
+          `}
+          style={
+            value.emi
+              ? {
+                  background:
+                    "linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                }
+              : {}
+          }
         >
           {value.emi && (
             <svg
@@ -85,6 +95,7 @@ export function CreditOptions({
             </svg>
           )}
         </div>
+
         <Label className="m-0">EMI</Label>
       </label>
     </div>

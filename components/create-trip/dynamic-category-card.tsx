@@ -150,31 +150,59 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                 {/* Pricing Type */}
                 <div className="space-y-2">
                     <Label>Pricing Type</Label>
+
                     <RadioGroup
                         value={category.type}
                         onValueChange={(val) => updateField('type', val)}
                         className="grid grid-cols-2 gap-4"
                     >
-                        <div className={cn(
-                            "relative flex flex-col gap-2 rounded-lg border-2 p-4 cursor-pointer hover:bg-gray-50 transition-all",
-                            category.type === 'single' ? "border-orange-200 bg-orange-50/30" : "border-gray-200 bg-white"
-                        )}>
-                            <RadioGroupItem value="single" id={`single-${category.id}`} className="sr-only" />
-                            <Label htmlFor={`single-${category.id}`} className="cursor-pointer font-bold">Single Price</Label>
-                            <span className="text-xs text-muted-foreground">Single price for this category</span>
-                        </div>
 
-                        <div className={cn(
-                            "relative flex flex-col gap-2 rounded-lg border-2 p-4 cursor-pointer hover:bg-gray-50 transition-all",
-                            category.type === 'multi' ? "border-orange-200 bg-orange-50/30" : "border-gray-200 bg-white"
-                        )}>
-                            <RadioGroupItem value="multi" id={`multi-${category.id}`} className="sr-only" />
-                            <Label htmlFor={`multi-${category.id}`} className="cursor-pointer font-bold">Multi-price</Label>
-                            <span className="text-xs text-muted-foreground">Different choices with different pricing</span>
-                        </div>
+                        {/* SINGLE PRICE CARD */}
+                        <Label
+                            htmlFor={`single-${category.id}`}
+                            className={cn(
+                                "relative flex flex-col gap-2 rounded-lg border-2 p-4 cursor-pointer hover:bg-gray-50 transition-all",
+                                category.type === 'single'
+                                    ? "border-orange-300 bg-orange-50/40"
+                                    : "border-gray-200 bg-white"
+                            )}
+                            style={{ alignItems: "flex-start" }}
+                        >
+                            <RadioGroupItem
+                                value="single"
+                                id={`single-${category.id}`}
+                                className="sr-only"
+                            />
+                            <span className="font-bold">Single Price</span>
+                            <span className="text-xs text-muted-foreground">
+                                Single price for this category
+                            </span>
+                        </Label>
+
+                        {/* MULTI PRICE CARD */}
+                        <Label
+                            htmlFor={`multi-${category.id}`}
+                            className={cn(
+                                "relative flex flex-col gap-2 rounded-lg border-2 p-4 cursor-pointer hover:bg-gray-50 transition-all",
+                                category.type === 'multi'
+                                    ? "border-orange-300 bg-orange-50/40"
+                                    : "border-gray-200 bg-white"
+                            )}
+                            style={{ alignItems: "flex-start" }}
+                        >
+                            <RadioGroupItem
+                                value="multi"
+                                id={`multi-${category.id}`}
+                                className="sr-only"
+                            />
+                            <span className="font-bold ">Multi-price</span>
+                            <span className="text-xs text-muted-foreground">
+                                Different choices with different pricing
+                            </span>
+                        </Label>
+
                     </RadioGroup>
                 </div>
-
                 {/* Bulk Action */}
                 {category.type === 'multi' && (
                     <div className="flex justify-end">
