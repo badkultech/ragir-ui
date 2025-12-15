@@ -49,6 +49,7 @@ interface DynamicCategoryCardProps {
 export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCategoryCardProps) {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [optionToDelete, setOptionToDelete] = useState<{ idx: number; option: DynamicOption } | null>(null);
+    const [bulkDiscount, setBulkDiscount] = useState('');
 
     const handleDeleteClick = (idx: number, option: DynamicOption) => {
         setOptionToDelete({ idx, option });
@@ -205,19 +206,35 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                 </div>
                 {/* Bulk Action */}
                 {category.type === 'multi' && (
-                    <div className="flex justify-end">
-                        <Button
-                            variant="link"
-                            className="text-orange-500 h-auto p-0 text-xs font-semibold"
-                            onClick={() => {
-                                const firstDiscount = category.options[0]?.discount || '0';
-                                const newOptions = category.options.map(o => ({ ...o, discount: firstDiscount }));
-                                onChange({ ...category, options: newOptions });
-                            }}
-                        >
-                            <Tag className="w-3 h-3 mr-1" />
-                            Apply Discount to All
-                        </Button>
+                    <div className="space-y-3 pt-2">
+                        <div className="flex items-center gap-2 text-orange-500 font-medium text-sm">
+                            <Tag className="w-4 h-4" />
+                            <span>Apply Discount to All</span>
+                        </div>
+                        <div className="flex gap-3 items-center">
+                            <div className="relative w-40">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">Discount</span>
+                                <Input
+                                    placeholder=""
+                                    value={bulkDiscount}
+                                    onChange={(e) => setBulkDiscount(e.target.value)}
+                                    className="pl-20 pr-12 h-11"
+                                />
+                                <div className="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-50 text-gray-500 border rounded px-2 py-1 text-xs">
+                                    % ₹
+                                </div>
+                            </div>
+                            <Button
+                                className="bg-[#FF7A00] hover:bg-[#E06900] text-white h-11 px-6 rounded-lg font-medium"
+                                onClick={() => {
+                                    if (!bulkDiscount) return;
+                                    const newOptions = category.options.map(o => ({ ...o, discount: bulkDiscount }));
+                                    onChange({ ...category, options: newOptions });
+                                }}
+                            >
+                                Apply to all
+                            </Button>
+                        </div>
                     </div>
                 )}
 
