@@ -6,6 +6,7 @@ import { CertificationItem } from "@/components/homePage/shared/certification-it
 import { CheckCircle } from "lucide-react";
 import { Footer } from "@/components/homePage/sections/footer";
 import { ROUTES } from "@/lib/utils";
+import { MainHeader } from "@/components/search-results/MainHeader";
 
 const partnersData: Record<
   string,
@@ -67,6 +68,7 @@ export default async function PartnerDetailPage({
   return (
     <>
       <div className="min-h-screen bg-white">
+        <MainHeader isLoggedIn={true}/>
         <div className="container mx-auto px-4 md:px-20 py-8">
           {/* Header with back button */}
           <div className="flex items-center gap-4 mb-6">

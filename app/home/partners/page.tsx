@@ -4,6 +4,7 @@ import { PartnerCard } from "@/components/homePage/shared/partner-card";
 import { Header } from "@/components/homePage/sections/header";
 import { Footer } from "@/components/homePage/sections/footer";
 import { ROUTES } from "@/lib/utils";
+import { MainHeader } from "@/components/search-results/MainHeader";
 
 const partners = [
   { id: "the-lalit", name: "The Lalit", logo: "/tp-logo1.jpg" },
@@ -20,7 +21,7 @@ const partners = [
 export default function PartnersPage() {
   return (
     <>
-      <Header />
+      <MainHeader isLoggedIn={true} />
       <div className="min-h-screen">
         <div className="container mx-auto px-4 py-8">
           {/* Header with back button */}
