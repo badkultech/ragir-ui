@@ -1,7 +1,8 @@
 export interface PartnerRequest {
-  organizerName: string;
+  organizerName?: string;
   email: string;
   phone: string;
+  partnerType: "ORGANIZER" | "USER";
 }
 
 export interface PartnerResponse {

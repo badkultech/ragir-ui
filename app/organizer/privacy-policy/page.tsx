@@ -1,9 +1,6 @@
 "use client";
 
 import { AppHeader } from "@/components/app-header";
-import type { Metadata } from "next";
-
-
 
 export default function PrivacyPolicyPage() {
   return (
@@ -21,30 +18,29 @@ export default function PrivacyPolicyPage() {
 
         <div className="space-y-8 text-sm md:text-base leading-relaxed text-gray-800">
           <p>
-            <strong>Ragir</strong> (We/Us/Our) is an online platform where users (You)
-            can discover and search fixed departure group trips. We partner with group
-            trip organizers who list their trips, bringing together the diverse and
-            exciting travel options in one trustworthy place.
+            <strong>Ragir</strong> (We/Us/Our) is an online platform where users (You) can discover and
+            search fixed departure group trips. We partner with group trip organizers who
+            list their trips, bringing together diverse and exciting travel experiences
+            in one trustworthy place.
           </p>
 
           <p>
             We are currently in the development stage, and while the platform is not yet
-            available for its intended purpose, we invite you to join our early access and
-            updates list. By sharing your email address, you will be among the first to
-            receive updates and opportunities to partner with us. We sincerely thank you
-            for your interest.
+            available for its intended purpose, we invite you to join our early access
+            and updates list. By sharing your email address, you will be among the first
+            to receive updates about our platform.
           </p>
 
           <p>
-            At Ragir, protecting your privacy is a priority. This Privacy Policy explains
-            how we collect, use, and protect your personal information when you visit our
+            Protecting your privacy is our priority. This Privacy Policy explains how we
+            collect, use, and protect your personal information when you visit our
             prelaunch page and share your details with us. Please note that this policy
             applies only to our prelaunch page. It will be updated after launch as our
             services and data processing evolve.
           </p>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">1. Information We Collect</h2>
+            <h2 className="font-bold text-lg mb-2">1. Information We Collect</h2>
             <p>
               For the purpose to notify you about our launch, provide early access, and
               keep you informed about new features and opportunities, we collect your{" "}
@@ -54,7 +50,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">2. How We Use Your Information</h2>
+            <h2 className="font-bold text-lg mb-2">2. How We Use Your Information</h2>
             <p>We use your information to:</p>
             <ul className="list-disc pl-6 space-y-1">
               <li>Send you updates about our launch, features, and services.</li>
@@ -63,7 +59,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">3. Sharing of Information</h2>
+            <h2 className="font-bold text-lg mb-2">3. Sharing of Information</h2>
             <p>
               We do not sell or rent your personal information. We share your information
               with trusted service providers such as email communication platforms or
@@ -73,7 +69,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">4. Data Security</h2>
+            <h2 className="font-bold text-lg mb-2">4. Data Security</h2>
             <p>
               We take the security of your personal information seriously. To safeguard
               it, we implement reasonable technical and organizational measures, including
@@ -86,7 +82,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">5. Your Choices and Rights</h2>
+            <h2 className="font-bold text-lg mb-2">5. Your Choices and Rights</h2>
             <p>
               You may unsubscribe from our communications at any time by clicking the
               “unsubscribe” link in our emails or by contacting us directly at{" "}
@@ -112,32 +108,28 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">6. Data Retention</h2>
+            <h2 className="font-bold text-lg mb-2">6. Data Retention</h2>
             <p>
               We retain your personal information only for as long as necessary to fulfill
-              the purposes outlined in this Privacy Policy, such as sending you updates,
-              providing early access, or contacting you regarding partnerships. Once the
-              purpose for which the information was collected is fulfilled, or if you
-              request deletion, we will securely delete, unless a longer retention period
-              is required by law.
+              the purposes outlined in this Privacy Policy, such as sending you updates
+              or providing early access. Once the purpose for which the information was
+              collected is fulfilled, or if you request deletion, we will securely delete,
+              unless a longer retention period is required by law.
             </p>
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">7. Non-Applicability</h2>
+            <h2 className="font-bold text-lg mb-2">7. Non-Applicability</h2>
             <p>
               Our website and services, including the prelaunch page, are not directed at
               individuals under the age of 18 and individuals residing outside India. If
               you fall within these categories, we kindly ask you not to use our platform
-              at this stage. As we grow, we intend to extend our services beyond India in
-              the future, not presently.
+              at this stage.
             </p>
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">
-              8. Data Protection Board of India
-            </h2>
+            <h2 className="font-bold text-lg mb-2">8. Data Protection Board of India</h2>
             <p>
               We aim to address all privacy-related concerns promptly. If you feel your
               issue has not been resolved to your satisfaction by us, you may raise it
@@ -147,7 +139,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">9. Changes to This Policy</h2>
+            <h2 className="font-bold text-lg mb-2">9. Changes to This Policy</h2>
             <p>
               We may update this Privacy Policy from time to time. Any updates will be
               posted here with a revised “Effective Date.”
@@ -155,7 +147,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-semibold text-lg mb-2">10. Contact Us</h2>
+            <h2 className="font-bold text-lg mb-2">10. Contact Us</h2>
             <p>
               If you have any questions or concerns, please contact us at{" "}
               <a
