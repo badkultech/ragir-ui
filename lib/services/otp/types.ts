@@ -18,7 +18,6 @@ export interface ValidateOtpRequest {
   identifier: string; // email or mobile
   otp: string;
   type: "EMAIL" | "MOBILE"; // matches your OTPType enum
-  organization: boolean; // true if it's an organization login
   userPublicId?: string; // optional, required if organization is true
 }
 
