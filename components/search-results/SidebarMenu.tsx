@@ -32,7 +32,7 @@ export function SidebarMenu({
 
       {/* Sidebar Panel */}
       <div
-        className={`absolute right-0 top-0 h-full w-full max-w-sm bg-card shadow-2xl transition-transform duration-300 ${
+        className={`absolute right-0 top-0 h-full w-full md:max-w-sm bg-card shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
