@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[700px] bg-white overflow-x-hidden max-w-full">
+    <section className="relative min-h-[700px] bg-white overflow-visible max-w-full">
       <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-8 md:py-16">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Left content */}
@@ -29,7 +29,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="flex justify-center lg:justify-end w-full overflow-x-hidden">
+          <div className="flex justify-center lg:justify-end w-full overflow-visible">
             <SearchTripsCard />
           </div>
         </div>

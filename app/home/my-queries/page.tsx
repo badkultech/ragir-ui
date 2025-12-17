@@ -19,6 +19,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import GradientCheckbox from "@/components/ui/GradientCheckbox"
 import { MainHeader } from "@/components/search-results/MainHeader"
+import { menuItems, notificationsData, userMenuItems } from "../page"
+import { SidebarMenu } from "@/components/search-results/SidebarMenu"
 
 type QuestionStatus = "responded" | "pending"
 
@@ -76,6 +78,8 @@ export default function MyQueriesPage() {
     const [reportReasons, setReportReasons] = useState<string[]>([])
     const [reportDetails, setReportDetails] = useState("")
     const router = useRouter()
+    const [notifications, setNotifications] = useState(notificationsData);
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const totalQueries = mockQuestions.length
     const respondedQueries = mockQuestions.filter((q) => q.status === "responded").length
@@ -122,9 +126,14 @@ export default function MyQueriesPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <>
+        <div className="min-h-screen bg-white w-full">
             {/* Header */}
-           <MainHeader logoText="My Queries" isLoggedIn={true}/>
+           <MainHeader logoText="My Queries" isLoggedIn={true}
+           notifications={notifications}
+           onUpdateNotifications={setNotifications}
+           onMenuOpen={() => setSidebarOpen(true)}
+           />
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -398,5 +407,12 @@ export default function MyQueriesPage() {
                 </div>
             )}
         </div>
+        <SidebarMenu 
+            isOpen={isSidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            menuItems={menuItems}
+            userMenuItems={userMenuItems}
+            />
+        </>
     )
 }

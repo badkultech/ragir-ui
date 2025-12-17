@@ -6,6 +6,8 @@ import { ChevronLeft, Menu, Scale, Bell, Info, Send, X, Clock } from "lucide-rea
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
 import { MainHeader } from "@/components/search-results/MainHeader"
+import { menuItems, notificationsData, userMenuItems } from "../page"
+import { SidebarMenu } from "@/components/search-results/SidebarMenu"
 
 interface InvitationRequest {
   id: string
@@ -56,6 +58,9 @@ export default function TripInvitationsPage() {
   const [selectedTrip, setSelectedTrip] = useState<InvitationRequest | null>(null)
   const [openCardId, setOpenCardId] = useState<string>(invitationRequests[0].id)
   const router = useRouter()
+  const [notifications, setNotifications] = useState(notificationsData)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
 
   const openButtonsFor = (id: string) => {
     setOpenCardId(id)
@@ -72,10 +77,15 @@ export default function TripInvitationsPage() {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-background">
 
       {/* Header */}
-      <MainHeader logoText="Trip Invitations sent" isLoggedIn={true}/>
+      <MainHeader logoText="Trip Invitations sent" isLoggedIn={true}
+      notifications={notifications}
+      onUpdateNotifications={setNotifications}
+      onMenuOpen={() => setIsSidebarOpen(true)}
+      />
 
       {/* Main Content */}
       <main className="max-w-[1200px] mx-auto px-4 md:px-8 py-6 md:py-10">
@@ -200,5 +210,12 @@ export default function TripInvitationsPage() {
         </div>
       )}
     </div>
+    <SidebarMenu 
+    isOpen={isSidebarOpen}
+    onClose={() => setIsSidebarOpen(false)}
+    menuItems={menuItems}
+    userMenuItems={userMenuItems}
+    />
+    </>
   )
 }

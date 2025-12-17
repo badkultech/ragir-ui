@@ -15,7 +15,7 @@ import {
   Scale, Search, Settings, Users
 } from "lucide-react";
 
-const menuItems = [
+ export const menuItems = [
   { icon: Search, label: "Search by Mood", href: "/home/search-by-mood" },
   { icon: MapPin, label: "Search by Destinations", href: "/home/search-by-destinations" },
   { icon: Users, label: "About us", href: "/home/about" },
@@ -25,14 +25,14 @@ const menuItems = [
   { icon: Bookmark, label: "Wishlist", href: "/home//wishlist" },
 ];
 
-const userMenuItems = [
+export const userMenuItems = [
   { icon: Bell, label: "Trip Invitations Sent", href: "/home/invitations" },
   { icon: MessageCircleQuestion, label: "My Queries", href: "/home/my-queries" },
   { icon: Bookmark, label: "Saved Trips", href: "/saved" },
   { icon: Settings, label: "Settings", href: "/home/settings" },
 ];
 
-const notificationsData = [
+export const notificationsData = [
   {
     id: 1,
     type: "booking",

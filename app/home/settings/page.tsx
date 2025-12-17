@@ -1,15 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import {
-  ChevronLeft,
-  Scale,
-  Bell,
-  Menu,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import Sidebar from "@/components/search-results/settings/Sidebar";
 import ProfileTab from "@/components/search-results/settings/ProfileTab";
 import CommunicationsTab from "@/components/search-results/settings/CommunicationsTab";
@@ -22,6 +13,8 @@ import DeactivateModal from "@/components/search-results/settings/DeactivateModa
 import DeleteModal from "@/components/search-results/settings/DeleteModal";
 import { useRouter } from "next/navigation";
 import { MainHeader } from "@/components/search-results/MainHeader";
+import { menuItems, notificationsData, userMenuItems } from "../page";
+import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 
 export default function SettingsPage() {
 
@@ -51,14 +44,20 @@ export default function SettingsPage() {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter()
+  const [notifications, setNotifications] = useState(notificationsData);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+    <div className="min-h-screen bg-background w-full">
 
       {/* ✅ HEADER FIXED */}
       <MainHeader logoText="Settings"
         isLoggedIn={true}
+        notifications={notifications}
+        onUpdateNotifications={setNotifications}
+        onMenuOpen={() => setSidebarOpen(true)}
        />
 
       {/* MAIN CONTENT AREA */}
@@ -102,5 +101,12 @@ export default function SettingsPage() {
       <DeleteModal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} />
 
     </div>
+    <SidebarMenu
+    isOpen={isSidebarOpen}
+    onClose={() => setSidebarOpen(false)}
+    menuItems={menuItems}
+    userMenuItems={userMenuItems}
+    />
+    </>
   );
 }

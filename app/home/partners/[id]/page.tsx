@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, Youtube, Globe, Instagram, Calendar, Store } from "lucide-react";
@@ -7,6 +9,10 @@ import { CheckCircle } from "lucide-react";
 import { Footer } from "@/components/homePage/sections/footer";
 import { ROUTES } from "@/lib/utils";
 import { MainHeader } from "@/components/search-results/MainHeader";
+import { useRouter } from "next/navigation";
+import { use, useState } from "react";
+import { menuItems, notificationsData, userMenuItems } from "../../page";
+import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 
 const partnersData: Record<
   string,
@@ -52,32 +58,32 @@ const partnersData: Record<
   },
 };
 
-// Generate static params for all partners
-export function generateStaticParams() {
-  return Object.keys(partnersData).map((id) => ({ id }));
-}
 
-export default async function PartnerDetailPage({
+export default function PartnerDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const { id } = use(params); 
   const partner = partnersData[id] || partnersData["the-lalit"];
+  const routes = useRouter()  
+  const [notifications, setNotifications] = useState(notificationsData);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
       <div className="min-h-screen bg-white">
-        <MainHeader isLoggedIn={true}/>
+        <MainHeader isLoggedIn={true}
+        notifications={notifications}
+        onUpdateNotifications={setNotifications}
+        onMenuOpen={() => setSidebarOpen(true)}
+        />
         <div className="container mx-auto px-4 md:px-20 py-8">
           {/* Header with back button */}
           <div className="flex items-center gap-4 mb-6">
-            <Link
-              href={ROUTES.COMMON.HOME_PARTNERS}
-              className=" hover:bg-gray-100 transition-colors"
-            >
+            <button onClick={() => routes.back()}>
               <ChevronLeft className="w-6 h-6 text-gray-400 font-bold" />
-            </Link>
+            </button>
             <h1 className="text-3xl font-bold italic font-barlow text-gray-900">
               {partner.name}
             </h1>
@@ -209,6 +215,13 @@ export default async function PartnerDetailPage({
 
       </div>
       <Footer />
+
+      <SidebarMenu
+                    isOpen={isSidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
+                    menuItems={menuItems}
+                    userMenuItems={userMenuItems}
+                  />
     </>
 
   );

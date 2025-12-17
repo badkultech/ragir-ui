@@ -82,12 +82,13 @@ export function SearchTripsCard() {
 
 
   return (
-    <div className="bg-white rounded-[20px] md:rounded-3xl shadow-[0_0_15px_rgba(0,0,0,0.2)] p-3 md:p-6 w-full max-w-[600px] overflow-hidden">
+    <div className="bg-white rounded-[20px] md:rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.12)] 
+        p-4 md:p-6 w-full max-w-[360px] sm:max-w-[420px] md:max-w-[500px] lg:max-w-[600px] mx-auto">
       {/* Header */}
       <h2 className="text-xl font-semibold text-center mb-4">Search Trips</h2>
 
       {/* Tabs */}
-      <div className="flex bg-white shadow-[0_0_15px_rgba(0,0,0,0.2)] rounded-full p-1 mb-6">
+      <div className="flex bg-white shadow-[0_0_15px_rgba(0,0,0,0.12)] rounded-full p-1 mb-6">
         <button
           onClick={() => setActiveTab("destination")}
           className={cn(
