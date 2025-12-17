@@ -3,6 +3,7 @@ import { Marquee } from "@/components/homePage/shared/marquee";
 import { PartnerLogo } from "@/components/homePage/shared/partner-logo";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { ROUTES } from "@/lib/utils";
 
 const partners = [
   "/tp-logo1.jpg",
@@ -33,7 +34,7 @@ export function PartnersSection() {
 
       <div className="text-center my-8 ">
         <Link
-          href="/home/partners"
+          href={ROUTES.COMMON.HOME_PARTNERS}
           className="text-lg text-[#ff804c] flex items-center gap-2  justify-center font-semibold font-poppins  hover:text-primary/80 transition-colors"
         >
           View All

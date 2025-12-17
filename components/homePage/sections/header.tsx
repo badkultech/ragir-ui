@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ROUTES } from "@/lib/utils"
 
 export function Header() {
   return (
@@ -8,22 +9,22 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={ROUTES.COMMON.HOME} className="flex items-center gap-2">
             <span className="text-2xl font-bold text-primary">Ragir</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href={ROUTES.COMMON.HOME} className="text-sm font-medium hover:text-primary transition-colors">
               Home
             </Link>
-            <Link href="/trips" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href={ROUTES.COMMON.TRIPS} className="text-sm font-medium hover:text-primary transition-colors">
               Trips
             </Link>
-            <Link href="/destinations" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href={ROUTES.COMMON.DESTINATIONS} className="text-sm font-medium hover:text-primary transition-colors">
               Destinations
             </Link>
-            <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href={ROUTES.COMMON.ABOUT} className="text-sm font-medium hover:text-primary transition-colors">
               About
             </Link>
           </nav>

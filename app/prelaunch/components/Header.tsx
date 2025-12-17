@@ -5,6 +5,7 @@ import React from "react";
 import Image from "next/image";
 import styles from "../prelaunch.module.css";
 import { MoveRight } from "lucide-react";
+import { ROUTES } from "@/lib/utils";
 
 /**
  * Header Component
@@ -19,7 +20,7 @@ export default function Header({
   return (
     <header className={`${styles.header_bg} p-4 md:py-[1.2rem] md:px-[4rem]`}>
       <nav className="flex justify-between items-center">
-        <Link href="/" className="font-bold">
+        <Link href={ROUTES.COMMON.HOME} className="font-bold">
           <Image
             src="/prelaunch-page-imgs/logo-ragir.svg"
             width={100}

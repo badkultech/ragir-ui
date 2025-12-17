@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus, Copy } from "lucide-react";
 import Link from "next/link";
+import { ROUTES } from "@/lib/utils";
 
 interface CreateTripModalProps {
   open: boolean;
@@ -43,7 +44,7 @@ export function CreateTripModal({
         {/* Content */}
         <div className="space-y-5">
           {/* Start from Scratch */}
-          <Link href="/organizer/create-trip">
+          <Link href={ROUTES.ORGANIZER.CREATE_TRIP}>
             <Button
               variant="ghost"
               className="cursor-pointer
@@ -69,7 +70,7 @@ export function CreateTripModal({
           </Link>
           {/* Use Similar Trip */}
 
-          <Link href="/organizer/trip-overview">
+          <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW}>
             <Button
               variant="ghost"
               className="cursor-pointer

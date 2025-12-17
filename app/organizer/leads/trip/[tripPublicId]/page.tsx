@@ -19,6 +19,7 @@ import {
 } from "@/lib/services/organizer/trip/leads";
 import { TripLeadsStatus } from "@/lib/services/organizer/trip/leads/types";
 import { LeadFilters } from "@/components/leads/LeadFilters";
+import { ROUTES } from "@/lib/utils";
 
 export default function LeadsPage() {
   const { tripPublicId } = useParams();
@@ -113,7 +114,7 @@ export default function LeadsPage() {
               asChild
               className="bg-orange-500 hover:bg-orange-600 text-white rounded-md px-5 py-2"
             >
-              <Link href="/organizer/leads/all">View All Leads</Link>
+              <Link href={ROUTES.ORGANIZER.LEADS_ALL}>View All Leads</Link>
             </Button>
           </div>
 

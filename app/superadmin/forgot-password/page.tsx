@@ -10,6 +10,7 @@ import { GradientButton } from "@/components/gradient-button";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
 import RequiredStar from "@/components/common/RequiredStar";
+import { ROUTES } from "@/lib/utils";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col !font-poppins">
+    <div className="min-h-screen flex flex-col">
       {/* Header (same as Admin Login) */}
       <AppHeader showAvatar={false} title="Admin Forgot Password" />
 
@@ -77,19 +78,19 @@ export default function ForgotPasswordPage() {
               <div className="flex items-center mb-6">
                 <button
                   type="button"
-                  onClick={() => router.replace("/superadmin/login")}
+                  onClick={() => router.replace(ROUTES.SUPER_ADMIN.LOGIN)}
                   className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </button>
-                <h1 className="text-3xl !font-poppins font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-gray-900">
                   Forgot Password
                 </h1>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="block text-sm !font-poppins font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700">
                     Enter Email <RequiredStar />
                   </label>
                   <input
@@ -100,13 +101,13 @@ export default function ForgotPasswordPage() {
                     placeholder="Enter your email address"
                     className={[
                       "w-full rounded-2xl border-0 bg-blue-50 px-5 py-4 text-base text-gray-900 placeholder-gray-500",
-                      "focus:outline-none focus:ring-2 focus:ring-orange-400 !font-poppins",
+                      "focus:outline-none focus:ring-2 focus:ring-orange-400",
                       emailError ? "ring-2 ring-[#FF804C]" : "",
                     ].join(" ")}
                     disabled={isLoading}
                   />
                   {emailError && (
-                    <p className="text-[#FF804C] text-sm !font-poppins">
+                    <p className="text-[#FF804C] text-sm">
                       {emailError}
                     </p>
                   )}
@@ -120,11 +121,11 @@ export default function ForgotPasswordPage() {
                 </GradientButton>
 
                 <div className="text-center pt-2">
-                  <span className="text-sm text-gray-600 !font-poppins">
+                  <span className="text-sm text-gray-600">
                     Remember your password?{" "}
                     <Link
-                      href="/superadmin/login"
-                      className="text-[#FF804C] hover:underline font-medium"
+                      href={ROUTES.SUPER_ADMIN.LOGIN}
+                      className="text-[#FD6E34] hover:underline font-medium"
                     >
                       Sign in here
                     </Link>
@@ -137,13 +138,13 @@ export default function ForgotPasswordPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2 !font-poppins">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Check Your Email
               </h2>
-              <p className="text-gray-600 text-sm mb-6 !font-poppins">
+              <p className="text-gray-600 text-sm mb-6">
                 We've sent a password reset link to <strong>{email}</strong>
               </p>
-              <p className="text-gray-500 text-xs mb-6 !font-poppins">
+              <p className="text-gray-500 text-xs mb-6">
                 Didn't receive the email? Check your spam folder or try again.
               </p>
               <button
@@ -151,7 +152,7 @@ export default function ForgotPasswordPage() {
                   setIsSubmitted(false);
                   setEmail("");
                 }}
-                className="text-[#FF804C] hover:underline font-medium text-sm !font-poppins"
+                className="text-[#FF804C] hover:underline font-medium text-sm"
               >
                 Try again with different email
               </button>

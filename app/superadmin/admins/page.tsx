@@ -18,6 +18,7 @@ import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { AppHeader } from "@/components/app-header";
 import { Pagination } from "@/components/common/Pagination";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { ROUTES } from "@/lib/utils";
 
 // Modal Component
 interface ActionModalProps {
@@ -409,7 +410,7 @@ export default function Dashboard() {
                       <div className="w-8 h-8 rounded-full bg-gray-300" />
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-full flex items-center justify-center">
-                      <Link href="/superadmin/add-admin">
+                      <Link href={ROUTES.SUPER_ADMIN.ADD_ADMIN}>
                         <Plus className="w-4 h-4 text-white" />
                       </Link>
                     </div>
@@ -424,7 +425,7 @@ export default function Dashboard() {
                 </p>
 
                 <Link
-                  href="/superadmin/add-admin"
+                  href={ROUTES.SUPER_ADMIN.ADD_ADMIN}
                   className="inline-flex items-center justify-center px-8 py-3 rounded-full font-medium border-2 border-white shadow-lg text-white hover:shadow-xl transition-shadow"
                   style={{
                     background:
@@ -484,7 +485,7 @@ export default function Dashboard() {
                     Get started by adding your first admin user.
                   </p>
                   <Link
-                    href="/superadmin/add-admin"
+                    href={ROUTES.SUPER_ADMIN.ADD_ADMIN}
                     className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white shadow-lg"
                     style={{
                       background:

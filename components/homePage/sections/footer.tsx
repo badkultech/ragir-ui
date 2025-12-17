@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react"
 import Image from "next/image"
+import { ROUTES } from "@/lib/utils"
 
 export function Footer() {
   return (
@@ -9,7 +10,7 @@ export function Footer() {
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           {/* Logo & Description */}
           <div className="md:col-span-2">
-            <Link href="/" className="text-2xl font-bold text-primary">
+            <Link href={ROUTES.COMMON.HOME} className="text-2xl font-bold text-primary">
               <Image src="/logo.png" alt="Logo" width={100} height={100} className=" h-11 w-auto" />
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
@@ -23,22 +24,22 @@ export function Footer() {
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/trips" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.TRIPS} className="hover:text-primary transition-colors">
                     Trips
                   </Link>
                 </li>
                 <li>
-                  <Link href="/destinations" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.DESTINATIONS} className="hover:text-primary transition-colors">
                     Destinations
                   </Link>
                 </li>
                 <li>
-                  <Link href="/leaders" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.LEADERS} className="hover:text-primary transition-colors">
                     Trip Leaders
                   </Link>
                 </li>
                 <li>
-                  <Link href="/about" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.ABOUT} className="hover:text-primary transition-colors">
                     About Us
                   </Link>
                 </li>
@@ -50,22 +51,22 @@ export function Footer() {
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/help" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.HELP} className="hover:text-primary transition-colors">
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.CONTACT} className="hover:text-primary transition-colors">
                     Contact Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="/faq" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.FAQ} className="hover:text-primary transition-colors">
                     FAQs
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="hover:text-primary transition-colors">
+                  <Link href={ROUTES.COMMON.TERMS} className="hover:text-primary transition-colors">
                     Terms & Conditions
                   </Link>
                 </li>

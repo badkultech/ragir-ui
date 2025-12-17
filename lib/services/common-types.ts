@@ -15,3 +15,11 @@ export interface PageResponse<T> {
   first: boolean;
   last: boolean;
 }
+
+export interface UploadedFile {
+  id: number;
+  type: string;
+  url: string;
+  file?: string;
+  markedForDeletion?: boolean;
+}

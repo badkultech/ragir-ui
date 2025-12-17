@@ -17,7 +17,7 @@ export function CategoryCard({
 }: CategoryCardProps) {
   return (
     <button
-      className="group w-full max-w-sm bg-white rounded-[18px] shadow-[0_0_10px_rgba(0,0,0,0.15)] p-4 text-left hover:shadow-2xl transition-shadow duration-300 ease-in-out"
+      className="group w-full md:max-w-sm bg-white rounded-[18px] shadow-[0_0_10px_rgba(0,0,0,0.15)] p-4 text-left hover:shadow-2xl transition-shadow duration-300 ease-in-out"
       aria-label={title}
     >
       <div className="relative rounded-xl overflow-hidden bg-gray-200">

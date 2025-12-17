@@ -8,6 +8,7 @@ import { GradientButton } from "@/components/gradient-button";
 // ✅ import mutation
 import { useJoinAsPartnerMutation } from "@/lib/services/prelaunch/partners";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import { MESSAGES, VALIDATION_PATTERNS } from "@/lib/utils";
 
 export default function JoinAsPartner() {
     const [phone, setPhone] = useState("");
@@ -28,10 +29,9 @@ export default function JoinAsPartner() {
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setEmail(value);
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!value) setEmailError("");
-        else if (!emailRegex.test(value))
-            setEmailError("Please enter a valid email address");
+        else if (!VALIDATION_PATTERNS.EMAIL.test(value))
+            setEmailError(MESSAGES.VALIDATION.EMAIL_INVALID);
         else setEmailError("");
     };
 
@@ -40,22 +40,22 @@ export default function JoinAsPartner() {
         e.preventDefault();
 
         if (!name.trim()) {
-            showApiError("Please enter your name.");
+            showApiError(MESSAGES.PARTNER.NAME_REQUIRED);
             return;
         }
 
         if (name.length > 50) {
-            showApiError("Name cannot exceed 50 characters.");
+            showApiError(MESSAGES.PARTNER.NAME_LENGTH_MAX);
             return;
         }
 
         if (emailError || !email) {
-            showApiError("Please enter a valid email address.");
+            showApiError(MESSAGES.VALIDATION.EMAIL_INVALID);
             return;
         }
 
         if (phone.length !== 10) {
-            showApiError("Please enter a valid 10-digit phone number.");
+            showApiError(MESSAGES.PARTNER.PHONE_INVALID_10);
             return;
         }
 
@@ -66,7 +66,7 @@ export default function JoinAsPartner() {
                 phone,
             }).unwrap();
 
-            showSuccess("🎉 Successfully registered as a partner!");
+            showSuccess(MESSAGES.PARTNER.REGISTER_SUCCESS);
             console.log("Partner registered:", result);
 
             // Reset form
@@ -75,7 +75,7 @@ export default function JoinAsPartner() {
             setPhone("");
         } catch (error: any) {
             console.error("Error submitting form:", error);
-            showApiError(error?.data || "Something went wrong. Please try again.");
+            showApiError(error?.data || MESSAGES.PARTNER.GENERIC_ERROR);
         }
     };
 
