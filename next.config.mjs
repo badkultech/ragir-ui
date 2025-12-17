@@ -1,19 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
   images: {
     unoptimized: true,
-  },
-
-  // ✅ Explicitly force Webpack
-  experimental: {
-    webpackBuildWorker: true,
-  },
-
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.devtool = 'source-map';
-    }
-    return config;
   },
 };
 
