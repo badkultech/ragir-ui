@@ -49,6 +49,22 @@ const notificationsData = [
     time: "2 hours ago",
     read: false,
   },
+  {
+    id: 3,
+    type: "reminder",
+    title: "Trip Reminder",
+    description: "Your Himalayan Adventure Trek starts in 3 days",
+    time: "2 hours ago",
+    read: false,
+  },
+  {
+    id: 4,
+    type: "update",
+    title: "Trip Update",
+    description: "Itinerary updated for Goa Beach Getaway",
+    time: "2 hours ago",
+    read: true,
+  },
 ];
 
 export default function Home() {
