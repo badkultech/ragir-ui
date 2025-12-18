@@ -72,7 +72,6 @@ export default function VerifyOTPPage() {
         identifier: phoneNumber,
         otp: otp.join(""),
         type: "MOBILE",
-        organization: false,
         userPublicId: userPublicId,
       }).unwrap();
 
