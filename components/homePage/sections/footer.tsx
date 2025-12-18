@@ -5,7 +5,7 @@ import { ROUTES } from "@/lib/utils"
 
 export function Footer() {
   return (
-    <footer className="py-12 ">
+    <footer className="pt-12 ">
       <div className="container mx-auto px-4 md:px-20">
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           {/* Logo & Description */}
@@ -75,22 +75,23 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t flex justify-between border-muted-foreground/20 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Ragir. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="#" className="hover:text-primary transition-colors">
-              <Facebook className="w-5 h-5" />
-            </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
-              <Twitter className="w-5 h-5" />
-            </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
-              <Instagram className="w-5 h-5" />
-            </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
-              <Youtube className="w-5 h-5" />
-            </Link>
-          </div>
+
+      </div>
+      <div className="border-t flex justify-between border-muted-foreground/20 py-4 px-4 text-center text-sm text-white bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]">
+        <p>&copy; {new Date().getFullYear()} Ragir. All rights reserved.</p>
+        <div className="flex gap-4">
+          <Link href="#" className="hover:text-primary transition-colors">
+            <Facebook className="w-5 h-5" />
+          </Link>
+          <Link href="#" className="hover:text-primary transition-colors">
+            <Twitter className="w-5 h-5" />
+          </Link>
+          <Link href="#" className="hover:text-primary transition-colors">
+            <Instagram className="w-5 h-5" />
+          </Link>
+          <Link href="#" className="hover:text-primary transition-colors">
+            <Youtube className="w-5 h-5" />
+          </Link>
         </div>
       </div>
     </footer>

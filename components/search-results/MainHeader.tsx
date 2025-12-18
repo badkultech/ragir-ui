@@ -23,8 +23,8 @@ export function MainHeader({
   const router = useRouter();
 
   return (
-    <header className="relative z-20 bg-white border-b border-[#E5E7EB]">
-      <div className="container mx-auto flex items-center justify-between w-full px-4 md:px-20 py-3">
+    <header className="w-full relative z-20 bg-white border-b border-[#E5E7EB]">
+      <div className=" flex items-center justify-between px-4 md:px-20 py-3">
 
         {/* LEFT SECTION */}
         <div className="flex items-center gap-2 flex-shrink-0">

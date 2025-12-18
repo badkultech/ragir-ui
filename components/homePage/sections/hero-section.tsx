@@ -3,12 +3,12 @@ import Image from "next/image";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[700px] bg-white">
-      <div className="container mx-auto px-4 md:px-20 py-8 md:py-16">
+    <section className="relative min-h-[700px] bg-white overflow-visible max-w-full">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-8 md:py-16">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Left content */}
           <div className="space-y-6">
-            <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground leading-[1.2] md:leading-[1.1] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground leading-[1.2] md:leading-[1.1] tracking-tight">
               Join Group Trips. Meet Like Minded Travelers. Around the World!
             </h1>
             <p className="hidden md:block text-muted-foreground text-base max-w-md leading-relaxed">
@@ -27,55 +27,9 @@ export function HeroSection() {
                 className="w-full h-auto rounded-lg object-cover"
               />
             </div>
-            {/* for Indivisual images */}
-            {/* <div className="pt-4 grid grid-cols-2 gap-3 max-w-md"> */}
-            {/* Top left - tall pill shape */}
-            {/* <div className="overflow-hidden animate-float">
-                <div className="w-full h-32 rounded-[50px] overflow-hidden border-4 border-white shadow-lg">
-                  <img
-                    src="/person-standing-on-cliff-overlooking-mountains-nor.jpg"
-                    alt="Traveler on cliff"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div> */}
-
-            {/* Top right - wider rounded rectangle */}
-            {/* <div className="overflow-hidden animate-float-delayed">
-                <div className="w-full h-32 rounded-3xl overflow-hidden border-4 border-white shadow-lg">
-                  <img
-                    src="/northern-lights-aurora-borealis-night-sky.jpg"
-                    alt="Northern lights"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div> */}
-
-            {/* Bottom left - rounded rectangle */}
-            {/* <div className="overflow-hidden animate-float-slow">
-                <div className="w-full h-28 rounded-3xl overflow-hidden border-4 border-white shadow-lg">
-                  <img
-                    src="/ancient-bridge-architecture-silhouette-sunset.jpg"
-                    alt="Bridge silhouette"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div> */}
-
-            {/* Bottom right - smaller rounded */}
-            {/* <div className="overflow-hidden animate-float">
-                <div className="w-3/4 h-28 rounded-[40px] overflow-hidden border-4 border-white shadow-lg">
-                  <img
-                    src="/group-of-hikers-with-backpacks-mountains.jpg"
-                    alt="Group of hikers"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div> */}
-            {/* </div> */}
           </div>
 
-          <div className="flex justify-center lg:justify-end">
+          <div className="flex justify-center lg:justify-end w-full overflow-visible">
             <SearchTripsCard />
           </div>
         </div>
