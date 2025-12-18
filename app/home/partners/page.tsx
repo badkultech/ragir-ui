@@ -1,9 +1,15 @@
-import Link from "next/link";
+"use client";
+
+
 import { ChevronLeft } from "lucide-react";
 import { PartnerCard } from "@/components/homePage/shared/partner-card";
-import { Header } from "@/components/homePage/sections/header";
 import { Footer } from "@/components/homePage/sections/footer";
-import { ROUTES } from "@/lib/utils";
+import { MainHeader } from "@/components/search-results/MainHeader";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { SidebarMenu } from "@/components/search-results/SidebarMenu";
+import { menuItems, notificationsData, userMenuItems } from "../constants";
+
 
 const partners = [
   { id: "the-lalit", name: "The Lalit", logo: "/tp-logo1.jpg" },
@@ -18,19 +24,25 @@ const partners = [
 ];
 
 export default function PartnersPage() {
+  const routes = useRouter()
+  const [notifications, setNotifications] = useState(notificationsData);
+
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   return (
     <>
-      <Header />
+      <MainHeader
+        isLoggedIn={true}
+        notifications={notifications}
+        onUpdateNotifications={setNotifications}
+        onMenuOpen={() => setSidebarOpen(true)}
+      />
       <div className="min-h-screen">
         <div className="container mx-auto px-4 py-8">
           {/* Header with back button */}
           <div className="flex items-center gap-4 mb-8">
-            <Link
-              href={ROUTES.COMMON.HOME_NAV}
-              className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors"
-            >
+            <button onClick={() => routes.back()}>
               <ChevronLeft className="w-5 h-5 text-gray-600" />
-            </Link>
+            </button>
             <h1 className="text-2xl md:text-3xl font-barlow font-semibold italic  text-gray-900">
               Our Trusted Partners
             </h1>
@@ -50,6 +62,12 @@ export default function PartnersPage() {
         </div>
       </div>
       <Footer />
+      <SidebarMenu
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+      />
     </>
   );
 }

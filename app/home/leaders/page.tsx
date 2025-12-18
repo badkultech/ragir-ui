@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 import { TripLeaderCard } from "@/components/homePage/shared/trip-leader-card"
 import { TripLeaderModal } from "@/components/homePage/shared/trip-leader-modal"
-import { ROUTES } from "@/lib/utils"
+import { MainHeader } from "@/components/search-results/MainHeader"
+import { useRouter } from "next/navigation"
+import { menuItems, notificationsData, userMenuItems } from "../constants";
+
+import { SidebarMenu } from "@/components/search-results/SidebarMenu"
 
 const tripLeaders = [
     {
@@ -85,6 +88,9 @@ const tripLeaders = [
 export default function TripLeadersPage() {
     const [selectedLeader, setSelectedLeader] = useState<(typeof tripLeaders)[0] | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const routes = useRouter()
+    const [notifications, setNotifications] = useState(notificationsData);
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const handleCardClick = (leader: (typeof tripLeaders)[0]) => {
         setSelectedLeader(leader)
@@ -97,37 +103,47 @@ export default function TripLeadersPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Header */}
-            <div className="px-4 md:px-8 lg:px-16 py-8">
-                <div className="flex items-center gap-4 mb-8">
-                    <Link
-                        href={ROUTES.COMMON.HOME}
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-                    >
-                        <ChevronLeft className="w-5 h-5 text-gray-600" />
-                    </Link>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 italic">Trip Leaders</h1>
+        <>
+            <div className="min-h-screen bg-white">
+                <MainHeader isLoggedIn={true}
+                    notifications={notifications}
+                    onUpdateNotifications={setNotifications}
+                    onMenuOpen={() => setSidebarOpen(true)}
+                />
+                {/* Header */}
+                <div className="px-4 md:px-8 lg:px-16 py-8">
+                    <div className="flex items-center gap-4 mb-8">
+                        <button onClick={() => routes.back()}>
+                            <ChevronLeft className="w-5 h-5 text-gray-600" />
+                        </button>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 italic">Trip Leaders</h1>
+                    </div>
+
+                    {/* Grid of cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {tripLeaders.map((leader) => (
+                            <TripLeaderCard
+                                key={leader.id}
+                                name={leader.name}
+                                image={leader.image}
+                                organization={leader.organization}
+                                quote={leader.quote}
+                                variant="grid"
+                                onClick={() => handleCardClick(leader)}
+                            />
+                        ))}
+                    </div>
                 </div>
 
-                {/* Grid of cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {tripLeaders.map((leader) => (
-                        <TripLeaderCard
-                            key={leader.id}
-                            name={leader.name}
-                            image={leader.image}
-                            organization={leader.organization}
-                            quote={leader.quote}
-                            variant="grid"
-                            onClick={() => handleCardClick(leader)}
-                        />
-                    ))}
-                </div>
+                {/* Modal */}
+                <TripLeaderModal isOpen={isModalOpen} onClose={handleCloseModal} leader={selectedLeader} />
             </div>
-
-            {/* Modal */}
-            <TripLeaderModal isOpen={isModalOpen} onClose={handleCloseModal} leader={selectedLeader} />
-        </div>
+            <SidebarMenu
+                isOpen={isSidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                menuItems={menuItems}
+                userMenuItems={userMenuItems}
+            />
+        </>
     )
 }

@@ -77,7 +77,7 @@ export function Footer() {
 
 
       </div>
-      <div className="border-t flex justify-between border-muted-foreground/20 bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)] py-6 px-20 text-center text-sm text-white">
+      <div className="border-t flex justify-between border-muted-foreground/20 py-4 px-4 text-center text-sm text-white bg-[linear-gradient(90deg,#FEA901_0%,#FD6E34_33%,#FE336A_66%,#FD401A_100%)]">
         <p>&copy; {new Date().getFullYear()} Ragir. All rights reserved.</p>
         <div className="flex gap-4">
           <Link href="#" className="hover:text-primary transition-colors">
