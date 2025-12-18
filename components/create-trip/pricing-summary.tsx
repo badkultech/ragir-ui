@@ -82,7 +82,7 @@ export function PricingSummary({
                                 {selectedOption.name}
                               </h4>
                               <p className="text-sm text-[#757575] mt-0.5">
-                                {category.name}
+                                {`${category.name} Category`}
                               </p>
                             </div>
 
@@ -175,51 +175,51 @@ export function PricingSummary({
                     </div>
 
                     {/* Available Options (Screenshot Style) */}
-<div className="mt-4">
-  
+                    <div className="mt-4">
 
-  {/* Soft white box wrapper */}
-  <div className="bg-white rounded-xl p-3 space-y-2 shadow-sm border border-gray-100">
-<p className="text-xs font-semibold text-gray-800 mb-2">
-    Available Options
-  </p>
-    {displayedOptions.map((opt, optIdx) => {
-      const { original, final, hasDiscount } =
-        calculateDiscountedPrice(opt.price, opt.discount);
 
-      return (
-        <div
-          key={optIdx}
-          className="bg-gray-50 rounded-lg p-3 flex justify-between items-center border border-gray-200"
-        >
-          {/* LEFT — Option Name */}
-          <span className="text-sm text-gray-700">
-            {opt.name}
-          </span>
+                      {/* Soft white box wrapper */}
+                      <div className="bg-white rounded-xl p-3 space-y-2 shadow-sm border border-gray-100">
+                        <p className="text-xs font-semibold text-gray-800 mb-2">
+                          Available Options
+                        </p>
+                        {displayedOptions.map((opt, optIdx) => {
+                          const { original, final, hasDiscount } =
+                            calculateDiscountedPrice(opt.price, opt.discount);
 
-          {/* RIGHT — Prices */}
-          <div className="text-right leading-tight">
-            {hasDiscount && (
-              <div className="text-[10px] text-gray-400 line-through">
-                {formatPrice(original)}
-              </div>
-            )}
-            <div className="text-sm font-semibold text-gray-900">
-              {formatPrice(final)}
-            </div>
-          </div>
-        </div>
-      );
-    })}
+                          return (
+                            <div
+                              key={optIdx}
+                              className="bg-gray-50 rounded-lg p-3 flex justify-between items-center border border-gray-200"
+                            >
+                              {/* LEFT — Option Name */}
+                              <span className="text-sm text-gray-700">
+                                {opt.name}
+                              </span>
 
-    {hasMore && (
-      <div className="text-xs text-center text-gray-400 italic">
-        ...and {allOptions.length - 3} more
-      </div>
-    )}
+                              {/* RIGHT — Prices */}
+                              <div className="text-right leading-tight">
+                                {hasDiscount && (
+                                  <div className="text-[10px] text-gray-400 line-through">
+                                    {formatPrice(original)}
+                                  </div>
+                                )}
+                                <div className="text-sm font-semibold text-gray-900">
+                                  {formatPrice(final)}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
 
-  </div>
-</div>
+                        {hasMore && (
+                          <div className="text-xs text-center text-gray-400 italic">
+                            ...and {allOptions.length - 3} more
+                          </div>
+                        )}
+
+                      </div>
+                    </div>
 
                   </div>
                 );

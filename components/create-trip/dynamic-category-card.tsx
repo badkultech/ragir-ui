@@ -24,7 +24,6 @@ import {
     DialogClose,
 } from "@/components/ui/dialog";
 
-
 export interface DynamicOption {
     id: string;
     name: string;
@@ -64,9 +63,8 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
         }
     };
 
-    const updateField = (field: keyof DynamicCategory, value: any) => {
+    const updateField = (field: keyof DynamicCategory, value: any) =>
         onChange({ ...category, [field]: value });
-    };
 
     const addOption = () => {
         const newOption: DynamicOption = {
@@ -89,14 +87,25 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
         onChange({ ...category, options: newOptions });
     };
 
+    /* ⭐ IMPORTANT PATCH ⭐
+       Simple (single) mode → Name "Standard" must exist for summary
+       but must NOT show in UI 
+    */
+    if (category.type === "single" && category.options[0]) {
+        const opt = category.options[0];
+        if (!opt.name || opt.name.trim() === "") {
+            updateOption(0, "name", "Standard");
+        }
+    }
+
     return (
         <div className="bg-gray-50/50 border border-gray-200 rounded-xl p-5 mb-6 relative">
+
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-lg">Price Category</h3>
 
-                    {/* Info Tooltip */}
                     <TooltipProvider delayDuration={100}>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -125,8 +134,8 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                 </div>
             </div>
 
-
             <div className="space-y-4">
+
                 {/* Basic Info */}
                 <div className="space-y-2">
                     <Label>Category Name</Label>
@@ -157,8 +166,7 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                         onValueChange={(val) => updateField('type', val)}
                         className="grid grid-cols-2 gap-4"
                     >
-
-                        {/* SINGLE PRICE CARD */}
+                        {/* SINGLE */}
                         <Label
                             htmlFor={`single-${category.id}`}
                             className={cn(
@@ -175,12 +183,10 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                 className="sr-only"
                             />
                             <span className="font-bold">Single Price</span>
-                            <span className="text-xs text-muted-foreground">
-                                Single price for this category
-                            </span>
+                            <span className="text-xs text-muted-foreground">Single price for this category</span>
                         </Label>
 
-                        {/* MULTI PRICE CARD */}
+                        {/* MULTI */}
                         <Label
                             htmlFor={`multi-${category.id}`}
                             className={cn(
@@ -196,14 +202,14 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                 id={`multi-${category.id}`}
                                 className="sr-only"
                             />
-                            <span className="font-bold ">Multi-price</span>
+                            <span className="font-bold">Multi-price</span>
                             <span className="text-xs text-muted-foreground">
                                 Different choices with different pricing
                             </span>
                         </Label>
-
                     </RadioGroup>
                 </div>
+
                 {/* Bulk Action */}
                 {category.type === 'multi' && (
                     <div className="space-y-3 pt-2">
@@ -211,11 +217,11 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                             <Tag className="w-4 h-4" />
                             <span>Apply Discount to All</span>
                         </div>
+
                         <div className="flex gap-3 items-center">
                             <div className="relative w-40">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">Discount</span>
                                 <Input
-                                    placeholder=""
                                     value={bulkDiscount}
                                     onChange={(e) => setBulkDiscount(e.target.value)}
                                     className="pl-20 pr-12 h-11"
@@ -224,11 +230,15 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                     % ₹
                                 </div>
                             </div>
+
                             <Button
                                 className="bg-[#FF7A00] hover:bg-[#E06900] text-white h-11 px-6 rounded-lg font-medium"
                                 onClick={() => {
                                     if (!bulkDiscount) return;
-                                    const newOptions = category.options.map(o => ({ ...o, discount: bulkDiscount }));
+                                    const newOptions = category.options.map(o => ({
+                                        ...o,
+                                        discount: bulkDiscount
+                                    }));
                                     onChange({ ...category, options: newOptions });
                                 }}
                             >
@@ -241,8 +251,10 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                 {/* Options List */}
                 <div className="space-y-3">
                     {category.type === 'single' ? (
-                        // Single Type Layout - No Option Name
+                        /* Single Type Layout — No Name Shown */
                         <div className="flex gap-4 items-end">
+                            
+                            {/* PRICE */}
                             <div className="flex-1 space-y-1">
                                 <Label className="text-xs text-muted-foreground">Price (₹)</Label>
                                 <Input
@@ -253,6 +265,8 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                     className="h-11"
                                 />
                             </div>
+
+                            {/* DISCOUNT */}
                             <div className="w-1/3 space-y-1">
                                 <Label className="text-xs text-muted-foreground">Discount</Label>
                                 <div className="relative">
@@ -263,13 +277,14 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                         className="h-11 pr-8"
                                     />
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                        <span className="text-sm">%</span>
+                                        %
                                     </div>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        // Multi Type Layout - Standard List
+
+                        /* Multi Type Layout */
                         category.options.map((option, idx) => (
                             <div key={option.id} className="flex gap-2 items-start">
                                 <div className="flex-1 space-y-1">
@@ -280,6 +295,7 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                         onChange={(e) => updateOption(idx, 'name', e.target.value)}
                                     />
                                 </div>
+
                                 <div className="w-28 space-y-1">
                                     {idx === 0 && <Label className="text-xs text-muted-foreground">Price (₹)</Label>}
                                     <Input
@@ -289,6 +305,7 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                         onChange={(e) => updateOption(idx, 'price', e.target.value)}
                                     />
                                 </div>
+
                                 <div className="w-32 space-y-1">
                                     {idx === 0 && <Label className="text-xs text-muted-foreground">Discount</Label>}
                                     <div className="relative">
@@ -298,14 +315,18 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                             onChange={(e) => updateOption(idx, 'discount', e.target.value)}
                                             className="pr-8"
                                         />
-                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                            <span className="text-xs">%</span>
-                                        </div>
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">%</div>
                                     </div>
                                 </div>
+
                                 {category.options.length > 1 && (
                                     <div className={idx === 0 ? "pt-7" : ""}>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(idx, option)} className="h-10 w-10 text-muted-foreground hover:text-destructive">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDeleteClick(idx, option)}
+                                            className="h-10 w-10 text-muted-foreground hover:text-destructive"
+                                        >
                                             <X className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -326,26 +347,33 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                         Add Pricing Option
                     </Button>
                 )}
+
             </div>
 
+            {/* Delete Modal */}
             <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Confirm Deletion</DialogTitle>
-                        <DialogDescription>
-                            You are about to delete:
-                        </DialogDescription>
+                        <DialogDescription>You are about to delete:</DialogDescription>
                     </DialogHeader>
+
                     {optionToDelete && (
                         <div className="border rounded-xl p-4 my-2">
-                            <div className="text-sm text-gray-500 mb-1">{optionToDelete.option.name || 'Untitled Option'}</div>
-                            <div className="text-xl font-bold">₹ {optionToDelete.option.price || '0'}</div>
+                            <div className="text-sm text-gray-500 mb-1">
+                                {optionToDelete.option.name || 'Untitled Option'}
+                            </div>
+                            <div className="text-xl font-bold">
+                                ₹ {optionToDelete.option.price || '0'}
+                            </div>
                         </div>
                     )}
+
                     <DialogFooter className="gap-2 sm:gap-0">
                         <DialogClose asChild>
                             <Button variant="outline" className="w-full sm:w-auto h-11">Cancel</Button>
                         </DialogClose>
+
                         <Button
                             variant="destructive"
                             onClick={confirmDelete}
@@ -357,6 +385,7 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
         </div>
     );
 }
