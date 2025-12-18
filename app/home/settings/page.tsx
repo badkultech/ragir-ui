@@ -13,7 +13,8 @@ import DeactivateModal from "@/components/search-results/settings/DeactivateModa
 import DeleteModal from "@/components/search-results/settings/DeleteModal";
 import { useRouter } from "next/navigation";
 import { MainHeader } from "@/components/search-results/MainHeader";
-import { menuItems, notificationsData, userMenuItems } from "../page";
+import { menuItems, notificationsData, userMenuItems } from "../constants";
+
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 
 export default function SettingsPage() {
@@ -46,67 +47,67 @@ export default function SettingsPage() {
   const router = useRouter()
   const [notifications, setNotifications] = useState(notificationsData);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  
+
 
   return (
     <>
-    <div className="min-h-screen bg-background w-full">
+      <div className="min-h-screen bg-background w-full">
 
-      {/* ✅ HEADER FIXED */}
-      <MainHeader logoText="Settings"
-        isLoggedIn={true}
-        notifications={notifications}
-        onUpdateNotifications={setNotifications}
-        onMenuOpen={() => setSidebarOpen(true)}
-       />
+        {/* ✅ HEADER FIXED */}
+        <MainHeader logoText="Settings"
+          isLoggedIn={true}
+          notifications={notifications}
+          onUpdateNotifications={setNotifications}
+          onMenuOpen={() => setSidebarOpen(true)}
+        />
 
-      {/* MAIN CONTENT AREA */}
-      <main className="max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-10">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-10">
+        {/* MAIN CONTENT AREA */}
+        <main className="max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-10">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-10">
 
-          {/* SIDEBAR */}
-          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            {/* SIDEBAR */}
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-          {/* TAB CONTENT */}
-          <div className="flex-1">
-            {activeTab === "profile" && (
-              <ProfileTab formData={formData} setFormData={setFormData} />
-            )}
+            {/* TAB CONTENT */}
+            <div className="flex-1">
+              {activeTab === "profile" && (
+                <ProfileTab formData={formData} setFormData={setFormData} />
+              )}
 
-            {activeTab === "communications" && (
-              <CommunicationsTab
-                communications={communications}
-                setCommunications={setCommunications}
-              />
-            )}
+              {activeTab === "communications" && (
+                <CommunicationsTab
+                  communications={communications}
+                  setCommunications={setCommunications}
+                />
+              )}
 
-            {activeTab === "preferences" && <PreferencesTab />}
-            {activeTab === "support" && <SupportTab />}
-            {activeTab === "legal" && <LegalTab />}
+              {activeTab === "preferences" && <PreferencesTab />}
+              {activeTab === "support" && <SupportTab />}
+              {activeTab === "legal" && <LegalTab />}
 
-            {activeTab === "security" && (
-              <SecurityTab
-                setShowLogoutModal={setShowLogoutModal}
-                setShowDeactivateModal={setShowDeactivateModal}
-                setShowDeleteModal={setShowDeleteModal}
-              />
-            )}
+              {activeTab === "security" && (
+                <SecurityTab
+                  setShowLogoutModal={setShowLogoutModal}
+                  setShowDeactivateModal={setShowDeactivateModal}
+                  setShowDeleteModal={setShowDeleteModal}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      {/* MODALS */}
-      <LogoutModal open={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
-      <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)} />
-      <DeleteModal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} />
+        {/* MODALS */}
+        <LogoutModal open={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
+        <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)} />
+        <DeleteModal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} />
 
-    </div>
-    <SidebarMenu
-    isOpen={isSidebarOpen}
-    onClose={() => setSidebarOpen(false)}
-    menuItems={menuItems}
-    userMenuItems={userMenuItems}
-    />
+      </div>
+      <SidebarMenu
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+      />
     </>
   );
 }

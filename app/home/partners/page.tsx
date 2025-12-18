@@ -8,7 +8,8 @@ import { MainHeader } from "@/components/search-results/MainHeader";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
-import { menuItems, notificationsData, userMenuItems } from "../page";
+import { menuItems, notificationsData, userMenuItems } from "../constants";
+
 
 const partners = [
   { id: "the-lalit", name: "The Lalit", logo: "/tp-logo1.jpg" },
@@ -62,11 +63,11 @@ export default function PartnersPage() {
       </div>
       <Footer />
       <SidebarMenu
-              isOpen={isSidebarOpen}
-              onClose={() => setSidebarOpen(false)}
-              menuItems={menuItems}
-              userMenuItems={userMenuItems}
-            />
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+      />
     </>
   );
 }

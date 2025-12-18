@@ -11,7 +11,8 @@ import { ROUTES } from "@/lib/utils";
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { useRouter } from "next/navigation";
 import { use, useState } from "react";
-import { menuItems, notificationsData, userMenuItems } from "../../page";
+import { menuItems, notificationsData, userMenuItems } from "../../constants";
+
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 
 const partnersData: Record<
@@ -64,9 +65,9 @@ export default function PartnerDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params); 
+  const { id } = use(params);
   const partner = partnersData[id] || partnersData["the-lalit"];
-  const routes = useRouter()  
+  const routes = useRouter()
   const [notifications, setNotifications] = useState(notificationsData);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -74,9 +75,9 @@ export default function PartnerDetailPage({
     <>
       <div className="min-h-screen bg-white">
         <MainHeader isLoggedIn={true}
-        notifications={notifications}
-        onUpdateNotifications={setNotifications}
-        onMenuOpen={() => setSidebarOpen(true)}
+          notifications={notifications}
+          onUpdateNotifications={setNotifications}
+          onMenuOpen={() => setSidebarOpen(true)}
         />
         <div className="container mx-auto px-4 md:px-20 py-8">
           {/* Header with back button */}
@@ -217,11 +218,11 @@ export default function PartnerDetailPage({
       <Footer />
 
       <SidebarMenu
-                    isOpen={isSidebarOpen}
-                    onClose={() => setSidebarOpen(false)}
-                    menuItems={menuItems}
-                    userMenuItems={userMenuItems}
-                  />
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+      />
     </>
 
   );
