@@ -54,6 +54,18 @@ export function AddStayForm({
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
+  const normalizeTime = (t: any) => {
+    if (Array.isArray(t) && t.length >= 2) {
+      const hh = String(t[0]).padStart(2, "0");
+      const mm = String(t[1]).padStart(2, "0");
+      return `${hh}:${mm}`;
+    }
+    if (typeof t === "string") {
+      return t.length > 5 ? t.slice(0, 5) : t;
+    }
+    return t || "";
+  };
+
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
     const blob = await res.blob();
@@ -64,8 +76,8 @@ export function AddStayForm({
     if (!initialData) return;
     setTitle(initialData.title || initialData.name || "");
     setSharingType(initialData.sharingType || "");
-    setCheckIn(initialData.checkInTime || "");
-    setCheckOut(initialData.checkOutTime || "");
+    setCheckIn(normalizeTime(initialData.checkInTime));
+    setCheckOut(normalizeTime(initialData.checkOutTime));
     setLocation(initialData.location || "");
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
@@ -105,8 +117,8 @@ export function AddStayForm({
       setLocation(fd.location || "");
       setDescription(fd.description || "");
       setPacking(fd.packingSuggestion || "");
-      setCheckIn(fd.checkInTime || "");
-      setCheckOut(fd.checkOutTime || "");
+      setCheckIn(normalizeTime(fd.checkInTime));
+      setCheckOut(normalizeTime(fd.checkOutTime));
       setSharingType(
         typeof fd.sharingType === "string"
           ? fd.sharingType

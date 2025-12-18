@@ -151,7 +151,8 @@ export default function ItineraryPage() {
     (op: "create" | "update" | "delete", dayNumber: number, item: any) => {
       setDayItemsMap((prev) => {
         const copy = { ...(prev ?? {}) };
-        const list = Array.isArray(copy[dayNumber]) ? [...copy[dayNumber]] : [];
+        const val = copy[dayNumber];
+        const list: any[] = Array.isArray(val) ? [...val] : [];
 
         if (op === "create") {
           list.unshift(item);

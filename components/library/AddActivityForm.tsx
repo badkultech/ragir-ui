@@ -65,6 +65,18 @@ export function AddActivityForm({
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
+  const normalizeTime = (t: any) => {
+    if (Array.isArray(t) && t.length >= 2) {
+      const hh = String(t[0]).padStart(2, "0");
+      const mm = String(t[1]).padStart(2, "0");
+      return `${hh}:${mm}`;
+    }
+    if (typeof t === "string") {
+      return t.length > 5 ? t.slice(0, 5) : t;
+    }
+    return t || "";
+  };
+
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
     const blob = await res.blob();
@@ -107,10 +119,15 @@ export function AddActivityForm({
 
     setPriceType(initialData.priceCharge ? "CHARGEABLE" : "INCLUDED");
     setLocation(initialData.location || "");
-    setTime(initialData.time || "");
+    setTime(normalizeTime(initialData.time));
     setDescription(initialData.description || "");
     setPacking(initialData.packingSuggestion || "");
 
+    try {
+      docsManager.resetDocuments();
+    } catch (e) {
+      console.error("Failed to reset documents", e);
+    }
   }, [initialData]);
 
   const handleLibrarySelect = async (item: any) => {
@@ -132,7 +149,7 @@ export function AddActivityForm({
       } else {
         setMoodTags([]);
       }
-      setTime(fd.time?.slice(0, 5) || "");
+      setTime(normalizeTime(fd.time));
       setPacking(fd.packingSuggestion || "");
       setPriceType(
         String(fd.priceCharge) === "CHARGEABLE"
