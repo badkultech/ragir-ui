@@ -15,15 +15,22 @@ import { TripLeadersSection } from "@/components/homePage/sections/trip-leaders-
 import { Footer } from "@/components/homePage/sections/footer";
 import { menuItems, userMenuItems, notificationsData } from "./constants";
 
-export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [notificationsList, setNotificationsList] = useState(notificationsData);
+import { PhoneEntryModal } from "@/components/auth/PhoneEntryModal";
+import { OTPVerificationModal } from "@/components/auth/OTPVerificationModal";
+import { RegisterModal } from "@/components/auth/RegisterModal";
 
+export default function Home() {
   const dispatch = useDispatch();
   const router = useRouter();
 
   const { accessToken, userData } = useSelector(selectAuthState);
   const isLoggedIn = Boolean(accessToken && userData);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [notificationsList, setNotificationsList] = useState(notificationsData);
+
+  const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
+  const [phone, setPhone] = useState("");
 
   const handleLogout = () => {
     localStorage.clear();
@@ -33,9 +40,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen relative">
       <MainHeader
         isLoggedIn={isLoggedIn}
+        onLoginClick={() => setAuthStep("PHONE")}
         onMenuOpen={() => setIsMenuOpen(true)}
         notifications={notificationsList}
         onUpdateNotifications={setNotificationsList}
@@ -56,6 +64,35 @@ export default function Home() {
         onLogout={handleLogout}
         isLoggedIn={isLoggedIn}
       />
+
+      {/* PHONE ENTRY MODAL */}
+      {authStep === "PHONE" && (
+        <PhoneEntryModal
+          onClose={() => setAuthStep(null)}
+          onOtpSent={(p) => {
+            setPhone(p);
+            setAuthStep("OTP");
+          }}
+        />
+      )}
+
+      {/* OTP VERIFICATION MODAL */}
+      {authStep === "OTP" && (
+        <OTPVerificationModal
+          phone={phone}
+          onBack={() => setAuthStep("PHONE")}
+          onClose={() => setAuthStep(null)}
+          onNewUser={() => setAuthStep("REGISTER")}
+        />
+      )}
+
+      {/* REGISTER MODAL */}
+      {authStep === "REGISTER" && (
+        <RegisterModal
+          phone={phone}
+          onClose={() => setAuthStep(null)}
+        />
+      )}
     </main>
   );
 }
