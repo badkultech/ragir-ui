@@ -2,18 +2,15 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-
 import { Header } from "@/components/search-results/header";
 import { SearchResultsTripCard } from "@/components/search-results/search-results-trip-card";
 import { AdvancedFilters } from "@/components/search-results/advanced-filters";
-
 import { DesktopFilterBar } from "@/components/search-results/desktop-filter-bar";
 import { DesktopFilterSidebar } from "@/components/search-results/desktop-filter-sidebar";
 import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
 import { FilterTags } from "@/components/search-results/filter-tags";
 import NoTripsFound from "@/components/search-results/NoTripsFound";
 
-/* ---------------- SAMPLE TRIP DATA ---------------- */
 const trips = [
   {
     id: 1,
@@ -69,11 +66,8 @@ const trips = [
   },
 ];
 
-/* -------------- MAIN PAGE -------------------- */
-
 export default function SearchResultsWithFilters() {
   const searchParams = useSearchParams();
-
   const moodsFromUrl = searchParams.get("moods");
   const destinationFromUrl = searchParams.get("destination");
   const regionFromUrl = searchParams.get("region");
@@ -97,7 +91,6 @@ export default function SearchResultsWithFilters() {
 
     if (destinationFromUrl)
       list.push({ id: id++, label: `Destination: ${destinationFromUrl}` });
-
     if (regionFromUrl)
       list.push({ id: id++, label: `Region: ${regionFromUrl}` });
 
@@ -115,7 +108,6 @@ export default function SearchResultsWithFilters() {
       const hasAtLeastOneMood = parsedMoods.some((mood) =>
         tripBadges.includes(mood.toLowerCase())
       );
-
       if (!hasAtLeastOneMood) return false;
     }
     if (destinationFromUrl) {
@@ -166,17 +158,12 @@ export default function SearchResultsWithFilters() {
   if (sortBy === "price_low") {
     sortedTrips.sort((a, b) => a.price - b.price);
   }
-
   if (sortBy === "price_high") {
     sortedTrips.sort((a, b) => b.price - a.price);
   }
-
-  // Agar discount ho to:
   if (sortBy === "discount") {
     sortedTrips.sort((a, b) => (b.discount || 0) - (a.discount || 0));
   }
-
-  // Popularity (defaults to rating)
   if (sortBy === "popularity") {
     sortedTrips.sort((a, b) => b.rating - a.rating);
   }
@@ -193,14 +180,21 @@ export default function SearchResultsWithFilters() {
         onRemove={removeFilter}
         onClear={clearAllFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
-        onToggleSort={() => setShowSortDropdown(!showSortDropdown)}
+        onToggleSort={(state?: boolean) => {
+          if (window.innerWidth >= 768) {
+            if (typeof state === "boolean") {
+              setShowSortDropdown(state);
+            } else {
+              setShowSortDropdown((prev) => !prev);
+            }
+          }
+        }}
+
         showSortDropdown={showSortDropdown}
 
-        onSortSelect={{
-          onSort: (type: SortType) => {
-            setSortBy(type);
-            setShowSortDropdown(false);
-          }
+        onSortSelect={(type: SortType) => {
+          setSortBy(type);
+          setShowSortDropdown(false);
         }}
       />
 
@@ -267,7 +261,10 @@ export default function SearchResultsWithFilters() {
 
       {/* MOBILE BOTTOM FILTER BAR */}
       <MobileBottomBar
-        onSort={() => setShowSortDropdown(true)}
+        onSort={() => {
+          setShowFilters(false);   // Ensure no overlap
+          setShowSortDropdown(true);
+        }}
         onFilters={() => setShowFilters(true)}
       />
 
@@ -298,6 +295,50 @@ export default function SearchResultsWithFilters() {
           }}
         />
       </div>
+      {/* MOBILE SORT SHEET */}
+      {showSortDropdown && (
+        <div
+          className="fixed inset-0 z-50 flex items-end md:hidden"
+          onClick={() => setShowSortDropdown(false)}
+        >
+
+          <div
+            className="bg-white w-full rounded-t-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-lg font-semibold mb-3">Sort By</p>
+
+            <button
+              onClick={() => { setSortBy("price_low"); setShowSortDropdown(false); }}
+              className="w-full text-left py-3 border-b"
+            >
+              Price Per Day: Lowest
+            </button>
+
+            <button
+              onClick={() => { setSortBy("price_high"); setShowSortDropdown(false); }}
+              className="w-full text-left py-3 border-b"
+            >
+              Price Per Day: Highest
+            </button>
+
+            <button
+              onClick={() => { setSortBy("discount"); setShowSortDropdown(false); }}
+              className="w-full text-left py-3 border-b"
+            >
+              Biggest Discount
+            </button>
+
+            <button
+              onClick={() => { setSortBy("popularity"); setShowSortDropdown(false); }}
+              className="w-full text-left py-3"
+            >
+              Popularity
+            </button>
+          </div>
+        </div>
+      )}
+
 
       <div className="h-16 md:hidden" />
     </div>
