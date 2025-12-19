@@ -86,7 +86,7 @@ export default function Dashboard() {
     email: null,
   });
 
-  const pageSize = 1;
+  const pageSize = 5;
   const userData = useSelector(selectAuthState).userData;
 
   const {
