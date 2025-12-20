@@ -9,6 +9,8 @@ import { MainHeader } from "@/components/search-results/MainHeader"
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu"
+import { useDispatch, useSelector } from "react-redux"
+import { logout, selectAuthState } from "@/lib/slices/auth"
 
 interface InvitationRequest {
   id: string
@@ -62,6 +64,15 @@ export default function TripInvitationsPage() {
   const [notifications, setNotifications] = useState(notificationsData)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+  const dispatch = useDispatch();
+  const { accessToken, userData } = useSelector(selectAuthState);
+    const isLoggedIn = Boolean(accessToken && userData);
+    const handleLogout = () => {
+        localStorage.clear();
+        dispatch(logout());
+        setIsSidebarOpen(false);
+        router.push("/home");
+      };
 
   const openButtonsFor = (id: string) => {
     setOpenCardId(id)
@@ -216,6 +227,8 @@ export default function TripInvitationsPage() {
         onClose={() => setIsSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
       />
     </>
   )
