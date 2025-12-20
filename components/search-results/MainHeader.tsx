@@ -11,14 +11,16 @@ export function MainHeader({
   onUpdateNotifications = () => { },
   logoText = "",
   logoSrc = "/logo.png",
-  isLoggedIn = false, 
+  isLoggedIn = false,
+  onLoginClick = () => { },
 }: {
   onMenuOpen?: () => void;
   notifications?: any[];
   onUpdateNotifications?: (list: any[]) => void;
   logoText?: string;
   logoSrc?: string;
-  isLoggedIn?: boolean; 
+  isLoggedIn?: boolean;
+  onLoginClick?: () => void;
 }) {
   const router = useRouter();
 
@@ -57,12 +59,10 @@ export function MainHeader({
 
         {/* RIGHT SECTION */}
         <div className="ml-auto flex items-center gap-4">
-
-          {/* 👇 USER NOT LOGGED IN → Show Login/Register Button */}
           {!isLoggedIn && (
             <>
               <button
-                onClick={() => router.push("/login")}
+                onClick={onLoginClick}
                 className="px-4 py-1.5 rounded-full text-white font-medium 
                          bg-gradient-to-r from-orange-400 to-pink-500 
                          hover:opacity-90 transition"
@@ -74,8 +74,6 @@ export function MainHeader({
               </button>
             </>
           )}
-
-          {/* 👇 USER LOGGED IN → Show existing icons */}
           {isLoggedIn && (
             <>
               <button className="p-2 hidden md:block text-black/80 hover:text-black">
