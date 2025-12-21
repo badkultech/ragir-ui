@@ -21,6 +21,8 @@ import GradientCheckbox from "@/components/ui/GradientCheckbox"
 import { MainHeader } from "@/components/search-results/MainHeader"
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu"
+import { useDispatch, useSelector } from "react-redux"
+import { logout, selectAuthState } from "@/lib/slices/auth"
 
 type QuestionStatus = "responded" | "pending"
 
@@ -85,6 +87,15 @@ export default function MyQueriesPage() {
     const respondedQueries = mockQuestions.filter((q) => q.status === "responded").length
     const pendingQueries = mockQuestions.filter((q) => q.status === "pending").length
 
+      const dispatch = useDispatch();
+     const { accessToken, userData } = useSelector(selectAuthState);
+  const isLoggedIn = Boolean(accessToken && userData);
+  const handleLogout = () => {
+      localStorage.clear();
+      dispatch(logout());
+      setSidebarOpen(false);
+      router.push("/home");
+    };
     const toggleQuestion = (id: string) => {
         setExpandedQuestions((prev) => (prev.includes(id) ? prev.filter((qId) => qId !== id) : [...prev, id]))
     }
@@ -412,6 +423,8 @@ export default function MyQueriesPage() {
                 onClose={() => setSidebarOpen(false)}
                 menuItems={menuItems}
                 userMenuItems={userMenuItems}
+                onLogout={handleLogout}
+                isLoggedIn={isLoggedIn}
             />
         </>
     )

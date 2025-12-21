@@ -36,7 +36,7 @@ export default function Home() {
     localStorage.clear();
     dispatch(logout());
     setIsMenuOpen(false);
-    router.push("/login");
+    router.push("/home");
   };
 
   return (

@@ -16,6 +16,8 @@ import { MainHeader } from "@/components/search-results/MainHeader";
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectAuthState } from "@/lib/slices/auth";
 
 export default function SettingsPage() {
 
@@ -45,8 +47,17 @@ export default function SettingsPage() {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter()
+  const dispatch = useDispatch();
   const [notifications, setNotifications] = useState(notificationsData);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { accessToken, userData } = useSelector(selectAuthState);
+  const isLoggedIn = Boolean(accessToken && userData);
+  const handleLogout = () => {
+    localStorage.clear();
+    dispatch(logout());
+    setSidebarOpen(false);
+    router.push("/home");
+  };
 
 
   return (
@@ -97,7 +108,14 @@ export default function SettingsPage() {
         </main>
 
         {/* MODALS */}
-        <LogoutModal open={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
+        <LogoutModal
+          open={showLogoutModal}
+          onClose={() => setShowLogoutModal(false)}
+          onLogout={() => {
+            setShowLogoutModal(false);
+            handleLogout();     
+          }}
+        />
         <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)} />
         <DeleteModal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} />
 
@@ -107,6 +125,8 @@ export default function SettingsPage() {
         onClose={() => setSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
       />
     </>
   );
