@@ -18,17 +18,15 @@ import { CalendarIcon, PencilIcon } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Sidebar } from "@/components/traveler/Sidebar";
 
-import { selectAuthState } from "@/lib/slices/auth";
-import { useSelector } from "react-redux";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import {
   useGetTravelerProfileQuery,
   useUpdateTravelerProfileFormMutation,
 } from "@/lib/services/user";
-import { useRouter } from "next/navigation";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { GradientButton } from "@/components/gradient-button";
+import { useAuthActions } from "@/hooks/useAuthActions";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 
 type MoodsState = {
@@ -40,14 +38,13 @@ type MoodsState = {
 };
 
 export default function TravelerProfile() {
-  const { userData } = useSelector(selectAuthState);
+  const { userData, router } = useAuthActions();
   const orgId = useOrganizationId();
   const userPublicId = userData?.userPublicId || "";
   // Inside component
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const onPickAvatar = () => fileRef.current?.click();
 
