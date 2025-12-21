@@ -9,8 +9,7 @@ import { MainHeader } from "@/components/search-results/MainHeader"
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu"
-import { useDispatch, useSelector } from "react-redux"
-import { logout, selectAuthState } from "@/lib/slices/auth"
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 interface InvitationRequest {
   id: string
@@ -60,18 +59,12 @@ export default function TripInvitationsPage() {
   const [showNudgeModal, setShowNudgeModal] = useState(false)
   const [selectedTrip, setSelectedTrip] = useState<InvitationRequest | null>(null)
   const [openCardId, setOpenCardId] = useState<string>(invitationRequests[0].id)
-  const router = useRouter()
+  const { isLoggedIn, handleLogout, router } = useAuthActions();
   const [notifications, setNotifications] = useState(notificationsData)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const dispatch = useDispatch();
-  const { accessToken, userData } = useSelector(selectAuthState);
-  const isLoggedIn = Boolean(accessToken && userData);
-  const handleLogout = () => {
-    localStorage.clear();
-    dispatch(logout());
-    setIsSidebarOpen(false);
-    router.push("/home");
+  const onLogout = () => {
+    handleLogout(() => setIsSidebarOpen(false));
   };
 
   const openButtonsFor = (id: string) => {
@@ -93,7 +86,7 @@ export default function TripInvitationsPage() {
       <div className="min-h-screen bg-background">
 
         {/* Header */}
-        <MainHeader logoText="Trip Invitations sent" isLoggedIn={true}
+        <MainHeader logoText="Trip Invitations sent" isLoggedIn={isLoggedIn}
           notifications={notifications}
           onUpdateNotifications={setNotifications}
           onMenuOpen={() => setIsSidebarOpen(true)}
@@ -227,7 +220,7 @@ export default function TripInvitationsPage() {
         onClose={() => setIsSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
-        onLogout={handleLogout}
+        onLogout={onLogout}
         isLoggedIn={isLoggedIn}
       />
     </>

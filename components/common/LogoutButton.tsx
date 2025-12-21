@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { LogoutModal } from "@/components/organizer/LogoutModal";
-import { logout } from "@/lib/slices/auth";
 
 interface LogoutButtonProps {
   variant?: "dropdown" | "button";
   className?: string;
 }
+
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 /**
  * Universal Logout Button:
@@ -24,21 +23,10 @@ export const LogoutButton = ({
   className = "",
 }: LogoutButtonProps) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const dispatch = useDispatch();
-  const router = useRouter();
+  const { handleLogout } = useAuthActions();
 
   const handleConfirmLogout = () => {
-    // ✅ Step 1: Clear localStorage FIRST
-    localStorage.clear();
-
-    // ✅ Step 2: Clear Redux state
-    dispatch(logout());
-
-    // ✅ Step 3: Close modal
-    setShowLogoutModal(false);
-
-    // ✅ Step 4: Redirect (use replace to prevent back button)
-    router.replace("/");
+    handleLogout(() => setShowLogoutModal(false));
   };
 
   const handleOpenModal = () => {

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { logout, selectAuthState } from "@/lib/slices/auth";
-import { useRouter } from "next/navigation";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
@@ -20,11 +18,7 @@ import { OTPVerificationModal } from "@/components/auth/OTPVerificationModal";
 import { RegisterModal } from "@/components/auth/RegisterModal";
 
 export default function Home() {
-  const dispatch = useDispatch();
-  const router = useRouter();
-
-  const { accessToken, userData } = useSelector(selectAuthState);
-  const isLoggedIn = Boolean(accessToken && userData);
+  const { isLoggedIn, handleLogout, router } = useAuthActions();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notificationsList, setNotificationsList] = useState(notificationsData);
@@ -32,11 +26,8 @@ export default function Home() {
   const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
   const [phone, setPhone] = useState("");
 
-  const handleLogout = () => {
-    localStorage.clear();
-    dispatch(logout());
-    setIsMenuOpen(false);
-    router.push("/home");
+  const onLogout = () => {
+    handleLogout(() => setIsMenuOpen(false));
   };
 
   return (
@@ -61,7 +52,7 @@ export default function Home() {
         onClose={() => setIsMenuOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
-        onLogout={handleLogout}
+        onLogout={onLogout}
         isLoggedIn={isLoggedIn}
       />
 

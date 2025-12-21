@@ -16,8 +16,7 @@ import { MainHeader } from "@/components/search-results/MainHeader";
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
-import { useDispatch, useSelector } from "react-redux";
-import { logout, selectAuthState } from "@/lib/slices/auth";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 export default function SettingsPage() {
 
@@ -46,17 +45,12 @@ export default function SettingsPage() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const router = useRouter()
-  const dispatch = useDispatch();
+  const { isLoggedIn, handleLogout, router } = useAuthActions();
   const [notifications, setNotifications] = useState(notificationsData);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const { accessToken, userData } = useSelector(selectAuthState);
-  const isLoggedIn = Boolean(accessToken && userData);
-  const handleLogout = () => {
-    localStorage.clear();
-    dispatch(logout());
-    setSidebarOpen(false);
-    router.push("/home");
+
+  const onLogout = () => {
+    handleLogout(() => setSidebarOpen(false));
   };
 
 
@@ -66,7 +60,7 @@ export default function SettingsPage() {
 
         {/* ✅ HEADER FIXED */}
         <MainHeader logoText="Settings"
-          isLoggedIn={true}
+          isLoggedIn={isLoggedIn}
           notifications={notifications}
           onUpdateNotifications={setNotifications}
           onMenuOpen={() => setSidebarOpen(true)}
@@ -113,7 +107,7 @@ export default function SettingsPage() {
           onClose={() => setShowLogoutModal(false)}
           onLogout={() => {
             setShowLogoutModal(false);
-            handleLogout();     
+            onLogout();
           }}
         />
         <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)} />
@@ -125,7 +119,7 @@ export default function SettingsPage() {
         onClose={() => setSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
-        onLogout={handleLogout}
+        onLogout={onLogout}
         isLoggedIn={isLoggedIn}
       />
     </>

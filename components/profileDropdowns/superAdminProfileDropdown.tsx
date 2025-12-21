@@ -8,15 +8,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { selectAuthState } from "@/lib/slices/auth";
-import { getDashboardPath, ROLES } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useAuthActions } from "@/hooks/useAuthActions";
+import { getDashboardPath } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function SuperAdminProfileDropdown() {
-  const router = useRouter();
-  const { userData } = useSelector(selectAuthState);
+  const { userData, handleLogout, router } = useAuthActions();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -57,11 +54,7 @@ export function SuperAdminProfileDropdown() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => {
-            localStorage.clear();
-            // Optionally redirect
-            window.location.href = "/superadmin/login";
-          }}
+          onClick={() => handleLogout(undefined, "/superadmin/login")}
         >
           Log out
         </DropdownMenuItem>

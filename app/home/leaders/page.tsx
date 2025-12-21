@@ -9,8 +9,7 @@ import { useRouter } from "next/navigation"
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu"
-import { useSelector, useDispatch } from "react-redux"
-import { logout, selectAuthState } from "@/lib/slices/auth"
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 const tripLeaders = [
     {
@@ -90,18 +89,12 @@ const tripLeaders = [
 export default function TripLeadersPage() {
     const [selectedLeader, setSelectedLeader] = useState<(typeof tripLeaders)[0] | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const dispatch = useDispatch()
-    const router = useRouter()
+    const { isLoggedIn, handleLogout, router } = useAuthActions();
     const [notifications, setNotifications] = useState(notificationsData);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { accessToken, userData } = useSelector(selectAuthState);
-    const isLoggedIn = Boolean(accessToken && userData);
 
-    const handleLogout = () => {
-        localStorage.clear();
-        dispatch(logout());
-        setIsSidebarOpen(false);
-        router.push("/home");
+    const onLogout = () => {
+        handleLogout(() => setIsSidebarOpen(false));
     };
 
     const handleCardClick = (leader: (typeof tripLeaders)[0]) => {
@@ -155,7 +148,7 @@ export default function TripLeadersPage() {
                 onClose={() => setIsSidebarOpen(false)}
                 menuItems={menuItems}
                 userMenuItems={userMenuItems}
-                onLogout={handleLogout}
+                onLogout={onLogout}
                 isLoggedIn={isLoggedIn}
             />
         </>

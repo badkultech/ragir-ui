@@ -9,8 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { menuItems, notificationsData, userMenuItems } from "../constants";
-import { logout, selectAuthState } from "@/lib/slices/auth";
-import { useDispatch, useSelector } from "react-redux";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 const partners = [
   { id: "the-lalit", name: "The Lalit", logo: "/tp-logo1.jpg" },
@@ -25,18 +24,12 @@ const partners = [
 ];
 
 export default function PartnersPage() {
-  const router = useRouter()
+  const { isLoggedIn, handleLogout, router } = useAuthActions();
   const [notifications, setNotifications] = useState(notificationsData);
-
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const { accessToken, userData } = useSelector(selectAuthState);
-  const isLoggedIn = Boolean(accessToken && userData);
-  const dispatch = useDispatch();
-  const handleLogout = () => {
-    localStorage.clear();
-    dispatch(logout());
-    setSidebarOpen(false);
-    router.push("/home");
+
+  const onLogout = () => {
+    handleLogout(() => setSidebarOpen(false));
   };
   return (
     <>

@@ -14,8 +14,6 @@ import { use, useState } from "react";
 import { menuItems, notificationsData, userMenuItems } from "../../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
-import { logout, selectAuthState } from "@/lib/slices/auth";
-import { useDispatch, useSelector } from "react-redux";
 
 const partnersData: Record<
   string,
@@ -62,6 +60,8 @@ const partnersData: Record<
 };
 
 
+import { useAuthActions } from "@/hooks/useAuthActions";
+
 export default function PartnerDetailPage({
   params,
 }: {
@@ -69,24 +69,18 @@ export default function PartnerDetailPage({
 }) {
   const { id } = use(params);
   const partner = partnersData[id] || partnersData["the-lalit"];
-  const routes = useRouter()
+  const { isLoggedIn, handleLogout, router } = useAuthActions();
   const [notifications, setNotifications] = useState(notificationsData);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const { accessToken, userData } = useSelector(selectAuthState);
-  const isLoggedIn = Boolean(accessToken && userData);
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const handleLogout = () => {
-    localStorage.clear();
-    dispatch(logout());
-    setSidebarOpen(false);
-    router.push("/home");
+
+  const onLogout = () => {
+    handleLogout(() => setSidebarOpen(false));
   };
 
   return (
     <>
       <div className="min-h-screen bg-white">
-        <MainHeader isLoggedIn={true}
+        <MainHeader isLoggedIn={isLoggedIn}
           notifications={notifications}
           onUpdateNotifications={setNotifications}
           onMenuOpen={() => setSidebarOpen(true)}
@@ -94,7 +88,7 @@ export default function PartnerDetailPage({
         <div className="container mx-auto px-4 md:px-20 py-8">
           {/* Header with back button */}
           <div className="flex items-center gap-4 mb-6">
-            <button onClick={() => routes.back()}>
+            <button onClick={() => router.back()}>
               <ChevronLeft className="w-6 h-6 text-gray-400 font-bold" />
             </button>
             <h1 className="text-3xl font-bold italic font-barlow text-gray-900">
@@ -234,7 +228,7 @@ export default function PartnerDetailPage({
         onClose={() => setSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
-        onLogout={handleLogout}
+        onLogout={onLogout}
         isLoggedIn={isLoggedIn}
       />
     </>
