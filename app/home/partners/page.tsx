@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { menuItems, notificationsData, userMenuItems } from "../constants";
-
+import { logout, selectAuthState } from "@/lib/slices/auth";
+import { useDispatch, useSelector } from "react-redux";
 
 const partners = [
   { id: "the-lalit", name: "The Lalit", logo: "/tp-logo1.jpg" },
@@ -24,10 +25,19 @@ const partners = [
 ];
 
 export default function PartnersPage() {
-  const routes = useRouter()
+  const router = useRouter()
   const [notifications, setNotifications] = useState(notificationsData);
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { accessToken, userData } = useSelector(selectAuthState);
+  const isLoggedIn = Boolean(accessToken && userData);
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    localStorage.clear();
+    dispatch(logout());
+    setSidebarOpen(false);
+    router.push("/home");
+  };
   return (
     <>
       <MainHeader
@@ -40,7 +50,7 @@ export default function PartnersPage() {
         <div className="container mx-auto px-4 py-8">
           {/* Header with back button */}
           <div className="flex items-center gap-4 mb-8">
-            <button onClick={() => routes.back()}>
+            <button onClick={() => router.back()}>
               <ChevronLeft className="w-5 h-5 text-gray-600" />
             </button>
             <h1 className="text-2xl md:text-3xl font-barlow font-semibold italic  text-gray-900">
@@ -67,6 +77,8 @@ export default function PartnersPage() {
         onClose={() => setSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
       />
     </>
   );

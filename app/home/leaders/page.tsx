@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation"
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu"
+import { useSelector, useDispatch } from "react-redux"
+import { logout, selectAuthState } from "@/lib/slices/auth"
 
 const tripLeaders = [
     {
@@ -88,9 +90,19 @@ const tripLeaders = [
 export default function TripLeadersPage() {
     const [selectedLeader, setSelectedLeader] = useState<(typeof tripLeaders)[0] | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const routes = useRouter()
+    const dispatch = useDispatch()
+    const router = useRouter()
     const [notifications, setNotifications] = useState(notificationsData);
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { accessToken, userData } = useSelector(selectAuthState);
+    const isLoggedIn = Boolean(accessToken && userData);
+
+    const handleLogout = () => {
+        localStorage.clear();
+        dispatch(logout());
+        setIsSidebarOpen(false);
+        router.push("/home");
+    };
 
     const handleCardClick = (leader: (typeof tripLeaders)[0]) => {
         setSelectedLeader(leader)
@@ -105,15 +117,15 @@ export default function TripLeadersPage() {
     return (
         <>
             <div className="min-h-screen bg-white">
-                <MainHeader isLoggedIn={true}
+                <MainHeader isLoggedIn={isLoggedIn}
                     notifications={notifications}
                     onUpdateNotifications={setNotifications}
-                    onMenuOpen={() => setSidebarOpen(true)}
+                    onMenuOpen={() => setIsSidebarOpen(true)}
                 />
                 {/* Header */}
                 <div className="px-4 md:px-8 lg:px-16 py-8">
                     <div className="flex items-center gap-4 mb-8">
-                        <button onClick={() => routes.back()}>
+                        <button onClick={() => router.back()}>
                             <ChevronLeft className="w-5 h-5 text-gray-600" />
                         </button>
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 italic">Trip Leaders</h1>
@@ -140,9 +152,11 @@ export default function TripLeadersPage() {
             </div>
             <SidebarMenu
                 isOpen={isSidebarOpen}
-                onClose={() => setSidebarOpen(false)}
+                onClose={() => setIsSidebarOpen(false)}
                 menuItems={menuItems}
                 userMenuItems={userMenuItems}
+                onLogout={handleLogout}
+                isLoggedIn={isLoggedIn}
             />
         </>
     )

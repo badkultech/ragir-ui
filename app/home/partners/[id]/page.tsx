@@ -14,6 +14,8 @@ import { use, useState } from "react";
 import { menuItems, notificationsData, userMenuItems } from "../../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
+import { logout, selectAuthState } from "@/lib/slices/auth";
+import { useDispatch, useSelector } from "react-redux";
 
 const partnersData: Record<
   string,
@@ -70,6 +72,16 @@ export default function PartnerDetailPage({
   const routes = useRouter()
   const [notifications, setNotifications] = useState(notificationsData);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { accessToken, userData } = useSelector(selectAuthState);
+  const isLoggedIn = Boolean(accessToken && userData);
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    localStorage.clear();
+    dispatch(logout());
+    setSidebarOpen(false);
+    router.push("/home");
+  };
 
   return (
     <>
@@ -222,6 +234,8 @@ export default function PartnerDetailPage({
         onClose={() => setSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
       />
     </>
 

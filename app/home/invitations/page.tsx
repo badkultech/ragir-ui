@@ -66,13 +66,13 @@ export default function TripInvitationsPage() {
 
   const dispatch = useDispatch();
   const { accessToken, userData } = useSelector(selectAuthState);
-    const isLoggedIn = Boolean(accessToken && userData);
-    const handleLogout = () => {
-        localStorage.clear();
-        dispatch(logout());
-        setIsSidebarOpen(false);
-        router.push("/home");
-      };
+  const isLoggedIn = Boolean(accessToken && userData);
+  const handleLogout = () => {
+    localStorage.clear();
+    dispatch(logout());
+    setIsSidebarOpen(false);
+    router.push("/home");
+  };
 
   const openButtonsFor = (id: string) => {
     setOpenCardId(id)
