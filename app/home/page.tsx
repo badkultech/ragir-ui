@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuthActions } from "@/hooks/useAuthActions";
+
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { HeroSection } from "@/components/homePage/sections/hero-section";
