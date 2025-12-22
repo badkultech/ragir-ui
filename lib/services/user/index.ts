@@ -136,6 +136,29 @@ export const userAPI = baseAPI.injectEndpoints({
         },
       ],
     }),
+  
+
+        deactivateUser: builder.mutation<
+      ApiResponse<null>,
+      { organizationId: string; publicId: string }
+    >({
+      query: ({ organizationId, publicId }) => ({
+        url: `/org/${organizationId}/user/${publicId}/deactivate`,
+        method: "PUT",
+      }),
+      invalidatesTags: [TAGS.user, TAGS.travelerProfile],
+    }),
+
+    deleteUser: builder.mutation<
+      ApiResponse<null>,
+      { organizationId: string; publicId: string }
+    >({
+      query: ({ organizationId, publicId }) => ({
+        url: `/org/${organizationId}/user/${publicId}/delete`,
+        method: "PUT",
+      }),
+    }),
+
   }),
 });
 
@@ -145,4 +168,6 @@ export const {
   useUpdateUserProfileMutation,
   useGetTravelerProfileQuery,
   useUpdateTravelerProfileFormMutation,
+  useDeactivateUserMutation,
+  useDeleteUserMutation,
 } = userAPI;
