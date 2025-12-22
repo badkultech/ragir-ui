@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useAuthActions } from "@/hooks/useAuthActions";
-
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { HeroSection } from "@/components/homePage/sections/hero-section";
@@ -12,7 +11,6 @@ import { RegionsSection } from "@/components/homePage/sections/regions-section";
 import { TripLeadersSection } from "@/components/homePage/sections/trip-leaders-section";
 import { Footer } from "@/components/homePage/sections/footer";
 import { menuItems, userMenuItems, notificationsData } from "./constants";
-
 import { PhoneEntryModal } from "@/components/auth/PhoneEntryModal";
 import { OTPVerificationModal } from "@/components/auth/OTPVerificationModal";
 import { RegisterModal } from "@/components/auth/RegisterModal";
@@ -38,6 +36,7 @@ export default function Home() {
         onMenuOpen={() => setIsMenuOpen(true)}
         notifications={notificationsList}
         onUpdateNotifications={setNotificationsList}
+        variant="center"
       />
 
       <HeroSection />

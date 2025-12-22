@@ -13,6 +13,7 @@ export function MainHeader({
   logoSrc = "/logo.png",
   isLoggedIn = false,
   onLoginClick = () => { },
+  variant = "center",
 }: {
   onMenuOpen?: () => void;
   notifications?: any[];
@@ -21,12 +22,19 @@ export function MainHeader({
   logoSrc?: string;
   isLoggedIn?: boolean;
   onLoginClick?: () => void;
+  variant?: "center" | "edge";
 }) {
   const router = useRouter();
 
   return (
     <header className="w-full relative z-20 bg-white border-b border-[#E5E7EB]">
-      <div className=" flex items-center justify-between px-4 md:px-20 py-3">
+      <div
+        className={
+          variant === "center"
+            ? "max-w-[1400px] mx-auto px-4 md:px-20 py-3 flex items-center justify-between"
+            : "w-full px-4 md:px-4 py-2 flex items-center justify-between"
+        }
+      >
 
         {/* LEFT SECTION */}
         <div className="flex items-center gap-2 flex-shrink-0">

@@ -90,6 +90,7 @@ export default function TripInvitationsPage() {
           notifications={notifications}
           onUpdateNotifications={setNotifications}
           onMenuOpen={() => setIsSidebarOpen(true)}
+          variant="edge"
         />
 
         {/* Main Content */}
