@@ -11,12 +11,13 @@ import { PartnersSection } from "@/components/homePage/sections/partners-section
 import { RegionsSection } from "@/components/homePage/sections/regions-section";
 import { TripLeadersSection } from "@/components/homePage/sections/trip-leaders-section";
 import { Footer } from "@/components/homePage/sections/footer";
-import { menuItems, userMenuItems, notificationsData } from "./constants";
-
 import {
   Bell, Bookmark, Gift, Heart, MapPin, MessageCircleQuestion,
   Scale, Search, Settings, Users
 } from "lucide-react";
+import { PhoneEntryModal } from "@/components/auth/PhoneEntryModal";
+import { OTPVerificationModal } from "@/components/auth/OTPVerificationModal";
+import { RegisterModal } from "@/components/auth/RegisterModal";
 
 const menuItems = [
   { icon: Search, label: "Search by Mood", href: "/home/search-by-mood" },
