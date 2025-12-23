@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { useUserId } from "@/hooks/useUserId";
 
 interface SecurityTabProps {
   setShowLogoutModal: (v: boolean) => void;
@@ -26,8 +28,8 @@ export default function SecurityTab({
   const [deleteUser, { isLoading: isDeleting }] =
     useDeleteUserMutation();
 
-  const organizationId = userData?.organizationPublicId!;
-  const publicId = userData?.userPublicId!;
+  const organizationId = useOrganizationId()
+  const publicId = useUserId()
 
   /* ---------------- DEACTIVATE ---------------- */
   const handleDeactivate = async () => {
