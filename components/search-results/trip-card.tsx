@@ -12,7 +12,7 @@ interface TripCardProps {
   subLocation: string;
   rating: number | null;
   days: string;
-  dates: string;
+  dates: string; 
   price: number | null;
   badge: string;
   image: string;
