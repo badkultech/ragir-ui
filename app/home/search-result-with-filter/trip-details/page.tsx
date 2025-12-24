@@ -96,7 +96,6 @@ export default function TripDetailsPage() {
 
             {/* Right */}
             <DesktopSidebar
-              onPricing={() => setShowPricingDetails(true)}
               onAsk={() => setShowAsk(true)}
             />
           </div>

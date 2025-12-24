@@ -1,16 +1,48 @@
+"use client"
+
+import { useState } from "react"
 import Image from "next/image"
-import { Bike, Home, Send, MessageCircle, CheckCircle2, ChevronDown } from "lucide-react"
+import {
+  Bike,
+  Send,
+  MessageCircle,
+  ChevronUp,
+  ChevronDown,
+  AlertCircle,
+} from "lucide-react"
+
+const pricingOptions = [
+  {
+    id: 1,
+    title: "Enfield 350cc",
+    subtitle: "Solo Rider",
+    price: "₹ 47,000",
+  },
+  {
+    id: 2,
+    title: "Himalayan 411cc",
+    subtitle: "Dual Rider",
+    price: "₹ 35,000",
+  },
+  {
+    id: 3,
+    title: "Himalayan 411cc",
+    subtitle: "Solo Rider",
+    price: "₹ 52,000",
+  },
+]
 
 export default function DesktopSidebar({
-  onPricing,
   onAsk,
 }: {
-  onPricing: () => void
   onAsk: () => void
 }) {
+  const [selected, setSelected] = useState<number | null>(null)
+
   return (
     <div className="hidden lg:block lg:col-span-1">
       <div className="sticky top-24 space-y-4">
+
         {/* Images */}
         <div className="grid grid-cols-2 gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -32,43 +64,90 @@ export default function DesktopSidebar({
         </div>
 
         {/* Pricing Card */}
-        <div className="bg-white rounded-2xl border p-6">
-          <p className="text-3xl font-bold">₹12,999</p>
-          <p className="text-xs text-gray-500 mb-4">Starting from</p>
+        <div className="bg-white rounded-2xl border p-5 space-y-4">
 
-          <button
-            onClick={onPricing}
-            className="w-full flex justify-between items-center p-3 border rounded-lg mb-4"
-          >
+          {/* Price Header */}
+          <div className="flex justify-between items-center">
             <div>
-              <p className="text-sm font-medium">Occupancy - Double</p>
-              <p className="text-xs text-gray-500">Select pricing option</p>
+              <p className="text-xs text-gray-500">Starting from</p>
+              <p className="text-3xl font-bold">
+                ₹12,999{" "}
+                <span className="text-sm font-normal text-gray-500">
+                  per person
+                </span>
+              </p>
             </div>
-            <ChevronDown className="w-4 h-4" />
-          </button>
-
-          <div className="space-y-3 mb-4">
-            <Row icon={<Bike />} text="2 vehicle options" onClick={onPricing} />
-            <Row icon={<Home />} text="3 accommodation types" onClick={onPricing} />
           </div>
 
-          <div className="p-3 bg-orange-50 rounded-lg flex gap-2 mb-4">
-            <CheckCircle2 className="w-4 h-4 text-orange-600" />
-            <p className="text-xs text-orange-900">
-              Select your preferred options to continue.
-            </p>
-          </div>
+          {/* Expanded Content */}
+          <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+              <p className="font-medium text-sm">Occupancy – Double</p>
 
-          <button onClick={onPricing} className="w-full bg-orange-500 text-white py-3 rounded-lg">
-            <Send className="inline w-4 h-4 mr-2" />
+              {pricingOptions.map((opt) => {
+                const active = selected === opt.id
+
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setSelected(opt.id)}
+                    className={`w-full flex justify-between items-start p-4 rounded-xl border transition
+                      ${
+                        active
+                          ? "border-orange-500 bg-white"
+                          : "border-transparent bg-white"
+                      }
+                    `}
+                  >
+                    <div className="flex gap-3 items-start">
+                      <Bike className="w-4 h-4 mt-1 text-gray-600" />
+                      <div className="text-left">
+                        <p className="font-semibold text-sm">
+                          {opt.title}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {opt.subtitle}
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="font-semibold text-sm">
+                      {opt.price}
+                    </p>
+                  </button>
+                )
+              })}
+            </div>
+          
+
+          {/* Warning */}
+          {!selected && (
+            <div className="flex gap-2 items-center text-xs text-orange-600 bg-orange-50 p-3 rounded-lg">
+              <AlertCircle className="w-4 h-4" />
+              Please select a price option before requesting an invite.
+            </div>
+          )}
+
+          {/* Request Invite */}
+          <button
+            disabled={!selected}
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition
+              ${
+                selected
+                  ? "bg-orange-500 text-white hover:bg-orange-600"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }
+            `}
+          >
+            <Send className="w-4 h-4" />
             Request Invite
           </button>
 
+          {/* Send Query */}
           <button
             onClick={onAsk}
-            className="w-full mt-3 border-2 border-orange-500 text-orange-500 py-3 rounded-lg"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-orange-500 text-orange-500 font-medium"
           >
-            <MessageCircle className="inline w-4 h-4 mr-2" />
+            <MessageCircle className="w-4 h-4" />
             Send Query to Organiser
           </button>
         </div>
@@ -76,15 +155,3 @@ export default function DesktopSidebar({
     </div>
   )
 }
-
-const Row = ({ icon, text, onClick }: any) => (
-  <div className="flex justify-between items-center border-b pb-3">
-    <div className="flex gap-2 items-center text-sm text-gray-600">
-      {icon}
-      {text}
-    </div>
-    <button onClick={onClick} className="text-xs text-orange-500">
-      View Details
-    </button>
-  </div>
-)

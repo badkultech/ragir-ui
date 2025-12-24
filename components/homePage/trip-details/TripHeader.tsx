@@ -1,10 +1,26 @@
 import { Bookmark, Heart, Share2, MapPin } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MoodTag } from "@/components/search-results/mood-tag"
 
 export default function TripHeader({ onOpenOrganizer }: { onOpenOrganizer: () => void }) {
+
+  const moods = ["Mountain", "Skygaze", "Beach", "Desert"]
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex-1">
+
+        <div className="flex flex-wrap gap-2 mb-3">
+          {moods.map((mood) => (
+            <MoodTag
+              key={mood}
+              name={mood}
+              icon={mood}
+              isActive={true} 
+            />
+          ))}
+        </div>
+
+        
         <h1 className="text-2xl md:text-3xl font-bold mb-4">
           Himachal Backpacking: Manali, Kasol & Jibhi
         </h1>
