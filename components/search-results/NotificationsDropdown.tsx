@@ -57,36 +57,27 @@ export function NotificationsDropdown({
 
             {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute right-0 top-full mt-2 w-[360px] bg-white rounded-2xl shadow-xl border border-[#f1f1f1] overflow-hidden z-50">
+                <div className="absolute right-0 top-full mt-2 w-[350px] bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
 
                     {/* Header */}
-                    <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div className="px-4 py-3 border-b border-gray-200 flex items-start justify-between">
                         <div>
-                            <h3 className="text-base font-semibold text-gray-900">Notifications</h3>
-                            <p className="text-sm text-gray-500">{unreadCount} unread notifications</p>
+                            <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                            <p className="text-xs text-gray-500 mt-0.5">{unreadCount} unread notifications</p>
                         </div>
 
                         <button
                             onClick={markAllAsRead}
-                            className="text-sm text-[#ff7a30] hover:text-[#ff5a00] font-medium flex items-center gap-1"
+                            className="text-xs text-[#ff7043] hover:text-[#ff5722] font-normal flex items-center gap-1.5 mt-0.5"
                         >
-                            <span className="flex items-center">
-                                <svg width="21" height="12" viewBox="0 0 21 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0.900391 6.90039L4.65039 10.6504M9.90039 4.65039L13.6504 0.900391M6.90039 6.90039L10.6504 10.6504L19.6504 0.900391"
-                                        stroke="#FF804C"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            </span>
+                            <Check className="w-3.5 h-3.5" />
                             Mark all as read
                         </button>
                     </div>
 
-                   {/* NOTIFICATION LIST  */}
-                    <div className="max-h-[420px] overflow-y-auto">
-                        {notifications.map((n) => (
+                    {/* NOTIFICATION LIST  */}
+                    <div className="max-h-[400px] overflow-y-auto">
+                        {notifications.map((n, index) => (
                             <div
                                 key={n.id}
                                 onClick={() => {
@@ -95,25 +86,32 @@ export function NotificationsDropdown({
                                     );
                                     onUpdateNotifications(updated);
                                 }}
-                                className={`relative px-5 py-4 border-b border-gray-100 flex items-start gap-4 cursor-pointer transition-all 
-                                        ${!n.read ? "bg-[#fff4ef]" : "bg-white"}
+                                className={`relative px-4 py-3.5 flex items-start gap-3 cursor-pointer transition-all hover:bg-gray-50
+                                        ${!n.read ? "bg-[#fff5f2]" : "bg-white"}
+                                        ${index !== notifications.length - 1 ? "border-b border-gray-200" : ""}
                                     `}
                             >
-                                {/* SAME ICON */}
-                                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center justify-center">
-                                    <Bell className="w-5 h-5 text-[#4b4b4b]" />
-                                </div>
+                                {/* Bell Icon in White Box */}
 
+
+
+                                <div className="flex-shrink-0">
+                                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-100">
+                                        <Bell className="w-[18px] h-[18px] text-gray-800" />
+                                    </div>
+                                </div>
                                 {/* CONTENT */}
-                                <div className="flex-1">
-                                    <p className="text-sm font-semibold text-gray-900">{n.title}</p>
-                                    <p className="text-sm text-gray-600 mt-0.5">{n.description}</p>
-                                    <p className="text-xs text-gray-400 mt-2">{n.time}</p>
+                                <div className="flex-1 min-w-0 pt-0.5">
+                                    <p className="text-sm font-semibold text-gray-900 leading-tight">{n.title}</p>
+                                    <p className="text-xs text-gray-600 mt-1 leading-relaxed">{n.description}</p>
+                                    <p className="text-xs text-gray-400 ml-[-50px] mt-2">{n.time}</p>
                                 </div>
 
                                 {/* UNREAD DOT */}
                                 {!n.read && (
-                                    <span className="absolute right-4 top-6 w-3 h-3 bg-[#ff6a33] rounded-full"></span>
+                                    <div className="flex-shrink-0 mt-2">
+                                        <span className="block w-2.5 h-2.5 bg-[#ff7043] rounded-full"></span>
+                                    </div>
                                 )}
                             </div>
                         ))}
@@ -121,8 +119,8 @@ export function NotificationsDropdown({
 
 
                     {/* Footer */}
-                    <div className="px-5 py-3 border-t border-gray-100">
-                        <button className="w-full text-center text-sm text-[#ff7a30] hover:text-[#ff5a00] font-medium">
+                    <div className="px-4 py-2.5 border-t border-gray-100 bg-white">
+                        <button className="w-full text-center text-sm text-[#ff7043] hover:text-[#ff5722] font-normal">
                             Show More
                         </button>
                     </div>

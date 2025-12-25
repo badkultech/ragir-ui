@@ -19,29 +19,52 @@ export function GstStatusToggle({
 
   return (
     <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-      {options.map((opt) => (
-        <button
-          type="button"
-          key={opt.key}
-          onClick={() => onChange(opt.key)}
-          className={cn(
-            "rounded-md border items-center justify-center px-3 py-2 text-left",
-            value === opt.key ? "border-orange-200 bg-orange-50 ring-orange-500" : "border-border",
-          )}
-          aria-pressed={value === opt.key}
-        >
-          <div className="flex items-center gap-2 ">
-            <span
-              className={cn(
-                "inline-block h-3 w-3 rounded-full border-2",
-                value === opt.key ? "bg-orange-500 border-orange-300" : "border-muted-foreground",
-              )}
-              aria-hidden
-            />
-            <Label className="m-0 cursor-pointer">{opt.label}</Label>
-          </div>
-        </button>
-      ))}
+      {options.map((opt) => {
+        const active = value === opt.key
+
+        return (
+          <button
+            type="button"
+            key={opt.key}
+            onClick={() => onChange(opt.key)}
+            className={cn(
+              "rounded-md border items-center justify-center px-3 py-2 text-left transition-all",
+              active ? "border-orange-300 bg-orange-50" : "border-border"
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center"
+                style={
+                  active
+                    ? {
+                        border: "2px solid transparent",
+                        background: `
+                          linear-gradient(white, white) padding-box,
+                          linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
+                        `,
+                      }
+                    : {
+                        border: "2px solid #D1D5DB",
+                        background: "white",
+                      }
+                }
+              >
+                {active && (
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                    }}
+                  ></div>
+                )}
+              </div>
+              <Label className="cursor-pointer">{opt.label}</Label>
+            </div>
+          </button>
+        )
+      })}
     </div>
   )
 }
