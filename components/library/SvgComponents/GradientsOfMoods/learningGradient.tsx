@@ -26,7 +26,7 @@ export const LearningGradient = ({
         width='1'
         height='1'
       >
-        <use xlinkHref='#image0_177_10730' transform='scale(0.000976562)' />
+        <use xlinkHref='#image0_177_10730' transform="translate(-0.30, 0) scale(0.0011)" />
       </pattern>
       <image
         id='image0_177_10730'
