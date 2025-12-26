@@ -94,8 +94,8 @@ export default function SearchResultsWithFilters() {
     if (regionFromUrl)
       list.push({ id: id++, label: `Region: ${regionFromUrl}` });
 
-    // if (yearFromUrl) list.push({ id: id++, label: `Year: ${yearFromUrl}` });
-    // if (monthFromUrl) list.push({ id: id++, label: `Month: ${monthFromUrl}` });
+    if (yearFromUrl) list.push({ id: id++, label: `Year: ${yearFromUrl}` });
+    if (monthFromUrl) list.push({ id: id++, label: `Month: ${monthFromUrl}` });
 
     return list;
   });
@@ -152,7 +152,7 @@ export default function SearchResultsWithFilters() {
   const [showFilters, setShowFilters] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
-  const [sortBy, setSortBy] = useState("popularity");
+  const [sortBy, setSortBy] = useState<string | null>(null);
   let sortedTrips = [...filteredTrips];
 
   if (sortBy === "price_low") {
@@ -168,6 +168,15 @@ export default function SearchResultsWithFilters() {
     sortedTrips.sort((a, b) => b.rating - a.rating);
   }
   type SortType = "price_low" | "price_high" | "discount" | "popularity";
+
+
+  const sortLabelMap: Record<string, string> = {
+    price_low: "Price Per Day: Lowest",
+    price_high: "Price Per Day: Highest",
+    discount: "Biggest Discount",
+    popularity: "Popularity",
+  };
+
 
 
   return (
@@ -196,6 +205,7 @@ export default function SearchResultsWithFilters() {
           setSortBy(type);
           setShowSortDropdown(false);
         }}
+        selectedSortLabel={sortBy ? sortLabelMap[sortBy] : "Sort By"}
       />
 
       <main className="max-w-[1400px] bg-white mx-auto px-4 md:px-8 py-6">
@@ -227,22 +237,30 @@ export default function SearchResultsWithFilters() {
           {/* RESULTS SECTION */}
           <div className="flex-1 ">
             {/* Mobile Filter Tags */}
-            <div className="md:hidden mb-3">
+            <div className="md:hidden mb-3 rounded-2xl border border-[#f1eee9] bg-[#fff6f2] p-4">
+              <p className="text-sm font-medium mb-2">Showing results for:</p>
+
               <FilterTags filters={filters} onRemove={removeFilter} />
-              {filters.length > 0 && (
-                <button
-                  onClick={clearAllFilters}
-                  className="text-xs text-[#e07a5f] mt-1 underline"
-                >
-                  Clear all
-                </button>
-              )}
+
+              <div className="flex justify-between items-center mt-3">
+                <p className="text-sm">
+                  <span className="text-[#e07a5f] font-semibold">
+                    {filteredTrips.length}
+                  </span>{" "}
+                  trips found
+                </p>
+
+                {filters.length > 0 && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-xs text-[#e07a5f] underline"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </div>
             </div>
 
-            <p className="text-sm text-[#6b6b6b] mb-4">
-              <span className="text-[#e07a5f] font-semibold">{filteredTrips.length}</span>{" "}
-              trips found
-            </p>
 
             {filteredTrips.length === 0 ? (
               <NoTripsFound />
@@ -266,6 +284,7 @@ export default function SearchResultsWithFilters() {
           setShowSortDropdown(true);
         }}
         onFilters={() => setShowFilters(true)}
+        sortLabel={sortBy ? sortLabelMap[sortBy] : "Sort By"}
       />
 
       {/* MOBILE FILTER PANEL */}

@@ -12,6 +12,7 @@ export function DesktopFilterBar({
   onToggleSort,
   showSortDropdown,
   onSortSelect,
+  selectedSortLabel,
 }: any) {
 
   const dropdownRef = useRef(null);
@@ -56,7 +57,7 @@ export function DesktopFilterBar({
           }}
           className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm"
         >
-          Sort By
+          {selectedSortLabel || "Sort"}
           <ChevronDown className="w-4 h-4" />
         </button>
 
