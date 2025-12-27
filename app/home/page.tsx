@@ -16,6 +16,7 @@ import { PhoneEntryModal } from "@/components/auth/PhoneEntryModal";
 import { OTPVerificationModal } from "@/components/auth/OTPVerificationModal";
 import { RegisterModal } from "@/components/auth/RegisterModal";
 
+
 export default function Home() {
   const { isLoggedIn, handleLogout, router } = useAuthActions();
 
