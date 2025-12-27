@@ -11,11 +11,65 @@ import { PartnersSection } from "@/components/homePage/sections/partners-section
 import { RegionsSection } from "@/components/homePage/sections/regions-section";
 import { TripLeadersSection } from "@/components/homePage/sections/trip-leaders-section";
 import { Footer } from "@/components/homePage/sections/footer";
-import { menuItems, userMenuItems, notificationsData } from "./constants";
+import {
+  Bell, Bookmark, Gift, Heart, MapPin, MessageCircleQuestion,
+  Scale, Search, Settings, Users
+} from "lucide-react";
 import { PhoneEntryModal } from "@/components/auth/PhoneEntryModal";
 import { OTPVerificationModal } from "@/components/auth/OTPVerificationModal";
 import { RegisterModal } from "@/components/auth/RegisterModal";
 
+const menuItems = [
+  { icon: Search, label: "Search by Mood", href: "/home/search-by-mood" },
+  { icon: MapPin, label: "Search by Destinations", href: "/home/search-by-destinations" },
+  { icon: Users, label: "About us", href: "/home/about" },
+  { icon: Heart, label: "Popular Trips", href: "/home/popular-trips" },
+  { icon: Gift, label: "Biggest Discounts", href: "/home/discounts" },
+  { icon: Scale, label: "Compare Trips", href: "/home/compare-trips" },
+  { icon: Bookmark, label: "Wishlist", href: "/home//wishlist" },
+];
+
+const userMenuItems = [
+  { icon: Bell, label: "Trip Invitations Sent", href: "/home/invitations" },
+  { icon: MessageCircleQuestion, label: "My Queries", href: "/home/my-queries" },
+  { icon: Bookmark, label: "Saved Trips", href: "/saved" },
+  { icon: Settings, label: "Settings", href: "/home/settings" },
+];
+
+const notificationsData = [
+  {
+    id: 1,
+    type: "booking",
+    title: "Booking Confirmed!",
+    description: "Your booking for Ladakh Skygaze has been confirmed",
+    time: "2 hours ago",
+    read: false,
+  },
+  {
+    id: 2,
+    type: "message",
+    title: "New Message",
+    description: "Trip organizer replied to your query",
+    time: "2 hours ago",
+    read: false,
+  },
+  {
+    id: 3,
+    type: "reminder",
+    title: "Trip Reminder",
+    description: "Your Himalayan Adventure Trek starts in 3 days",
+    time: "2 hours ago",
+    read: false,
+  },
+  {
+    id: 4,
+    type: "update",
+    title: "Trip Update",
+    description: "Itinerary updated for Goa Beach Getaway",
+    time: "2 hours ago",
+    read: true,
+  },
+];
 
 export default function Home() {
   const { isLoggedIn, handleLogout, router } = useAuthActions();
