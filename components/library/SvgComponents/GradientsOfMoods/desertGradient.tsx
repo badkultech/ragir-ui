@@ -26,7 +26,7 @@ export const DesertGradient = ({ height = '200', width = '200' }: DesertGradient
             width='1'
             height='1'
           >
-            <use xlinkHref='#image0_177_10718' transform='scale(0.000976562)' />
+            <use xlinkHref='#image0_177_10718' transform="translate(-0.35, -0.15) scale(0.001)" />
           </pattern>
           <image
             id='image0_177_10718'

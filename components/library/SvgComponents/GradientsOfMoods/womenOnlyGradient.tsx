@@ -26,7 +26,7 @@ export const WomenOnlyGradient = ({
         width='1'
         height='1'
       >
-        <use xlinkHref='#image0_177_10751' transform='scale(0.000976562)' />
+        <use xlinkHref='#image0_177_10751' transform=' translate(-0.20,-0.60) scale(0.0011)' />
       </pattern>
       <image
         id='image0_177_10751'

@@ -19,6 +19,7 @@ import {
   PartiesIcon,
   LearningIcon,
   CampingIcon,
+  SpiritualIcon,
 } from "@/components/library/SvgComponents/Icons";
 
 // GRADIENT SVGs
@@ -44,12 +45,12 @@ import { CampingGradient } from "@/components/library/SvgComponents/GradientsOfM
 interface MoodTagProps {
   name: string;
   icon: any
-  isActive?: boolean; 
+  isActive?: boolean;
   onClick?: () => void;
 }
 
 export function MoodTag({ name, isActive = false, onClick }: MoodTagProps) {
-  
+
   const moodMap: any = {
     Mountain: { icon: MountainIcon, bg: MountainGradient },
     Skygaze: { icon: NightIcon, bg: SkygazyGradient },
@@ -66,7 +67,7 @@ export function MoodTag({ name, isActive = false, onClick }: MoodTagProps) {
     Parties: { icon: PartiesIcon, bg: PartyGradient },
     Learning: { icon: LearningIcon, bg: LearningGradient },
     Camping: { icon: CampingIcon, bg: CampingGradient },
-    Spiritual: { icon: FemaleIcon, bg: WomenOnlyGradient },
+    Spiritual: { icon: SpiritualIcon, bg: WomenOnlyGradient },
   };
 
   const data = moodMap[name] || {};

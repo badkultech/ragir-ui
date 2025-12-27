@@ -2,9 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { ChevronLeft, Heart, ChevronDown, AlertCircle, Search } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { TripCard } from "@/components/search-results/trip-card"
+import { AlertCircle, Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Footer } from "@/components/search-results/footer"
 import { MonthYearSelector } from "@/components/search-results/MonthYearSelector"
@@ -180,7 +178,7 @@ export default function SearchByDestinationPage() {
             {/* Main Content */}
             <main className="flex-1 flex flex-col md:flex-row max-w-[1400px] mx-auto w-full">
                 {/* Sidebar - Left on desktop, top on mobile */}
-                <aside className="w-full md:w-[320px] lg:w-[360px] md:min-h-[calc(100vh-65px)] bg-card md:border-r border-border p-4 md:p-6 flex-shrink-0">
+                <aside className="w-full md:w-[340px] lg:w-[440px] bg-[#ffffff] border-r border-[#eee8e2] p-4 md:p-6 flex-shrink-0">
                     {/* Attention Banner - Mobile */}
                     <div className="md:hidden mb-4 bg-[#fff8f5] border border-[#f4a261]/30 rounded-xl p-3 flex items-start gap-3">
                         <AlertCircle className="w-5 h-5 text-[#e07a5f] flex-shrink-0 mt-0.5" />
@@ -192,13 +190,13 @@ export default function SearchByDestinationPage() {
                         </div>
                     </div>
 
-                    <div className="bg-card md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 border md:border-0 border-border">
-                        <h2 className="text-base font-semibold text-foreground mb-3">Search Trips</h2>
+                    <div className="bg-white rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-[#f2ebe5] ">
+                        <h2 className="text-base font-semibold text-foreground text-center mb-3">Search Trips</h2>
 
                         {/* Destination Input */}
                         <div className="mb-5">
-                            <p className="text-sm text-muted-foreground mb-2">Where do you want to travel?</p>
-                            <label className="text-sm font-medium text-foreground mb-2 block">Destination</label>
+                            <p className="text-sm text-foreground font-semibold mb-6 mt-3">Where do you want to travel?</p>
+                            <label className="text-sm font-semibold text-foreground mb-2 block">Destination</label>
                             <div className="relative">
                                 <input
                                     type="text"
@@ -257,36 +255,47 @@ export default function SearchByDestinationPage() {
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Date Selection */}
-                    <div className="p-6">
-                        <MonthYearSelector
-                            year={selectedYear}
-                            month={selectedMonth}
-                            minYear={2024}
-                            maxYear={2030}
-                            onChange={({ year, month }) => {
-                                setSelectedYear(year);
-                                setSelectedMonth(month);
-                            }}
-                        />
+                        {/* Date Selection */}
+                        <div className="p-4">
+                            <MonthYearSelector
+                                year={selectedYear}
+                                month={selectedMonth}
+                                minYear={2024}
+                                maxYear={2030}
+                                onChange={({ year, month }) => {
+                                    setSelectedYear(year);
+                                    setSelectedMonth(month);
+                                }}
+                            />
 
-                        {/* Search Button */}
-                        <button
-                            onClick={() =>
-                                router.push(
-                                    `/traveler/search-result/search-result-with-filter?destination=${encodeURIComponent(
-                                        destination
-                                    )}&region=${region}&year=${selectedYear}&month=${selectedMonth}`
-                                )
-                            }
-                          className="w-full py-3  bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)] text-white font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                        >
-                            <Search className="w-4 h-4" />
-                            Search
-                        </button>
+                            {/* Search Button */}
+                            <button
+                                onClick={() => {
+                                    const params = new URLSearchParams()
 
+                                    // Destination diya ho → sirf destination
+                                    if (destination.trim()) {
+                                        params.set("destination", destination)
+                                    }
+                                    // Destination empty ho → region send karo
+                                    else {
+                                        params.set("region", region)
+                                    }
+
+                                    params.set("year", selectedYear.toString())
+                                    params.set("month", selectedMonth)
+
+                                    router.push(`/home/search-result-with-filter?${params.toString()}`)
+                                }}
+
+                                className="w-full py-3 mt-5  bg-[linear-gradient(90deg,#fea901,#fd6e34,#FE336A,#FD401A)] text-white font-semibold rounded-full hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                            >
+                                <Search className="w-4 h-4" />
+                                Search
+                            </button>
+
+                        </div>
                     </div>
                 </aside>
 

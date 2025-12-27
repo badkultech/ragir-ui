@@ -64,6 +64,7 @@ export default function SettingsPage() {
           notifications={notifications}
           onUpdateNotifications={setNotifications}
           onMenuOpen={() => setSidebarOpen(true)}
+          variant="edge"
         />
 
         {/* MAIN CONTENT AREA */}

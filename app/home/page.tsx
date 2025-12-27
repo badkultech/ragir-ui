@@ -92,6 +92,7 @@ export default function Home() {
         onMenuOpen={() => setIsMenuOpen(true)}
         notifications={notificationsList}
         onUpdateNotifications={setNotificationsList}
+        variant="center"
       />
 
       <HeroSection />

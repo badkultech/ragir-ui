@@ -36,7 +36,7 @@ export function Header({ title, showBack = true, showWishlist = true }: HeaderPr
         {/* Right */}
         <div className="flex items-center gap-2">
           {showWishlist && (
-            <button className="p-1.5 hover:bg-muted rounded-full transition-colors hidden md:flex">
+            <button className="p-1.5 hover:bg-muted rounded-full transition-colors">
               <Heart className="w-5 h-5 text-foreground" />
             </button>
           )}

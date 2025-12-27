@@ -65,8 +65,11 @@ export function SearchTripsCard() {
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (activeTab === "destination") {
-      if (destination.trim()) params.set("destination", destination);
-      params.set("region", selectedRegion);
+      if (destination.trim()) {
+        params.set("destination", destination);
+      } else {
+        params.set("region", selectedRegion);
+      }
     }
     if (activeTab === "moods") {
       if (selectedMoods.length > 0) {
@@ -181,7 +184,7 @@ export function SearchTripsCard() {
         /* Moods Section */
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">What&apos;s your travel mood?</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {moods.map((mood) => (
               <MoodTag
                 key={mood.name}

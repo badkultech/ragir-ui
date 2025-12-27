@@ -137,6 +137,7 @@ export default function MyQueriesPage() {
                     notifications={notifications}
                     onUpdateNotifications={setNotifications}
                     onMenuOpen={() => setSidebarOpen(true)}
+                    variant="edge"
                 />
 
                 {/* Main Content */}

@@ -27,8 +27,6 @@ const moods = [
   { name: "Spiritual", icon: Moon, active: false },
 ]
 
-const months = ["July", "Aug", "Sept", "Oct", "Nov"]
-
 const skygazeTrips = [
   {
     id: 1,
@@ -56,7 +54,7 @@ const skygazeTrips = [
     badge: "Skygaze",
     badgeColor: "bg-[#3d5a4c]",
     badgeIcon: Sun,
-        image: "/home-page-img/d3657587fdf6bdd2dcc43f2a6c23503094168ae9.jpg",
+    image: "/home-page-img/d3657587fdf6bdd2dcc43f2a6c23503094168ae9.jpg",
   },
   {
     id: 3,
@@ -70,7 +68,7 @@ const skygazeTrips = [
     badge: "Skygaze",
     badgeColor: "bg-[#3d5a4c]",
     badgeIcon: Sun,
-       image: "/home-page-img/d3657587fdf6bdd2dcc43f2a6c23503094168ae9.jpg",
+    image: "/home-page-img/d3657587fdf6bdd2dcc43f2a6c23503094168ae9.jpg",
   }, {
     id: 4,
     title: "Ladakh Skygaze",
@@ -140,7 +138,7 @@ const adventureTrips = [
     badge: "Adventure",
     badgeColor: "bg-[#e07a5f]",
     badgeIcon: Compass,
-     image: "/home-page-img/54ecd90d2735d571e1a3645d66563b5ebcb8b6b1.jpg",
+    image: "/home-page-img/54ecd90d2735d571e1a3645d66563b5ebcb8b6b1.jpg",
 
   },
   {
@@ -155,7 +153,7 @@ const adventureTrips = [
     badge: "Adventure",
     badgeColor: "bg-[#e07a5f]",
     badgeIcon: Compass,
-        image: "/home-page-img/54ecd90d2735d571e1a3645d66563b5ebcb8b6b1.jpg",
+    image: "/home-page-img/54ecd90d2735d571e1a3645d66563b5ebcb8b6b1.jpg",
   },
 ]
 
@@ -186,7 +184,7 @@ const weekendTrips = [
     badge: "Weekends",
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
     badgeIcon: Calendar,
-        image: "/home-page-img/67862b478a93af55c65eb3954c6ef378d237e554.jpg",
+    image: "/home-page-img/67862b478a93af55c65eb3954c6ef378d237e554.jpg",
   },
   {
     id: 9,
@@ -200,7 +198,7 @@ const weekendTrips = [
     badge: "Weekends",
     badgeIcon: Calendar,
     badgeColor: "bg-gradient-to-r from-[#f4a261] to-[#e07a5f]",
-        image: "/home-page-img/67862b478a93af55c65eb3954c6ef378d237e554.jpg",
+    image: "/home-page-img/67862b478a93af55c65eb3954c6ef378d237e554.jpg",
   },
 ]
 
@@ -225,16 +223,16 @@ export default function SearchByMoodPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col md:flex-row max-w-[1400px] mx-auto w-full py-6 px-4 md:px-8 gap-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[320px] lg:w-[360px] flex-shrink-0 md:min-h-[calc(100vh-65px)] bg-white">
+        <aside className="w-full md:w-[320px] lg:w-[420px] flex-shrink-0 md:min-h-[calc(100vh-65px)] bg-white">
           <div className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-[#f0f0f0] p-5">
             <h2 className="text-base font-semibold text-[#2d2d2d] mb-3 text-center">
               Search Trips
             </h2>
             <div className="mb-6">
-              <p className="text-sm text-[#191818] mb-3">
+              <p className="text-sm text-foreground font-semibold mb-3">
                 What&apos;s your travel mood?
               </p>
-              <div className="flex flex-wrap gap-2 relative z-0">
+              <div className="flex flex-wrap justify-center gap-2 relative z-0">
                 {moods.map((mood) => (
                   <MoodTag
                     key={mood.name}
@@ -262,7 +260,7 @@ export default function SearchByMoodPage() {
             <button
               onClick={() => {
                 router.push(
-                  `/traveler/search-result/search-result-with-filter?moods=${encodeURIComponent(
+                  `/home/search-result-with-filter?moods=${encodeURIComponent(
                     JSON.stringify(selectedMoods)
                   )}&year=${selectedYear}&month=${selectedMonth}`
                 );
