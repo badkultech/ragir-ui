@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { Pin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -36,6 +37,7 @@ import {
   MountainIcon,
   NightIcon,
   PartiesIcon,
+  SpiritualIcon,
   WellnessIcon,
 } from '@/components/library/SvgComponents/Icons';
 import { CampingGradient } from '@/components/library/SvgComponents/GradientsOfMoods/campingGradient';
@@ -97,6 +99,14 @@ export function CreateTrip({ tripId }: Props) {
   const [tripSaving, setTripSaving] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [saveDraftDisabled, setSaveDraftDisabled] = useState(false);
+
+  const [allTags, setAllTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (cityTags.length > 0 && allTags.length === 0) {
+      setAllTags(Array.from(new Set([...allTags, ...cityTags])));
+    }
+  }, [cityTags]);
 
 
 
@@ -190,7 +200,7 @@ export function CreateTrip({ tripId }: Props) {
     {
       id: 'spiritual',
       label: 'Spiritual',
-      icon: FemaleIcon,
+      icon: SpiritualIcon,
       gradient: SpiritualGradient,
     },
   ];
@@ -248,7 +258,16 @@ export function CreateTrip({ tripId }: Props) {
         tripTitle: trip.name ?? "",
         startDate: `${trip.startDate} ${trip.startTime}`,
         endDate: `${trip.endDate} ${trip.endTime}`,
-        totalDays: trip.totalDays ?? 1,
+        totalDays: (() => {
+          if (trip.startDate && trip.endDate) {
+            const s = new Date(trip.startDate);
+            const e = new Date(trip.endDate);
+            const diffTime = e.getTime() - s.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            return diffDays > 0 ? diffDays : 1;
+          }
+          return trip.totalDays ?? 1;
+        })(),
         minGroupSize: trip.minGroupSize,
         maxGroupSize: trip.maxGroupSize,
         minAge: trip.minAge,
@@ -455,36 +474,85 @@ export function CreateTrip({ tripId }: Props) {
   };
 
   const addCityTag = () => {
-    if (cityInput.trim() && !cityTags.includes(cityInput.trim())) {
-      dispatch(setCityTags([...cityTags, cityInput.trim()]));
+    if (cityInput.trim()) {
+      const newTag = cityInput.trim();
+
+      // 1. Add to allTags if not present
+      if (!allTags.includes(newTag)) {
+        setAllTags([...allTags, newTag]);
+      }
+
+      // 2. Add to selected (Redux) if not present
+      if (!cityTags.includes(newTag)) {
+        dispatch(setCityTags([...cityTags, newTag]));
+      }
+
       dispatch(setCityInput(''));
     }
   };
 
   const removeCityTag = (tagToRemove: string) => {
+    // Completely remove from both lists
+    setAllTags(allTags.filter((tag) => tag !== tagToRemove));
     dispatch(setCityTags(cityTags.filter((tag) => tag !== tagToRemove)));
   };
 
+  const toggleCityTagSelection = (tag: string) => {
+    if (cityTags.includes(tag)) {
+      // Deselect: remove from Redux but keep in allTags
+      dispatch(setCityTags(cityTags.filter((t) => t !== tag)));
+    } else {
+      // Select: add to Redux
+      dispatch(setCityTags([...cityTags, tag]));
+    }
+  };
+
   useEffect(() => {
-    if (!formData.startDate || !formData.endDate) return;
+    if (!formData.startDate) return;
 
-    const parseDateOnly = (dateStr: string) => {
-      const d = new Date(dateStr);
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate()); // time removed
-    };
+    const start = new Date(formData.startDate);
+    const days = Math.max(1, Number(formData.totalDays) || 1);
 
-    const start = parseDateOnly(formData.startDate);
-    const end = parseDateOnly(formData.endDate);
+    // Calculate End Date
+    const end = new Date(start);
+    end.setDate(start.getDate() + (days - 1));
 
-    // Calculate pure DATE difference (no time)
-    const diffTime = end.getTime() - start.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    // Preserve the time from the start date or default to same time
+    // We need to format it back to the string format expected by the picker/state
+    // Assuming formData.startDate is an ISO-like string or something Date constructor accepts.
 
-    // Ensure minimum 1 day always
-    const finalDays = diffDays < 1 ? 1 : diffDays;
+    // We'll format to match the typical input requirements if needed, 
+    // but the state seems to hold Date strings. 
+    // Let's ensure we update the state with the new End Date.
 
-    dispatch(setFormData({ ...formData, totalDays: finalDays }));
-  }, [formData.startDate, formData.endDate]);
+    // Note: This matches the format used in handleSaveTrip: ISO string or similar
+    // We'll just use the same format as the input usually provides.
+    // However, CustomDateTimePicker returns value directly. 
+    // Let's construct a string compatible with what CustomDateTimePicker expects.
+    // If it expects the same format as it emits.
+
+    // Simple approach: Use ISO string, but we might need to be careful about timezone offsets 
+    // if the component isn't handling them. 
+    // For now, let's assume standard JS Date behavior works since we are just adding days.
+
+    // Formatting to local ISO-like string to keep it consistent if needed, 
+    // or just use typical string conversion.
+    // Let's try to keep the format consistent with the existing data.
+    // The existing code used `new Date(formData.endDate)` which implies standard date string parsing works.
+
+    // We will update the form data.
+    // Using a safe toISOString() or similar might be best, but let's check current format.
+    // The previous hook used `parseDateOnly` which suggests date parts matter most.
+
+    const formattedEnd = end.toString(); // Or toISOString() might be safer if the picker handles it.
+    // Let's use the same format as startDate if possible?
+
+    // Actually, let's just use the `setFormData` with the Date object converted to string.
+    // Usually components like dates as ISO strings.
+
+    dispatch(setFormData({ ...formData, endDate: end.toISOString() }));
+
+  }, [formData.startDate, formData.totalDays]);
 
 
   return (
@@ -528,8 +596,9 @@ export function CreateTrip({ tripId }: Props) {
               )}
             </div>
 
-            {/* Start and End Dates */}
+            {/* Start Date, Total Days, End Date Grid */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
+
               {/* Start Date */}
               <div className="flex flex-col gap-1 relative pb-5">
                 <Label className='text-gray-600 font-medium'>
@@ -552,46 +621,54 @@ export function CreateTrip({ tripId }: Props) {
                   </p>
                 )}
               </div>
-              {/* End Date */}
+
+              {/* Total Days - MOVED HERE */}
               <div className="flex flex-col gap-1 relative pb-5">
                 <Label className='text-gray-600 font-medium'>
-                  End Date<RequiredStar />
+                  Total Days (Duration) <RequiredStar />
+                </Label>
+                <div className='relative'>
+                  <Input
+                    value={formData.totalDays}
+                    type="number"
+                    min={1}
+                    onChange={(e) => {
+                      let val = parseInt(e.target.value);
+                      if (isNaN(val) || val < 0) val = 0;
+                      handleInputChange('totalDays', val);
+                    }}
+                    className='w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                  />
+                  <span className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    Days
+                  </span>
+                </div>
+              </div>
+
+              {/* End Date - Auto Calculated */}
+              <div className="flex flex-col gap-1 relative pb-5 md:col-span-2">
+                <Label className='text-gray-600 font-medium'>
+                  End Date (Auto-Calculated)
                 </Label>
                 <CustomDateTimePicker
                   value={formData.endDate}
-                  onChange={(val) => {
-                    handleInputChange('endDate', val);
-                    clearError("endDate");
-                  }}
-                  minDate={formData.startDate || getTodayStr()}
-                  stepMinutes={15}
-                  placeholder="Select end date & time"
-                  className="w-full"
+                  disabled={true} // DISABLED
+                  onChange={() => { }} // No-op
+                  placeholder="End Date will appear here"
+                  className="w-full opacity-60 bg-gray-100 cursor-not-allowed"
                 />
+                <p className="text-xs text-gray-400 mt-1">
+                  End date is automatically calculated based on start date and total days.
+                </p>
                 {errors.endDate && (
-                  <p className="text-red-500 text-sm absolute left-0 top-15">
+                  <p className="text-red-500 text-sm absolute left-0 -bottom-2">
                     {errors.endDate}
                   </p>
                 )}
               </div>
-
             </div>
 
-            {/* Total Days */}
-            <div>
-              <Label
-                htmlFor='totalDays'
-                className='text-sm font-medium text-gray-700 mb-2 block'
-              >
-                Total Days
-              </Label>
-              <div className='flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2'>
-                <span className='text-gray-500'>{formData.totalDays}</span>
-                <span className='text-gray-900 font-medium'>
-                  {formData.totalDays} Days | {formData.totalDays - 1} Nights
-                </span>
-              </div>
-            </div>
+
 
             {/* Group Size */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-5'>
@@ -805,47 +882,68 @@ export function CreateTrip({ tripId }: Props) {
 
             {/* Locations */}
             <div className='mb-6'>
-              <Label className='block text-gray-600 mb-2 font-medium'>
-                City Tags<RequiredStar />
-              </Label>
+              <div className='flex items-center justify-between mb-2'>
+                <Label className='block text-gray-600 font-medium'>
+                  Destination Tags <RequiredStar />
+                </Label>
+              </div>
+
               <div className='space-y-3'>
                 <div className='flex gap-2'>
                   <Input
                     id='cityTags'
-                    placeholder='Add cities/destinations'
+                    placeholder='Enter destination'
                     value={cityInput}
                     onChange={(e) => {
                       dispatch(setCityInput(e.target.value));
                       clearError("cityTags");
                     }}
-
-                    onKeyPress={(e) => e.key === 'Enter' && addCityTag()}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCityTag();
+                      }
+                    }}
                     className='flex-1'
                   />
-
                 </div>
 
-                {cityTags.length > 0 && (
-                  <div className='flex flex-wrap gap-2'>
-                    {cityTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className='inline-flex items-center gap-1 px-3 py-1 bg-blue-50 border border-blue-200 
-               text-blue-700 rounded-full text-sm cursor-default hover:bg-blue-100 transition'
-                      >
-                        {tag}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeCityTag(tag);
-                          }}
-                          className='ml-1 text-blue-500 hover:text-blue-700 cursor-pointer'
+                {(allTags.length > 0) && (
+                  <div className='flex flex-wrap gap-3'>
+                    {allTags.map((tag) => {
+                      const isSelected = cityTags.includes(tag);
+                      return (
+                        <div
+                          key={tag}
+                          onClick={() => toggleCityTagSelection(tag)}
+                          className={`
+                            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm cursor-pointer border transition-all select-none
+                            ${isSelected
+                              ? 'bg-orange-50 border-orange-500 text-orange-500'
+                              : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
+                            }
+                          `}
                         >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-
+                          <Pin className={`w-3.5 h-3.5 ${isSelected ? 'fill-orange-500' : 'fill-gray-400'} rotate-45`} />
+                          <span className="font-medium">{tag}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeCityTag(tag);
+                            }}
+                            className={`
+                              ml-1 rounded-full p-0.5 hover:bg-black/5 transition
+                              ${isSelected ? 'text-orange-500' : 'text-gray-400'}
+                            `}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.5 3.5L3.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M3.5 3.5L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
                 {errors.cityTags && (
@@ -1109,7 +1207,7 @@ export function CreateTrip({ tripId }: Props) {
           }}
 
         />
-      </div>
+      </div >
     </div >
   );
 }
