@@ -12,6 +12,7 @@ interface Props {
   mode?: "datetime" | "date"
   stepMinutes?: number
   minDate?: string // Format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM"
+  disabled?: boolean
 }
 
 export function CustomDateTimePicker({
@@ -22,6 +23,7 @@ export function CustomDateTimePicker({
   mode = "datetime",
   stepMinutes = 15,
   minDate,
+  disabled = false,
 }: Props) {
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)
@@ -235,20 +237,21 @@ export function CustomDateTimePicker({
   }
 
   return (
-    <div ref={wrapperRef} className={`relative ${className}`}>
+    <div ref={wrapperRef} className={`relative ${className} ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
       <div className="relative flex items-center">
         <Input
           type="text"
           value={formatted}
           placeholder={placeholder}
           readOnly
+          disabled={disabled}
           className="w-full pr-10 cursor-pointer bg-background"
-          onClick={() => setOpen((s) => !s)}
+          onClick={() => !disabled && setOpen((s) => !s)}
         />
         <Calendar
           size={18}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
-          onClick={() => setOpen((s) => !s)}
+          onClick={() => !disabled && setOpen((s) => !s)}
         />
       </div>
 
