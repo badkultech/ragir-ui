@@ -24,9 +24,10 @@ import { useOrganizationId } from "@/hooks/useOrganizationId";
 type AddActivityFormProps = {
   mode?: "library" | "trip";
   onCancel: () => void;
-  onSave: (data: any, documents?: DocShape[]) => void;
+  onSave: (data: any, documents?: DocShape[], saveInLibrary?: boolean) => void;
   header?: string;
   initialData?: any;
+
 };
 
 type OptionType = { value: string; label: string };
@@ -64,6 +65,7 @@ export function AddActivityForm({
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
+  const [formLibrary, setFormLibrary] = useState(false);
 
   const normalizeTime = (t: any) => {
     if (Array.isArray(t) && t.length >= 2) {
@@ -138,6 +140,8 @@ export function AddActivityForm({
         activityId: item.id,
       }).unwrap();
 
+      setFormLibrary(true);
+      setIsLibraryLoading(false);
       setTitle(fd.name || "");
       setLocation(fd.location || "");
       setDescription(fd.description || "");
@@ -241,7 +245,8 @@ export function AddActivityForm({
           packing,
           mode,
         },
-        docsManager.documents
+        docsManager.documents,
+        saveInLibrary
       );
       showSuccess("Activity saved successfully!");
     } catch {
@@ -413,7 +418,7 @@ export function AddActivityForm({
         )}
       </div>
 
-      {isTripMode && (
+      {isTripMode && header === "Add Activity" && !formLibrary && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
             <input
@@ -435,7 +440,7 @@ export function AddActivityForm({
           </div>
         </div>
       )}
-      {isSaving && (
+      {isSaving && header === "Add Activity" && (
         <div className="w-full flex justify-center my-2">
           <p className="text-sm text-orange-500 font-medium">
             Saving...

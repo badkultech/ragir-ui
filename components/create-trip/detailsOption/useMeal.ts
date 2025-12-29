@@ -8,6 +8,7 @@ import {
   useLazyGetTripMealByIdQuery,
 } from "@/lib/services/organizer/trip/itinerary/day-details/meal";
 import { mapMealToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
+import { useCreateMealMutation } from "@/lib/services/organizer/trip/library/meal";
 
 function normalizeDocuments(docs: any[]) {
   if (!Array.isArray(docs)) return [];
@@ -28,8 +29,8 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
   const [createMeal] = useCreateTripMealMutation();
   const [updateMeal] = useUpdateTripMealMutation();
   const [deleteMeal] = useDeleteTripMealMutation();
+  const [createLibraryMeal] = useCreateMealMutation();
 
-  /* ------------------------- EDIT -------------------------- */
   const handleMealEdit = async (itemId: number) => {
     if (cacheRef.current[itemId]) {
       setInitialMealData(cacheRef.current[itemId]);
@@ -51,8 +52,8 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
       mealType: data.mealType ?? "",
       time: data.time ?? "",
       location: data.location ?? "",
-      chargeable: data.chargeable ?? false,   
-      packingSuggestion :data.packingSuggestion??"",
+      chargeable: data.chargeable ?? false,
+      packingSuggestion: data.packingSuggestion ?? "",
       documents: normalizeDocuments(data.documents ?? []),
     };
     cacheRef.current[itemId] = mapped;
@@ -60,13 +61,21 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
     return mapped;
   };
 
-  const handleMealSave = async (data: any, itemId?: number , documents:any[]=[] ) => {
+  const handleMealSave = async (
+    data: any,
+    itemId?: number,
+    documents: any[] = []
+  ) => {
+
+    const saveInLibrary = data.saveInLibrary ?? false;
+
     const form = mapMealToFormData(
       {
         ...data,
         time: data.time,
+        saveInLibrary,
       },
-      documents,
+      documents
     );
 
     let res;
@@ -79,6 +88,7 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
         itemId: String(itemId),
         data: form,
       }).unwrap();
+
       delete cacheRef.current[String(itemId)];
     } else {
       res = await createMeal({
@@ -89,13 +99,24 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
       }).unwrap();
     }
 
-    const raw = res;
+    if (saveInLibrary) {
+      try {
+        await createLibraryMeal({
+          organizationId,
+          data: form,
+        }).unwrap();
+      } catch (e) {
+        console.error("Failed to save meal to library", e);
+      }
+    }
 
     return {
-      ...raw,
-      documents: normalizeDocuments(raw.documents ?? []),
+      ...res,
+      documents: normalizeDocuments(res.documents ?? []),
     };
   };
+
+
 
   const handleMealDelete = async (id: number) => {
     await deleteMeal({
@@ -104,7 +125,7 @@ export function useMeal({ organizationId, tripPublicId, dayDetailId }: any) {
       dayDetailId,
       itemId: String(id),
     }).unwrap();
-      delete cacheRef.current[String(id)];
+    delete cacheRef.current[String(id)];
     return { id };
   };
 

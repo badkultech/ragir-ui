@@ -48,7 +48,7 @@ export function DetailsOptions({
   const meal = useMeal({ organizationId, tripPublicId, dayDetailId });
   const activity = useActivity({ organizationId, tripPublicId, dayDetailId });
 
-  const handleSave = async (formData: any, documents: any[] = []) => {
+  const handleSave = async (formData: any, documents: any[] = [], saveInLibrary?: boolean) => {
     let apiResult = null;
 
     const itemId = getItemId(initialData);
@@ -73,7 +73,7 @@ export function DetailsOptions({
           break;
 
         case "activity":
-          apiResult = await activity.handleActivitySave(formData, itemId, documents);
+          apiResult = await activity.handleActivitySave(formData, itemId, documents, saveInLibrary);
           break;
       }
 
@@ -321,8 +321,8 @@ export function DetailsOptions({
                 {item.documents?.length > 0 && (
                   <div className="flex gap-3 mt-3 flex-wrap">
                     {item.documents
-                      .filter((d:any) => d?.url || d?.file)
-                      .map((doc:any, idx:number) => {
+                      .filter((d: any) => d?.url || d?.file)
+                      .map((doc: any, idx: number) => {
 
                         const src =
                           doc?.file instanceof File

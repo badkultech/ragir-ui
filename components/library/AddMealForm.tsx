@@ -51,6 +51,7 @@ export function AddMealForm({
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
+  const [fromLibrary, setFromLibrary] = useState(false);
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
@@ -105,6 +106,8 @@ export function AddMealForm({
         organizationId,
         mealId: item.id,
       }).unwrap();
+      setFromLibrary(true);
+      setSaveInLibrary(false);
       setTitle(fd.name || "");
       setLocation(fd.location || "");
       setDescription(fd.description || "");
@@ -179,6 +182,7 @@ export function AddMealForm({
     const isValid = validateForm();
     if (!isValid) return;
     setIsSaving(true);
+
 
 
     try {
@@ -334,7 +338,7 @@ export function AddMealForm({
       </div>
 
       {/* Save in Library */}
-      {isTripMode && (
+      {isTripMode && header === "Add Meal" && !fromLibrary && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
             <input
@@ -358,7 +362,7 @@ export function AddMealForm({
       )}
 
 
-      {isSaving && (
+      {isSaving && header === "Add Meal" && (
         <div className="w-full flex justify-center my-2">
           <p className="text-sm text-orange-500 font-medium">
             Saving...

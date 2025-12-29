@@ -64,6 +64,7 @@ export function AddTransitForm({
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
+  const [fromLibrary, setFromLibrary] = useState(false);
 
   async function urlToFile(url: string, filename = "library_image.jpg") {
     const res = await fetch(url);
@@ -139,6 +140,8 @@ export function AddTransitForm({
   const handleLibrarySelect = async (item: any) => {
     if (!item.id) return;
     setIsLibraryLoading(true);
+    setFromLibrary(true);
+    setSaveInLibrary(false);
     try {
       const full = await getTransitByIdTrigger({
         organizationId,
@@ -524,7 +527,7 @@ export function AddTransitForm({
         )}
       </div>
 
-      {isTripMode && (
+      {isTripMode && header === "Add Transit" && !fromLibrary && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
             <input
@@ -547,7 +550,7 @@ export function AddTransitForm({
         </div>
       )}
 
-      {isSaving && (
+      {isSaving && header === "Add Transit" && (
         <div className="w-full flex justify-center my-2">
           <p className="text-sm text-orange-500 font-medium">
             Saving...

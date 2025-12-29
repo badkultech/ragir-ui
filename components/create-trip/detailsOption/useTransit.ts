@@ -40,8 +40,8 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
       name: data.name || "",
       fromLocation: data.fromLocation,
       toLocation: data.toLocation,
-      startTime: data.startTime?.slice(0,5) || "",
-      endTime: data.endTime?.slice(0,5) || "",
+      startTime: data.startTime?.slice(0, 5) || "",
+      endTime: data.endTime?.slice(0, 5) || "",
       vehicleTypes: data.vehicleTypes || [],
       customVehicleType: data.customVehicleType || "",
       arrangedBy: data.arrangedBy || "ORGANIZER",
@@ -55,62 +55,71 @@ export function useTransit({ organizationId, tripPublicId, dayDetailId }: any) {
 
     return mapped;
   };
-const handleTransitSave = async (
-  data: any,
-  itemId?: number,
-  documents: any[] = [],
-  saveInLibrary?: boolean
-) => {
-  try {
-    const form = mapTransitToFormData(
-      {
-        ...data,
-        saveInLibrary: data.saveInLibrary ?? false,  
-      },
-      documents
-    );
+  const handleTransitSave = async (
+    data: any,
+    itemId?: number,
+    documents: any[] = []
+  ) => {
+    try {
+      const form = mapTransitToFormData(
+        {
+          ...data,
+          saveInLibrary: data.saveInLibrary ?? false,
+        },
+        documents
+      );
 
-    let res;
+      let res;
 
-    if (itemId) {
-      res = await updateTransit({
+      if (itemId) {
+        res = await updateTransit({
+          organizationId,
+          tripPublicId,
+          dayDetailId,
+          itemId: String(itemId),
+          data: form,
+        }).unwrap();
+
+        delete cacheRef.current[String(itemId)];
+
+        return {
+          ...res,
+          id: res.tripItemId,
+          tripItemId: res.tripItemId || itemId,
+          tripType: "TRANSIT",
+        };
+      }
+
+      res = await createTransit({
         organizationId,
         tripPublicId,
         dayDetailId,
-        itemId: String(itemId),
         data: form,
       }).unwrap();
-      delete cacheRef.current[String(itemId)];
-      const updated = res;
+
+      if (data.saveInLibrary) {
+        try {
+          await createLibraryTransit({
+            organizationId,
+            data: form,
+          }).unwrap();
+        } catch (libErr) {
+          console.warn("Library save failed (but trip saved ok)", libErr);
+        }
+      }
 
       return {
-        ...updated,
-        id: updated.tripItemId,
-        tripItemId: updated.tripItemId || itemId,
+        ...res,
+        id: res.tripItemId,
+        tripItemId: res.tripItemId,
         tripType: "TRANSIT",
       };
+    } catch (err) {
+      console.error("Transit save error:", err);
+      throw err;
     }
+  };
 
-    res = await createTransit({
-      organizationId,
-      tripPublicId,
-      dayDetailId,
-      data: form,
-    }).unwrap();
-
-    const created = res;
-
-    return {
-      ...created,
-      id: created.tripItemId,
-      tripItemId: created.tripItemId ,
-      tripType: "TRANSIT",
-    };
-  } catch (err) {
-    console.error("Transit save error:", err);
-    throw err;
-  }
-};
 
 
   const handleTransitDelete = async (id: number) => {

@@ -9,6 +9,7 @@ import {
 } from "@/lib/services/organizer/trip/itinerary/day-details/stay";
 
 import { mapStayToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
+import { useCreateStayMutation } from "@/lib/services/organizer/trip/library/stay";
 
 function normalizeDocuments(docs: any[]) {
   if (!Array.isArray(docs)) return [];
@@ -29,6 +30,7 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
   const [createStay] = useCreateTripStayMutation();
   const [updateStay] = useUpdateTripStayMutation();
   const [deleteStay] = useDeleteTripStayMutation();
+  const [createLibraryStay] = useCreateStayMutation();
 
   const handleStayEdit = async (itemId: number) => {
     if (cacheRef.current[itemId]) {
@@ -60,36 +62,66 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
     return mapped;
   };
 
-  const handleStaySave = async (data: any, itemId?: number, documents: any[] = []) => {
-    const form = mapStayToFormData(data, documents);
+  const handleStaySave = async (
+    data: any,
+    itemId?: number,
+    documents: any[] = []
+  ) => {
+    try {
+      const form = mapStayToFormData(
+        {
+          ...data,
+          saveInLibrary: data.saveInLibrary ?? false,
+        },
+        documents
+      );
 
-    let res;
+      let res;
+      if (itemId) {
+        res = await updateStay({
+          organizationId,
+          tripPublicId,
+          dayDetailId,
+          itemId: String(itemId),
+          data: form,
+        }).unwrap();
 
-    if (itemId) {
-      res = await updateStay({
-        organizationId,
-        tripPublicId,
-        dayDetailId,
-        itemId: String(itemId),
-        data: form,
-      }).unwrap();
-      delete cacheRef.current[String(itemId)];
-    } else {
+        delete cacheRef.current[String(itemId)];
+
+        return {
+          ...res,
+          documents: normalizeDocuments(res.documents ?? []),
+          tripType: "STAY",
+        };
+      }
       res = await createStay({
         organizationId,
         tripPublicId,
         dayDetailId,
         data: form,
       }).unwrap();
+      if (data.saveInLibrary) {
+        try {
+          await createLibraryStay({
+            organizationId,
+            data: form,
+          }).unwrap();
+        } catch (e) {
+          console.warn("Stay saved, but failed to save in library", e);
+        }
+      }
+
+      return {
+        ...res,
+        documents: normalizeDocuments(res.documents ?? []),
+        tripType: "STAY",
+      };
+    } catch (err) {
+      console.error("Stay save error:", err);
+      throw err;
     }
-
-    const raw = res;
-
-    return {
-      ...raw,
-      documents: normalizeDocuments(raw.documents ?? []),
-    };
   };
+
   const handleStayDelete = async (id: number) => {
     await deleteStay({
       organizationId,
@@ -97,7 +129,7 @@ export function useStay({ organizationId, tripPublicId, dayDetailId }: any) {
       dayDetailId,
       itemId: String(id),
     }).unwrap();
-      delete cacheRef.current[String(id)];
+    delete cacheRef.current[String(id)];
     return { id };
   };
 

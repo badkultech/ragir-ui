@@ -9,15 +9,16 @@ import {
 } from "@/lib/services/organizer/trip/itinerary/day-details/day-description";
 
 import { mapDayDescriptionToFormData } from "@/lib/services/organizer/trip/library/common/formDataMappers";
+import { useCreateDayDescriptionMutation } from "@/lib/services/organizer/trip/library/day-description";
 
 /* ---------------------- NORMALIZE SERVER DOCS ---------------------- */
 function normalizeDocuments(docs: any[]) {
   if (!Array.isArray(docs)) return [];
 
   return docs
-    .filter((d) => d?.url || d?.file) 
+    .filter((d) => d?.url || d?.file)
     .map((d) => ({
-      id:null,
+      id: null,
       url: d.url ?? null,
       type: d.type ?? "IMAGE",
       file: d.file ?? null,
@@ -35,6 +36,8 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
   const [createDesc] = useCreateTripDayDescriptionMutation();
   const [updateDesc] = useUpdateTripDayDescriptionMutation();
   const [deleteDesc] = useDeleteTripDayDescriptionMutation();
+  const [createLibraryDesc] = useCreateDayDescriptionMutation();
+
 
   /* ---------------------- EDIT ---------------------- */
   const handleEdit = async (item: any) => {
@@ -64,11 +67,11 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
         typeof data.time === "string"
           ? data.time.slice(0, 5)
           : data.time?.hour !== undefined
-          ? `${String(data.time.hour).padStart(2, "0")}:${String(
+            ? `${String(data.time.hour).padStart(2, "0")}:${String(
               data.time.minute
             ).padStart(2, "0")}`
-          : "",
-            documents: data.documents || [],
+            : "",
+      documents: data.documents || [],
     };
     cacheRef.current[itemId] = mapped;
     setInitialData(mapped);
@@ -110,19 +113,33 @@ export function useDayDescription({ organizationId, tripPublicId, dayDetailId }:
       }).unwrap();
     }
 
-    const raw = res;
+    if (data?.saveInLibrary) {
+      const libForm = mapDayDescriptionToFormData(
+        {
+          title: data.title,
+          description: data.description,
+          location: data.location,
+          time: data.time,
+          packingSuggestion: data.packing,
+        },
+        documents
+      );
+
+      await createLibraryDesc({
+        organizationId,
+        data: libForm,
+      }).unwrap();
+    }
 
     return {
-  ...raw,
-  tripType: "DAY_DESCRIPTION",
-  tripItemId:raw.tripItemId,
-  id: raw.tripItemId,
-  documents: normalizeDocuments(raw.documents ?? []),
-};
-
+      ...res,
+      tripType: "DAY_DESCRIPTION",
+      tripItemId: res.tripItemId,
+      id: res.tripItemId,
+      documents: normalizeDocuments(res.documents ?? []),
+    };
   };
 
-  /* ---------------------- DELETE ---------------------- */
   const handleDelete = async (id: number) => {
     await deleteDesc({
       organizationId,

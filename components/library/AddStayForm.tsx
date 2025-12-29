@@ -53,6 +53,7 @@ export function AddStayForm({
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
+  const [fromLibrary, setFromLibrary] = useState(false);
 
   const normalizeTime = (t: any) => {
     if (Array.isArray(t) && t.length >= 2) {
@@ -111,6 +112,7 @@ export function AddStayForm({
   const handleLibrarySelect = async (item: any) => {
     if (!item.id) return;
     setIsLibraryLoading(true);
+    setFromLibrary(true);
     try {
       const fd = await usegetbyid({ organizationId, stayId: String(item.id) }).unwrap();
       setTitle(fd.name || "");
@@ -290,7 +292,7 @@ export function AddStayForm({
       </div>
 
       {/* Save in Library */}
-      {isTripMode && (
+      {isTripMode && header === "Add Stay" && !fromLibrary && (
         <div className="flex justify-end items-center gap-2 mt-2">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -312,7 +314,7 @@ export function AddStayForm({
       )}
 
 
-      {isSaving && (
+      {isSaving && header === "Add Stay" && (
         <div className="w-full flex justify-center my-2">
           <p className="text-sm text-orange-500 font-medium">
             Saving...

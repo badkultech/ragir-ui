@@ -56,6 +56,8 @@ export function AddDayDescriptionForm({
   const [isSaving, setIsSaving] = useState(false);
   const organizationId = useOrganizationId();
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
+  const [fromLibrary, setFromLibrary] = useState(false);
+
 
   const normalizeTime = (t: any) => {
     if (Array.isArray(t) && t.length >= 2) {
@@ -71,6 +73,7 @@ export function AddDayDescriptionForm({
 
   useEffect(() => {
     if (!initialData) return;
+    setFromLibrary(false);
     setTitle(initialData.name || initialData.title || "");
     setDescription(initialData.description || "");
     setLocation(initialData.location || "");
@@ -86,6 +89,7 @@ export function AddDayDescriptionForm({
 
   const handleLibrarySelect = async (item: any) => {
     setIsLibraryLoading(true);
+    setFromLibrary(true);
 
     try {
       const fd = await getbyid({
@@ -277,7 +281,7 @@ export function AddDayDescriptionForm({
         )}
       </div>
 
-      {isTripMode && (
+      {isTripMode && header === "Add Day Description" && !fromLibrary && (
         <div className="flex flex-col items-end gap-2">
           <div className="flex justify-end items-center gap-2">
             <input
@@ -301,7 +305,7 @@ export function AddDayDescriptionForm({
       )}
 
 
-      {isSaving && (
+      {isSaving && header === "Add Day Description" && (
         <div className="w-full flex justify-center my-2">
           <p className="text-sm text-orange-500 font-medium">
             Saving...
