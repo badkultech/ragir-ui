@@ -10,6 +10,7 @@ type AuthState = {
   userData?: AuthTokenPayload | null | undefined;
   isTokenExpired?: boolean;
   focusedOrganizationId?: string | null;
+  focusedUserId?: string | null;
 };
 
 const initialState: AuthState = {
@@ -18,6 +19,7 @@ const initialState: AuthState = {
   userData: null,
   isTokenExpired: false,
   focusedOrganizationId: null,
+  focusedUserId: null,
 };
 
 const authSlice = createSlice({
@@ -45,6 +47,7 @@ const authSlice = createSlice({
         state.focusedOrganizationId =
           action.payload.focusedOrganizationId ??
           decodedData.organizationPublicId;
+        state.focusedUserId = action.payload.focusedUserId ?? decodedData.userPublicId;
         state.isTokenExpired = false;
       }
     },
@@ -55,15 +58,19 @@ const authSlice = createSlice({
       state.userData = null;
       state.isTokenExpired = false;
       state.focusedOrganizationId = null;
+      state.focusedUserId = null;
     },
 
     setFocusedOrganizationId: (state, action: PayloadAction<string>) => {
       state.focusedOrganizationId = action.payload;
     },
+    setFocusedUserId: (state, action: PayloadAction<string>) => {
+      state.focusedUserId = action.payload;
+    },
   },
 });
 
-export const { setCredentials, logout, setFocusedOrganizationId } =
+export const { setCredentials, logout, setFocusedOrganizationId, setFocusedUserId } =
   authSlice.actions;
 export const selectAuthState = (state: RootState) => state.auth;
 export default authSlice;

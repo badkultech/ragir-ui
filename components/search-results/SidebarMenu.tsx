@@ -5,7 +5,7 @@ import { X, LogOut, LucideIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface MenuItem {
-  icon:LucideIcon;
+  icon: LucideIcon;
   label: string;
   href: string;
 }
@@ -15,26 +15,28 @@ export function SidebarMenu({
   onClose,
   menuItems,
   userMenuItems,
+  onLogout,
+  isLoggedIn,
 }: {
   isOpen: boolean;
   onClose: () => void;
   menuItems: MenuItem[];
   userMenuItems: MenuItem[];
+  onLogout: () => void;
+  isLoggedIn: boolean;
 }) {
   return (
     <div
-      className={`fixed inset-0 z-50 transition-opacity duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
+      className={`fixed inset-0 z-50 transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       {/* Sidebar Panel */}
       <div
-        className={`absolute right-0 top-0 h-full w-full md:max-w-sm bg-card shadow-2xl transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`absolute right-0 top-0 h-full w-full md:max-w-sm bg-card shadow-2xl transition-transform duration-300 ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-end p-4 border-b border-border">
@@ -46,9 +48,8 @@ export function SidebarMenu({
           </button>
         </div>
 
-        {/* Body Scroll Area */}
+        {/* Body */}
         <div className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-70px)]">
-          
           {/* Main Menu */}
           {menuItems.map((item) => (
             <Link
@@ -58,49 +59,75 @@ export function SidebarMenu({
               className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors group"
             >
               <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
-              <span className="text-sm font-medium text-foreground">{item.label}</span>
+              <span className="text-sm font-medium text-foreground">
+                {item.label}
+              </span>
             </Link>
           ))}
 
-          {/* Divider */}
           <div className="my-4 border-t border-border" />
 
-          {/* User Profile */}
-          <div className="flex items-center gap-3 px-4 py-3">
-            <Avatar className="w-10 h-10">
-              <AvatarImage src="/man-profile.png" />
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                DR
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Dirk Russell</p>
-              <p className="text-xs text-muted-foreground">dirk@gmail.com</p>
-            </div>
-          </div>
+          {/* Only show user profile & user menu when logged in */}
+          {isLoggedIn && (
+            <>
+              {/* User Profile */}
+              <div className="flex items-center gap-3 px-4 py-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage src="/man-profile.png" />
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    DR
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">
+                    Dirk Russell
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    dirk@gmail.com
+                  </p>
+                </div>
+              </div>
 
-          {/* User Menu Items */}
-          {userMenuItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors group"
+              {/* User Menu Items */}
+              {userMenuItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors group"
+                >
+                  <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+
+              <div className="my-4 border-t border-border" />
+
+              {/* Logout Button */}
+              <button
+                onClick={onLogout}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-primary text-primary rounded-full hover:bg-primary/5 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm font-medium">Log Out</span>
+              </button>
+            </>
+          )}
+
+          {/* If NOT logged in → show Login/Register button */}
+          {!isLoggedIn && (
+            <button
+              onClick={() => {
+                onClose();
+                window.location.href = "/phone-entry";
+              }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors"
             >
-              <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
-              <span className="text-sm font-medium text-foreground">{item.label}</span>
-            </Link>
-          ))}
-
-          {/* Divider */}
-          <div className="my-4 border-t border-border" />
-
-          {/* Logout */}
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-primary text-primary rounded-full hover:bg-primary/5 transition-colors">
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm font-medium">Log Out</span>
-          </button>
-
+              Login / Register
+            </button>
+          )}
         </div>
       </div>
     </div>

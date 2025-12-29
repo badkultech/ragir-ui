@@ -43,46 +43,6 @@ export default function DashboardMainContent() {
     }
   };
 
-  const activities = [
-    { message: 'Sarah joined “Himalayan Adventure”', time: "2 hours ago" },
-    { message: "Desert Safari Expedition started", time: "5 hours ago" },
-    { message: "Added 3 new Activity items", time: "1 day ago" },
-    { message: "Desert Safari Expedition started", time: "5 hours ago" },
-  ];
-
-  // fallback dummy trips (still used when API returns empty)
-  const tripsFallback = [
-    {
-      name: "Rajasthan Folk Festival",
-      location: "Jodhpur, Rajasthan",
-      image: "/images/trip1.jpg",
-      description:
-        "Traditional music and dance performances with local artisans and cultural workshops",
-      startDate: "2025-11-05",
-      endDate: "2025-11-10",
-      tripPublicId: "fallback-1",
-    },
-    {
-      name: "Desert Camping Escape",
-      location: "Jaisalmer, Rajasthan",
-      image: "/images/trip2.jpg",
-      description: "Stargazing, camel safaris and desert BBQ",
-      startDate: "2025-11-12",
-      endDate: "2025-11-15",
-      tripPublicId: "fallback-2",
-    },
-    {
-      name: "Fort & Palace Tour",
-      location: "Jaipur, Rajasthan",
-      image: "/images/trip3.jpg",
-      description:
-        "Heritage walks through forts and palaces with local guides and craft visits",
-      startDate: "2025-11-20",
-      endDate: "2025-11-22",
-      tripPublicId: "fallback-3",
-    },
-  ];
-
   // ---- NEW: dashboard query ----
   const {
     data: dashboard,
@@ -107,7 +67,7 @@ export default function DashboardMainContent() {
       description: t.highlights ?? "",
       startDate: t.startDate ?? undefined,
       endDate: t.endDate ?? undefined,
-    })) as any[]) ?? tripsFallback;
+    })) as any[]);
 
   const nextMonthTrips =
     (dashboard?.nextMonth?.map((t) => ({
@@ -118,7 +78,7 @@ export default function DashboardMainContent() {
       description: t.highlights ?? "",
       startDate: t.startDate ?? undefined,
       endDate: t.endDate ?? undefined,
-    })) as any[]) ?? tripsFallback;
+    })) as any[]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -192,47 +152,11 @@ export default function DashboardMainContent() {
               </Card>
             </Link>
           </div>
-
-          {/* Recent Activity */}
-          <Card>
-            <CardHeader className="flex items-center justify-between border-b pb-2">
-              <CardTitle>Recent Activity</CardTitle>
-              <Link href={ROUTES.ORGANIZER.TRIPS_ACTIVITIES}>
-                <Button
-                  size="sm"
-                  className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
-                >
-                  View All
-                </Button>
-              </Link>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-4 pt-4">
-              {activities.map((activity, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="bg-white border rounded-full p-1">
-                      <Bell className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm">{activity.message}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {activity.time}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
           {/* This Month Trips */}
           <section>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold">This Month</h2>
-              <Link href={ROUTES.ORGANIZER.TRIPS} className="">
+              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW} className="">
                 <Button
                   size="sm"
                   className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
@@ -243,7 +167,7 @@ export default function DashboardMainContent() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(currentMonthTrips ?? tripsFallback).map((trip: any, i: number) => (
+              {currentMonthTrips?.map((trip: any, i: number) => (
                 <Card key={trip.tripPublicId ?? i} className="hover:shadow-md transition overflow-hidden">
                   <img
                     src={trip.image}
@@ -266,11 +190,22 @@ export default function DashboardMainContent() {
             </div>
           </section>
 
-          {/* November Trips (last month) */}
+          {/* Next Month Trips */}
           <section>
-            <h2 className="text-lg font-semibold mb-3">Next Month, 2025</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold mb-3">Next Month</h2>
+              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW} className="">
+                <Button
+                  size="sm"
+                  className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
+                >
+                  View All
+                </Button>
+              </Link>
+            </div>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(nextMonthTrips ?? tripsFallback).map((trip: any, i: number) => (
+              {(nextMonthTrips)?.map((trip: any, i: number) => (
                 <Card key={trip.tripPublicId ?? i} className="hover:shadow-md transition overflow-hidden">
                   <img
                     src={trip.image}

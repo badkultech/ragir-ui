@@ -22,6 +22,7 @@ export { WellnessIcon } from './wellnessIcon';
 export { TripIcon } from '../organizer/sidebar/icon/TripSidebarIcon';
 export { LibraryIcon } from '../organizer/sidebar/icon/LibrarySidebarIcon';
 export { TicketIcon } from '../organizer/support-tickets/icon/TicketIcon';
+export { SpiritualIcon } from './spiritualIcon';
 
 
 // NOTE: prefer named imports: `import { BeachIcon } from "@/components/library/SvgComponents/Icons"`

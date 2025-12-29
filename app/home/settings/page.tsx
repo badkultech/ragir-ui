@@ -16,6 +16,7 @@ import { MainHeader } from "@/components/search-results/MainHeader";
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 export default function SettingsPage() {
 
@@ -44,9 +45,13 @@ export default function SettingsPage() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const router = useRouter()
+  const { isLoggedIn, handleLogout, router } = useAuthActions();
   const [notifications, setNotifications] = useState(notificationsData);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const onLogout = () => {
+    handleLogout(() => setSidebarOpen(false));
+  };
 
 
   return (
@@ -55,10 +60,11 @@ export default function SettingsPage() {
 
         {/* ✅ HEADER FIXED */}
         <MainHeader logoText="Settings"
-          isLoggedIn={true}
+          isLoggedIn={isLoggedIn}
           notifications={notifications}
           onUpdateNotifications={setNotifications}
           onMenuOpen={() => setSidebarOpen(true)}
+          variant="edge"
         />
 
         {/* MAIN CONTENT AREA */}
@@ -97,7 +103,14 @@ export default function SettingsPage() {
         </main>
 
         {/* MODALS */}
-        <LogoutModal open={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
+        <LogoutModal
+          open={showLogoutModal}
+          onClose={() => setShowLogoutModal(false)}
+          onLogout={() => {
+            setShowLogoutModal(false);
+            onLogout();
+          }}
+        />
         <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)} />
         <DeleteModal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} />
 
@@ -107,6 +120,8 @@ export default function SettingsPage() {
         onClose={() => setSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
+        onLogout={onLogout}
+        isLoggedIn={isLoggedIn}
       />
     </>
   );

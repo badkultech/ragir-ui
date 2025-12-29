@@ -9,6 +9,7 @@ import { MainHeader } from "@/components/search-results/MainHeader"
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu"
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 interface InvitationRequest {
   id: string
@@ -58,10 +59,13 @@ export default function TripInvitationsPage() {
   const [showNudgeModal, setShowNudgeModal] = useState(false)
   const [selectedTrip, setSelectedTrip] = useState<InvitationRequest | null>(null)
   const [openCardId, setOpenCardId] = useState<string>(invitationRequests[0].id)
-  const router = useRouter()
+  const { isLoggedIn, handleLogout, router } = useAuthActions();
   const [notifications, setNotifications] = useState(notificationsData)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+  const onLogout = () => {
+    handleLogout(() => setIsSidebarOpen(false));
+  };
 
   const openButtonsFor = (id: string) => {
     setOpenCardId(id)
@@ -82,10 +86,11 @@ export default function TripInvitationsPage() {
       <div className="min-h-screen bg-background">
 
         {/* Header */}
-        <MainHeader logoText="Trip Invitations sent" isLoggedIn={true}
+        <MainHeader logoText="Trip Invitations sent" isLoggedIn={isLoggedIn}
           notifications={notifications}
           onUpdateNotifications={setNotifications}
           onMenuOpen={() => setIsSidebarOpen(true)}
+          variant="edge"
         />
 
         {/* Main Content */}
@@ -216,6 +221,8 @@ export default function TripInvitationsPage() {
         onClose={() => setIsSidebarOpen(false)}
         menuItems={menuItems}
         userMenuItems={userMenuItems}
+        onLogout={onLogout}
+        isLoggedIn={isLoggedIn}
       />
     </>
   )

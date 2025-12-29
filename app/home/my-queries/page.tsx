@@ -21,6 +21,7 @@ import GradientCheckbox from "@/components/ui/GradientCheckbox"
 import { MainHeader } from "@/components/search-results/MainHeader"
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu"
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 type QuestionStatus = "responded" | "pending"
 
@@ -77,7 +78,7 @@ export default function MyQueriesPage() {
     const [newQuestion, setNewQuestion] = useState("")
     const [reportReasons, setReportReasons] = useState<string[]>([])
     const [reportDetails, setReportDetails] = useState("")
-    const router = useRouter()
+    const { isLoggedIn, handleLogout, router } = useAuthActions();
     const [notifications, setNotifications] = useState(notificationsData);
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -85,6 +86,9 @@ export default function MyQueriesPage() {
     const respondedQueries = mockQuestions.filter((q) => q.status === "responded").length
     const pendingQueries = mockQuestions.filter((q) => q.status === "pending").length
 
+    const onLogout = () => {
+        handleLogout(() => setSidebarOpen(false));
+    };
     const toggleQuestion = (id: string) => {
         setExpandedQuestions((prev) => (prev.includes(id) ? prev.filter((qId) => qId !== id) : [...prev, id]))
     }
@@ -129,10 +133,11 @@ export default function MyQueriesPage() {
         <>
             <div className="min-h-screen bg-white w-full">
                 {/* Header */}
-                <MainHeader logoText="My Queries" isLoggedIn={true}
+                <MainHeader logoText="My Queries" isLoggedIn={isLoggedIn}
                     notifications={notifications}
                     onUpdateNotifications={setNotifications}
                     onMenuOpen={() => setSidebarOpen(true)}
+                    variant="edge"
                 />
 
                 {/* Main Content */}
@@ -412,6 +417,8 @@ export default function MyQueriesPage() {
                 onClose={() => setSidebarOpen(false)}
                 menuItems={menuItems}
                 userMenuItems={userMenuItems}
+                onLogout={onLogout}
+                isLoggedIn={isLoggedIn}
             />
         </>
     )

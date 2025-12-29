@@ -7,12 +7,11 @@ import { GradientButton } from "@/components/gradient-button";
 import { ArrowRight } from "lucide-react";
 import { useGenerateOtpMutation } from "@/lib/services/otp";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 export default function PhoneEntryPage() {
   const [loginMethod, setLoginMethod] = useState<"EMAIL" | "MOBILE">("MOBILE");
-  const router = useRouter();
+  const { userData, router } = useAuthActions();
   const [generateOtp] = useGenerateOtpMutation();
   const [otpError, setOtpError] = useState<string | null>(null);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
@@ -21,7 +20,6 @@ export default function PhoneEntryPage() {
   const [userType, setUserType] = useState<string>("user");
 
   const [phoneNumber, setPhoneNumber] = useState("");
-  const { userData } = useSelector(selectAuthState);
   const userPublicId = userData?.userPublicId || "";
 
   const handleGenerateOTP = async () => {
