@@ -27,6 +27,8 @@ export const ENDPOINTS = {
   FORGOT_ORGANIZER_PASSWORD: '/public/invite/forgot-password',
 
   PARTNER: '/public/join_as_partner',
+  // trip search
+  TRIP_SEARCH: '/public/trip/search',
 
   // ======= Group Leader Library =======
   GET_ALL_GROUP_LEADERS: (organizationId: string) =>

@@ -27,6 +27,8 @@ import {
   Flower2,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useSearchPublicTripsQuery } from "@/lib/services/trip-search"
+import { skipToken } from "@reduxjs/toolkit/query"
 
 const moods = [
   { name: "Mountain", icon: Mountain, selected: true },
@@ -57,34 +59,68 @@ export function SearchTripsCard() {
   const [destination, setDestination] = useState("")
   const [selectedRegion, setSelectedRegion] = useState<"domestic" | "international">("domestic")
   const router = useRouter();
+  const [criteria, setCriteria] = useState<any>(null);
+
 
   const toggleMood = (moodName: string) => {
     setSelectedMoods((prev) => (prev.includes(moodName) ? prev.filter((m) => m !== moodName) : [...prev, moodName]))
   }
+  
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (activeTab === "destination") {
-      if (destination.trim()) {
-        params.set("destination", destination);
-      } else {
-        params.set("region", selectedRegion);
-      }
-    }
-    if (activeTab === "moods") {
-      if (selectedMoods.length > 0) {
-        params.set("moods", JSON.stringify(selectedMoods));
-      }
-    }
-    params.set("year", year.toString());
-    params.set("month", selectedMonth);
+  const newCriteria: any = {};
 
-    router.push(`/home/search-result-with-filter?${params.toString()}`);
-  };
+  if (activeTab === "destination") {
+    if (destination.trim()) {
+      newCriteria.destination = destination;
+    } else {
+      newCriteria.isDomestic = selectedRegion === "domestic";
+    }
+  }
+
+  if (activeTab === "moods" && selectedMoods.length > 0) {
+   newCriteria.moods = selectedMoods.map(m =>
+  m.replace("-", "_").toUpperCase()
+);
+
+  }
+const monthIndexMap: any = {
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12,
+};
+
+newCriteria.month = monthIndexMap[selectedMonth];
+newCriteria.year = year;
+
+  setCriteria(newCriteria);
+};
+
+const { data, isLoading, error } = useSearchPublicTripsQuery(
+  criteria
+    ? {
+        criteria,
+        pageable: {
+          page: 0,
+          size: 10,
+        },
+      }
+    : skipToken
+);
 
 
 
   return (
+    <>
     <div className="bg-white rounded-[20px] md:rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.12)] 
         p-4 md:p-6 w-full max-w-[360px] sm:max-w-[420px] md:max-w-[500px] lg:max-w-[600px] mx-auto">
       {/* Header */}
@@ -222,5 +258,40 @@ export function SearchTripsCard() {
         </div>
       </GradientButton>
     </div>
+
+    {/* RESULTS SECTION */}
+<div className="mt-6">
+  {isLoading && <p>Loading trips...</p>}
+
+  {error && (
+    <p className="text-red-500 text-sm">
+      Failed to load trips
+    </p>
+  )}
+
+  {data?.content?.length === 0 && (
+    <p className="text-gray-500 text-sm">
+      No trips found.
+    </p>
+  )}
+
+  {data?.content?.map((trip) => (
+    <div
+      key={trip.publicId}
+      className="border rounded-lg p-3 mt-3 bg-orange-50"
+    >
+      <p className="font-semibold">{trip.name}</p>
+
+      <p className="text-sm text-gray-600">
+        {trip.startDate} — {trip.endDate}
+      </p>
+
+      <p className="text-xs mt-1">
+        {trip.cityTags?.join(", ")}
+      </p>
+    </div>
+  ))}
+</div>
+</>
   )
 }
