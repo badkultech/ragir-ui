@@ -401,7 +401,7 @@ export function CreateTrip({ tripId }: Props) {
         data.append("moodTags[]", tag);
       });
       cityTags.forEach(city => {
-        data.append("cityTags[]", city);
+        data.append("destinationTags[]", city);
       });
       leaders.forEach((leader) => {
         data.append("groupLeaderIds", leader.id.toString());
