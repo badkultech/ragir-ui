@@ -41,7 +41,7 @@ export default function DesktopSidebar({
 
   return (
     <div className="hidden lg:block lg:col-span-1">
-      <div className="sticky top-24 space-y-4">
+      <div className=" space-y-4 mt-4">
 
         {/* Images */}
         <div className="grid grid-cols-2 gap-2">
@@ -64,7 +64,7 @@ export default function DesktopSidebar({
         </div>
 
         {/* Pricing Card */}
-        <div className="bg-white rounded-2xl border p-5 space-y-4">
+        <div className="bg-white rounded-2xl border p-5 mt-4 space-y-4">
 
           {/* Price Header */}
           <div className="flex justify-between items-center">
@@ -81,43 +81,42 @@ export default function DesktopSidebar({
 
           {/* Expanded Content */}
           <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-              <p className="font-medium text-sm">Occupancy – Double</p>
+            <p className="font-medium text-sm">Occupancy – Double</p>
 
-              {pricingOptions.map((opt) => {
-                const active = selected === opt.id
+            {pricingOptions.map((opt) => {
+              const active = selected === opt.id
 
-                return (
-                  <button
-                    key={opt.id}
-                    onClick={() => setSelected(opt.id)}
-                    className={`w-full flex justify-between items-start p-4 rounded-xl border transition
-                      ${
-                        active
-                          ? "border-orange-500 bg-white"
-                          : "border-transparent bg-white"
-                      }
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => setSelected(opt.id)}
+                  className={`w-full flex justify-between items-start p-4 rounded-xl border transition
+                      ${active
+                      ? "border-orange-500 bg-white"
+                      : "border-transparent bg-white"
+                    }
                     `}
-                  >
-                    <div className="flex gap-3 items-start">
-                      <Bike className="w-4 h-4 mt-1 text-gray-600" />
-                      <div className="text-left">
-                        <p className="font-semibold text-sm">
-                          {opt.title}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {opt.subtitle}
-                        </p>
-                      </div>
+                >
+                  <div className="flex gap-3 items-start">
+                    <Bike className="w-4 h-4 mt-1 text-gray-600" />
+                    <div className="text-left">
+                      <p className="font-semibold text-sm">
+                        {opt.title}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {opt.subtitle}
+                      </p>
                     </div>
+                  </div>
 
-                    <p className="font-semibold text-sm">
-                      {opt.price}
-                    </p>
-                  </button>
-                )
-              })}
-            </div>
-          
+                  <p className="font-semibold text-sm">
+                    {opt.price}
+                  </p>
+                </button>
+              )
+            })}
+          </div>
+
 
           {/* Warning */}
           {!selected && (
@@ -131,10 +130,9 @@ export default function DesktopSidebar({
           <button
             disabled={!selected}
             className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition
-              ${
-                selected
-                  ? "bg-orange-500 text-white hover:bg-orange-600"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ${selected
+                ? "bg-orange-500 text-white hover:bg-orange-600"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }
             `}
           >
