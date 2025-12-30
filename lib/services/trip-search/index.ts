@@ -10,40 +10,40 @@ export const publicTripAPI = baseAPI.injectEndpoints({
       PageResponse<PublicTripDTO>,
       { criteria: SearchCriteria; pageable?: Pageable }
     >({
-    query: ({ criteria }) => {
-  const params = new URLSearchParams();
+      query: ({ criteria }) => {
+        const params = new URLSearchParams();
 
-  if (criteria?.month)
-    params.append("month", String(criteria.month));
+        if (criteria?.month)
+          params.append("month", String(criteria.month));
 
-  if (criteria?.year)
-    params.append("year", String(criteria.year));
+        if (criteria?.year)
+          params.append("year", String(criteria.year));
 
-  // ⭐ DESTINATION TAGS
-  if (criteria?.destinationTags?.length) {
-    criteria.destinationTags.forEach(tag =>
-      params.append(
-        "destinationTags",
-        tag.trim().toUpperCase().replace(/\s+/g, "_")
-      )
-    );
-  }
+        // ⭐ DESTINATION TAGS
+        if (criteria?.destinationTags?.length) {
+          criteria.destinationTags.forEach(tag =>
+            params.append(
+              "destinationTags",
+              tag.trim().toUpperCase().replace(/\s+/g, "_")
+            )
+          );
+        }
 
-  // ⭐ MOODS
-  if (criteria?.moods?.length) {
-    criteria.moods.forEach(m =>
-      params.append(
-        "moods",
-        m.trim().toUpperCase().replace(/\s+/g, "_")
-      )
-    );
-  }
+        // ⭐ MOODS
+        if (criteria?.moods?.length) {
+          criteria.moods.forEach(m =>
+            params.append(
+              "moods",
+              m.trim().replace(/\s+/g, "_")
+            )
+          );
+        }
 
-  return {
-    url: `${ENDPOINTS.TRIP_SEARCH}?${params.toString()}`,
-    method: "GET",
-  };
-},
+        return {
+          url: `${ENDPOINTS.TRIP_SEARCH}?${params.toString()}`,
+          method: "GET",
+        };
+      },
 
 
 

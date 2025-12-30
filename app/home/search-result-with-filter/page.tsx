@@ -70,7 +70,7 @@ const trips = [
 export default function SearchResultsWithFilters() {
   const searchParams = useSearchParams();
   const moodsFromUrl = searchParams.get("moods");
-  const destinationFromUrl = searchParams.get("destination");
+  const destinationFromUrl = searchParams.get("destinationTags");
   const regionFromUrl = searchParams.get("region");
   const yearFromUrl = searchParams.get("year");
   const monthFromUrl = searchParams.get("month");
@@ -92,21 +92,21 @@ export default function SearchResultsWithFilters() {
   // moods
   const moodsAll = searchParams.getAll("moods");
 
-if (moodsAll.length > 0) {
-  criteria.moods = moodsAll.map(m =>
-    m.replace("-", "_").toLowerCase()
-  );
-}
+  if (moodsAll.length > 0) {
+    criteria.moods = moodsAll.map(m =>
+      m.replace("-", "_").toLowerCase()
+    );
+  }
 
-let parsedMoods: string[] = moodsAll;
+  let parsedMoods: string[] = moodsAll;
 
-if (moodsAll.length > 0) {
-  parsedMoods = moodsAll;
-} else if (moodsFromUrl) {
-  try {
-    parsedMoods = JSON.parse(moodsFromUrl);
-  } catch {}
-}
+  if (moodsAll.length > 0) {
+    parsedMoods = moodsAll;
+  } else if (moodsFromUrl) {
+    try {
+      parsedMoods = JSON.parse(moodsFromUrl);
+    } catch { }
+  }
 
 
   /* ---- Initial Filters Build ---- */
@@ -117,7 +117,7 @@ if (moodsAll.length > 0) {
     parsedMoods.forEach((m) => list.push({ id: id++, label: m }));
 
     if (destinationFromUrl)
-      list.push({ id: id++, label: `DestinationTags: ${destinationFromUrl}` });
+      list.push({ id: id++, label: `Destination: ${destinationFromUrl}` });
     if (regionFromUrl)
       list.push({ id: id++, label: `Region: ${regionFromUrl}` });
 
@@ -262,32 +262,32 @@ if (moodsAll.length > 0) {
 
             {!isLoading && apiTrips.length === 0 && <NoTripsFound />}
 
-           {apiTrips.length > 0 && (
-  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-    {apiTrips.map((trip: any) => (
-      <SearchResultsTripCard
-        key={trip.publicId}
-        id={trip.publicId}
-        title={trip.name}
-        provider={trip.providerName || "—"}
-        location={
-          trip.cityTags?.join(", ") ||
-          trip.destinationTags?.join(", ") ||
-          "—"
-        }
-        rating={trip.rating || 4.5}
-        days={`${trip.totalDays || "-"}D/${trip.totalNights || "-"}N`}
-        dates={`${trip.startDate} — ${trip.endDate}`}
-        price={trip.startingPrice || 0}
-        image={trip.bannerImageUrl || "/hampi-ruins-temples.png"}
-        badges={[
-          ...(trip.moodTags || []),
-          ...(trip.destinationTags || []),
-        ]}
-      />
-    ))}
-  </div>
-)}
+            {apiTrips.length > 0 && (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {apiTrips.map((trip: any) => (
+                  <SearchResultsTripCard
+                    key={trip.publicId}
+                    id={trip.publicId}
+                    title={trip.name}
+                    provider={trip.providerName || "—"}
+                    location={
+                      trip.cityTags?.join(", ") ||
+                      trip.destinationTags?.join(", ") ||
+                      "—"
+                    }
+                    rating={trip.rating || 4.5}
+                    days={`${trip.totalDays || "-"}D/${trip.totalNights || "-"}N`}
+                    dates={`${trip.startDate} — ${trip.endDate}`}
+                    price={trip.startingPrice || 0}
+                    image={trip.bannerImageUrl || "/hampi-ruins-temples.png"}
+                    badges={[
+                      ...(trip.moodTags || []),
+                      ...(trip.destinationTags || []),
+                    ]}
+                  />
+                ))}
+              </div>
+            )}
 
 
           </div>
