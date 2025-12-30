@@ -10,6 +10,7 @@ import { DesktopFilterSidebar } from "@/components/search-results/desktop-filter
 import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
 import { FilterTags } from "@/components/search-results/filter-tags";
 import NoTripsFound from "@/components/search-results/NoTripsFound";
+import { useSearchPublicTripsQuery } from "@/lib/services/trip-search";
 
 const trips = [
   {
@@ -74,13 +75,39 @@ export default function SearchResultsWithFilters() {
   const yearFromUrl = searchParams.get("year");
   const monthFromUrl = searchParams.get("month");
 
-  /* ---- Parse Mood Array ---- */
-  let parsedMoods: string[] = [];
-  try {
-    parsedMoods = moodsFromUrl ? JSON.parse(moodsFromUrl) : [];
-  } catch {
-    parsedMoods = [];
+  const criteria: any = {
+    month: monthFromUrl ? Number(monthFromUrl) : undefined,
+    year: yearFromUrl ? Number(yearFromUrl) : undefined,
+    destinationTags: [],
+    moods: []
+  };
+
+  // destination
+  if (destinationFromUrl) {
+    criteria.destinationTags.push(
+      destinationFromUrl.toLowerCase().replace(/\s+/g, "_")
+    );
   }
+
+  // moods
+  const moodsAll = searchParams.getAll("moods");
+
+if (moodsAll.length > 0) {
+  criteria.moods = moodsAll.map(m =>
+    m.replace("-", "_").toLowerCase()
+  );
+}
+
+let parsedMoods: string[] = moodsAll;
+
+if (moodsAll.length > 0) {
+  parsedMoods = moodsAll;
+} else if (moodsFromUrl) {
+  try {
+    parsedMoods = JSON.parse(moodsFromUrl);
+  } catch {}
+}
+
 
   /* ---- Initial Filters Build ---- */
   const [filters, setFilters] = useState(() => {
@@ -90,7 +117,7 @@ export default function SearchResultsWithFilters() {
     parsedMoods.forEach((m) => list.push({ id: id++, label: m }));
 
     if (destinationFromUrl)
-      list.push({ id: id++, label: `Destination: ${destinationFromUrl}` });
+      list.push({ id: id++, label: `DestinationTags: ${destinationFromUrl}` });
     if (regionFromUrl)
       list.push({ id: id++, label: `Region: ${regionFromUrl}` });
 
@@ -101,45 +128,12 @@ export default function SearchResultsWithFilters() {
   });
 
   /* ---------------- FILTER LOGIC ---------------- */
-  const filteredTrips = trips.filter((trip) => {
-
-    const tripBadges = trip.badges.map((b) => b.toLowerCase());
-    if (parsedMoods.length > 0) {
-      const hasAtLeastOneMood = parsedMoods.some((mood) =>
-        tripBadges.includes(mood.toLowerCase())
-      );
-      if (!hasAtLeastOneMood) return false;
-    }
-    if (destinationFromUrl) {
-      if (!trip.location.toLowerCase().includes(destinationFromUrl.toLowerCase())) {
-        return false;
-      }
-    }
-    if (filters.length > 0) {
-      let matchFound = false;
-
-      for (const f of filters) {
-        const label = f.label.toLowerCase();
-
-        // Destination from sidebar
-        if (label.includes("destination:")) {
-          const dest = label.replace("destination:", "").trim();
-          if (trip.location.toLowerCase().includes(dest)) {
-            matchFound = true;
-          }
-        }
-
-        // Mood match
-        if (trip.badges.some((b) => label.includes(b.toLowerCase()))) {
-          matchFound = true;
-        }
-      }
-
-      if (!matchFound) return false;
-    }
-
-    return true;
+  const { data, isLoading, error } = useSearchPublicTripsQuery({
+    criteria,
+    pageable: { page: 0, size: 10 }
   });
+  const apiTrips = data?.content || [];
+
 
 
 
@@ -153,10 +147,10 @@ export default function SearchResultsWithFilters() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   const [sortBy, setSortBy] = useState<string | null>(null);
-  let sortedTrips = [...filteredTrips];
+  let sortedTrips = [...apiTrips];
 
   if (sortBy === "price_low") {
-    sortedTrips.sort((a, b) => a.price - b.price);
+    sortedTrips.sort((a, b) => (a.price || 0) - (b.price || 0));
   }
   if (sortBy === "price_high") {
     sortedTrips.sort((a, b) => b.price - a.price);
@@ -245,7 +239,7 @@ export default function SearchResultsWithFilters() {
               <div className="flex justify-between items-center mt-3">
                 <p className="text-sm">
                   <span className="text-[#e07a5f] font-semibold">
-                    {filteredTrips.length}
+                    {apiTrips.length}
                   </span>{" "}
                   trips found
                 </p>
@@ -262,16 +256,39 @@ export default function SearchResultsWithFilters() {
             </div>
 
 
-            {filteredTrips.length === 0 ? (
-              <NoTripsFound />
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {sortedTrips.map((trip) => (
-                  <SearchResultsTripCard key={trip.id} {...trip} />
-                ))}
+            {isLoading && <p>Loading trips...</p>}
 
-              </div>
-            )}
+            {error && <p className="text-red-500">Failed to load trips</p>}
+
+            {!isLoading && apiTrips.length === 0 && <NoTripsFound />}
+
+           {apiTrips.length > 0 && (
+  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {apiTrips.map((trip: any) => (
+      <SearchResultsTripCard
+        key={trip.publicId}
+        id={trip.publicId}
+        title={trip.name}
+        provider={trip.providerName || "—"}
+        location={
+          trip.cityTags?.join(", ") ||
+          trip.destinationTags?.join(", ") ||
+          "—"
+        }
+        rating={trip.rating || 4.5}
+        days={`${trip.totalDays || "-"}D/${trip.totalNights || "-"}N`}
+        dates={`${trip.startDate} — ${trip.endDate}`}
+        price={trip.startingPrice || 0}
+        image={trip.bannerImageUrl || "/hampi-ruins-temples.png"}
+        badges={[
+          ...(trip.moodTags || []),
+          ...(trip.destinationTags || []),
+        ]}
+      />
+    ))}
+  </div>
+)}
+
 
           </div>
         </div>

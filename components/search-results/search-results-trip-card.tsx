@@ -10,7 +10,7 @@ interface SearchResultsTripCardProps {
   title: string
   provider: string
   location: string
-  subLocation: string
+  subLocation?: string
   rating: number | null
   days: string
   dates: string

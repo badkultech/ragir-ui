@@ -27,6 +27,8 @@ import {
   Flower2,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useSearchPublicTripsQuery } from "@/lib/services/trip-search"
+import { skipToken } from "@reduxjs/toolkit/query"
 
 const moods = [
   { name: "Mountain", icon: Mountain, selected: true },
@@ -54,37 +56,59 @@ export function SearchTripsCard() {
   const [selectedMoods, setSelectedMoods] = useState<string[]>(["Mountain", "Wellness", "Women-Only"])
   const [selectedMonth, setSelectedMonth] = useState("Jan")
   const [year, setYear] = useState(2026)
-  const [destination, setDestination] = useState("")
+  const [destinationTags, setDestinationTags] = useState("")
   const [selectedRegion, setSelectedRegion] = useState<"domestic" | "international">("domestic")
   const router = useRouter();
+  const [criteria, setCriteria] = useState<any>(null);
+
 
   const toggleMood = (moodName: string) => {
     setSelectedMoods((prev) => (prev.includes(moodName) ? prev.filter((m) => m !== moodName) : [...prev, moodName]))
   }
+  
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (activeTab === "destination") {
-      if (destination.trim()) {
-        params.set("destination", destination);
-      } else {
-        params.set("region", selectedRegion);
-      }
-    }
-    if (activeTab === "moods") {
-      if (selectedMoods.length > 0) {
-        params.set("moods", JSON.stringify(selectedMoods));
-      }
-    }
-    params.set("year", year.toString());
-    params.set("month", selectedMonth);
+  const params = new URLSearchParams();
 
-    router.push(`/home/search-result-with-filter?${params.toString()}`);
+  // DESTINATION TAGS / REGION
+  if (activeTab === "destination") {
+    if (destinationTags.trim()) {
+      params.append(
+        "destinationTags",
+        destinationTags.trim().toUpperCase().replace(/\s+/g, "_")
+      );
+    } else {
+      params.append(
+        "destinationTags",
+        selectedRegion === "domestic" ? "DOMESTIC" : "INTERNATIONAL"
+      );
+    }
+  }
+
+  // MOODS
+  if (activeTab === "moods" && selectedMoods.length > 0) {
+    selectedMoods.forEach(m =>
+      params.append(
+        "moods",
+        m.replace("-", "_").toUpperCase()
+      )
+    );
+  }
+
+  // MONTH + YEAR
+  const monthIndexMap: any = {
+    Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+    Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12,
   };
 
+  params.append("month", String(monthIndexMap[selectedMonth]));
+  params.append("year", String(year));
 
+  router.push(`/home/search-result-with-filter?${params.toString()}`);
+};
 
   return (
+    <>
     <div className="bg-white rounded-[20px] md:rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.12)] 
         p-4 md:p-6 w-full max-w-[360px] sm:max-w-[420px] md:max-w-[500px] lg:max-w-[600px] mx-auto">
       {/* Header */}
@@ -125,8 +149,8 @@ export function SearchTripsCard() {
             <input
               type="text"
               placeholder="Enter destination"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+              value={destinationTags}
+              onChange={(e) => setDestinationTags(e.target.value)}
               className="w-full mt-1.5 px-3 py-2 md:px-4 md:py-3 border border-gray-200 rounded-lg text-xs md:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
@@ -222,5 +246,6 @@ export function SearchTripsCard() {
         </div>
       </GradientButton>
     </div>
+</>
   )
 }
