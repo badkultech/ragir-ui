@@ -28,7 +28,7 @@ export const ENDPOINTS = {
 
   PARTNER: '/public/join_as_partner',
   // trip search
-  TRIP_SEARCH: '/public/trip/search',
+  TRIP_SEARCH: '/public/trips/search',
 
   // ======= Group Leader Library =======
   GET_ALL_GROUP_LEADERS: (organizationId: string) =>

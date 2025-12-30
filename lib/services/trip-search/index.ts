@@ -10,7 +10,7 @@ export const publicTripAPI = baseAPI.injectEndpoints({
       PageResponse<PublicTripDTO>,
       { criteria: SearchCriteria; pageable?: Pageable }
     >({
-     query: ({ criteria }) => {
+    query: ({ criteria }) => {
   const params = new URLSearchParams();
 
   if (criteria?.month)
@@ -18,14 +18,6 @@ export const publicTripAPI = baseAPI.injectEndpoints({
 
   if (criteria?.year)
     params.append("year", String(criteria.year));
-
-  // ⭐ DESTINATION
-  if (criteria?.destination) {
-    params.append(
-      "destination",
-      criteria.destination.trim().toUpperCase().replace(/\s+/g, "_")
-    );
-  }
 
   // ⭐ DESTINATION TAGS
   if (criteria?.destinationTags?.length) {
@@ -52,6 +44,7 @@ export const publicTripAPI = baseAPI.injectEndpoints({
     method: "GET",
   };
 },
+
 
 
       transformResponse: (response: {

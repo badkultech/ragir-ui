@@ -56,7 +56,7 @@ export function SearchTripsCard() {
   const [selectedMoods, setSelectedMoods] = useState<string[]>(["Mountain", "Wellness", "Women-Only"])
   const [selectedMonth, setSelectedMonth] = useState("Jan")
   const [year, setYear] = useState(2026)
-  const [destination, setDestination] = useState("")
+  const [destinationTags, setDestinationTags] = useState("")
   const [selectedRegion, setSelectedRegion] = useState<"domestic" | "international">("domestic")
   const router = useRouter();
   const [criteria, setCriteria] = useState<any>(null);
@@ -68,56 +68,44 @@ export function SearchTripsCard() {
   
 
   const handleSearch = () => {
-  const newCriteria: any = {};
+  const params = new URLSearchParams();
 
+  // DESTINATION TAGS / REGION
   if (activeTab === "destination") {
-    if (destination.trim()) {
-      newCriteria.destination = destination;
+    if (destinationTags.trim()) {
+      params.append(
+        "destinationTags",
+        destinationTags.trim().toUpperCase().replace(/\s+/g, "_")
+      );
     } else {
-      newCriteria.isDomestic = selectedRegion === "domestic";
+      params.append(
+        "destinationTags",
+        selectedRegion === "domestic" ? "DOMESTIC" : "INTERNATIONAL"
+      );
     }
   }
 
+  // MOODS
   if (activeTab === "moods" && selectedMoods.length > 0) {
-   newCriteria.moods = selectedMoods.map(m =>
-  m.replace("-", "_").toUpperCase()
-);
-
+    selectedMoods.forEach(m =>
+      params.append(
+        "moods",
+        m.replace("-", "_").toUpperCase()
+      )
+    );
   }
-const monthIndexMap: any = {
-  Jan: 1,
-  Feb: 2,
-  Mar: 3,
-  Apr: 4,
-  May: 5,
-  Jun: 6,
-  Jul: 7,
-  Aug: 8,
-  Sep: 9,
-  Oct: 10,
-  Nov: 11,
-  Dec: 12,
+
+  // MONTH + YEAR
+  const monthIndexMap: any = {
+    Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+    Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12,
+  };
+
+  params.append("month", String(monthIndexMap[selectedMonth]));
+  params.append("year", String(year));
+
+  router.push(`/home/search-result-with-filter?${params.toString()}`);
 };
-
-newCriteria.month = monthIndexMap[selectedMonth];
-newCriteria.year = year;
-
-  setCriteria(newCriteria);
-};
-
-const { data, isLoading, error } = useSearchPublicTripsQuery(
-  criteria
-    ? {
-        criteria,
-        pageable: {
-          page: 0,
-          size: 10,
-        },
-      }
-    : skipToken
-);
-
-
 
   return (
     <>
@@ -161,8 +149,8 @@ const { data, isLoading, error } = useSearchPublicTripsQuery(
             <input
               type="text"
               placeholder="Enter destination"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+              value={destinationTags}
+              onChange={(e) => setDestinationTags(e.target.value)}
               className="w-full mt-1.5 px-3 py-2 md:px-4 md:py-3 border border-gray-200 rounded-lg text-xs md:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
@@ -258,40 +246,6 @@ const { data, isLoading, error } = useSearchPublicTripsQuery(
         </div>
       </GradientButton>
     </div>
-
-    {/* RESULTS SECTION */}
-<div className="mt-6">
-  {isLoading && <p>Loading trips...</p>}
-
-  {error && (
-    <p className="text-red-500 text-sm">
-      Failed to load trips
-    </p>
-  )}
-
-  {data?.content?.length === 0 && (
-    <p className="text-gray-500 text-sm">
-      No trips found.
-    </p>
-  )}
-
-  {data?.content?.map((trip) => (
-    <div
-      key={trip.publicId}
-      className="border rounded-lg p-3 mt-3 bg-orange-50"
-    >
-      <p className="font-semibold">{trip.name}</p>
-
-      <p className="text-sm text-gray-600">
-        {trip.startDate} — {trip.endDate}
-      </p>
-
-      <p className="text-xs mt-1">
-        {trip.cityTags?.join(", ")}
-      </p>
-    </div>
-  ))}
-</div>
 </>
   )
 }
