@@ -970,7 +970,7 @@ export function CreateTrip({ tripId }: Props) {
                           className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition border-b last:border-b-0"
                         >
                           <p className="text-sm font-medium text-gray-800">
-                            {row.raw.attraction}, {row.raw.city}, {row.raw.province}
+                            {row.raw.attraction}, {row.raw.city}, {row.raw.province}, 
                             {row.raw.country} • {row.raw.region} • {row.raw.pinCode}
                           </p>
                           <p className="text-xs text-gray-500">
