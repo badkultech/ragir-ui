@@ -7,6 +7,8 @@ export function cn(...inputs: Array<ClassValue>) {
 
 export const ENDPOINTS = {
   GET_POST: '/posts',
+  DESTINATION_MASTER: '/master/destinations',
+  DESTINATION_MASTER_SEARCH: '/master/destinations/search',
 
   // otp
   GENERATE_OTP: '/otp/generate-otp',

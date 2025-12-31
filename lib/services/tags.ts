@@ -39,4 +39,5 @@ export const TAGS = {
   organizerDashboard: "OrganizerDashboard",
   trips: "Trips",
   groupLeaders: 'GroupLeaders',
+  DestinationMaster: 'DestinationMaster',
 } as const;

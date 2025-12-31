@@ -75,6 +75,7 @@ import { useOrganizationId } from '@/hooks/useOrganizationId';
 import { validateRequiredFields } from '@/lib/utils/validateRequiredFields';
 import RequiredStar from '../common/RequiredStar';
 import { toast } from "@/hooks/use-toast";
+import { useSearchDestinationMasterQuery } from '@/lib/services/superadmin/destination-master';
 
 interface Props {
   tripId?: string;
@@ -83,6 +84,9 @@ interface Props {
 export function CreateTrip({ tripId }: Props) {
   const dispatch = useDispatch();
   const state = useSelector(organizerState);
+  const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
+  const [debouncedCityInput, setDebouncedCityInput] = useState("");
+
   const {
     leaderModalOpen,
     selectedTags,
@@ -108,7 +112,35 @@ export function CreateTrip({ tripId }: Props) {
     }
   }, [cityTags]);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedCityInput(cityInput);
+    }, 300);
 
+    return () => clearTimeout(handler);
+  }, [cityInput]);
+
+  const { data: destinationMasterData } =
+    useSearchDestinationMasterQuery(debouncedCityInput, {
+      skip: debouncedCityInput.length < 2,
+    });
+
+  const destinationMasterRows = useMemo(() => {
+    if (!destinationMasterData?.data) return [];
+
+    return destinationMasterData.data.map((row: any) => ({
+      raw: row,
+      tags: [
+        row.attraction,
+        row.city,
+        row.province,
+        row.country,
+        row.region,
+        row.domestic ? "DOMESTIC" : "INTERNATIONAL",
+        row.pinCode,
+      ].filter(Boolean),
+    }));
+  }, [destinationMasterData]);
 
 
   const tags = [
@@ -888,28 +920,70 @@ export function CreateTrip({ tripId }: Props) {
                 </Label>
               </div>
 
-              <div className='space-y-3'>
-                <div className='flex gap-2'>
-                  <Input
-                    id='cityTags'
-                    placeholder='Enter destination'
-                    value={cityInput}
-                    onChange={(e) => {
-                      dispatch(setCityInput(e.target.value));
-                      clearError("cityTags");
-                    }}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addCityTag();
-                      }
-                    }}
-                    className='flex-1'
-                  />
-                </div>
+              <div className='space-y-3 relative'>
+                {/* Input */}
+                <Input
+                  id='cityTags'
+                  placeholder='Enter destination'
+                  value={cityInput}
+                  onChange={(e) => {
+                    dispatch(setCityInput(e.target.value));
+                    setShowDestinationSuggestions(true);
+                    clearError("cityTags");
+                  }}
+                  onBlur={() => {
+                    // allow click selection before closing
+                    setTimeout(() => setShowDestinationSuggestions(false), 150);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCityTag();
+                    }
+                  }}
+                  className='w-full'
+                />
 
-                {(allTags.length > 0) && (
-                  <div className='flex flex-wrap gap-3'>
+                {/* 🔽 Destination Suggestions Dropdown */}
+                {showDestinationSuggestions &&
+                  debouncedCityInput.length >= 2 &&
+                  destinationMasterRows.length > 0 && (
+                    <div className="absolute z-20 mt-1 w-full border rounded-lg bg-white shadow max-h-60 overflow-y-auto">
+                      {destinationMasterRows.map((row: { raw: string; tags: string[] }, idx: number) => (
+                        <div
+                          key={idx}
+                          onClick={() => {
+                            row.tags.forEach((tag) => {
+                              if (!allTags.includes(tag)) {
+                                setAllTags((prev) => [...prev, tag]);
+                              }
+                              if (!cityTags.includes(tag)) {
+                                dispatch(setCityTags([...cityTags, tag]));
+                              }
+                            });
+
+                            dispatch(setCityInput(""));
+                            setShowDestinationSuggestions(false);
+                          }}
+                          className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition border-b last:border-b-0"
+                        >
+                          <p className="text-sm font-medium text-gray-800">
+                            {row.raw.attraction}, {row.raw.city}, {row.raw.province}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {row.raw.country} • {row.raw.region} • {row.raw.pinCode}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Click to add all destination tags
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                {/* Selected / Available Tags */}
+                {allTags.length > 0 && (
+                  <div className='flex flex-wrap gap-3 mt-3'>
                     {allTags.map((tag) => {
                       const isSelected = cityTags.includes(tag);
                       return (
@@ -917,40 +991,38 @@ export function CreateTrip({ tripId }: Props) {
                           key={tag}
                           onClick={() => toggleCityTagSelection(tag)}
                           className={`
-                            inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm cursor-pointer border transition-all select-none
-                            ${isSelected
+                inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm cursor-pointer border transition-all select-none
+                ${isSelected
                               ? 'bg-orange-50 border-orange-500 text-orange-500'
                               : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
                             }
-                          `}
+              `}
                         >
-                          <Pin className={`w-3.5 h-3.5 ${isSelected ? 'fill-orange-500' : 'fill-gray-400'} rotate-45`} />
+                          <Pin
+                            className={`w-3.5 h-3.5 ${isSelected ? 'fill-orange-500' : 'fill-gray-400'} rotate-45`}
+                          />
                           <span className="font-medium">{tag}</span>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               removeCityTag(tag);
                             }}
-                            className={`
-                              ml-1 rounded-full p-0.5 hover:bg-black/5 transition
-                              ${isSelected ? 'text-orange-500' : 'text-gray-400'}
-                            `}
+                            className={`ml-1 rounded-full p-0.5 hover:bg-black/5 transition`}
                           >
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M10.5 3.5L3.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                              <path d="M3.5 3.5L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                            ✕
                           </button>
                         </div>
                       );
                     })}
                   </div>
                 )}
+
                 {errors.cityTags && (
                   <p className="text-red-500 text-sm mt-1">{errors.cityTags}</p>
                 )}
               </div>
             </div>
+
 
             {/* Highlights */}
             <div className='mb-8'>

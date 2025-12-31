@@ -10,6 +10,7 @@ import {
   ChevronRight,
   X,
   Shuffle,
+  MapPinPlusInside,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { LogoutButton } from "../common/LogoutButton";
@@ -52,6 +53,11 @@ const nav: NavItem[] = [
     label: "Switch Organization",
     href: "/superadmin/switch",
     icon: Shuffle
+  },
+  {
+    label: "Locations",
+    href: "/superadmin/destination-master",
+    icon: MapPinPlusInside
   },
 ];
 
