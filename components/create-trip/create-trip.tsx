@@ -969,8 +969,6 @@ export function CreateTrip({ tripId }: Props) {
                         >
                           <p className="text-sm font-medium text-gray-800">
                             {row.raw.attraction}, {row.raw.city}, {row.raw.province}
-                          </p>
-                          <p className="text-xs text-gray-500">
                             {row.raw.country} • {row.raw.region} • {row.raw.pinCode}
                           </p>
                           <p className="text-xs text-gray-500">
