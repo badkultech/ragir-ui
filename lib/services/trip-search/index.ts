@@ -10,40 +10,57 @@ export const publicTripAPI = baseAPI.injectEndpoints({
       PageResponse<PublicTripDTO>,
       { criteria: SearchCriteria; pageable?: Pageable }
     >({
-    query: ({ criteria }) => {
-  const params = new URLSearchParams();
+      query: ({ criteria }) => {
+        const params = new URLSearchParams();
 
-  if (criteria?.month)
-    params.append("month", String(criteria.month));
+        if (criteria?.month)
+          params.append("month", String(criteria.month));
 
-  if (criteria?.year)
-    params.append("year", String(criteria.year));
+        if (criteria?.year)
+          params.append("year", String(criteria.year));
 
-  // ⭐ DESTINATION TAGS
-  if (criteria?.destinationTags?.length) {
-    criteria.destinationTags.forEach(tag =>
-      params.append(
-        "destinationTags",
-        tag.trim().toUpperCase().replace(/\s+/g, "_")
-      )
-    );
-  }
+        if (criteria?.destinationTags?.length) {
+          criteria.destinationTags.forEach(tag =>
+            params.append(
+              "destinationTags",
+              tag.trim().toUpperCase().replace(/\s+/g, "_")
+            )
+          );
+        }
 
-  // ⭐ MOODS
-  if (criteria?.moods?.length) {
-    criteria.moods.forEach(m =>
-      params.append(
-        "moods",
-        m.trim().toUpperCase().replace(/\s+/g, "_")
-      )
-    );
-  }
+        if (criteria?.moods?.length) {
+          criteria.moods.forEach(m =>
+            params.append(
+              "moods",
+              m.trim().replace(/\s+/g, "_")
+            )
+          );
+        }
 
-  return {
-    url: `${ENDPOINTS.TRIP_SEARCH}?${params.toString()}`,
-    method: "GET",
-  };
-},
+        if (criteria?.minDays)
+          params.append("minDays", String(criteria.minDays));
+
+        if (criteria?.maxDays)
+          params.append("maxDays", String(criteria.maxDays));
+
+        if (criteria?.minAge)
+          params.append("minAge", String(criteria.minAge));
+
+        if (criteria?.maxAge)
+          params.append("maxAge", String(criteria.maxAge));
+
+        if (criteria?.minBudget)
+          params.append("minBudget", String(criteria.minBudget));
+
+        if (criteria?.maxBudget)
+          params.append("maxBudget", String(criteria.maxBudget));
+
+
+        return {
+          url: `${ENDPOINTS.TRIP_SEARCH}?${params.toString()}`,
+          method: "GET",
+        };
+      },
 
 
 

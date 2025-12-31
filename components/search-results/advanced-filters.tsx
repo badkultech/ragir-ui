@@ -82,8 +82,7 @@ export function AdvancedFilters({
   onClose,
   isMobile = false,
   onApplyFilters
-}: AdvancedFiltersProps) 
- {
+}: AdvancedFiltersProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     Object.fromEntries(filterSections.map((s) => [s.id, s.defaultOpen])),
   )
@@ -105,14 +104,24 @@ export function AdvancedFilters({
   }
   const getSelectedFilters = () => ({
     duration: selectedDuration,
-    budget: budgetRange,
+    minBudget: budgetRange.min,
+    maxBudget: budgetRange.max,
+    minAge: undefined,
+    maxAge: undefined,
     occupancy: selectedOccupancy,
     groupType: selectedGroupType,
     moods: selectedMoods,
     emi: emiAvailable,
-    destinations: destinations.filter(d => d.checked).map(d => d.name),
-    departureCities: departureCities.filter(c => c.checked).map(c => c.name),
-  })
+
+    destinations: destinations
+      .filter(d => d.checked)
+      .map(d => d.name),
+
+    departureCities: departureCities
+      .filter(c => c.checked)
+      .map(c => c.name),
+  });
+
 
 
   const containerClass = isMobile
@@ -171,8 +180,8 @@ export function AdvancedFilters({
                   key={duration}
                   onClick={() => setSelectedDuration(duration)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedDuration === duration
-                      ? "bg-[#e07a5f] text-white border-[#e07a5f]"
-                      : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
+                    ? "bg-[#e07a5f] text-white border-[#e07a5f]"
+                    : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
                     }`}
                 >
                   {duration}
@@ -332,8 +341,8 @@ export function AdvancedFilters({
                   key={type}
                   onClick={() => setSelectedOccupancy(type)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedOccupancy === type
-                      ? "bg-[#e07a5f] text-white border-[#e07a5f]"
-                      : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
+                    ? "bg-[#e07a5f] text-white border-[#e07a5f]"
+                    : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
                     }`}
                 >
                   {type}
@@ -360,8 +369,8 @@ export function AdvancedFilters({
                   key={type}
                   onClick={() => setSelectedGroupType(type)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedGroupType === type
-                      ? "bg-[#e07a5f] text-white border-[#e07a5f]"
-                      : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
+                    ? "bg-[#e07a5f] text-white border-[#e07a5f]"
+                    : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
                     }`}
                 >
                   {type}

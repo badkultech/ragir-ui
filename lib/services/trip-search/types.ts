@@ -20,9 +20,16 @@ export type SearchCriteria = {
   month?: number;
   year?: number;
   destinationTags?: string[];
-  isDomestic?: boolean;
   moods?: string[];
+  isDomestic?: boolean;
+  minDays?: number;
+  maxDays?: number;
+  minAge?: number;
+  maxAge?: number;
+  minBudget?: number;
+  maxBudget?: number;
 };
+
 
 export type Pageable = {
   page: number;
