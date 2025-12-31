@@ -128,7 +128,9 @@ export function CreateTrip({ tripId }: Props) {
   const destinationMasterRows = useMemo(() => {
     if (!destinationMasterData?.data) return [];
 
-    return destinationMasterData.data.map((row: any) => ({
+    const rows = Array.isArray(destinationMasterData.data) ? destinationMasterData.data : [];
+
+    return rows.map((row: any) => ({
       raw: row,
       tags: [
         row.attraction,
