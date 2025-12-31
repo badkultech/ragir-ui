@@ -949,7 +949,7 @@ export function CreateTrip({ tripId }: Props) {
                   debouncedCityInput.length >= 2 &&
                   destinationMasterRows.length > 0 && (
                     <div className="absolute z-20 mt-1 w-full border rounded-lg bg-white shadow max-h-60 overflow-y-auto">
-                      {destinationMasterRows.map((row: { raw: string; tags: string[] }, idx: number) => (
+                      {destinationMasterRows.map((row: { raw: any; tags: string[] }, idx: number) => (
                         <div
                           key={idx}
                           onClick={() => {
