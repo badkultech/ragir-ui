@@ -44,6 +44,11 @@ const nav: NavItem[] = [
     ],
   },
   {
+    label: "Group Leader",
+    href: "/superadmin/group-leaders",
+    icon: Shuffle
+  },
+  {
     label: "Switch Organization",
     href: "/superadmin/switch",
     icon: Shuffle
@@ -120,18 +125,16 @@ export function Sidebar({ showLogo = true, isOpen, onClose }: SidebarProps) {
                 <div className="flex items-center justify-between">
                   <Link
                     href={href || "#"}
-                    className={`group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all ${
-                      active
-                        ? "bg-gray-900 text-white shadow-sm"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
+                    className={`group relative flex flex-1 items-center gap-3 rounded-lg px-4 py-3 transition-all ${active
+                      ? "bg-gray-900 text-white shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
                   >
                     <Icon
-                      className={`w-5 h-5 ${
-                        active
-                          ? "text-white"
-                          : "text-gray-700 group-hover:text-gray-900"
-                      }`}
+                      className={`w-5 h-5 ${active
+                        ? "text-white"
+                        : "text-gray-700 group-hover:text-gray-900"
+                        }`}
                     />
                     <span className="font-medium">{label}</span>
                   </Link>
@@ -157,19 +160,17 @@ export function Sidebar({ showLogo = true, isOpen, onClose }: SidebarProps) {
                         <Link
                           key={href}
                           href={href || "#"}
-                          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all ${
-                            childActive
-                              ? "bg-gray-900 text-white"
-                              : "text-gray-600 hover:bg-gray-100"
-                          }`}
+                          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all ${childActive
+                            ? "bg-gray-900 text-white"
+                            : "text-gray-600 hover:bg-gray-100"
+                            }`}
                         >
                           {boxedPlus ? (
                             <span
-                              className={`inline-flex h-5 w-5 items-center justify-center rounded border text-xs font-semibold ${
-                                childActive
-                                  ? "bg-white/10 border-white/20 text-white"
-                                  : "border-gray-300 text-gray-600 group-hover:border-gray-400"
-                              }`}
+                              className={`inline-flex h-5 w-5 items-center justify-center rounded border text-xs font-semibold ${childActive
+                                ? "bg-white/10 border-white/20 text-white"
+                                : "border-gray-300 text-gray-600 group-hover:border-gray-400"
+                                }`}
                             >
                               <Plus className="h-3.5 w-3.5" />
                             </span>

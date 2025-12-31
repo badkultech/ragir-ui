@@ -38,4 +38,5 @@ export const TAGS = {
   tripQueryComments: 'tripQueryComments',
   organizerDashboard: "OrganizerDashboard",
   trips: "Trips",
+  groupLeaders: 'GroupLeaders',
 } as const;

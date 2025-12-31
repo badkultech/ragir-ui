@@ -26,6 +26,17 @@ export const ENDPOINTS = {
   RESEND_ORGANIZER_INVITE: '/public/invite/resend-invite',
   FORGOT_ORGANIZER_PASSWORD: '/public/invite/forgot-password',
 
+  // superadmin
+  GROUP_LEADERS: () => "/tenant/group-leaders",
+
+  PROMOTE_GROUP_LEADER: (leaderId: number) =>
+    `/tenant/trip-leaders/${leaderId}/promotions`,
+
+  DEACTIVATE_GROUP_LEADER_PROMOTION: (promotionId: number) =>
+    `/tenant/group-leaders/promotions/${promotionId}/deactivate`,
+
+
+
   PARTNER: '/public/join_as_partner',
   // trip search
   TRIP_SEARCH: '/public/trips/search',
