@@ -11,7 +11,6 @@ import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
 import { FilterTags } from "@/components/search-results/filter-tags";
 import NoTripsFound from "@/components/search-results/NoTripsFound";
 import { useSearchPublicTripsQuery } from "@/lib/services/trip-search";
-
 const trips = [
   {
     id: 1,
@@ -69,47 +68,37 @@ const trips = [
 
 export default function SearchResultsWithFilters() {
   const searchParams = useSearchParams();
+
   const moodsFromUrl = searchParams.get("moods");
   const destinationFromUrl = searchParams.get("destinationTags");
   const regionFromUrl = searchParams.get("region");
   const yearFromUrl = searchParams.get("year");
   const monthFromUrl = searchParams.get("month");
 
-  const criteria: any = {
-    month: monthFromUrl ? Number(monthFromUrl) : undefined,
-    year: yearFromUrl ? Number(yearFromUrl) : undefined,
-    destinationTags: [],
-    moods: []
-  };
-
-  // destination
-  if (destinationFromUrl) {
-    criteria.destinationTags.push(
-      destinationFromUrl.toLowerCase().replace(/\s+/g, "_")
-    );
-  }
-
-  // moods
   const moodsAll = searchParams.getAll("moods");
 
-  if (moodsAll.length > 0) {
-    criteria.moods = moodsAll.map(m =>
-      m.replace("-", "_").toLowerCase()
-    );
-  }
+  // ---------- INITIAL API CRITERIA ----------
+  const [criteria, setCriteria] = useState<any>({
+    month: monthFromUrl ? Number(monthFromUrl) : undefined,
+    year: yearFromUrl ? Number(yearFromUrl) : undefined,
+    destinationTags: destinationFromUrl
+      ? [destinationFromUrl.toLowerCase().replace(/\s+/g, "_")]
+      : [],
+    moods:
+      moodsAll.length > 0
+        ? moodsAll.map((m) => m.replace("-", "_").toLowerCase())
+        : [],
+  });
 
+  // ---------- UI FILTER TAGS ----------
   let parsedMoods: string[] = moodsAll;
 
-  if (moodsAll.length > 0) {
-    parsedMoods = moodsAll;
-  } else if (moodsFromUrl) {
+  if (moodsAll.length === 0 && moodsFromUrl) {
     try {
       parsedMoods = JSON.parse(moodsFromUrl);
     } catch { }
   }
 
-
-  /* ---- Initial Filters Build ---- */
   const [filters, setFilters] = useState(() => {
     let list: { id: number; label: string }[] = [];
     let id = 1;
@@ -118,26 +107,26 @@ export default function SearchResultsWithFilters() {
 
     if (destinationFromUrl)
       list.push({ id: id++, label: `Destination: ${destinationFromUrl}` });
+
     if (regionFromUrl)
       list.push({ id: id++, label: `Region: ${regionFromUrl}` });
 
     if (yearFromUrl) list.push({ id: id++, label: `Year: ${yearFromUrl}` });
+
     if (monthFromUrl) list.push({ id: id++, label: `Month: ${monthFromUrl}` });
 
     return list;
   });
 
-  /* ---------------- FILTER LOGIC ---------------- */
+  // ---------- API CALL ----------
   const { data, isLoading, error } = useSearchPublicTripsQuery({
     criteria,
-    pageable: { page: 0, size: 10 }
+    pageable: { page: 0, size: 10 },
   });
+
   const apiTrips = data?.content || [];
 
-
-
-
-  /* ---------------- ACTIONS ---------------- */
+  // ---------- ACTIONS ----------
   const removeFilter = (id: number) =>
     setFilters((prev) => prev.filter((f) => f.id !== id));
 
@@ -147,22 +136,6 @@ export default function SearchResultsWithFilters() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   const [sortBy, setSortBy] = useState<string | null>(null);
-  let sortedTrips = [...apiTrips];
-
-  if (sortBy === "price_low") {
-    sortedTrips.sort((a, b) => (a.price || 0) - (b.price || 0));
-  }
-  if (sortBy === "price_high") {
-    sortedTrips.sort((a, b) => b.price - a.price);
-  }
-  if (sortBy === "discount") {
-    sortedTrips.sort((a, b) => (b.discount || 0) - (a.discount || 0));
-  }
-  if (sortBy === "popularity") {
-    sortedTrips.sort((a, b) => b.rating - a.rating);
-  }
-  type SortType = "price_low" | "price_high" | "discount" | "popularity";
-
 
   const sortLabelMap: Record<string, string> = {
     price_low: "Price Per Day: Lowest",
@@ -171,45 +144,172 @@ export default function SearchResultsWithFilters() {
     popularity: "Popularity",
   };
 
-
+  type SortType = "price_low" | "price_high" | "discount" | "popularity";
 
   return (
-    <div className="min-h-screen bg-[#f5f3f0]">
-      <Header title="Search Results" />
+    <>
+      <div className="min-h-screen bg-[#f5f3f0]">
+        <Header title="Search Results" />
 
-      {/* DESKTOP FILTER BAR */}
-      <DesktopFilterBar
-        filters={filters}
-        onRemove={removeFilter}
-        onClear={clearAllFilters}
-        onToggleFilters={() => setShowFilters(!showFilters)}
-        onToggleSort={(state?: boolean) => {
-          if (window.innerWidth >= 768) {
-            if (typeof state === "boolean") {
-              setShowSortDropdown(state);
-            } else {
-              setShowSortDropdown((prev) => !prev);
+        {/* DESKTOP FILTER BAR */}
+        <DesktopFilterBar
+          filters={filters}
+          onRemove={removeFilter}
+          onClear={clearAllFilters}
+          onToggleFilters={() => setShowFilters(!showFilters)}
+          onToggleSort={(state?: boolean) => {
+            if (window.innerWidth >= 768) {
+              if (typeof state === "boolean") setShowSortDropdown(state);
+              else setShowSortDropdown((p) => !p);
             }
-          }
-        }}
+          }}
+          showSortDropdown={showSortDropdown}
+          onSortSelect={(type: SortType) => {
+            setSortBy(type);
+            setShowSortDropdown(false);
+          }}
+          selectedSortLabel={sortBy ? sortLabelMap[sortBy] : "Sort By"}
+        />
 
-        showSortDropdown={showSortDropdown}
+        <main className="max-w-[1400px] bg-white mx-auto px-4 md:px-8 py-6">
+          <div className="flex gap-6 ">
+            {/* DESKTOP SIDEBAR */}
+            <DesktopFilterSidebar
+              isOpen={showFilters}
+              onClose={() => setShowFilters(false)}
+              onApply={(data: any) => {
+                setCriteria((prev: any) => ({
+                  ...prev,
 
-        onSortSelect={(type: SortType) => {
-          setSortBy(type);
-          setShowSortDropdown(false);
-        }}
-        selectedSortLabel={sortBy ? sortLabelMap[sortBy] : "Sort By"}
-      />
+                  // moods
+                  moods: data.moods?.map((m: string) =>
+                    m.toLowerCase().replace(/\s+/g, "_")
+                  ),
 
-      <main className="max-w-[1400px] bg-white mx-auto px-4 md:px-8 py-6">
-        <div className="flex gap-6 ">
+                  // destinations
+                  destinationTags: data.destinations?.map((d: string) =>
+                    d.toLowerCase().replace(/\s+/g, "_")
+                  ),
 
-          {/* DESKTOP SIDEBAR */}
-          <DesktopFilterSidebar
+                  // duration
+                  ...(data.duration === "3-5 Days" && { minDays: 3, maxDays: 5 }),
+                  ...(data.duration === "6-7 Days" && { minDays: 6, maxDays: 7 }),
+                  ...(data.duration === "7+ Days" && { minDays: 7 }),
+
+                  // age (if present)
+                  ...(data.minAge && { minAge: Number(data.minAge) }),
+                  ...(data.maxAge && { maxAge: Number(data.maxAge) }),
+
+                  // budget -> API
+                  minBudget: Number(data.minBudget ?? 0),
+                  maxBudget: Number(data.maxBudget ?? 0),
+                }));
+
+                // TAGS UI (same)
+                const selectedTags = [
+                  ...data.moods,
+                  data.duration,
+                  data.occupancy,
+                  data.groupType,
+                  ...data.destinations,
+                  ...data.departureCities,
+                ].filter(Boolean);
+
+                setFilters(
+                  selectedTags.map((tag: string, index: number) => ({
+                    id: index + 1,
+                    label: tag,
+                  }))
+                );
+
+                setShowFilters(false);
+              }}
+
+            />
+
+            {/* RESULTS */}
+            <div className="flex-1 ">
+              {isLoading && <p>Loading trips...</p>}
+
+              {error && (
+                <p className="text-red-500">Failed to load trips</p>
+              )}
+
+              {!isLoading && apiTrips.length === 0 && <NoTripsFound />}
+
+              {apiTrips.length > 0 && (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {apiTrips.map((trip: any) => (
+                    <SearchResultsTripCard
+                      key={trip.publicId}
+                      id={trip.publicId}
+                      title={trip.name}
+                      provider={trip.providerName || "—"}
+                      location={
+                        trip.cityTags?.join(", ") ||
+                        trip.destinationTags?.join(", ") ||
+                        "—"
+                      }
+                      rating={trip.rating || 4.5}
+                      days={`${trip.totalDays || "-"}D/${trip.totalNights || "-"
+                        }N`}
+                      dates={`${trip.startDate} — ${trip.endDate}`}
+                      price={trip.startingPrice || 0}
+                      image={
+                        trip.bannerImageUrl ||
+                        "/hampi-ruins-temples.png"
+                      }
+                      badges={[
+                        ...(trip.moodTags || []),
+                        ...(trip.destinationTags || []),
+                      ]}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </main>
+
+        {/* MOBILE BOTTOM BAR */}
+        <MobileBottomBar
+          onSort={() => {
+            setShowFilters(false);
+            setShowSortDropdown(true);
+          }}
+          onFilters={() => setShowFilters(true)}
+          sortLabel={sortBy ? sortLabelMap[sortBy] : "Sort By"}
+        />
+
+        {/* MOBILE FILTER PANEL */}
+        <div className="md:hidden">
+          <AdvancedFilters
             isOpen={showFilters}
+            isMobile={true}
             onClose={() => setShowFilters(false)}
-            onApply={(data: any) => {
+            onApplyFilters={(data: any) => {
+              setCriteria((prev: any) => ({
+                ...prev,
+
+                moods: data.moods?.map((m: string) =>
+                  m.toLowerCase().replace(/\s+/g, "_")
+                ),
+
+                destinationTags: data.destinations?.map((d: string) =>
+                  d.toLowerCase().replace(/\s+/g, "_")
+                ),
+
+                ...(data.duration === "3-5 Days" && { minDays: 3, maxDays: 5 }),
+                ...(data.duration === "6-7 Days" && { minDays: 6, maxDays: 7 }),
+                ...(data.duration === "7+ Days" && { minDays: 7 }),
+
+                ...(data.minAge && { minAge: Number(data.minAge) }),
+                ...(data.maxAge && { maxAge: Number(data.maxAge) }),
+
+                minBudget: Number(data.minBudget ?? 0),
+                maxBudget: Number(data.maxBudget ?? 0),
+              }));
+
               const selectedTags = [
                 ...data.moods,
                 data.duration,
@@ -225,111 +325,14 @@ export default function SearchResultsWithFilters() {
                   label: tag,
                 }))
               );
+
+              setShowFilters(false);
             }}
+
           />
-
-          {/* RESULTS SECTION */}
-          <div className="flex-1 ">
-            {/* Mobile Filter Tags */}
-            <div className="md:hidden mb-3 rounded-2xl border border-[#f1eee9] bg-[#fff6f2] p-4">
-              <p className="text-sm font-medium mb-2">Showing results for:</p>
-
-              <FilterTags filters={filters} onRemove={removeFilter} />
-
-              <div className="flex justify-between items-center mt-3">
-                <p className="text-sm">
-                  <span className="text-[#e07a5f] font-semibold">
-                    {apiTrips.length}
-                  </span>{" "}
-                  trips found
-                </p>
-
-                {filters.length > 0 && (
-                  <button
-                    onClick={clearAllFilters}
-                    className="text-xs text-[#e07a5f] underline"
-                  >
-                    Clear all filters
-                  </button>
-                )}
-              </div>
-            </div>
-
-
-            {isLoading && <p>Loading trips...</p>}
-
-            {error && <p className="text-red-500">Failed to load trips</p>}
-
-            {!isLoading && apiTrips.length === 0 && <NoTripsFound />}
-
-            {apiTrips.length > 0 && (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {apiTrips.map((trip: any) => (
-                  <SearchResultsTripCard
-                    key={trip.publicId}
-                    id={trip.publicId}
-                    title={trip.name}
-                    provider={trip.providerName || "—"}
-                    location={
-                      trip.cityTags?.join(", ") ||
-                      trip.destinationTags?.join(", ") ||
-                      "—"
-                    }
-                    rating={trip.rating || 4.5}
-                    days={`${trip.totalDays || "-"}D/${trip.totalNights || "-"}N`}
-                    dates={`${trip.startDate} — ${trip.endDate}`}
-                    price={trip.startingPrice || 0}
-                    image={trip.bannerImageUrl || "/hampi-ruins-temples.png"}
-                    badges={[
-                      ...(trip.moodTags || []),
-                      ...(trip.destinationTags || []),
-                    ]}
-                  />
-                ))}
-              </div>
-            )}
-
-
-          </div>
         </div>
-      </main>
 
-      {/* MOBILE BOTTOM FILTER BAR */}
-      <MobileBottomBar
-        onSort={() => {
-          setShowFilters(false);   // Ensure no overlap
-          setShowSortDropdown(true);
-        }}
-        onFilters={() => setShowFilters(true)}
-        sortLabel={sortBy ? sortLabelMap[sortBy] : "Sort By"}
-      />
-
-      {/* MOBILE FILTER PANEL */}
-      <div className="md:hidden">
-        <AdvancedFilters
-          isOpen={showFilters}
-          isMobile={true}
-          onClose={() => setShowFilters(false)}
-          onApplyFilters={(data: any) => {
-            const selectedTags = [
-              ...data.moods,
-              data.duration,
-              data.occupancy,
-              data.groupType,
-              ...data.destinations,
-              ...data.departureCities,
-            ].filter(Boolean);
-
-            setFilters(
-              selectedTags.map((tag: string, index: number) => ({
-                id: index + 1,
-                label: tag,
-              }))
-            );
-
-            setShowFilters(false);
-          }}
-        />
+        <div className="h-16 md:hidden" />
       </div>
       {/* MOBILE SORT SHEET */}
       {showSortDropdown && (
@@ -337,7 +340,6 @@ export default function SearchResultsWithFilters() {
           className="fixed inset-0 z-50 flex items-end md:hidden"
           onClick={() => setShowSortDropdown(false)}
         >
-
           <div
             className="bg-white w-full rounded-t-2xl p-5"
             onClick={(e) => e.stopPropagation()}
@@ -374,9 +376,6 @@ export default function SearchResultsWithFilters() {
           </div>
         </div>
       )}
-
-
-      <div className="h-16 md:hidden" />
-    </div>
+    </>
   );
 }

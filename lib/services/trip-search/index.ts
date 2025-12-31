@@ -19,7 +19,6 @@ export const publicTripAPI = baseAPI.injectEndpoints({
         if (criteria?.year)
           params.append("year", String(criteria.year));
 
-        // ⭐ DESTINATION TAGS
         if (criteria?.destinationTags?.length) {
           criteria.destinationTags.forEach(tag =>
             params.append(
@@ -29,7 +28,6 @@ export const publicTripAPI = baseAPI.injectEndpoints({
           );
         }
 
-        // ⭐ MOODS
         if (criteria?.moods?.length) {
           criteria.moods.forEach(m =>
             params.append(
@@ -38,6 +36,25 @@ export const publicTripAPI = baseAPI.injectEndpoints({
             )
           );
         }
+
+        if (criteria?.minDays)
+          params.append("minDays", String(criteria.minDays));
+
+        if (criteria?.maxDays)
+          params.append("maxDays", String(criteria.maxDays));
+
+        if (criteria?.minAge)
+          params.append("minAge", String(criteria.minAge));
+
+        if (criteria?.maxAge)
+          params.append("maxAge", String(criteria.maxAge));
+
+        if (criteria?.minBudget)
+          params.append("minBudget", String(criteria.minBudget));
+
+        if (criteria?.maxBudget)
+          params.append("maxBudget", String(criteria.maxBudget));
+
 
         return {
           url: `${ENDPOINTS.TRIP_SEARCH}?${params.toString()}`,
