@@ -4,6 +4,7 @@ import { ReduxProvider } from "@/lib/redux-provider";
 import HydratedAuth from "@/components/AuthLoader";
 import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata = {
   title: "Ragir - Organizer Dashboard",
@@ -34,6 +35,7 @@ export default function RootLayout({
           <HydratedAuth>
             {children}
             <Analytics />
+            <SpeedInsights />
             <Toaster />
           </HydratedAuth>
         </ReduxProvider>
