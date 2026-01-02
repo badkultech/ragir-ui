@@ -77,9 +77,6 @@ export function MainHeader({
               >
                 Log in / Register
               </button>
-              <button>
-                <Menu className="w-6 h-6" />
-              </button>
             </>
           )}
           {isLoggedIn && (
