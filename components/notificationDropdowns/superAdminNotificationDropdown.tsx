@@ -46,9 +46,9 @@ export function SuperAdminNotificationDropdown({
 
   const [markAsSeen] = useMarkNotificationAsSeenMutation();
 
-  const handleMarkAsSeen = async (id: number) => {
+  const handleMarkAsSeen = async (recipientId: number) => {
     try {
-      await markAsSeen({ organizationId, userId, id }).unwrap();
+      await markAsSeen({ organizationId, userId, recipientId }).unwrap();
     } catch (e) {
       console.error("Failed to mark as seen", e);
     }
@@ -59,7 +59,7 @@ export function SuperAdminNotificationDropdown({
       const unread = data.notifications.filter((n) => !n.isSeen);
       await Promise.all(
         unread.map((n) =>
-          markAsSeen({ organizationId, userId, id: n.id }).unwrap()
+          markAsSeen({ organizationId, userId, recipientId: n.id }).unwrap()
         )
       );
       refetch();

@@ -1,41 +1,54 @@
-// services/notification.ts
 import { baseAPI } from "../..";
-import { ApiResponse } from "@/lib/services/common-types";
 import { ENDPOINTS } from "@/lib/utils";
-import { NotificationStatus } from "./types";
+import { UserNotificationsResponse } from "./types";
 
 export const notificationAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
+
+    // ==========================
+    // USER INBOX
+    // ==========================
     getUserNotifications: builder.query<
-      { unreadCount: number; notifications: any[] },
+      UserNotificationsResponse,
       { organizationId: string; userId: string }
     >({
       query: ({ organizationId, userId }) =>
         ENDPOINTS.USER_NOTIFICATIONS(organizationId, userId),
-      transformResponse: (response: any) => {
-        const notifications = response?.data || [];
-        const unreadCount = notifications.filter((n: any) => !n.isSeen).length;
+
+      transformResponse: (response: any): UserNotificationsResponse => {
+        const recipients = response?.data ?? [];
+
+        const notifications = recipients.map((r: any) => ({
+          id: r.id, // recipientId (important)
+          title: r.notification?.title,
+          message: r.notification?.message,
+          categoryCode: r.notification?.categoryCode,
+          sentAt: r.createdDate,
+          isSeen: r.isSeen,
+        }));
 
         return {
-          unreadCount,
-          notifications: notifications.map((n: any) => ({
-            id: n.id,
-            title: n.notification?.title,
-            message: n.notification?.message,
-            sentAt: n.sentAt,
-            isSeen: n.isSeen,
-          })),
+          unreadCount: notifications.filter((n: any) => !n.isSeen).length,
+          notifications,
         };
       },
+
       providesTags: ["notifications"],
     }),
 
+    // ==========================
+    // MARK AS SEEN
+    // ==========================
     markNotificationAsSeen: builder.mutation<
-      NotificationStatus, // you may adjust return type to match DTO
-      { organizationId: string; userId: string; id: number }
+      void,
+      { organizationId: string; userId: string; recipientId: number }
     >({
-      query: ({ organizationId, userId, id }) => ({
-        url: ENDPOINTS.MARK_NOTIFICATION_SEEN(organizationId, userId, id),
+      query: ({ organizationId, userId, recipientId }) => ({
+        url: ENDPOINTS.MARK_NOTIFICATION_SEEN(
+          organizationId,
+          userId,
+          recipientId
+        ),
         method: "PUT",
       }),
       invalidatesTags: ["notifications"],

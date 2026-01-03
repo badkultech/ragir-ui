@@ -1,11 +1,13 @@
-export interface NotificationStatus {
+export interface NotificationItem {
+  id: number;                  // recipientId
+  title: string;
+  message: string;
+  categoryCode: string;
+  isSeen: boolean;
+  sentAt?: string;
+}
+
+export interface UserNotificationsResponse {
   unreadCount: number;
-  notifications: {
-    id:  number;
-    title: string;
-    message: string;
-    type: string;   // e.g. info/success/warning
-    isSeen: boolean;
-    sentAt?: string;
-  }[];
+  notifications: NotificationItem[];
 }

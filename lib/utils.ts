@@ -80,13 +80,13 @@ export const ENDPOINTS = {
 
   // Notifications
   USER_NOTIFICATIONS: (organizationId: string, userId: string) =>
-    `/org/${organizationId}/user/${userId}/user-notifications-status`,
+    `/org/${organizationId}/notification/user/${userId}`,
   MARK_NOTIFICATION_SEEN: (
     organizationId: string,
     userId: string,
     id: number,
   ) =>
-    `/org/${organizationId}/user/${userId}/user-notifications-status/${id}/seen`,
+    `/org/${organizationId}/notification/${id}/seen`,
   ORGANIZATION_PROFILE: (organizationId: string) =>
     `/org/${organizationId}/profile`,
   ORGANIZER: {

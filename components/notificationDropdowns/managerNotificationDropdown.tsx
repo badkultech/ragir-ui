@@ -45,9 +45,9 @@ export function ManagerNotificationDropdown({
 
   const [markAsSeen] = useMarkNotificationAsSeenMutation();
 
-  const handleMarkAsSeen = async (id: number) => {
+  const handleMarkAsSeen = async (recipientId: number) => {
     try {
-      await markAsSeen({ organizationId, userId, id }).unwrap();
+      await markAsSeen({ organizationId, userId, recipientId }).unwrap();
     } catch (e) {
       console.error("Failed to mark as seen", e);
     }
