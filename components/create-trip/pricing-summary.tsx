@@ -51,6 +51,12 @@ export function PricingSummary({
   const totalAddonsCharge = addOns.reduce((sum, item) => sum + (Number(item.charge) || 0), 0);
   rangeMax += totalAddonsCharge;
 
+  const applyGstIfNeeded = (amount: number) => {
+    if (gstMode !== "includes") return amount;
+    return Math.round(amount + amount * 0.18);
+  };
+
+
   return (
     <div className="space-y-6">
       {/* Pricing Summary Widget */}
@@ -151,7 +157,7 @@ export function PricingSummary({
             <div className="flex items-center justify-between">
               <span className="text-gray-500">GST Status</span>
               <Badge variant="secondary" className={`font-normal px-2 py-0.5 ${gstMode === 'includes' ? 'bg-green-100 text-green-700 hover:bg-green-100' : 'bg-gray-100 text-gray-700 hover:bg-gray-100'}`}>
-                {gstMode === 'includes' ? 'Included' : 'Excluded'}
+                {gstMode === "includes" ? "Included (18%)" : "Excluded"}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
@@ -172,9 +178,9 @@ export function PricingSummary({
             <div className="bg-white rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">Price Range</p>
               <div className="text-lg font-bold text-gray-900">
-                {mode === 'simple'
-                  ? formatPrice(Number(simplePrice))
-                  : `${formatPrice(rangeMin)} - ${formatPrice(rangeMax)}`
+                {mode === "simple"
+                  ? formatPrice(applyGstIfNeeded(Number(simplePrice || 0)))
+                  : `${formatPrice(rangeMin)} - ${formatPrice(applyGstIfNeeded(rangeMax))}`
                 }
               </div>
             </div>

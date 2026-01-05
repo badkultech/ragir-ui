@@ -68,24 +68,58 @@ export default function PricingPage() {
   // Restore existing data
   useEffect(() => {
     if (!pricingData) return;
-    setPrice(String(pricingData.basePrice ?? ''));
-    setDiscount(String(pricingData.discountPercent ?? ''));
-    setDiscountUntil(pricingData.discountValidUntil || '');
-    setGst(pricingData.includesGst ? 'includes' : 'excludes');
-    setDepositPercent(String(pricingData.depositRequiredPercent ?? ''));
+
+    // Set mode from API
+    setMode(
+      pricingData.tripPricingType === "DYNAMIC"
+        ? "dynamic"
+        : "simple"
+    );
+
+    // SIMPLE PRICING DATA
+    if (pricingData.simplePricingRequest) {
+      setPrice(String(pricingData.simplePricingRequest.basePrice ?? ""));
+      setDiscount(String(pricingData.simplePricingRequest.discountPercent ?? ""));
+      setDiscountUntil(pricingData.simplePricingRequest.discountValidUntil || "");
+    }
+
+    // DYNAMIC PRICING DATA
+    if (pricingData.dynamicPricingRequest) {
+      setDynamicCategories(
+        pricingData.dynamicPricingRequest.pricingCategoryDtos?.map((c: any) => ({
+          id: crypto.randomUUID(),
+          name: c.categoryName,
+          description: c.description,
+          type: c.pricingCategoryType === "SINGLE" ? "single" : "multi",
+          options: c.pricingCategoryOptionDTOs.map((o: any) => ({
+            id: crypto.randomUUID(),
+            name: o.name,
+            price: String(o.price),
+            discount: String(o.discount),
+          }))
+        })) ?? []
+      );
+    }
+
+    // COMMON FIELDS
+    setGst(pricingData.includesGst ? "includes" : "excludes");
+    setDepositPercent(String(pricingData.depositRequiredPercent ?? ""));
     setCredit({
-      card: pricingData.creditOptions === 'CREDIT_CARD',
-      emi: pricingData.creditOptions === 'EMI',
+      card: pricingData.creditOptions === "CREDIT_CARD",
+      emi: pricingData.creditOptions === "EMI",
     });
-    setPolicy(pricingData.cancellationPolicy || '');
+    setPolicy(pricingData.cancellationPolicy || "");
+
+    // ADD ONS (null safe)
     setAddOns(
       (pricingData.addOns || []).map((a: any) => ({
-        id: String(a.id),
+        id: String(a.id ?? crypto.randomUUID()),
         name: a.name,
         charge: Number(a.charge),
-      })),
+      }))
     );
   }, [pricingData]);
+
 
   // DYNAMIC PRICING SATE
   const [dynamicCategories, setDynamicCategories] = useState<DynamicCategory[]>([]);
@@ -124,47 +158,74 @@ export default function PricingPage() {
     if (!tripId) return;
 
     try {
-      if (isDraft) {
-        setDraftDisabled(true);
-      } else {
-        setIsSavingNext(true);
-      }
+      isDraft ? setDraftDisabled(true) : setIsSavingNext(true);
 
       const fd = new FormData();
-      // ... (Rest of existing save logic - keeping it minimal for now as we focus on UI)
-      // I will need to update this to support dynamic pricing JSON later
-      fd.append('discountPercent', String(Number(discount || 0)));
-      fd.append('discountValidUntil', discountUntil || '');
-      fd.append('includesGst', gst === 'includes' ? 'true' : 'false');
-      fd.append('depositRequiredPercent', String(Number(depositPercent || 0)));
-      fd.append('creditOptions', credit.card ? 'CREDIT_CARD' : 'EMI');
-      fd.append('cancellationPolicy', policy || '');
-      fd.append('basePrice', String(Number(price || 0)));
-      // Note: Backend might not support dynamic yet, but UI flow is priority
 
+      // COMMON FIELDS
+      fd.append("includesGst", gst === "includes" ? "true" : "false");
+      fd.append("depositRequiredPercent", String(Number(depositPercent || 0)));
+      fd.append("creditOptions", credit.card ? "CREDIT_CARD" : "EMI");
+      fd.append("cancellationPolicy", policy || "");
+      fd.append("tripPricingType", mode === "simple" ? "SIMPLE" : "DYNAMIC");
+
+      // ---------- SIMPLE PRICING ----------
+      if (mode === "simple") {
+        fd.append("simplePricingRequest.basePrice", String(Number(price || 0)));
+        fd.append("simplePricingRequest.discountPercent", String(Number(discount || 0)));
+        fd.append("simplePricingRequest.discountValidUntil", discountUntil || "");
+      }
+
+      // ---------- DYNAMIC PRICING ----------
+      if (mode === "dynamic") {
+        dynamicCategories.forEach((cat, i) => {
+          fd.append(`dynamicPricingRequest.pricingCategoryDtos[${i}].categoryName`, cat.name);
+          fd.append(`dynamicPricingRequest.pricingCategoryDtos[${i}].description`, cat.description);
+          fd.append(
+            `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryType`,
+            cat.type === "single" ? "SINGLE" : "MULTI"
+          );
+
+          cat.options.forEach((opt, j) => {
+            fd.append(
+              `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryOptionDTOs[${j}].name`,
+              opt.name
+            );
+            fd.append(
+              `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryOptionDTOs[${j}].price`,
+              String(Number(opt.price || 0))
+            );
+            fd.append(
+              `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryOptionDTOs[${j}].discount`,
+              String(Number(opt.discount || 0))
+            );
+          });
+        });
+      }
+
+
+      // ---------- ADD ONS ----------
+      addOns.forEach((a, i) => {
+        fd.append(`addOns[${i}].name`, a.name);
+        fd.append(`addOns[${i}].charge`, String(Number(a.charge || 0)));
+      });
+
+      // CREATE / UPDATE
       if (!pricingData) {
-        await createPricing({
-          organizationId,
-          tripPublicId: tripId,
-          data: fd as any,
-        }).unwrap();
+        await createPricing({ organizationId, tripPublicId: tripId, data: fd as any }).unwrap();
       } else {
-        await updatePricing({
-          organizationId,
-          tripPublicId: tripId,
-          data: fd as any,
-        }).unwrap();
+        await updatePricing({ organizationId, tripPublicId: tripId, data: fd as any }).unwrap();
       }
-      if (!isDraft) {
-        router.push(`/organizer/create-trip/${tripId}/review`);
-      }
+
+      if (!isDraft) router.push(`/organizer/create-trip/${tripId}/review`);
     } catch (e) {
-      console.error('Pricing save error', e);
+      console.error("Pricing save error", e);
       if (isDraft) setDraftDisabled(false);
     } finally {
       if (!isDraft) setIsSavingNext(false);
     }
   };
+
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
