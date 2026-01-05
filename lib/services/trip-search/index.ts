@@ -23,7 +23,7 @@ export const publicTripAPI = baseAPI.injectEndpoints({
           criteria.destinationTags.forEach(tag =>
             params.append(
               "destinationTags",
-              tag.trim().toUpperCase().replace(/\s+/g, "_")
+              tag.trim().replace(/\s+/g, "_")
             )
           );
         }
