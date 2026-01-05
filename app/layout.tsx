@@ -1,9 +1,10 @@
 import { Poppins, Barlow } from "next/font/google";
-import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { ReduxProvider } from "@/lib/redux-provider";
 import HydratedAuth from "@/components/AuthLoader";
 import { Toaster } from "@/components/ui/toaster";
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata = {
   title: "Ragir - Organizer Dashboard",
@@ -33,6 +34,8 @@ export default function RootLayout({
         <ReduxProvider>
           <HydratedAuth>
             {children}
+            <Analytics />
+            <SpeedInsights />
             <Toaster />
           </HydratedAuth>
         </ReduxProvider>
