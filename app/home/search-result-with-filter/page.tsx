@@ -66,6 +66,17 @@ const trips = [
   },
 ];
 
+const calculateDuration = (startDate: string, endDate: string) => {
+  if (!startDate || !endDate) return "-D/-N";
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return "-D/-N";
+
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return `${nights + 1}D/${nights}N`;
+};
+
 export default function SearchResultsWithFilters() {
   const searchParams = useSearchParams();
 
@@ -305,8 +316,7 @@ export default function SearchResultsWithFilters() {
                         "—"
                       }
                       rating={trip.rating || 4.5}
-                      days={`${trip.totalDays || "-"}D/${trip.totalNights || "-"
-                        }N`}
+                      days={calculateDuration(trip.startDate, trip.endDate)}
                       dates={`${trip.startDate} — ${trip.endDate}`}
                       price={trip.startingPrice || 0}
                       image={
