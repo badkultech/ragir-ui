@@ -90,9 +90,12 @@ export function AdvancedFilters({
   const [budgetRange, setBudgetRange] = useState({ min: 5000, max: 50000 })
   const [selectedOccupancy, setSelectedOccupancy] = useState("Single Occupancy")
   const [selectedGroupType, setSelectedGroupType] = useState("Exclusive Group")
-  const [selectedMoods, setSelectedMoods] = useState(["Skygaze"])
+  const [selectedMoods, setSelectedMoods] = useState<string[]>([])
   const [emiAvailable, setEmiAvailable] = useState(false)
-  const [_, setForceUpdate] = useState(0);
+
+  // Properly manage destinations and departure cities state
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([])
+  const [selectedDepartureCities, setSelectedDepartureCities] = useState<string[]>([])
 
 
   const toggleSection = (id: string) => {
@@ -102,6 +105,19 @@ export function AdvancedFilters({
   const toggleMood = (name: string) => {
     setSelectedMoods((prev) => (prev.includes(name) ? prev.filter((m) => m !== name) : [...prev, name]))
   }
+
+  const toggleDestination = (name: string) => {
+    setSelectedDestinations((prev) =>
+      prev.includes(name) ? prev.filter((d) => d !== name) : [...prev, name]
+    )
+  }
+
+  const toggleDepartureCity = (name: string) => {
+    setSelectedDepartureCities((prev) =>
+      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
+    )
+  }
+
   const getSelectedFilters = () => ({
     duration: selectedDuration,
     minBudget: budgetRange.min,
@@ -112,17 +128,20 @@ export function AdvancedFilters({
     groupType: selectedGroupType,
     moods: selectedMoods,
     emi: emiAvailable,
-
-    destinations: destinations
-      .filter(d => d.checked)
-      .map(d => d.name),
-
-    departureCities: departureCities
-      .filter(c => c.checked)
-      .map(c => c.name),
+    destinations: selectedDestinations,
+    departureCities: selectedDepartureCities,
   });
 
-
+  const clearAllFilters = () => {
+    setSelectedDuration("7+ Days")
+    setBudgetRange({ min: 5000, max: 50000 })
+    setSelectedOccupancy("Single Occupancy")
+    setSelectedGroupType("Exclusive Group")
+    setSelectedMoods([])
+    setEmiAvailable(false)
+    setSelectedDestinations([])
+    setSelectedDepartureCities([])
+  }
 
   const containerClass = isMobile
     ? `fixed inset-0 z-50 bg-white transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`
@@ -281,12 +300,8 @@ export function AdvancedFilters({
                 <label key={dest.name} className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    checked={dest.checked}
-                    onChange={(e) => {
-                      dest.checked = e.target.checked;
-                      setForceUpdate(x => x + 1); // force re-render
-                    }}
-
+                    checked={selectedDestinations.includes(dest.name)}
+                    onChange={() => toggleDestination(dest.name)}
                     className="w-4 h-4 rounded border-[#e5e3e0] text-[#e07a5f] focus:ring-[#e07a5f]"
                   />
                   <span className="text-xs text-[#4d4d4d]">{dest.name}</span>
@@ -313,7 +328,8 @@ export function AdvancedFilters({
                 <label key={city.name} className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    defaultChecked={city.checked}
+                    checked={selectedDepartureCities.includes(city.name)}
+                    onChange={() => toggleDepartureCity(city.name)}
                     className="w-4 h-4 rounded border-[#e5e3e0] text-[#e07a5f] focus:ring-[#e07a5f]"
                   />
                   <span className="text-xs text-[#4d4d4d]">{city.name}</span>
@@ -399,7 +415,9 @@ export function AdvancedFilters({
 
       {/* Action Buttons */}
       <div className="flex gap-3 mt-6 pt-4 border-t border-[#e5e3e0]">
-        <button className="flex-1 py-2.5 text-sm font-medium text-[#6b6b6b] border border-[#e5e3e0] rounded-full hover:bg-[#f5f3f0] transition-colors">
+        <button
+          onClick={clearAllFilters}
+          className="flex-1 py-2.5 text-sm font-medium text-[#6b6b6b] border border-[#e5e3e0] rounded-full hover:bg-[#f5f3f0] transition-colors">
           Clear All
         </button>
         <button

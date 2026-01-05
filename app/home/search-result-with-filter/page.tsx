@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/search-results/header";
 import { SearchResultsTripCard } from "@/components/search-results/search-results-trip-card";
@@ -27,7 +27,7 @@ const trips = [
     image: "/hampi-ruins-temples.png",
   }, {
     id: 2,
-    title: "Himalayan Adventure Trek",
+    title: "Himalayans Adventure Trek",
     provider: "Mountain Trails",
     location: "Himachal Pradesh, Leh, Nubra Valley",
     subLocation: "+2 more",
@@ -126,11 +126,65 @@ export default function SearchResultsWithFilters() {
 
   const apiTrips = data?.content || [];
 
+
+
+
   // ---------- ACTIONS ----------
-  const removeFilter = (id: number) =>
+  const removeFilter = (id: number) => {
+    const filterToRemove = filters.find((f) => f.id === id);
+    if (!filterToRemove) return;
+
+    // Update UI filters
     setFilters((prev) => prev.filter((f) => f.id !== id));
 
-  const clearAllFilters = () => setFilters([]);
+    // Update API criteria based on which filter was removed
+    setCriteria((prev: any) => {
+      const newCriteria = { ...prev };
+      const label = filterToRemove.label.toLowerCase();
+
+      // Check if it's a mood filter
+      const moodTypes = ['adventure', 'trekking', 'wellness', 'skygaze', 'cultural', 'wildlife', 'beach', 'spiritual'];
+      if (moodTypes.some(mood => label.includes(mood))) {
+        const moodToRemove = label.replace(/\s+/g, '_');
+        newCriteria.moods = (prev.moods || []).filter((m: string) => m !== moodToRemove);
+      }
+      // Check if it's a destination filter
+      else if (label.startsWith('destination:')) {
+        const destination = label.replace('destination:', '').trim().toLowerCase().replace(/\s+/g, '_');
+        newCriteria.destinationTags = (prev.destinationTags || []).filter((d: string) => d !== destination);
+      }
+      // Check if it's a region filter
+      else if (label.startsWith('region:')) {
+        delete newCriteria.region;
+      }
+      // Check if it's a year filter
+      else if (label.startsWith('year:')) {
+        delete newCriteria.year;
+      }
+      // Check if it's a month filter
+      else if (label.startsWith('month:')) {
+        delete newCriteria.month;
+      }
+      // Check if it's a duration filter
+      else if (label.includes('days')) {
+        delete newCriteria.minDays;
+        delete newCriteria.maxDays;
+      }
+
+      return newCriteria;
+    });
+  };
+
+  const clearAllFilters = () => {
+    setFilters([]);
+    // Reset criteria to empty state
+    setCriteria({
+      month: undefined,
+      year: undefined,
+      destinationTags: [],
+      moods: [],
+    });
+  };
 
   const [showFilters, setShowFilters] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -181,15 +235,15 @@ export default function SearchResultsWithFilters() {
                 setCriteria((prev: any) => ({
                   ...prev,
 
-                  // moods
+                  // moods - keep original case, just replace spaces
                   moods: data.moods?.map((m: string) =>
-                    m.toLowerCase().replace(/\s+/g, "_")
-                  ),
+                    m.replace(/\s+/g, "_")
+                  ) || [],
 
-                  // destinations
+                  // destinations - keep original case, just replace spaces
                   destinationTags: data.destinations?.map((d: string) =>
-                    d.toLowerCase().replace(/\s+/g, "_")
-                  ),
+                    d.replace(/\s+/g, "_")
+                  ) || [],
 
                   // duration
                   ...(data.duration === "3-5 Days" && { minDays: 3, maxDays: 5 }),
@@ -200,9 +254,9 @@ export default function SearchResultsWithFilters() {
                   ...(data.minAge && { minAge: Number(data.minAge) }),
                   ...(data.maxAge && { maxAge: Number(data.maxAge) }),
 
-                  // budget -> API
-                  minBudget: Number(data.minBudget ?? 0),
-                  maxBudget: Number(data.maxBudget ?? 0),
+                  // budget -> API (only set if non-zero)
+                  ...(data.minBudget && data.minBudget > 0 && { minBudget: Number(data.minBudget) }),
+                  ...(data.maxBudget && data.maxBudget > 0 && { maxBudget: Number(data.maxBudget) }),
                 }));
 
                 // TAGS UI (same)
@@ -291,13 +345,15 @@ export default function SearchResultsWithFilters() {
               setCriteria((prev: any) => ({
                 ...prev,
 
+                // moods - keep original case, just replace spaces
                 moods: data.moods?.map((m: string) =>
-                  m.toLowerCase().replace(/\s+/g, "_")
-                ),
+                  m.replace(/\s+/g, "_")
+                ) || [],
 
+                // destinations - keep original case, just replace spaces
                 destinationTags: data.destinations?.map((d: string) =>
-                  d.toLowerCase().replace(/\s+/g, "_")
-                ),
+                  d.replace(/\s+/g, "_")
+                ) || [],
 
                 ...(data.duration === "3-5 Days" && { minDays: 3, maxDays: 5 }),
                 ...(data.duration === "6-7 Days" && { minDays: 6, maxDays: 7 }),
@@ -306,8 +362,9 @@ export default function SearchResultsWithFilters() {
                 ...(data.minAge && { minAge: Number(data.minAge) }),
                 ...(data.maxAge && { maxAge: Number(data.maxAge) }),
 
-                minBudget: Number(data.minBudget ?? 0),
-                maxBudget: Number(data.maxBudget ?? 0),
+                // budget -> API (only set if non-zero)
+                ...(data.minBudget && data.minBudget > 0 && { minBudget: Number(data.minBudget) }),
+                ...(data.maxBudget && data.maxBudget > 0 && { maxBudget: Number(data.maxBudget) }),
               }));
 
               const selectedTags = [
