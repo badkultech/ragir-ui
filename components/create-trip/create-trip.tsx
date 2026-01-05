@@ -530,6 +530,11 @@ export function CreateTrip({ tripId }: Props) {
     setAllTags(allTags.filter((tag) => tag !== tagToRemove));
     dispatch(setCityTags(cityTags.filter((tag) => tag !== tagToRemove)));
   };
+  const clearAllCityTags = () => {
+    setAllTags([]);
+    dispatch(setCityTags([]));
+  };
+
 
   const toggleCityTagSelection = (tag: string) => {
     if (cityTags.includes(tag)) {
@@ -550,40 +555,7 @@ export function CreateTrip({ tripId }: Props) {
     // Calculate End Date
     const end = new Date(start);
     end.setDate(start.getDate() + (days - 1));
-
-    // Preserve the time from the start date or default to same time
-    // We need to format it back to the string format expected by the picker/state
-    // Assuming formData.startDate is an ISO-like string or something Date constructor accepts.
-
-    // We'll format to match the typical input requirements if needed, 
-    // but the state seems to hold Date strings. 
-    // Let's ensure we update the state with the new End Date.
-
-    // Note: This matches the format used in handleSaveTrip: ISO string or similar
-    // We'll just use the same format as the input usually provides.
-    // However, CustomDateTimePicker returns value directly. 
-    // Let's construct a string compatible with what CustomDateTimePicker expects.
-    // If it expects the same format as it emits.
-
-    // Simple approach: Use ISO string, but we might need to be careful about timezone offsets 
-    // if the component isn't handling them. 
-    // For now, let's assume standard JS Date behavior works since we are just adding days.
-
-    // Formatting to local ISO-like string to keep it consistent if needed, 
-    // or just use typical string conversion.
-    // Let's try to keep the format consistent with the existing data.
-    // The existing code used `new Date(formData.endDate)` which implies standard date string parsing works.
-
-    // We will update the form data.
-    // Using a safe toISOString() or similar might be best, but let's check current format.
-    // The previous hook used `parseDateOnly` which suggests date parts matter most.
-
-    const formattedEnd = end.toString(); // Or toISOString() might be safer if the picker handles it.
-    // Let's use the same format as startDate if possible?
-
-    // Actually, let's just use the `setFormData` with the Date object converted to string.
-    // Usually components like dates as ISO strings.
-
+    const formattedEnd = end.toString();
     dispatch(setFormData({ ...formData, endDate: end.toISOString() }));
 
   }, [formData.startDate, formData.totalDays]);
@@ -945,6 +917,17 @@ export function CreateTrip({ tripId }: Props) {
                   }}
                   className='w-full'
                 />
+                {cityTags.length > 0 && (
+                  <div className="flex justify-end mt-2">
+                    <button
+                      onClick={clearAllCityTags}
+                      className="text-sm text-red-500 hover:text-red-600 border border-red-500 px-2 py-1 rounded"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                )}
+
 
                 {/* 🔽 Destination Suggestions Dropdown */}
                 {showDestinationSuggestions &&
