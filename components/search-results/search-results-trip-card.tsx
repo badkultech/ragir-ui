@@ -4,9 +4,10 @@ import Image from "next/image"
 import { Heart, MapPin, Calendar, Clock, Users, Star } from "lucide-react"
 import { useState } from "react"
 import { moodMap } from "@/components/search-results/mood-tag"  
+import Link from "next/link"
 
 interface SearchResultsTripCardProps {
-  id: number
+  id: string
   title: string
   provider: string
   location: string
@@ -31,12 +32,14 @@ export function SearchResultsTripCard({
   price,
   badges,
   image,
+  id,
   isFavorite = false,
 }: SearchResultsTripCardProps) {
 
   const [favorite, setFavorite] = useState(isFavorite)
 
   return (
+    <Link href={`/home/search-result-with-filter/trip-details/${id}`}>
     <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e3e0] hover:shadow-lg transition-shadow cursor-pointer">
 
       {/* Image */}
@@ -154,5 +157,6 @@ export function SearchResultsTripCard({
         </div>
       </div>
     </div>
+    </Link>
   )
 }
