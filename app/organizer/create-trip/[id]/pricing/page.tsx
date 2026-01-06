@@ -13,6 +13,7 @@ import {
 } from '@/components/create-trip/gst-status-toggle';
 import { CreditOptions } from '@/components/create-trip/credit-options';
 import { PricingSummary } from '@/components/create-trip/pricing-summary';
+import { InputWithUnitToggle, UnitType } from '@/components/create-trip/input-with-unit-toggle';
 import { useParams, useRouter } from 'next/navigation';
 import { WizardFooter } from '@/components/create-trip/wizard-footer';
 import { TripStepperHeader } from '@/components/create-trip/tripStepperHeader';
@@ -47,8 +48,10 @@ export default function PricingPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
+  const [discountUnit, setDiscountUnit] = useState<UnitType>('percent');
   const [discountUntil, setDiscountUntil] = useState('');
-  const [depositPercent, setDepositPercent] = useState('');
+  const [depositPercent, setDepositPercent] = useState(''); // Kept name for compatibility, but logical value
+  const [depositUnit, setDepositUnit] = useState<UnitType>('percent');
   const [policy, setPolicy] = useState('');
   const [addOns, setAddOns] = useState<
     { id: string; name: string; charge: number }[]
@@ -364,28 +367,33 @@ export default function PricingPage() {
                         onChange={(e) => setPrice(e.target.value)}
                       />
 
-                      <Label>Discount</Label>
-                      <Input
-                        placeholder='Discount %'
-                        value={discount}
-                        onChange={(e) => setDiscount(e.target.value)}
-                      />
+                      <div className="space-y-3">
+                        {/* FIRST ROW: DISCOUNT + VALID UNTIL */}
+                        <div className='flex items-end gap-4'>
+                          <div className='flex-1 space-y-2'>
+                            <Label className="text-sm font-semibold text-gray-700">Discount</Label>
+                            <InputWithUnitToggle
+                              placeholder='Discount'
+                              value={discount}
+                              onChange={setDiscount}
+                              unit={discountUnit}
+                              onUnitChange={setDiscountUnit}
+                            />
+                          </div>
 
-                      <Label>Discount Valid Until</Label>
-                      <CustomDateTimePicker
-                        mode='date'
-                        value={discountUntil}
-                        onChange={setDiscountUntil}
-                        stepMinutes={15}
-                      />
+                          <div className='flex-1 space-y-2'>
+                            <Label className="text-sm font-semibold text-gray-700">Valid until</Label>
+                            <CustomDateTimePicker
+                              mode="date"
+                              value={discountUntil}
+                              onChange={setDiscountUntil}
+                              className="h-10"
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-                      <Label>Discount Valid Until</Label>
-                      <CustomDateTimePicker
-                        mode='date'
-                        value={discountUntil}
-                        onChange={setDiscountUntil}
-                        stepMinutes={15}
-                      />
+
                     </div>
                   )}
 
@@ -418,10 +426,12 @@ export default function PricingPage() {
                     <Label>GST Status *</Label>
                     <GstStatusToggle value={gst} onChange={setGst} />
                     <Label>Deposit Required</Label>
-                    <Input
-                      placeholder='Deposit %'
+                    <InputWithUnitToggle
+                      placeholder='Deposit Amount'
                       value={depositPercent}
-                      onChange={(e) => setDepositPercent(e.target.value)}
+                      onChange={setDepositPercent}
+                      unit={depositUnit}
+                      onUnitChange={setDepositUnit}
                     />
 
                     <Label>Credit Options</Label>
