@@ -309,7 +309,7 @@ export default function SearchResultsWithFilters() {
                       key={trip.publicId}
                       id={trip.publicId}
                       title={trip.name}
-                      provider={trip.providerName || "—"}
+                      provider={trip.organizerName || "—"}
                       location={
                         trip.cityTags?.join(", ") ||
                         trip.destinationTags?.join(", ") ||
