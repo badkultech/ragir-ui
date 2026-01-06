@@ -13,6 +13,7 @@ import {
 } from '@/components/create-trip/gst-status-toggle';
 import { CreditOptions } from '@/components/create-trip/credit-options';
 import { PricingSummary } from '@/components/create-trip/pricing-summary';
+import { InputWithUnitToggle, UnitType } from '@/components/create-trip/input-with-unit-toggle';
 import { useParams, useRouter } from 'next/navigation';
 import { WizardFooter } from '@/components/create-trip/wizard-footer';
 import { TripStepperHeader } from '@/components/create-trip/tripStepperHeader';
@@ -47,8 +48,10 @@ export default function PricingPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
+  const [discountUnit, setDiscountUnit] = useState<UnitType>('percent');
   const [discountUntil, setDiscountUntil] = useState('');
-  const [depositPercent, setDepositPercent] = useState('');
+  const [depositPercent, setDepositPercent] = useState(''); // Kept name for compatibility, but logical value
+  const [depositUnit, setDepositUnit] = useState<UnitType>('percent');
   const [policy, setPolicy] = useState('');
   const [addOns, setAddOns] = useState<
     { id: string; name: string; charge: number }[]
@@ -68,24 +71,58 @@ export default function PricingPage() {
   // Restore existing data
   useEffect(() => {
     if (!pricingData) return;
-    setPrice(String(pricingData.basePrice ?? ''));
-    setDiscount(String(pricingData.discountPercent ?? ''));
-    setDiscountUntil(pricingData.discountValidUntil || '');
-    setGst(pricingData.includesGst ? 'includes' : 'excludes');
-    setDepositPercent(String(pricingData.depositRequiredPercent ?? ''));
+
+    // Set mode from API
+    setMode(
+      pricingData.tripPricingType === "DYNAMIC"
+        ? "dynamic"
+        : "simple"
+    );
+
+    // SIMPLE PRICING DATA
+    if (pricingData.simplePricingRequest) {
+      setPrice(String(pricingData.simplePricingRequest.basePrice ?? ""));
+      setDiscount(String(pricingData.simplePricingRequest.discountPercent ?? ""));
+      setDiscountUntil(pricingData.simplePricingRequest.discountValidUntil || "");
+    }
+
+    // DYNAMIC PRICING DATA
+    if (pricingData.dynamicPricingRequest) {
+      setDynamicCategories(
+        pricingData.dynamicPricingRequest.pricingCategoryDtos?.map((c: any) => ({
+          id: crypto.randomUUID(),
+          name: c.categoryName,
+          description: c.description,
+          type: c.pricingCategoryType === "SINGLE" ? "single" : "multi",
+          options: c.pricingCategoryOptionDTOs.map((o: any) => ({
+            id: crypto.randomUUID(),
+            name: o.name,
+            price: String(o.price),
+            discount: String(o.discount),
+          }))
+        })) ?? []
+      );
+    }
+
+    // COMMON FIELDS
+    setGst(pricingData.includesGst ? "includes" : "excludes");
+    setDepositPercent(String(pricingData.depositRequiredPercent ?? ""));
     setCredit({
-      card: pricingData.creditOptions === 'CREDIT_CARD',
-      emi: pricingData.creditOptions === 'EMI',
+      card: pricingData.creditOptions === "CREDIT_CARD",
+      emi: pricingData.creditOptions === "EMI",
     });
-    setPolicy(pricingData.cancellationPolicy || '');
+    setPolicy(pricingData.cancellationPolicy || "");
+
+    // ADD ONS (null safe)
     setAddOns(
       (pricingData.addOns || []).map((a: any) => ({
-        id: String(a.id),
+        id: String(a.id ?? crypto.randomUUID()),
         name: a.name,
         charge: Number(a.charge),
-      })),
+      }))
     );
   }, [pricingData]);
+
 
   // DYNAMIC PRICING SATE
   const [dynamicCategories, setDynamicCategories] = useState<DynamicCategory[]>([]);
@@ -124,47 +161,74 @@ export default function PricingPage() {
     if (!tripId) return;
 
     try {
-      if (isDraft) {
-        setDraftDisabled(true);
-      } else {
-        setIsSavingNext(true);
-      }
+      isDraft ? setDraftDisabled(true) : setIsSavingNext(true);
 
       const fd = new FormData();
-      // ... (Rest of existing save logic - keeping it minimal for now as we focus on UI)
-      // I will need to update this to support dynamic pricing JSON later
-      fd.append('discountPercent', String(Number(discount || 0)));
-      fd.append('discountValidUntil', discountUntil || '');
-      fd.append('includesGst', gst === 'includes' ? 'true' : 'false');
-      fd.append('depositRequiredPercent', String(Number(depositPercent || 0)));
-      fd.append('creditOptions', credit.card ? 'CREDIT_CARD' : 'EMI');
-      fd.append('cancellationPolicy', policy || '');
-      fd.append('basePrice', String(Number(price || 0)));
-      // Note: Backend might not support dynamic yet, but UI flow is priority
 
+      // COMMON FIELDS
+      fd.append("includesGst", gst === "includes" ? "true" : "false");
+      fd.append("depositRequiredPercent", String(Number(depositPercent || 0)));
+      fd.append("creditOptions", credit.card ? "CREDIT_CARD" : "EMI");
+      fd.append("cancellationPolicy", policy || "");
+      fd.append("tripPricingType", mode === "simple" ? "SIMPLE" : "DYNAMIC");
+
+      // ---------- SIMPLE PRICING ----------
+      if (mode === "simple") {
+        fd.append("simplePricingRequest.basePrice", String(Number(price || 0)));
+        fd.append("simplePricingRequest.discountPercent", String(Number(discount || 0)));
+        fd.append("simplePricingRequest.discountValidUntil", discountUntil || "");
+      }
+
+      // ---------- DYNAMIC PRICING ----------
+      if (mode === "dynamic") {
+        dynamicCategories.forEach((cat, i) => {
+          fd.append(`dynamicPricingRequest.pricingCategoryDtos[${i}].categoryName`, cat.name);
+          fd.append(`dynamicPricingRequest.pricingCategoryDtos[${i}].description`, cat.description);
+          fd.append(
+            `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryType`,
+            cat.type === "single" ? "SINGLE" : "MULTI"
+          );
+
+          cat.options.forEach((opt, j) => {
+            fd.append(
+              `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryOptionDTOs[${j}].name`,
+              opt.name
+            );
+            fd.append(
+              `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryOptionDTOs[${j}].price`,
+              String(Number(opt.price || 0))
+            );
+            fd.append(
+              `dynamicPricingRequest.pricingCategoryDtos[${i}].pricingCategoryOptionDTOs[${j}].discount`,
+              String(Number(opt.discount || 0))
+            );
+          });
+        });
+      }
+
+
+      // ---------- ADD ONS ----------
+      addOns.forEach((a, i) => {
+        fd.append(`addOns[${i}].name`, a.name);
+        fd.append(`addOns[${i}].charge`, String(Number(a.charge || 0)));
+      });
+
+      // CREATE / UPDATE
       if (!pricingData) {
-        await createPricing({
-          organizationId,
-          tripPublicId: tripId,
-          data: fd as any,
-        }).unwrap();
+        await createPricing({ organizationId, tripPublicId: tripId, data: fd as any }).unwrap();
       } else {
-        await updatePricing({
-          organizationId,
-          tripPublicId: tripId,
-          data: fd as any,
-        }).unwrap();
+        await updatePricing({ organizationId, tripPublicId: tripId, data: fd as any }).unwrap();
       }
-      if (!isDraft) {
-        router.push(`/organizer/create-trip/${tripId}/review`);
-      }
+
+      if (!isDraft) router.push(`/organizer/create-trip/${tripId}/review`);
     } catch (e) {
-      console.error('Pricing save error', e);
+      console.error("Pricing save error", e);
       if (isDraft) setDraftDisabled(false);
     } finally {
       if (!isDraft) setIsSavingNext(false);
     }
   };
+
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -303,28 +367,33 @@ export default function PricingPage() {
                         onChange={(e) => setPrice(e.target.value)}
                       />
 
-                      <Label>Discount</Label>
-                      <Input
-                        placeholder='Discount %'
-                        value={discount}
-                        onChange={(e) => setDiscount(e.target.value)}
-                      />
+                      <div className="space-y-3">
+                        {/* FIRST ROW: DISCOUNT + VALID UNTIL */}
+                        <div className='flex items-end gap-4'>
+                          <div className='flex-1 space-y-2'>
+                            <Label className="text-sm font-semibold text-gray-700">Discount</Label>
+                            <InputWithUnitToggle
+                              placeholder='Discount'
+                              value={discount}
+                              onChange={setDiscount}
+                              unit={discountUnit}
+                              onUnitChange={setDiscountUnit}
+                            />
+                          </div>
 
-                      <Label>Discount Valid Until</Label>
-                      <CustomDateTimePicker
-                        mode='date'
-                        value={discountUntil}
-                        onChange={setDiscountUntil}
-                        stepMinutes={15}
-                      />
+                          <div className='flex-1 space-y-2'>
+                            <Label className="text-sm font-semibold text-gray-700">Valid until</Label>
+                            <CustomDateTimePicker
+                              mode="date"
+                              value={discountUntil}
+                              onChange={setDiscountUntil}
+                              className="h-10"
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-                      <Label>Discount Valid Until</Label>
-                      <CustomDateTimePicker
-                        mode='date'
-                        value={discountUntil}
-                        onChange={setDiscountUntil}
-                        stepMinutes={15}
-                      />
+
                     </div>
                   )}
 
@@ -357,10 +426,12 @@ export default function PricingPage() {
                     <Label>GST Status *</Label>
                     <GstStatusToggle value={gst} onChange={setGst} />
                     <Label>Deposit Required</Label>
-                    <Input
-                      placeholder='Deposit %'
+                    <InputWithUnitToggle
+                      placeholder='Deposit Amount'
                       value={depositPercent}
-                      onChange={(e) => setDepositPercent(e.target.value)}
+                      onChange={setDepositPercent}
+                      unit={depositUnit}
+                      onUnitChange={setDepositUnit}
                     />
 
                     <Label>Credit Options</Label>
