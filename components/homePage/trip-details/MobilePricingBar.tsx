@@ -1,3 +1,5 @@
+import { TRIP_DETAILS } from "@/lib/constants/strings";
+
 interface MobilePricingBarProps {
   onOpen: () => void;
   pricing: any;
@@ -16,7 +18,7 @@ export default function MobilePricingBar({ onOpen, pricing }: MobilePricingBarPr
       <div className="flex justify-between items-center">
 
         <div>
-          <p className="text-xs text-gray-500">Starting from</p>
+          <p className="text-xs text-gray-500">{TRIP_DETAILS.MOBILE_BAR.STARTING_FROM}</p>
 
           <p className="text-2xl font-bold">
             ₹{finalPrice.toLocaleString()}
@@ -24,7 +26,7 @@ export default function MobilePricingBar({ onOpen, pricing }: MobilePricingBarPr
 
           {discount > 0 && (
             <p className="text-xs text-green-600">
-              {discount}% OFF (₹{base.toLocaleString()} original)
+              {discount}% {TRIP_DETAILS.MOBILE_BAR.OFF} (₹{base.toLocaleString()} {TRIP_DETAILS.MOBILE_BAR.ORIGINAL})
             </p>
           )}
         </div>
@@ -33,7 +35,7 @@ export default function MobilePricingBar({ onOpen, pricing }: MobilePricingBarPr
           onClick={onOpen}
           className="bg-orange-500 text-white px-6 py-3 rounded-lg"
         >
-          View Options
+          {TRIP_DETAILS.MOBILE_BAR.VIEW_OPTIONS}
         </button>
 
       </div>

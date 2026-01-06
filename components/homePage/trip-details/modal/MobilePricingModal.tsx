@@ -1,4 +1,5 @@
 import { X, Bike, Send, CheckCircle2 } from "lucide-react"
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
 type SimplePricing = {
   basePrice?: number
@@ -26,7 +27,7 @@ export default function MobilePricingModal({
 
         {/* HEADER */}
         <div className="border-b px-6 py-4 flex justify-between">
-          <h3 className="font-bold">Pricing Options</h3>
+          <h3 className="font-bold">{TRIP_DETAILS.PRICING_MODAL.TITLE}</h3>
           <button onClick={onClose}>
             <X />
           </button>
@@ -40,15 +41,15 @@ export default function MobilePricingModal({
               <div className="flex gap-2">
                 <Bike className="text-gray-400" />
                 <div>
-                  <p className="text-sm font-medium">Base Package</p>
+                  <p className="text-sm font-medium">{TRIP_DETAILS.PRICING_MODAL.BASE_PACKAGE}</p>
 
                   {simple?.discountPercent ? (
                     <p className="text-xs text-green-600">
-                      {simple.discountPercent}% OFF until {simple.discountValidUntil}
+                      {simple.discountPercent}% {TRIP_DETAILS.PRICING_MODAL.OFF} until {simple.discountValidUntil}
                     </p>
                   ) : (
                     <p className="text-xs text-gray-500">
-                      Standard trip package pricing
+                      {TRIP_DETAILS.PRICING_MODAL.STANDARD_PRICING}
                     </p>
                   )}
                 </div>
@@ -82,14 +83,14 @@ export default function MobilePricingModal({
           <div className="bg-orange-50 p-3 rounded-lg flex gap-2">
             <CheckCircle2 className="text-orange-600" />
             <p className="text-xs text-orange-900">
-              Please select an option before requesting invite.
+              {TRIP_DETAILS.PRICING_MODAL.WARNING}
             </p>
           </div>
 
           {/* BUTTON */}
           <button className="w-full bg-gray-100 text-gray-400 py-3 rounded-lg">
             <Send className="inline w-4 h-4 mr-2" />
-            Request Invite
+            {TRIP_DETAILS.PRICING_MODAL.REQUEST_INVITE}
           </button>
         </div>
       </div>

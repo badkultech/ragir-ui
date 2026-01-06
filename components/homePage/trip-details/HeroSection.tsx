@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
 interface HeroSectionProps {
   title?: string;
@@ -7,7 +8,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({
-  title = "Trip",
+  title = TRIP_DETAILS.HERO.DEFAULT_TITLE,
   location = "",
   imageUrl,
 }: HeroSectionProps) {

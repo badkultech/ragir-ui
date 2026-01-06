@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 import Image from "next/image";
 import {
   Bike,
   Send,
-  MessageCircle,
+  ChevronUp,
+  ChevronDown,
   AlertCircle,
+  MessageCircle,
 } from "lucide-react";
 
 interface DesktopSidebarProps {
@@ -34,8 +37,8 @@ export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) 
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-28 rounded-xl overflow-hidden relative">
               <Image
-                src="/mountain-camp.png"
-                alt="Trip"
+                src="/kerala-backwaters.png"
+                alt="Trip gallery"
                 width={200}
                 height={150}
                 className="w-full h-full object-cover"
@@ -48,25 +51,25 @@ export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) 
         <div className="bg-white rounded-2xl border p-5 space-y-4">
 
           <div>
-            <p className="text-xs text-gray-500">Starting from</p>
+            <p className="text-xs text-gray-500">{TRIP_DETAILS.SIDEBAR.STARTING_FROM}</p>
 
             <p className="text-3xl font-bold">
               ₹{finalPrice.toLocaleString()}
               <span className="text-sm text-gray-500 font-normal">
-                {" "}per person
+                {" "}{TRIP_DETAILS.SIDEBAR.PER_PERSON}
               </span>
             </p>
 
             {discount > 0 && (
               <p className="text-sm text-green-600">
-                {discount}% OFF (₹{base.toLocaleString()} original)
+                {discount}% {TRIP_DETAILS.SIDEBAR.OFF} (₹{base.toLocaleString()} {TRIP_DETAILS.SIDEBAR.ORIGINAL})
               </p>
             )}
           </div>
 
           {/* Option selector – for now single option */}
           <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-            <p className="font-medium text-sm">Base Package</p>
+            <p className="font-medium text-sm">{TRIP_DETAILS.SIDEBAR.BASE_PACKAGE_TITLE}</p>
 
             <button
               onClick={() => setSelected(1)}
@@ -77,8 +80,8 @@ export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) 
               <div className="flex gap-3 items-start">
                 <Bike className="w-4 h-4 mt-1 text-gray-600" />
                 <div>
-                  <p className="font-semibold text-sm">Standard Package</p>
-                  <p className="text-xs text-gray-500">Includes all base benefits</p>
+                  <p className="font-semibold text-sm">{TRIP_DETAILS.SIDEBAR.STANDARD_PACKAGE}</p>
+                  <p className="text-xs text-gray-500">{TRIP_DETAILS.SIDEBAR.STANDARD_DESC}</p>
                 </div>
               </div>
 
@@ -91,7 +94,7 @@ export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) 
           {!selected && (
             <div className="flex gap-2 items-center text-xs text-orange-600 bg-orange-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4" />
-              Please select a price option before requesting an invite.
+              <p>{TRIP_DETAILS.SIDEBAR.SELECT_OPTION_WARNING}</p>
             </div>
           )}
 
@@ -104,7 +107,7 @@ export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) 
             `}
           >
             <Send className="w-4 h-4" />
-            Request Invite
+            {TRIP_DETAILS.SIDEBAR.REQUEST_INVITE}
           </button>
 
           <button
@@ -112,7 +115,7 @@ export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) 
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-orange-500 text-orange-500 font-medium"
           >
             <MessageCircle className="w-4 h-4" />
-            Send Query to Organiser
+            {TRIP_DETAILS.SIDEBAR.SEND_QUERY}
           </button>
         </div>
       </div>

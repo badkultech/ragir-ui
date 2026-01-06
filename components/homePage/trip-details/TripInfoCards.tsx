@@ -1,4 +1,5 @@
 import { MapPin, Calendar, Clock, Users } from "lucide-react";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
 interface TripInfoProps {
   startPoint?: string;
@@ -27,31 +28,31 @@ export default function TripInfoCards({
     <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-2xl border py-8">
       <Item
         icon={MapPin}
-        label="Route"
+        label={TRIP_DETAILS.INFO_CARDS.ROUTE}
         value={`${startPoint || "-"} → ${endPoint || "-"}`}
       />
 
       <Item
         icon={Calendar}
-        label="Dates"
+        label={TRIP_DETAILS.INFO_CARDS.DATES}
         value={`${startDate || "-"} — ${endDate || "-"}`}
       />
 
       <Item
         icon={Clock}
-        label="Duration"
+        label={TRIP_DETAILS.INFO_CARDS.DURATION}
         value={`${totalDays || "-"} Days`}
       />
 
       <Item
         icon={Users}
-        label="Age Group"
+        label={TRIP_DETAILS.INFO_CARDS.AGE_GROUP}
         value={`${minAge || "-"} — ${maxAge || "-"}`}
       />
 
       <Item
         icon={Users}
-        label="Group Size"
+        label={TRIP_DETAILS.INFO_CARDS.GROUP_SIZE}
         value={`${minGroupSize || "-"} — ${maxGroupSize || "-"}`}
       />
     </div>

@@ -1,5 +1,6 @@
 import { X } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { TRIP_DETAILS } from "@/lib/constants/strings"
 
 interface LeaderProfileModalProps {
   onClose: () => void
@@ -18,11 +19,11 @@ export default function LeaderProfileModal({
   onClose,
   leader,
 }: LeaderProfileModalProps) {
-  const name = leader?.name || "Arjun Sharma"
+  const name = leader?.name || TRIP_DETAILS.LEADER_MODAL.DEFAULT_NAME
   const bio =
     leader?.bio ||
-    "Hi, I'm an experienced mountain guide with multiple years of leading trips and ensuring safe adventures."
-  const tagline = leader?.tagline || "Adventure Specialist"
+    TRIP_DETAILS.LEADER_MODAL.DEFAULT_BIO
+  const tagline = leader?.tagline || TRIP_DETAILS.LEADER_MODAL.DEFAULT_TAGLINE
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -40,7 +41,7 @@ export default function LeaderProfileModal({
         <div className="p-6">
           <div className="flex gap-4 mb-4">
             <Avatar className="w-16 h-16">
-              <AvatarFallback className="bg-orange-500 text-white text-xl">
+              <AvatarFallback>
                 {name?.[0]}
               </AvatarFallback>
             </Avatar>
@@ -53,12 +54,12 @@ export default function LeaderProfileModal({
               </p>
 
               <p className="text-xs text-gray-400">
-                If you're seeking memorable trips • {leader?.likes || 1947} likes
+                {TRIP_DETAILS.LEADER_MODAL.LIKES_TEXT} • {leader?.likes || 1947} {TRIP_DETAILS.LEADER_MODAL.LIKES_SUFFIX}
               </p>
             </div>
           </div>
 
-          <h4 className="font-semibold mb-2">FULL BIOGRAPHY</h4>
+          <h4 className="font-semibold mb-2">{TRIP_DETAILS.LEADER_MODAL.FULL_BIO_TITLE}</h4>
 
           <p className="text-sm text-gray-600 leading-relaxed">
             {bio}
@@ -66,16 +67,16 @@ export default function LeaderProfileModal({
 
           {/* SAME UI — stats only dynamic */}
           <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl mt-6">
-            <Stat value={`${leader?.years || "12+"}`} label="Years Experience" />
-            <Stat value={`${leader?.trips || "300+"}`} label="Trips Organized" />
-            <Stat value={`${leader?.travelers || "1947"}`} label="Happy Travelers" />
+            <Stat value={`${leader?.years || "12+"}`} label={TRIP_DETAILS.LEADER_MODAL.YEARS_EXP} />
+            <Stat value={`${leader?.trips || "300+"}`} label={TRIP_DETAILS.LEADER_MODAL.TRIPS_ORG} />
+            <Stat value={`${leader?.travelers || "1947"}`} label={TRIP_DETAILS.LEADER_MODAL.HAPPY_TRAVELERS} />
           </div>
 
           <button
             onClick={onClose}
-            className="w-full mt-6 bg-orange-500 text-white py-3 rounded-lg"
+            className="w-full mt-6 bg-gray-100 text-gray-600 py-3 rounded-xl font-medium"
           >
-            Close
+            {TRIP_DETAILS.LEADER_MODAL.CLOSE}
           </button>
         </div>
 

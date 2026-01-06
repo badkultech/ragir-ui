@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { X } from "lucide-react"
+import { TRIP_DETAILS } from "@/lib/constants/strings"
 
 const options = [
   "Spam or irrelevant content",
@@ -23,7 +24,7 @@ export default function ReportModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-md w-full">
         <div className="border-b px-6 py-4 flex justify-between">
-          <h3 className="font-bold">Report this trip</h3>
+          <h3 className="font-bold">{TRIP_DETAILS.REPORT_MODAL.TITLE}</h3>
           <button onClick={onClose}>
             <X />
           </button>
@@ -31,7 +32,7 @@ export default function ReportModal({ onClose }: { onClose: () => void }) {
 
         <div className="p-6">
           <p className="text-sm text-gray-600 mb-4">
-            Help us understand the issue.
+            {TRIP_DETAILS.REPORT_MODAL.DESC}
           </p>
 
           <div className="space-y-2 mb-4">
@@ -61,13 +62,13 @@ export default function ReportModal({ onClose }: { onClose: () => void }) {
 
           <div className="flex gap-3">
             <button onClick={onClose} className="flex-1 border py-3 rounded-lg">
-              Cancel
+              {TRIP_DETAILS.REPORT_MODAL.CANCEL}
             </button>
             <button
               disabled={!selected.length}
               className="flex-1 bg-orange-500 text-white py-3 rounded-lg disabled:opacity-50"
             >
-              Yes, Report
+              {TRIP_DETAILS.REPORT_MODAL.SUBMIT}
             </button>
           </div>
         </div>

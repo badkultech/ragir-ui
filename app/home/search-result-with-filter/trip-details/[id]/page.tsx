@@ -26,10 +26,14 @@ import { MainHeader } from "@/components/search-results/MainHeader";
 import { Footer } from "@/components/search-results/footer";
 import { useTripDetailsQuery } from "@/lib/services/trip-search";
 
+import { TRIP_DETAILS } from "@/lib/constants/strings";
+
+// ... imports ...
+
 export default function TripDetailsPage() {
   const { id } = useParams();
 
-  // UI state (unchanged)
+  // ... state ...
   const [activeDay, setActiveDay] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [showAsk, setShowAsk] = useState(false);
@@ -38,9 +42,11 @@ export default function TripDetailsPage() {
   const [showPricingDetails, setShowPricingDetails] = useState(false);
 
   const { data, isLoading, error } = useTripDetailsQuery(id as string);
-  if (isLoading) return <p>Loading trip…</p>;
-  if (error) return <p>Failed to load trip</p>;
-  if (!data) return <p>Trip not found</p>;
+  if (isLoading) return <p>{TRIP_DETAILS.PAGE.LOADING}</p>;
+  if (error) return <p>{TRIP_DETAILS.PAGE.ERROR}</p>;
+  if (!data) return <p>{TRIP_DETAILS.PAGE.NOT_FOUND}</p>;
+
+  // ... payload extraction ...
   const payload = data;
   const trip = payload.tripResponse;
   const itinerary = payload.tripItineraryResponse;
@@ -49,10 +55,9 @@ export default function TripDetailsPage() {
   const pricing = payload.tripPricingDTO;
   const organizer = payload.organizerProfileResponse;
 
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <MainHeader logoText={trip?.name || "Trip Details"} isLoggedIn />
+      <MainHeader logoText={trip?.name || TRIP_DETAILS.PAGE.DEFAULT_LOGO} isLoggedIn />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -95,7 +100,7 @@ export default function TripDetailsPage() {
               <DayWiseItinerary
                 dayTabs={
                   itinerary?.dayDetailResponseList?.map(
-                    (d: any) => `Day ${d.dayNumber}`
+                    (d: any) => `${TRIP_DETAILS.PAGE.DAY_PREFIX}${d.dayNumber}`
                   ) || []
                 }
                 activeDay={activeDay}
@@ -120,7 +125,7 @@ export default function TripDetailsPage() {
                 onClick={() => setShowReport(true)}
                 className="mx-auto block text-sm text-gray-600 hover:text-gray-900"
               >
-                Report this trip
+                {TRIP_DETAILS.PAGE.REPORT_BUTTON}
               </button>
             </div>
 
@@ -151,11 +156,11 @@ export default function TripDetailsPage() {
       {showReport && <ReportModal onClose={() => setShowReport(false)} />}
       {showAsk && <AskQuestionModal onClose={() => setShowAsk(false)} />}
       {showOrganizer && (
-  <LeaderProfileModal
-    onClose={() => setShowOrganizer(false)}
-    leader={trip?.groupLeaders?.[0]}
-  />
-)}
+        <LeaderProfileModal
+          onClose={() => setShowOrganizer(false)}
+          leader={trip?.groupLeaders?.[0]}
+        />
+      )}
 
       {showMobilePricing && (
         <MobilePricingModal

@@ -7,8 +7,9 @@ import {
   Calendar,
   CheckCircle2,
 } from "lucide-react";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
-const tabs = ["Transfers", "Meals", "Stays", "Activities"];
+const tabs = TRIP_DETAILS.INCLUDED.TABS;
 
 interface IncludedProps {
   transfers?: any[];
@@ -26,12 +27,12 @@ export default function IncludedSection({
   const [active, setActive] = useState(0);
 
   const renderEmpty = () => (
-    <p className="text-sm text-gray-500">No items added yet.</p>
+    <p className="text-sm text-gray-500">{TRIP_DETAILS.INCLUDED.EMPTY}</p>
   );
 
   return (
     <div className="bg-white rounded-2xl border p-6">
-      <h2 className="text-xl font-semibold mb-4">What's Included</h2>
+      <h2 className="text-xl font-semibold mb-4">{TRIP_DETAILS.INCLUDED.INCLUDED_LABEL}</h2>
 
       {/* tabs */}
       <div className="flex gap-2 mb-6 overflow-x-auto">
@@ -39,11 +40,10 @@ export default function IncludedSection({
           <button
             key={tab}
             onClick={() => setActive(i)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm ${
-              active === i
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm ${active === i
                 ? "bg-orange-500 text-white"
                 : "bg-gray-100 text-gray-600"
-            }`}
+              }`}
           >
             {i === 0 && <Car className="w-4 h-4" />}
             {i === 1 && <Utensils className="w-4 h-4" />}

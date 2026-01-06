@@ -1,4 +1,5 @@
 import { Ban } from "lucide-react";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
 interface ExcludedItem {
   name?: string;
@@ -12,11 +13,11 @@ export default function ExcludedSection({
 }) {
   return (
     <div className="bg-white rounded-2xl border p-6">
-      <h2 className="text-xl font-bold mb-4">What's Excluded</h2>
+      <h2 className="text-xl font-bold mb-4">{TRIP_DETAILS.EXCLUDED.TITLE}</h2>
 
       <div className="grid md:grid-cols-3 gap-3">
         {items.length === 0 && (
-          <p className="text-sm text-gray-500">No exclusions added.</p>
+          <p className="text-sm text-gray-500">{TRIP_DETAILS.EXCLUDED.EMPTY}</p>
         )}
 
         {items.map((item, i) => (

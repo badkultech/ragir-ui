@@ -1,6 +1,7 @@
 import { Bookmark, Heart, Share2, MapPin, ArrowRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MoodTag } from "@/components/search-results/mood-tag";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
 interface TripHeaderProps {
   onOpenOrganizer: () => void;
@@ -32,19 +33,19 @@ function normalizeMood(mood: string) {
       return "Learning";
     case "spiritual":
       return "Spiritual";
-      case "mountain":
+    case "mountain":
       return "Mountain";
-      case "skygaze":
+    case "skygaze":
       return "Skygaze";
-      case "desert":
+    case "desert":
       return "Desert";
-      case "jungle":
+    case "jungle":
       return "Jungle";
-      case "trekking":
+    case "trekking":
       return "Trekking";
-      case "motorsports":
+    case "motorsports":
       return "Motorsports";
-      case "learning":
+    case "learning":
       return "Learning";
     default:
       // fallback — capitalize first letter
@@ -56,9 +57,9 @@ function normalizeMood(mood: string) {
 export default function TripHeader({
   onOpenOrganizer,
   moods = [],
-  tripTitle = "Trip Title",
-  providerName = "Organizer",
-  organizerName = "Trip Leader",
+  tripTitle = TRIP_DETAILS.HEADER.TRIP_TITLE_DEFAULT,
+  providerName = TRIP_DETAILS.HEADER.PROVIDER_DEFAULT,
+  organizerName = TRIP_DETAILS.HEADER.ORGANIZER_DEFAULT,
   cities = [],
 }: TripHeaderProps) {
   return (
@@ -79,7 +80,7 @@ export default function TripHeader({
                 isActive
               />
             );
-})}
+          })}
 
         </div>
 
@@ -102,7 +103,7 @@ export default function TripHeader({
               <p className="font-semibold">{providerName}</p>
 
               <button className="text-xs text-orange-500">
-                More Details <ArrowRight className="inline w-3 h-3" />
+                {TRIP_DETAILS.HEADER.MORE_DETAILS} <ArrowRight className="inline w-3 h-3" />
               </button>
             </div>
           </div>
@@ -121,7 +122,7 @@ export default function TripHeader({
                 onClick={onOpenOrganizer}
                 className="text-xs text-orange-500"
               >
-                View Profile <ArrowRight className="inline w-3 h-3" />
+                {TRIP_DETAILS.HEADER.VIEW_PROFILE} <ArrowRight className="inline w-3 h-3" />
               </button>
             </div>
           </div>

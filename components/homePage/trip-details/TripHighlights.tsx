@@ -1,3 +1,5 @@
+import { TRIP_DETAILS } from "@/lib/constants/strings";
+
 interface TripHighlightsProps {
   highlights?: string;
 }
@@ -5,10 +7,10 @@ interface TripHighlightsProps {
 export default function TripHighlights({ highlights }: TripHighlightsProps) {
   return (
     <div className="bg-white rounded-2xl border p-6">
-      <h2 className="text-xl font-bold mb-3">Trip Highlights</h2>
+      <h2 className="text-xl font-bold mb-3">{TRIP_DETAILS.HIGHLIGHTS.TITLE}</h2>
 
       <p className="text-gray-600 leading-relaxed">
-        {highlights || "No highlights added yet."}
+        {highlights || TRIP_DETAILS.HIGHLIGHTS.EMPTY}
       </p>
     </div>
   );
