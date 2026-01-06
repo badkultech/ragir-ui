@@ -7,6 +7,7 @@ export interface OrganizationDashboardTripItemResponse {
     document?: DocumentRequest | null;
     startDate?: string | null; // ISO date string
     endDate?: string | null;   // ISO date string
+    destinationTags?: string | null;
 }
 
 export interface OrganizerDashboardResponse {

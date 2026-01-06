@@ -62,8 +62,8 @@ export default function DashboardMainContent() {
     (dashboard?.currentMonth?.map((t) => ({
       tripPublicId: t.tripPublicId,
       name: t.name ?? "Untitled trip",
-      location: t.highlights ?? "", // if you have a location field on backend use it — falling back to highlights if not
-      image: t.document?.url ?? "/images/trip1.jpg",
+      location: t.destinationTags ?? "", // if you have a location field on backend use it — falling back to highlights if not
+      image: t.document?.url ?? "/placeholder.svg",
       description: t.highlights ?? "",
       startDate: t.startDate ?? undefined,
       endDate: t.endDate ?? undefined,
@@ -73,8 +73,8 @@ export default function DashboardMainContent() {
     (dashboard?.nextMonth?.map((t) => ({
       tripPublicId: t.tripPublicId,
       name: t.name ?? "Untitled trip",
-      location: t.highlights ?? "",
-      image: t.document?.url ?? "/images/trip2.jpg",
+      location: t.destinationTags ?? "",
+      image: t.document?.url ?? "/placeholder.svg",
       description: t.highlights ?? "",
       startDate: t.startDate ?? undefined,
       endDate: t.endDate ?? undefined,
