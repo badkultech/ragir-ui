@@ -13,6 +13,7 @@ interface Props {
     onUnitChange: (unit: UnitType) => void;
     placeholder?: string;
     className?: string; // Wrapper className
+    type?: string;
 }
 
 export function InputWithUnitToggle({
@@ -22,6 +23,7 @@ export function InputWithUnitToggle({
     onUnitChange,
     placeholder,
     className,
+    type,
 }: Props) {
     return (
         <div
@@ -34,6 +36,7 @@ export function InputWithUnitToggle({
                 className="outline-none border-0 text-sm flex-1 bg-transparent placeholder:text-gray-400"
                 placeholder={placeholder}
                 value={value}
+                type={type}
                 onChange={(e) => onChange(e.target.value)}
             />
             <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5 ml-2 border border-gray-200">

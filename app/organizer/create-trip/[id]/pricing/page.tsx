@@ -50,7 +50,7 @@ export default function PricingPage() {
   const [discount, setDiscount] = useState('');
   const [discountUnit, setDiscountUnit] = useState<UnitType>('percent');
   const [discountUntil, setDiscountUntil] = useState('');
-  const [depositPercent, setDepositPercent] = useState(''); // Kept name for compatibility, but logical value
+  const [depositPercent, setDepositPercent] = useState('');
   const [depositUnit, setDepositUnit] = useState<UnitType>('percent');
   const [policy, setPolicy] = useState('');
   const [addOns, setAddOns] = useState<
@@ -67,6 +67,8 @@ export default function PricingPage() {
 
   const [isSavingNext, setIsSavingNext] = useState(false);
   const [draftDisabled, setDraftDisabled] = useState(false);
+  const [errors, setErrors] = useState<any>({});
+  const [categoryValidStates, setCategoryValidStates] = useState<boolean[]>([]);
 
   // Restore existing data
   useEffect(() => {
@@ -157,8 +159,103 @@ export default function PricingPage() {
     setDynamicCategories(dynamicCategories.filter((_, i) => i !== idx));
   };
 
+  const validate = () => {
+    const e: any = {};
+
+    // SIMPLE PRICING
+    if (mode === "simple") {
+      if (!price || Number(price) <= 0) {
+        e.price = "Price is required and must be greater than 0";
+      }
+
+      if (discount === "") {
+        e.discount = "Discount is required";
+      } else {
+        if (discountUnit === "percent") {
+          if (Number(discount) < 0 || Number(discount) > 100) {
+            e.discount = "Discount must be between 0–100%";
+          }
+        }
+
+        if (discountUnit === "flat") {
+          if (Number(discount) <= 0) {
+            e.discount = "Discount must be greater than 0";
+          }
+        }
+      }
+      if (discountUntil === "") {
+        e.discountUntil = "Discount date is required";
+      } else {
+        const selected = new Date(discountUntil)
+        const now = new Date()
+
+        if (selected <= now) {
+          e.discountUntil = "Discount must be in the future";
+        }
+      }
+
+    }
+
+    // DYNAMIC PRICING
+    if (mode === "dynamic") {
+      if (!dynamicCategories.length) {
+        e.dynamic = "Add at least one pricing category";
+      }
+
+      dynamicCategories.forEach((c, i) => {
+        if (!c.name) {
+          e[`cat_${i}`] = "Category name is required";
+        }
+
+        c.options.forEach((o, j) => {
+          if (!o.price || Number(o.price) <= 0) {
+            e[`opt_${i}_${j}`] = "Price must be greater than 0";
+          }
+
+          if (o.discount && Number(o.discount) < 0) {
+            e[`disc_${i}_${j}`] = "Discount must be valid";
+          }
+        });
+      });
+    }
+
+    // COMMON
+    if (!policy) e.policy = "Cancellation policy is required";
+
+    // Deposit validation
+    if (depositUnit === "percent") {
+      if (depositPercent === "") {
+        e.depositPercent = "Deposit is required";
+      } else if (Number(depositPercent) < 0 || Number(depositPercent) > 100) {
+        e.depositPercent = "Deposit must be between 0–100%";
+      }
+    }
+
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const clearFieldError = (field: string) => {
+    setErrors((prev: any) => {
+      const copy = { ...prev }
+      delete copy[field]
+      return copy
+    })
+  }
+
+
   const handleSavePricing = async (isDraft: boolean = false) => {
     if (!tripId) return;
+    if (!validate()) return;
+    if (mode === "dynamic") {
+      const anyInvalid = categoryValidStates.some(v => v === false);
+
+      if (anyInvalid) {
+        alert("Please fix pricing validation errors first.");
+        return;
+      }
+    }
 
     try {
       isDraft ? setDraftDisabled(true) : setIsSavingNext(true);
@@ -364,34 +461,56 @@ export default function PricingPage() {
                       <Input
                         placeholder='Enter price'
                         value={price}
-                        onChange={(e) => setPrice(e.target.value)}
+                        onChange={(e) => {
+                          setPrice(e.target.value)
+                          clearFieldError('price')
+                        }}
                       />
+                      {errors.price && <p className="text-red-500 text-xs">{errors.price}</p>}
+                      <div className='flex items-end gap-4'>
 
-                      <div className="space-y-3">
-                        {/* FIRST ROW: DISCOUNT + VALID UNTIL */}
-                        <div className='flex items-end gap-4'>
-                          <div className='flex-1 space-y-2'>
-                            <Label className="text-sm font-semibold text-gray-700">Discount</Label>
-                            <InputWithUnitToggle
-                              placeholder='Discount'
-                              value={discount}
-                              onChange={setDiscount}
-                              unit={discountUnit}
-                              onUnitChange={setDiscountUnit}
-                            />
-                          </div>
+                        {/* DISCOUNT */}
+                        <div className='flex-1 space-y-2'>
+                          <Label className="text-sm font-semibold text-gray-700">Discount</Label>
 
-                          <div className='flex-1 space-y-2'>
-                            <Label className="text-sm font-semibold text-gray-700">Valid until</Label>
-                            <CustomDateTimePicker
-                              mode="date"
-                              value={discountUntil}
-                              onChange={setDiscountUntil}
-                              className="h-10"
-                            />
-                          </div>
+                          <InputWithUnitToggle
+                            placeholder='Discount'
+                            value={discount}
+                            type="number"
+                            onChange={(e) => {
+                              setDiscount(e)
+                              clearFieldError('discount')
+                            }}
+                            unit={discountUnit}
+                            onUnitChange={setDiscountUnit}
+                          />
+
+                          {errors.discount && (
+                            <p className="text-red-500 text-xs">{errors.discount}</p>
+                          )}
                         </div>
+
+                        {/* DATE */}
+                        <div className='flex-1 space-y-2'>
+                          <Label className="text-sm font-semibold text-gray-700">Valid until</Label>
+
+                          <CustomDateTimePicker
+                            mode="date"
+                            value={discountUntil}
+                            onChange={(v) => {
+                              setDiscountUntil(v)
+                              clearFieldError("discountUntil")
+                            }}
+                            className="h-10"
+                          />
+
+                          {errors.discountUntil && (
+                            <p className="text-red-500 text-xs">{errors.discountUntil}</p>
+                          )}
+                        </div>
+
                       </div>
+
 
 
                     </div>
@@ -406,6 +525,11 @@ export default function PricingPage() {
                           category={category}
                           onChange={(updated) => updateCategory(idx, updated)}
                           onRemove={() => removeCategory(idx)}
+                          onValidate={(isValid) => {
+                            const copy = [...categoryValidStates];
+                            copy[idx] = isValid;
+                            setCategoryValidStates(copy);
+                          }}
                         />
                       ))}
                       <Button
@@ -429,19 +553,31 @@ export default function PricingPage() {
                     <InputWithUnitToggle
                       placeholder='Deposit Amount'
                       value={depositPercent}
-                      onChange={setDepositPercent}
+                      type="number"
+                      onChange={(e) => {
+                        setDepositPercent(e)
+                        clearFieldError('depositPercent')
+                      }}
                       unit={depositUnit}
                       onUnitChange={setDepositUnit}
                     />
-
+                    {errors.depositPercent && (
+                      <p className="text-red-500 text-xs">{errors.depositPercent}</p>
+                    )}
                     <Label>Credit Options</Label>
                     <CreditOptions value={credit} onChange={setCredit} />
 
                     <Label>Cancellation Policy</Label>
                     <Textarea
                       value={policy}
-                      onChange={(e) => setPolicy(e.target.value)}
+                      onChange={(e) => {
+                        setPolicy(e.target.value)
+                        clearFieldError('policy')
+                      }}
                     />
+                    {errors.policy && (
+                      <p className="text-red-500 text-xs">{errors.policy}</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

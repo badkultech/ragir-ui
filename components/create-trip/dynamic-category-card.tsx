@@ -23,6 +23,7 @@ import {
     DialogFooter,
     DialogClose,
 } from "@/components/ui/dialog";
+import { useEffect } from 'react';
 
 export interface DynamicOption {
     id: string;
@@ -43,12 +44,61 @@ interface DynamicCategoryCardProps {
     category: DynamicCategory;
     onChange: (updated: DynamicCategory) => void;
     onRemove: () => void;
+    onValidate?: (isValid: boolean) => void;
 }
 
-export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCategoryCardProps) {
+export function DynamicCategoryCard({ category, onChange, onRemove, onValidate }: DynamicCategoryCardProps) {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [optionToDelete, setOptionToDelete] = useState<{ idx: number; option: DynamicOption } | null>(null);
     const [bulkDiscount, setBulkDiscount] = useState('');
+    const [errors, setErrors] = useState<any>({});
+    function validate() {
+        const e: any = {};
+
+        // category name
+        if (!category.name?.trim()) {
+            e.name = "Category name is required";
+        }
+
+        // must have at least 1 option
+        if (!category.options.length) {
+            e.options = "At least one option is required";
+        }
+
+        // SINGLE
+        if (category.type === "single") {
+            const opt = category.options[0];
+
+            if (!opt.price || Number(opt.price) <= 0) {
+                e.singlePrice = "Price must be greater than 0";
+            }
+
+            if (opt.discount && (Number(opt.discount) < 0 || Number(opt.discount) > 100)) {
+                e.singleDiscount = "Discount must be between 0–100";
+            }
+        }
+
+        // MULTI
+        if (category.type === "multi") {
+            category.options.forEach((o, i) => {
+                if (!o.name?.trim()) {
+                    e[`name-${i}`] = "Option name is required";
+                }
+
+                if (!o.price || Number(o.price) <= 0) {
+                    e[`price-${i}`] = "Price must be greater than 0";
+                }
+
+                if (o.discount && (Number(o.discount) < 0 || Number(o.discount) > 100)) {
+                    e[`discount-${i}`] = "Discount must be 0–100%";
+                }
+            });
+        }
+
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    }
+
 
     const handleDeleteClick = (idx: number, option: DynamicOption) => {
         setOptionToDelete({ idx, option });
@@ -98,6 +148,12 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
         }
     }
 
+    useEffect(() => {
+        if (onValidate) {
+            onValidate(validate());
+        }
+    }, [category]);
+
     return (
         <div className="bg-gray-50/50 border border-gray-200 rounded-xl p-5 mb-6 relative">
 
@@ -144,6 +200,9 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                         value={category.name}
                         onChange={(e) => updateField('name', e.target.value)}
                     />
+                    {errors.name && (
+                        <p className="text-red-500 text-xs">{errors.name}</p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -253,7 +312,7 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                     {category.type === 'single' ? (
                         /* Single Type Layout — No Name Shown */
                         <div className="flex gap-4 items-end">
-                            
+
                             {/* PRICE */}
                             <div className="flex-1 space-y-1">
                                 <Label className="text-xs text-muted-foreground">Price (₹)</Label>
@@ -264,6 +323,9 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                     onChange={(e) => updateOption(0, 'price', e.target.value)}
                                     className="h-11"
                                 />
+                                {errors.singlePrice && (
+                                    <p className="text-red-500 text-xs">{errors.singlePrice}</p>
+                                )}
                             </div>
 
                             {/* DISCOUNT */}
@@ -280,6 +342,9 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                         %
                                     </div>
                                 </div>
+                                {errors.singleDiscount && (
+                                    <p className="text-red-500 text-xs">{errors.singleDiscount}</p>
+                                )}
                             </div>
                         </div>
                     ) : (
@@ -294,6 +359,9 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                         value={option.name}
                                         onChange={(e) => updateOption(idx, 'name', e.target.value)}
                                     />
+                                    {errors[`name-${idx}`] && (
+                                        <p className="text-red-500 text-xs">{errors[`name-${idx}`]}</p>
+                                    )}
                                 </div>
 
                                 <div className="w-28 space-y-1">
@@ -304,6 +372,9 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                         value={option.price}
                                         onChange={(e) => updateOption(idx, 'price', e.target.value)}
                                     />
+                                    {errors[`price-${idx}`] && (
+                                        <p className="text-red-500 text-xs">{errors[`price-${idx}`]}</p>
+                                    )}
                                 </div>
 
                                 <div className="w-32 space-y-1">
@@ -317,6 +388,9 @@ export function DynamicCategoryCard({ category, onChange, onRemove }: DynamicCat
                                         />
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">%</div>
                                     </div>
+                                    {errors[`discount-${idx}`] && (
+                                        <p className="text-red-500 text-xs">{errors[`discount-${idx}`]}</p>
+                                    )}
                                 </div>
 
                                 {category.options.length > 1 && (
