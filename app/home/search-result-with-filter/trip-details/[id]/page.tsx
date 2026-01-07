@@ -55,6 +55,20 @@ export default function TripDetailsPage() {
   const pricing = payload.tripPricingDTO;
   const organizer = payload.organizerProfileResponse;
 
+  const rawActivities = itinerary?.dayDetailResponseList?.[activeDay]?.tripItems || [];
+
+  const activities = rawActivities.map((item: any) => ({
+    time: item.time || item.startTime || item.checkInTime || "--",
+    name: item.name,
+    description: item.description,
+    image: item.documents?.[0]?.url || "",
+  }));
+
+  const heroImage =
+    payload?.images?.length ? payload.images[0].url : undefined;
+
+  const sidebarImages = payload?.images || [];
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <MainHeader logoText={trip?.name || TRIP_DETAILS.PAGE.DEFAULT_LOGO} isLoggedIn />
@@ -69,7 +83,7 @@ export default function TripDetailsPage() {
               <HeroSection
                 title={trip?.name}
                 location={trip?.cityTags?.join(", ")}
-                imageUrl={trip?.bannerImageUrl}
+                imageUrl={heroImage}
               />
 
               <TripHeader
@@ -105,9 +119,7 @@ export default function TripDetailsPage() {
                 }
                 activeDay={activeDay}
                 setActiveDay={setActiveDay}
-                activities={
-                  itinerary?.dayDetailResponseList?.[activeDay]?.tripItems || []
-                }
+                activities={activities}
               />
 
 
@@ -133,6 +145,7 @@ export default function TripDetailsPage() {
             <DesktopSidebar
               onAsk={() => setShowAsk(true)}
               pricing={pricing}
+              images={sidebarImages}
             />
           </div>
         </div>
@@ -153,7 +166,13 @@ export default function TripDetailsPage() {
         />
       )}
 
-      {showReport && <ReportModal onClose={() => setShowReport(false)} />}
+      {showReport && (
+        <ReportModal
+          onClose={() => setShowReport(false)}
+          tripPublicId={trip?.publicId}
+        />
+      )}
+
       {showAsk && <AskQuestionModal onClose={() => setShowAsk(false)} />}
       {showOrganizer && (
         <LeaderProfileModal

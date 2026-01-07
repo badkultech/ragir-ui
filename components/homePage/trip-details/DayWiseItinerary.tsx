@@ -6,6 +6,7 @@ interface Activity {
   name?: string;
   description?: string;
   tags?: string[];
+  image?: string;
 }
 
 interface Props {
@@ -57,22 +58,31 @@ export default function DayWiseItinerary({
             {TRIP_DETAILS.ITINERARY.EMPTY_DAY}
           </p>
         )}
-        {activities.map((activity, i) => (
-          <div key={i} className="border-l-2 border-orange-500 pl-4">
 
-            <p className="text-xs text-gray-500 mb-1">
+        {activities.map((activity, i) => (
+          <div key={i} className="border-l-2 border-orange-500 pl-4 space-y-2">
+
+            {/* IMAGE */}
+            {activity.image && (
+              <img
+                src={activity.image}
+                alt={activity.name || "activity image"}
+                className="w-15 h-15 rounded-lg object-cover border"
+              />
+            )}
+
+            <p className="text-xs text-gray-500">
               {activity.time || "--"}
             </p>
 
-            <h3 className="font-semibold mb-2">
+            <h3 className="font-semibold">
               {activity.name || TRIP_DETAILS.ITINERARY.ACTIVITY_DEFAULT_NAME}
             </h3>
 
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-gray-600">
               {activity.description || ""}
             </p>
 
-            {/* tags only if available */}
             {!!activity.tags?.length && (
               <div className="flex flex-wrap gap-2">
                 {activity.tags.map((tag) => (
@@ -86,7 +96,6 @@ export default function DayWiseItinerary({
                 ))}
               </div>
             )}
-
           </div>
         ))}
       </div>
