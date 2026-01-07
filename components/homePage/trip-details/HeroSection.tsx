@@ -1,41 +1,48 @@
-import Image from "next/image"
-import { Users } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Image from "next/image";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  title?: string;
+  location?: string;
+  imageUrl?: string;
+}
+
+export default function HeroSection({
+  title = TRIP_DETAILS.HERO.DEFAULT_TITLE,
+  location = "",
+  imageUrl,
+}: HeroSectionProps) {
+
+  const fallbackImage = "/kerala-backwaters.png";
+
   return (
     <div className="relative">
+
       {/* Desktop */}
       <div className="hidden lg:block">
         <div className="h-96 rounded-2xl overflow-hidden relative">
           <Image
-            src="/kerala-backwaters.png"
-            alt="Trip hero"
-            width={800}
+            src={imageUrl || fallbackImage}
+            alt={title}
+            width={1200}
             height={600}
             className="w-full h-full object-cover"
           />
-
-          
         </div>
       </div>
 
       {/* Mobile */}
       <div className="lg:hidden">
-        <div className="grid grid-cols-2 gap-2 mb-2">
-          <div className="col-span-2 h-64 rounded-2xl overflow-hidden">
-            <Image
-              src="/kerala-backwaters.png"
-              alt="Trip hero"
-              width={800}
-              height={400}
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className="col-span-2 h-64 rounded-2xl overflow-hidden">
+          <Image
+            src={imageUrl || fallbackImage}
+            alt={title}
+            width={800}
+            height={400}
+            className="w-full h-full object-cover"
+          />
         </div>
-
-        
       </div>
     </div>
-  )
+  );
 }

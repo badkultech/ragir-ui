@@ -1,64 +1,48 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
+import { useState } from "react";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
+import Image from "next/image";
 import {
   Bike,
   Send,
-  MessageCircle,
   ChevronUp,
   ChevronDown,
   AlertCircle,
-} from "lucide-react"
+  MessageCircle,
+} from "lucide-react";
 
-const pricingOptions = [
-  {
-    id: 1,
-    title: "Enfield 350cc",
-    subtitle: "Solo Rider",
-    price: "₹ 47,000",
-  },
-  {
-    id: 2,
-    title: "Himalayan 411cc",
-    subtitle: "Dual Rider",
-    price: "₹ 35,000",
-  },
-  {
-    id: 3,
-    title: "Himalayan 411cc",
-    subtitle: "Solo Rider",
-    price: "₹ 52,000",
-  },
-]
+interface DesktopSidebarProps {
+  onAsk: () => void;
+  pricing: any;
+}
 
-export default function DesktopSidebar({
-  onAsk,
-}: {
-  onAsk: () => void
-}) {
-  const [selected, setSelected] = useState<number | null>(null)
+export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) {
+  const [selected, setSelected] = useState<number | null>(null);
+
+  // --- handle simple pricing ---
+  const simple = pricing?.simplePricingRequest;
+
+  const base = simple?.basePrice || 0;
+  const discount = simple?.discountPercent || 0;
+
+  const finalPrice = base - (base * discount) / 100;
 
   return (
     <div className="hidden lg:block lg:col-span-1">
-      <div className="sticky top-24 space-y-4">
+      <div className=" top-24 space-y-4">
 
-        {/* Images */}
+        {/* Images (for now dummy until API gives banner images) */}
         <div className="grid grid-cols-2 gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-28 rounded-xl overflow-hidden relative">
               <Image
-                src="/mountain-camp.png"
-                alt="Trip"
+                src="/kerala-backwaters.png"
+                alt="Trip gallery"
                 width={200}
                 height={150}
                 className="w-full h-full object-cover"
               />
-              {i === 5 && (
-                <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center">
-                  <span className="text-white font-semibold">+5 more</span>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -66,92 +50,75 @@ export default function DesktopSidebar({
         {/* Pricing Card */}
         <div className="bg-white rounded-2xl border p-5 space-y-4">
 
-          {/* Price Header */}
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-xs text-gray-500">Starting from</p>
-              <p className="text-3xl font-bold">
-                ₹12,999{" "}
-                <span className="text-sm font-normal text-gray-500">
-                  per person
-                </span>
+          <div>
+            <p className="text-xs text-gray-500">{TRIP_DETAILS.SIDEBAR.STARTING_FROM}</p>
+
+            <p className="text-3xl font-bold">
+              ₹{finalPrice.toLocaleString()}
+              <span className="text-sm text-gray-500 font-normal">
+                {" "}{TRIP_DETAILS.SIDEBAR.PER_PERSON}
+              </span>
+            </p>
+
+            {discount > 0 && (
+              <p className="text-sm text-green-600">
+                {discount}% {TRIP_DETAILS.SIDEBAR.OFF} (₹{base.toLocaleString()} {TRIP_DETAILS.SIDEBAR.ORIGINAL})
               </p>
-            </div>
+            )}
           </div>
 
-          {/* Expanded Content */}
+          {/* Option selector – for now single option */}
           <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-              <p className="font-medium text-sm">Occupancy – Double</p>
+            <p className="font-medium text-sm">{TRIP_DETAILS.SIDEBAR.BASE_PACKAGE_TITLE}</p>
 
-              {pricingOptions.map((opt) => {
-                const active = selected === opt.id
+            <button
+              onClick={() => setSelected(1)}
+              className={`w-full flex justify-between items-start p-4 rounded-xl border
+                ${selected ? "border-orange-500 bg-white" : "border-transparent bg-white"}
+              `}
+            >
+              <div className="flex gap-3 items-start">
+                <Bike className="w-4 h-4 mt-1 text-gray-600" />
+                <div>
+                  <p className="font-semibold text-sm">{TRIP_DETAILS.SIDEBAR.STANDARD_PACKAGE}</p>
+                  <p className="text-xs text-gray-500">{TRIP_DETAILS.SIDEBAR.STANDARD_DESC}</p>
+                </div>
+              </div>
 
-                return (
-                  <button
-                    key={opt.id}
-                    onClick={() => setSelected(opt.id)}
-                    className={`w-full flex justify-between items-start p-4 rounded-xl border transition
-                      ${
-                        active
-                          ? "border-orange-500 bg-white"
-                          : "border-transparent bg-white"
-                      }
-                    `}
-                  >
-                    <div className="flex gap-3 items-start">
-                      <Bike className="w-4 h-4 mt-1 text-gray-600" />
-                      <div className="text-left">
-                        <p className="font-semibold text-sm">
-                          {opt.title}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {opt.subtitle}
-                        </p>
-                      </div>
-                    </div>
+              <p className="font-semibold text-sm">
+                ₹{finalPrice.toLocaleString()}
+              </p>
+            </button>
+          </div>
 
-                    <p className="font-semibold text-sm">
-                      {opt.price}
-                    </p>
-                  </button>
-                )
-              })}
-            </div>
-          
-
-          {/* Warning */}
           {!selected && (
             <div className="flex gap-2 items-center text-xs text-orange-600 bg-orange-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4" />
-              Please select a price option before requesting an invite.
+              <p>{TRIP_DETAILS.SIDEBAR.SELECT_OPTION_WARNING}</p>
             </div>
           )}
 
-          {/* Request Invite */}
           <button
             disabled={!selected}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition
-              ${
-                selected
-                  ? "bg-orange-500 text-white hover:bg-orange-600"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium
+              ${selected
+                ? "bg-orange-500 text-white"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"}
             `}
           >
             <Send className="w-4 h-4" />
-            Request Invite
+            {TRIP_DETAILS.SIDEBAR.REQUEST_INVITE}
           </button>
 
-          {/* Send Query */}
           <button
             onClick={onAsk}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-orange-500 text-orange-500 font-medium"
           >
             <MessageCircle className="w-4 h-4" />
-            Send Query to Organiser
+            {TRIP_DETAILS.SIDEBAR.SEND_QUERY}
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
