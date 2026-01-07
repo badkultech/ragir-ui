@@ -83,6 +83,8 @@ export default function DashboardMainContent() {
       tags: normalizeTags(t.destinationTags),
       image: t.document?.url ?? "/placeholder.svg",
       description: t.highlights ?? "",
+      leads: t.leads ?? 0,
+      queries: t.queries ?? 0,
     })) ?? [];
 
 
@@ -96,6 +98,8 @@ export default function DashboardMainContent() {
       description: t.highlights ?? "",
       startDate: t.startDate ?? undefined,
       endDate: t.endDate ?? undefined,
+      leads: t.leads ?? 0,
+      queries: t.queries ?? 0,
     })) as any[]);
 
   return (
@@ -190,8 +194,8 @@ export default function DashboardMainContent() {
                     name={trip.name}
                     tags={trip.tags}
                     description={trip.description}
-                    leads={12}    // replace when backend provides
-                    queries={12}  // replace when backend provides
+                    leads={trip.leads}    // replace when backend provides
+                    queries={trip.queries}  // replace when backend provides
                   />
 
                 ))}
@@ -222,8 +226,8 @@ export default function DashboardMainContent() {
                     name={trip.name}
                     tags={trip.tags}
                     description={trip.description}
-                    leads={12}
-                    queries={12}
+                    leads={trip.leads}
+                    queries={trip.queries}
                   />
                 ))}
               </div>

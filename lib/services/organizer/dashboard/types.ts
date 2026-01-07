@@ -8,6 +8,8 @@ export interface OrganizationDashboardTripItemResponse {
     startDate?: string | null; // ISO date string
     endDate?: string | null;   // ISO date string
     destinationTags?: string[] | null;
+    leads?: number | null;
+    queries?: number | null;
 }
 
 export interface OrganizerDashboardResponse {
