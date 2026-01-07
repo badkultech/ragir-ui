@@ -24,6 +24,18 @@ import { useGetAllTripQueriesCountQuery } from "@/lib/services/organizer/trip/qu
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useGetOrganizationDashboardQuery } from "@/lib/services/organizer/dashboard";
 import { ROUTES } from "@/lib/utils";
+import { TripCard } from "@/components/organizer/dashboard/TripCard";
+
+
+function EmptyMonthState({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-40 rounded-xl border border-dashed bg-white text-sm text-muted-foreground">
+      No trips for {label}
+    </div>
+  );
+}
+
+
 
 
 export default function DashboardMainContent() {
@@ -57,23 +69,29 @@ export default function DashboardMainContent() {
   const totalLeads = dashboard?.totalLeads ?? 0;
   const totalQueries = dashboard?.totalQueries ?? 0;
 
-  // trip lists from API (arrays of OrganizationDashboardTripItemResponse)
+
+  const normalizeTags = (tags?: string[] | string | null) => {
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags;
+    return tags.split(",").map((t) => t.trim());
+  };
+
   const currentMonthTrips =
-    (dashboard?.currentMonth?.map((t) => ({
+    dashboard?.currentMonth?.map((t) => ({
       tripPublicId: t.tripPublicId,
       name: t.name ?? "Untitled trip",
-      location: t.destinationTags ?? "", // if you have a location field on backend use it — falling back to highlights if not
+      tags: normalizeTags(t.destinationTags),
       image: t.document?.url ?? "/placeholder.svg",
       description: t.highlights ?? "",
-      startDate: t.startDate ?? undefined,
-      endDate: t.endDate ?? undefined,
-    })) as any[]);
+    })) ?? [];
+
+
 
   const nextMonthTrips =
     (dashboard?.nextMonth?.map((t) => ({
       tripPublicId: t.tripPublicId,
       name: t.name ?? "Untitled trip",
-      location: t.destinationTags ?? "",
+      tags: normalizeTags(t.destinationTags),
       image: t.document?.url ?? "/placeholder.svg",
       description: t.highlights ?? "",
       startDate: t.startDate ?? undefined,
@@ -156,77 +174,64 @@ export default function DashboardMainContent() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold">This Month</h2>
-              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW} className="">
-                <Button
-                  size="sm"
-                  className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
-                >
-                  View All
+              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW}>
+                <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+                  View all
                 </Button>
               </Link>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {currentMonthTrips?.map((trip: any, i: number) => (
-                <Card key={trip.tripPublicId ?? i} className="hover:shadow-md transition overflow-hidden">
-                  <img
-                    src={trip.image}
-                    alt={trip.name}
-                    className="h-40 w-full object-cover"
+            {currentMonthTrips?.length ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentMonthTrips.map((trip, i) => (
+                  <TripCard
+                    key={trip.tripPublicId ?? i}
+                    image={trip.image}
+                    name={trip.name}
+                    tags={trip.tags}
+                    description={trip.description}
+                    leads={12}    // replace when backend provides
+                    queries={12}  // replace when backend provides
                   />
-                  <CardContent className="p-4 space-y-1">
-                    <h3 className="font-semibold text-lg">{trip.name}</h3>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {trip.location}
-                    </div>
-                    <p className="text-sm text-gray-600">{trip.description}</p>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {trip.startDate ? `${formatDate(trip.startDate)} → ${formatDate(trip.endDate)}` : ""}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+
+                ))}
+              </div>
+            ) : (
+              <EmptyMonthState label="this month" />
+            )}
           </section>
+
 
           {/* Next Month Trips */}
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold mb-3">Next Month</h2>
-              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW} className="">
-                <Button
-                  size="sm"
-                  className="bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
-                >
-                  View All
+              <h2 className="text-lg font-semibold">Next Month</h2>
+              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW}>
+                <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+                  View all
                 </Button>
               </Link>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(nextMonthTrips)?.map((trip: any, i: number) => (
-                <Card key={trip.tripPublicId ?? i} className="hover:shadow-md transition overflow-hidden">
-                  <img
-                    src={trip.image}
-                    alt={trip.name}
-                    className="h-40 w-full object-cover"
+            {nextMonthTrips?.length ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {nextMonthTrips.map((trip, i) => (
+                  <TripCard
+                    key={trip.tripPublicId ?? i}
+                    image={trip.image}
+                    name={trip.name}
+                    tags={trip.tags}
+                    description={trip.description}
+                    leads={12}
+                    queries={12}
                   />
-                  <CardContent className="p-4 space-y-1">
-                    <h3 className="font-semibold text-lg">{trip.name}</h3>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {trip.location}
-                    </div>
-                    <p className="text-sm text-gray-600">{trip.description}</p>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {trip.startDate ? `${formatDate(trip.startDate)} → ${formatDate(trip.endDate)}` : ""}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyMonthState label="next month" />
+            )}
           </section>
+
         </main>
       </div>
       {/* Create Trip Modal */}
