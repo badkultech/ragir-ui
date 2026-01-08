@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { TRIP_DETAILS } from "@/lib/constants/strings";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface HeroSectionProps {
   title?: string;
@@ -21,26 +22,40 @@ export default function HeroSection({
       {/* Desktop */}
       <div className="hidden lg:block">
         <div className="h-96 rounded-2xl overflow-hidden relative">
-          <Image
-            src={imageUrl || fallbackImage}
-            alt={title}
-            width={1200}
-            height={600}
-            className="w-full h-full object-cover"
-          />
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1200}
+              height={400}
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+              No image available
+            </div>
+          )}
+
         </div>
       </div>
 
       {/* Mobile */}
       <div className="lg:hidden">
         <div className="col-span-2 h-64 rounded-2xl overflow-hidden">
-          <Image
-            src={imageUrl || fallbackImage}
-            alt={title}
-            width={800}
-            height={400}
-            className="w-full h-full object-cover"
-          />
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1200}
+              height={400}
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+              No image available
+            </div>
+          )}
+
         </div>
       </div>
     </div>

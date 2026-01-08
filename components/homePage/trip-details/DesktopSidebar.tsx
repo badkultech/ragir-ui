@@ -90,13 +90,19 @@ export default function DesktopSidebar({
           {(images?.length ? images : Array.from({ length: 6 })).map(
             (img: any, i: number) => (
               <div key={i} className="h-28 rounded-xl overflow-hidden relative">
-                <Image
-                  src={img?.url || "/kerala-backwaters.png"}
-                  alt="Trip gallery"
-                  width={200}
-                  height={150}
-                  className="w-full h-full object-cover"
-                />
+                {img?.url ? (
+                  <Image
+                    src={img.url}
+                    alt="Trip gallery"
+                    width={200}
+                    height={150}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                    No image available
+                  </div>
+                )}
               </div>
             )
           )}

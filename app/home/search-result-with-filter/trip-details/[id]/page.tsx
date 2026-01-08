@@ -93,9 +93,12 @@ export default function TripDetailsPage() {
                 moods={trip?.moodTags || []}
                 tripTitle={trip?.name}
                 providerName={organizer?.organizerName}
+                providerImage={organizer?.displayPicture?.url || null}
                 organizerName={trip?.groupLeaders?.[0]?.name}
+                organizerImage={trip?.groupLeaders?.[0]?.documents?.[0]?.url || null}
                 cities={trip?.cityTags || []}
               />
+
 
 
               <TripInfoCards
@@ -175,9 +178,19 @@ export default function TripDetailsPage() {
       {showLeader && (
         <LeaderProfileModal
           onClose={() => setShowLeader(false)}
-          leader={trip?.groupLeaders?.[0]}
+          leader={{
+            name: trip?.groupLeaders?.[0]?.name,
+            bio: trip?.groupLeaders?.[0]?.bio,
+            tagline: trip?.groupLeaders?.[0]?.tagline,
+            imageUrl: trip?.groupLeaders?.[0]?.documents?.[0]?.url,
+            likes: 1947,
+            years: 12,
+            trips: 300,
+            travelers: 1947,
+          }}
         />
       )}
+
 
       {showMobilePricing && (
         <MobilePricingModal

@@ -1,5 +1,5 @@
 import { X } from "lucide-react"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { TRIP_DETAILS } from "@/lib/constants/strings"
 
 interface LeaderProfileModalProps {
@@ -8,6 +8,7 @@ interface LeaderProfileModalProps {
     name?: string
     bio?: string
     tagline?: string
+    imageUrl?: string
     likes?: number
     years?: number
     trips?: number
@@ -28,23 +29,27 @@ export default function LeaderProfileModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-
-        {/* Header — SAME UI */}
         <div className="border-b px-6 py-4 flex justify-between">
           <h3 className="font-bold">{name}</h3>
           <button onClick={onClose}>
             <X />
           </button>
         </div>
-
-        {/* Body — SAME UI */}
         <div className="p-6">
           <div className="flex gap-4 mb-4">
             <Avatar className="w-16 h-16">
+              {leader?.imageUrl && (
+                <AvatarImage
+                  src={leader.imageUrl}
+                  alt={name}
+                />
+              )}
+
               <AvatarFallback>
                 {name?.[0]}
               </AvatarFallback>
             </Avatar>
+
 
             <div>
               <p className="font-bold">{name}</p>
@@ -65,7 +70,6 @@ export default function LeaderProfileModal({
             {bio}
           </p>
 
-          {/* SAME UI — stats only dynamic */}
           <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl mt-6">
             <Stat value={`${leader?.years || "12+"}`} label={TRIP_DETAILS.LEADER_MODAL.YEARS_EXP} />
             <Stat value={`${leader?.trips || "300+"}`} label={TRIP_DETAILS.LEADER_MODAL.TRIPS_ORG} />
