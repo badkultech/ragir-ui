@@ -86,10 +86,9 @@ export function AdvancedFilters({
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     Object.fromEntries(filterSections.map((s) => [s.id, s.defaultOpen])),
   )
-  const [selectedDuration, setSelectedDuration] = useState("7+ Days")
-  const [budgetRange, setBudgetRange] = useState({ min: 5000, max: 50000 })
-  const [selectedOccupancy, setSelectedOccupancy] = useState("Single Occupancy")
-  const [selectedGroupType, setSelectedGroupType] = useState("Exclusive Group")
+  const [selectedDuration, setSelectedDuration] = useState("")
+  const [budgetRange, setBudgetRange] = useState({ min: 0, max: 50000 })
+  const [selectedOccupancy, setSelectedOccupancy] = useState("")
   const [selectedMoods, setSelectedMoods] = useState<string[]>([])
   const [emiAvailable, setEmiAvailable] = useState(false)
 
@@ -97,6 +96,13 @@ export function AdvancedFilters({
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([])
   const [selectedDepartureCities, setSelectedDepartureCities] = useState<string[]>([])
 
+
+  const minBudgetLimit = 0
+  const maxBudgetLimit = 100000
+
+  const getPercent = (value: number) => {
+    return ((value - minBudgetLimit) / (maxBudgetLimit - minBudgetLimit)) * 100
+  }
 
   const toggleSection = (id: string) => {
     setExpandedSections((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -125,7 +131,6 @@ export function AdvancedFilters({
     minAge: undefined,
     maxAge: undefined,
     occupancy: selectedOccupancy,
-    groupType: selectedGroupType,
     moods: selectedMoods,
     emi: emiAvailable,
     destinations: selectedDestinations,
@@ -135,8 +140,7 @@ export function AdvancedFilters({
   const clearAllFilters = () => {
     setSelectedDuration("7+ Days")
     setBudgetRange({ min: 5000, max: 50000 })
-    setSelectedOccupancy("Single Occupancy")
-    setSelectedGroupType("Exclusive Group")
+    setSelectedOccupancy("")
     setSelectedMoods([])
     setEmiAvailable(false)
     setSelectedDestinations([])
@@ -233,7 +237,10 @@ export function AdvancedFilters({
 
         {/* Budget Range */}
         <div className="border-b border-[#e5e3e0] pb-4">
-          <button onClick={() => toggleSection("budgetRange")} className="w-full flex items-center justify-between">
+          <button
+            onClick={() => toggleSection("budgetRange")}
+            className="w-full flex items-center justify-between"
+          >
             <span className="text-sm font-medium text-[#2d2d2d]">Budget Range</span>
             {expandedSections.budgetRange ? (
               <ChevronUp className="w-4 h-4 text-[#6b6b6b]" />
@@ -241,48 +248,108 @@ export function AdvancedFilters({
               <ChevronDown className="w-4 h-4 text-[#6b6b6b]" />
             )}
           </button>
+
           {expandedSections.budgetRange && (
-            <div className="mt-3 space-y-3">
+            <div className="mt-3 space-y-4">
+
+              {/* Inputs */}
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <label className="text-[10px] text-[#6b6b6b]">₹</label>
+                  <label className="text-[10px] text-[#6b6b6b]">Min</label>
                   <input
                     type="number"
                     value={budgetRange.min}
-                    onChange={(e) => setBudgetRange({ ...budgetRange, min: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setBudgetRange({
+                        ...budgetRange,
+                        min: Math.min(Number(e.target.value), budgetRange.max - 1),
+                      })
+                    }
                     className="w-full px-2 py-1.5 border border-[#e5e3e0] rounded-lg text-sm"
                   />
                 </div>
-                <span className="text-[#6b6b6b]">-</span>
+
+                <span className="text-[#6b6b6b]">—</span>
+
                 <div className="flex-1">
-                  <label className="text-[10px] text-[#6b6b6b]">₹</label>
+                  <label className="text-[10px] text-[#6b6b6b]">Max</label>
                   <input
                     type="number"
                     value={budgetRange.max}
-                    onChange={(e) => setBudgetRange({ ...budgetRange, max: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setBudgetRange({
+                        ...budgetRange,
+                        max: Math.max(Number(e.target.value), budgetRange.min + 1),
+                      })
+                    }
                     className="w-full px-2 py-1.5 border border-[#e5e3e0] rounded-lg text-sm"
                   />
                 </div>
               </div>
-              <div className="relative pt-2">
-                <div className="h-1 bg-[#e5e3e0] rounded-full">
-                  <div className="absolute h-1 bg-[#e07a5f] rounded-full" style={{ left: "10%", right: "20%" }} />
-                </div>
-                <div className="absolute top-0 left-[10%] w-4 h-4 bg-white border-2 border-[#e07a5f] rounded-full -translate-x-1/2" />
-                <div className="absolute top-0 right-[20%] w-4 h-4 bg-white border-2 border-[#e07a5f] rounded-full translate-x-1/2" />
+
+              {/* SLIDER */}
+              <div className="relative h-8">
+
+                {/* BASE LINE */}
+                <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-[3px] bg-[#e5e3e0] rounded-full" />
+
+                {/* ACTIVE RANGE (ORANGE) */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 h-[3px] bg-[#e07a5f] rounded-full pointer-events-none"
+                  style={{
+                    left: `${(budgetRange.min / maxBudgetLimit) * 100}%`,
+                    right: `${100 - (budgetRange.max / maxBudgetLimit) * 100}%`,
+                  }}
+                />
+
+                {/* MIN RANGE */}
+                <input
+                  type="range"
+                  min={minBudgetLimit}
+                  max={maxBudgetLimit}
+                  value={budgetRange.min}
+                  onChange={(e) =>
+                    setBudgetRange({
+                      ...budgetRange,
+                      min: Math.min(Number(e.target.value), budgetRange.max - 1),
+                    })
+                  }
+                  className="absolute w-full top-0 h-8 appearance-none bg-transparent z-20"
+                  style={{ pointerEvents: "auto" }}
+                />
+
+                {/* MAX RANGE */}
+                <input
+                  type="range"
+                  min={minBudgetLimit}
+                  max={maxBudgetLimit}
+                  value={budgetRange.max}
+                  onChange={(e) =>
+                    setBudgetRange({
+                      ...budgetRange,
+                      max: Math.max(Number(e.target.value), budgetRange.min + 1),
+                    })
+                  }
+                  className="absolute w-full top-0 h-8 appearance-none bg-transparent z-30"
+                  style={{ pointerEvents: "auto" }}
+                />
+
               </div>
-              <label className="flex items-center gap-2 mt-3">
+
+
+              <label className="flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
                   checked={emiAvailable}
                   onChange={(e) => setEmiAvailable(e.target.checked)}
-                  className="w-4 h-4 rounded border-[#e5e3e0] text-[#e07a5f] focus:ring-[#e07a5f]"
+                  className="w-4 h-4 rounded border-[#e5e3e0] text-[#e07a5f]"
                 />
                 <span className="text-xs text-[#6b6b6b]">EMI Available</span>
               </label>
             </div>
           )}
         </div>
+
 
         {/* Destinations */}
         <div className="border-b border-[#e5e3e0] pb-4">
@@ -357,34 +424,6 @@ export function AdvancedFilters({
                   key={type}
                   onClick={() => setSelectedOccupancy(type)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedOccupancy === type
-                    ? "bg-[#e07a5f] text-white border-[#e07a5f]"
-                    : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
-                    }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Group Type */}
-        <div className="border-b border-[#e5e3e0] pb-4">
-          <button onClick={() => toggleSection("groupType")} className="w-full flex items-center justify-between">
-            <span className="text-sm font-medium text-[#2d2d2d]">Group Type</span>
-            {expandedSections.groupType ? (
-              <ChevronUp className="w-4 h-4 text-[#6b6b6b]" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-[#6b6b6b]" />
-            )}
-          </button>
-          {expandedSections.groupType && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {["Exclusive Group", "Open for all"].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setSelectedGroupType(type)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${selectedGroupType === type
                     ? "bg-[#e07a5f] text-white border-[#e07a5f]"
                     : "bg-white text-[#4d4d4d] border-[#e0e0e0] hover:border-[#c0c0c0]"
                     }`}

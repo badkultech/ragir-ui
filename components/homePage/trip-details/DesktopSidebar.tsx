@@ -15,9 +15,10 @@ import {
 interface DesktopSidebarProps {
   onAsk: () => void;
   pricing: any;
+  images: { url: string }[];
 }
 
-export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) {
+export default function DesktopSidebar({ onAsk, pricing, images }: DesktopSidebarProps) {
   const [selected, setSelected] = useState<number | null>(null);
 
   // --- handle simple pricing ---
@@ -34,18 +35,21 @@ export default function DesktopSidebar({ onAsk, pricing }: DesktopSidebarProps) 
 
         {/* Images (for now dummy until API gives banner images) */}
         <div className="grid grid-cols-2 gap-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-xl overflow-hidden relative">
-              <Image
-                src="/kerala-backwaters.png"
-                alt="Trip gallery"
-                width={200}
-                height={150}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
+          {(images?.length ? images : Array.from({ length: 6 })).map(
+            (img: any, i: number) => (
+              <div key={i} className="h-28 rounded-xl overflow-hidden relative">
+                <Image
+                  src={img?.url || "/kerala-backwaters.png"}
+                  alt="Trip gallery"
+                  width={200}
+                  height={150}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )
+          )}
         </div>
+
 
         {/* Pricing Card */}
         <div className="bg-white rounded-2xl border p-5 space-y-4">

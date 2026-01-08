@@ -53,6 +53,14 @@ function normalizeMood(mood: string) {
   }
 }
 
+function formatCity(city: string) {
+  return city
+    .replace(/_/g, " ")              // underscores → spaces
+    .split(" ")
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
 
 export default function TripHeader({
   onOpenOrganizer,
@@ -136,9 +144,10 @@ export default function TripHeader({
               key={city}
               className="flex bg-[#FFF7F4] rounded-full items-center gap-1 px-3 py-1.5"
             >
-              <MapPin className="w-4 h-4" /> {city}
+              <MapPin className="w-4 h-4" /> {formatCity(city)}
             </span>
           ))}
+
         </div>
 
       </div>
