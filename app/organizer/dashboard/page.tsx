@@ -190,12 +190,13 @@ export default function DashboardMainContent() {
                 {currentMonthTrips.map((trip, i) => (
                   <TripCard
                     key={trip.tripPublicId ?? i}
+                    tripPublicId={trip.tripPublicId}
                     image={trip.image}
                     name={trip.name}
                     tags={trip.tags}
                     description={trip.description}
-                    leads={trip.leads}    // replace when backend provides
-                    queries={trip.queries}  // replace when backend provides
+                    leads={trip.leads}
+                    queries={trip.queries}
                   />
 
                 ))}
@@ -222,6 +223,7 @@ export default function DashboardMainContent() {
                 {nextMonthTrips.map((trip, i) => (
                   <TripCard
                     key={trip.tripPublicId ?? i}
+                    tripPublicId={trip.tripPublicId}
                     image={trip.image}
                     name={trip.name}
                     tags={trip.tags}

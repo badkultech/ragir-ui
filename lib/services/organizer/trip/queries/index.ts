@@ -54,6 +54,25 @@ export const tripQueryAPI = baseAPI.injectEndpoints({
       invalidatesTags: [{ type: TAGS.tripQueries }],
     }),
 
+    // Create a PUBLIC trip query (no user / no auth)
+    createPublicTripQuery: builder.mutation<
+      TripQueryResponse,
+      { tripPublicId: string; question: string }
+    >({
+      query: ({ tripPublicId, question }) => {
+        const formData = new FormData();
+        formData.append("question", question);
+
+        return {
+          url: ENDPOINTS.ORGANIZER.TRIP_PUBLIC_QUERIES(tripPublicId),
+          method: "POST",
+          body: formData,
+        };
+      },
+      transformResponse: (res: ApiResponse<TripQueryResponse>) => res.data,
+    }),
+
+
     // Optional: get all queries for organization (org-wide)
     getAllTripQueries: builder.query<TripQueryResponse[], string>({
       query: (organizationId) => ({
@@ -64,7 +83,7 @@ export const tripQueryAPI = baseAPI.injectEndpoints({
       providesTags: [{ type: TAGS.tripQueries }],
     }),
 
-     getAllTripQueriesCount: builder.query<number, string>({
+    getAllTripQueriesCount: builder.query<number, string>({
       query: (organizationId) => ({
         url: ENDPOINTS.ORGANIZER.TRIP_ORG_QUERIES_COUNT(organizationId),
         method: "GET",
@@ -149,6 +168,7 @@ export const {
   useGetAllTripQueriesQuery,
   useDeleteTripQueryMutation,
   useGetAllTripQueriesCountQuery,
+  useCreatePublicTripQueryMutation,
 
   useGetTripQueryCommentsQuery,
   useCreateTripQueryCommentMutation,

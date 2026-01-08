@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { MapPin } from "lucide-react";
+import { MapPin, MessageSquare, Users } from "lucide-react";
 import { formatTag } from "@/lib/utils/tagFormatter";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 type TripCardProps = {
     image: string;
@@ -10,6 +11,7 @@ type TripCardProps = {
     description?: string;
     leads?: number;
     queries?: number;
+    tripPublicId: string;
 };
 
 export function TripCard({
@@ -19,6 +21,7 @@ export function TripCard({
     description,
     leads = 0,
     queries = 0,
+    tripPublicId,
 }: TripCardProps) {
     const [showAllTags, setShowAllTags] = useState(false);
 
@@ -60,16 +63,32 @@ export function TripCard({
                         </div>
                     )}
                 </div>
-                {/* Footer */}
-                <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm">
-                    <div>
-                        Leads <span className="font-semibold text-orange-500">{leads}</span>
-                    </div>
-                    <div>
-                        Queries{" "}
-                        <span className="font-semibold text-orange-500">{queries}</span>
-                    </div>
+
+
+                <div className="flex items-center justify-between gap-3 text-sm">
+                    {/* Leads – LEFT */}
+                    <Link href={`/organizer/leads/trip/${tripPublicId}`} className="flex-1">
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border hover:bg-gray-100 cursor-pointer transition">
+                            <Users className="w-4 h-4 text-gray-600" />
+                            <span className="text-gray-800">Leads</span>
+                            <span className="font-semibold text-orange-500 ml-auto">
+                                {leads}
+                            </span>
+                        </div>
+                    </Link>
+
+                    {/* Queries – RIGHT */}
+                    <Link href={`/organizer/queries/trip/${tripPublicId}`} className="flex-1">
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border hover:bg-gray-100 cursor-pointer transition">
+                            <MessageSquare className="w-4 h-4 text-gray-600" />
+                            <span className="text-gray-800">Queries</span>
+                            <span className="font-semibold text-orange-500 ml-auto">
+                                {queries}
+                            </span>
+                        </div>
+                    </Link>
                 </div>
+
 
                 {/* Description */}
                 {description && (

@@ -154,7 +154,7 @@ export default function TripDetailsPage() {
       )}
 
       {showReport && <ReportModal onClose={() => setShowReport(false)} />}
-      {showAsk && <AskQuestionModal onClose={() => setShowAsk(false)} />}
+      {showAsk && <AskQuestionModal tripPublicId={trip?.publicId} onClose={() => setShowAsk(false)} />}
       {showOrganizer && (
         <LeaderProfileModal
           onClose={() => setShowOrganizer(false)}
