@@ -1,49 +1,166 @@
-import { X, CheckCircle2 } from "lucide-react"
-import { TRIP_DETAILS } from "@/lib/constants/strings"
+"use client";
+
+import { X, CheckCircle2 } from "lucide-react";
+import { TRIP_DETAILS } from "@/lib/constants/strings";
 
 export default function PricingDetailsModal({
-  pricingOptions,
+  pricing,
+  selectedPricing,
   onClose,
 }: {
-  pricingOptions: any[]
-  onClose: () => void
+  pricing: any;
+  selectedPricing: {
+    options: Record<string, any>;
+    addOns: string[];
+    finalPrice: number;
+  };
+  onClose: () => void;
 }) {
+  const simple = pricing?.simplePricingRequest;
+  const dynamic = pricing?.dynamicPricingRequest;
+  const addOns = pricing?.addOns || [];
+
+  const getFinal = (price: number, discount: number) =>
+    price - (price * discount) / 100;
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        {/* HEADER */}
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between">
-          <h3 className="font-bold">{TRIP_DETAILS.PRICING_DETAILS_MODAL.TITLE}</h3>
+          <h3 className="font-bold">
+            {TRIP_DETAILS.PRICING_DETAILS_MODAL.TITLE}
+          </h3>
           <button onClick={onClose}>
             <X />
           </button>
         </div>
 
         <div className="p-6 space-y-4">
-          {pricingOptions.map((opt, i) => (
-            <div key={i} className="flex justify-between border-b pb-3">
+          {/* ================= SIMPLE ================= */}
+          {pricing?.tripPricingType === "SIMPLE" && simple && (
+            <div className="flex justify-between border-b pb-3">
               <div>
-                <p className="font-semibold">{opt.type}</p>
-                <p className="text-sm text-gray-500">{opt.description}</p>
+                <p className="font-semibold">
+                  {TRIP_DETAILS.PRICING_MODAL.BASE_PACKAGE}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {simple.discountPercent
+                    ? `${simple.discountPercent}% OFF`
+                    : TRIP_DETAILS.PRICING_MODAL.STANDARD_PRICING}
+                </p>
               </div>
-              <span className="font-bold text-orange-500">{opt.price}</span>
-            </div>
-          ))}
 
-          <div className="flex items-center gap-2 text-sm">
+              <span className="font-bold text-orange-500">
+                ₹
+                {getFinal(
+                  simple.basePrice,
+                  simple.discountPercent
+                ).toLocaleString()}
+              </span>
+            </div>
+          )}
+
+          {/* ================= DYNAMIC ================= */}
+          {pricing?.tripPricingType === "DYNAMIC" &&
+            dynamic?.pricingCategoryDtos?.map((cat: any, i: number) => {
+              /* -------- SINGLE (auto included) -------- */
+              if (cat.pricingCategoryType === "SINGLE") {
+                const opt = cat.pricingCategoryOptionDTOs?.[0];
+                if (!opt) return null;
+
+                return (
+                  <div key={i} className="flex justify-between border-b pb-3">
+                    <div>
+                      <p className="font-semibold">{cat.categoryName}</p>
+                      <p className="text-sm text-gray-500">
+                        {opt.name} (Auto included)
+                      </p>
+                    </div>
+                    <span className="font-bold text-orange-500">
+                      ₹{getFinal(opt.price, opt.discount)}
+                    </span>
+                  </div>
+                );
+              }
+
+              /* -------- MULTI (ONLY SELECTED) -------- */
+              const selectedOpt =
+                selectedPricing.options?.[cat.categoryName];
+
+              if (!selectedOpt) return null;
+
+              return (
+                <div key={i} className="flex justify-between border-b pb-3">
+                  <div>
+                    <p className="font-semibold">{cat.categoryName}</p>
+                    <p className="text-sm text-gray-500">
+                      {selectedOpt.name}
+                    </p>
+                  </div>
+                  <span className="font-bold text-orange-500">
+                    ₹
+                    {getFinal(
+                      selectedOpt.price,
+                      selectedOpt.discount
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+
+          {/* ================= ADD-ONS (ONLY SELECTED) ================= */}
+          {selectedPricing.addOns.length > 0 &&
+            selectedPricing.addOns.map((name: string, i: number) => {
+              const add = addOns.find((a: any) => a.name === name);
+              if (!add) return null;
+
+              return (
+                <div key={i} className="flex justify-between border-b pb-3">
+                  <p className="font-semibold">{add.name}</p>
+                  <span className="font-bold text-orange-500">
+                    ₹{(add.charge || add.price || 0).toLocaleString()}
+                  </span>
+                </div>
+              );
+            })}
+
+          {/* ================= TOTAL ================= */}
+          <div className="flex justify-between pt-4 border-t font-bold text-orange-600">
+            <p>Total Payable</p>
+            <span>
+              ₹{selectedPricing.finalPrice.toLocaleString()}
+            </span>
+          </div>
+
+          {/* ================= EMI ================= */}
+          <div className="flex items-center gap-2 text-sm pt-2">
             <CheckCircle2 className="text-green-600" />
             {TRIP_DETAILS.PRICING_DETAILS_MODAL.EMI_AVAILABLE}
           </div>
 
+          {/* ================= CANCELLATION ================= */}
           <div className="border-t pt-4">
-            <p className="font-semibold mb-2">{TRIP_DETAILS.PRICING_DETAILS_MODAL.CANCELLATION_POLICY}</p>
+            <p className="font-semibold mb-2">
+              {TRIP_DETAILS.PRICING_DETAILS_MODAL.CANCELLATION_POLICY}
+            </p>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>{TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_30_DAYS}</li>
-              <li>{TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_15_DAYS}</li>
-              <li>{TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_7_DAYS}</li>
-              <li>{TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_LESS_7}</li>
+              <li>
+                {TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_30_DAYS}
+              </li>
+              <li>
+                {TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_15_DAYS}
+              </li>
+              <li>
+                {TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_7_DAYS}
+              </li>
+              <li>
+                {TRIP_DETAILS.PRICING_DETAILS_MODAL.POLICY_LESS_7}
+              </li>
             </ul>
           </div>
 
+          {/* ================= BUTTONS ================= */}
           <div className="flex gap-3 pt-4">
             <button
               onClick={onClose}
@@ -51,6 +168,7 @@ export default function PricingDetailsModal({
             >
               {TRIP_DETAILS.PRICING_DETAILS_MODAL.CANCEL}
             </button>
+
             <button className="flex-1 bg-orange-500 text-white py-3 rounded-lg">
               {TRIP_DETAILS.PRICING_DETAILS_MODAL.REQUEST_INVITE}
             </button>
@@ -58,5 +176,5 @@ export default function PricingDetailsModal({
         </div>
       </div>
     </div>
-  )
+  );
 }

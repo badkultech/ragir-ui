@@ -28,25 +28,31 @@ import { useTripDetailsQuery } from "@/lib/services/trip-search";
 
 import { TRIP_DETAILS } from "@/lib/constants/strings";
 
-// ... imports ...
-
 export default function TripDetailsPage() {
   const { id } = useParams();
 
-  // ... state ...
+  type SelectedPricing = {
+    options: Record<string, any>;
+    addOns: string[];
+    finalPrice: number;
+  };
   const [activeDay, setActiveDay] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [showAsk, setShowAsk] = useState(false);
   const [showOrganizer, setShowOrganizer] = useState(false);
   const [showMobilePricing, setShowMobilePricing] = useState(false);
   const [showPricingDetails, setShowPricingDetails] = useState(false);
+  const [selectedPricing, setSelectedPricing] = useState<SelectedPricing>({
+    options: {},
+    addOns: [],
+    finalPrice: 0,
+  });
 
   const { data, isLoading, error } = useTripDetailsQuery(id as string);
   if (isLoading) return <p>{TRIP_DETAILS.PAGE.LOADING}</p>;
   if (error) return <p>{TRIP_DETAILS.PAGE.ERROR}</p>;
   if (!data) return <p>{TRIP_DETAILS.PAGE.NOT_FOUND}</p>;
 
-  // ... payload extraction ...
   const payload = data;
   const trip = payload.tripResponse;
   const itinerary = payload.tripItineraryResponse;
@@ -146,6 +152,10 @@ export default function TripDetailsPage() {
               onAsk={() => setShowAsk(true)}
               pricing={pricing}
               images={sidebarImages}
+              onRequestInvite={(data) => {
+                setSelectedPricing(data);
+                setShowPricingDetails(true);
+              }}
             />
           </div>
         </div>
@@ -161,7 +171,8 @@ export default function TripDetailsPage() {
       {/* MODALS */}
       {showPricingDetails && (
         <PricingDetailsModal
-          pricingOptions={pricing}
+          pricing={pricing}
+          selectedPricing={selectedPricing}
           onClose={() => setShowPricingDetails(false)}
         />
       )}
@@ -184,6 +195,10 @@ export default function TripDetailsPage() {
         <MobilePricingModal
           options={pricing}
           onClose={() => setShowMobilePricing(false)}
+          onRequestInvite={() => {
+            setShowMobilePricing(false);
+            setShowPricingDetails(true);
+          }}
         />
       )}
     </div>
