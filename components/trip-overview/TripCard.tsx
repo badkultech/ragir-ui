@@ -13,8 +13,12 @@ import {
   PlusCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
-export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
+export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: any) {
+
+
+
   const renderButtons = () => {
     switch (tab) {
       // UPCOMING / ACTIVE TRIPS
@@ -117,9 +121,11 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
               variant="outline"
               size="sm"
               className="flex items-center justify-center gap-2 border-green-400 text-green-600 hover:bg-green-50 h-10 flex-grow rounded-lg"
+              onClick={onRestore}
             >
               <Undo2 size={15} /> Unarchive
             </Button>
+
             <Button
               variant="outline"
               size="sm"
@@ -138,9 +144,11 @@ export default function TripCard({ trip, tab, onArchive, onDelete }: any) {
             variant="outline"
             size="sm"
             className="flex items-center justify-center gap-2 border-green-400 text-green-600 hover:bg-green-50 h-10 rounded-lg"
+            onClick={onRestore}
           >
             <Undo2 size={15} /> Restore
           </Button>
+
         );
 
       default:

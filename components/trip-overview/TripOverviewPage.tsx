@@ -9,6 +9,8 @@ import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { format } from "date-fns";
 import { useGetFilteredTripsQuery, TripListItem } from "@/lib/services/organizer/trip/my-trips";
 import ConfirmArchiveModal from "./ConfirmArchiveModal";
+import ConfirmUnarchiveModal from "./ConfirmUnarchiveModal";
+import ConfirmRestoreModal from "./ConfirmRestoreModal";
 
 export default function TripOverviewPage() {
   const organizationId = useOrganizationId();
@@ -41,6 +43,8 @@ export default function TripOverviewPage() {
     deleted: "DELETED",
   } as const;
 
+
+
   const { data, isFetching } = useGetFilteredTripsQuery(
     {
       organizationId,
@@ -64,6 +68,9 @@ export default function TripOverviewPage() {
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openArchive, setOpenArchive] = useState(false);
+  const [openUnarchive, setOpenUnarchive] = useState(false);
+  const [openRestore, setOpenRestore] = useState(false);
+
 
   return (
     <div className="p-6 space-y-6">
@@ -135,6 +142,15 @@ export default function TripOverviewPage() {
               setSelectedTripId(trip.tripPublicId);
               setOpenArchive(true);
             }}
+            onUnarchive={() => {
+              setSelectedTripId(trip.tripPublicId);
+              setOpenUnarchive(true);
+            }}
+            onRestore={() => {
+              setSelectedTripId(trip.tripPublicId);
+              setOpenRestore(true);
+            }}
+
           />
         ))}
       </div>
@@ -169,6 +185,18 @@ export default function TripOverviewPage() {
         tripId={selectedTripId}
         onClose={() => setOpenArchive(false)}
       />
+      <ConfirmUnarchiveModal
+        open={openUnarchive}
+        tripId={selectedTripId}
+        onClose={() => setOpenUnarchive(false)}
+      />
+
+      <ConfirmRestoreModal
+        open={openRestore}
+        tripId={selectedTripId}
+        onClose={() => setOpenRestore(false)}
+      />
+
     </div>
   );
 }
