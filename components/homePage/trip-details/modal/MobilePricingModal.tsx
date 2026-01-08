@@ -11,7 +11,11 @@ export default function MobilePricingModal({
 }: {
   options: any;
   onClose: () => void;
-  onRequestInvite: () => void;
+  onRequestInvite: (data: {
+    options: any;
+    addOns: string[];
+    finalPrice: number;
+  }) => void;
 }) {
   const simple = options?.simplePricingRequest;
   const dynamic = options?.dynamicPricingRequest;
@@ -23,25 +27,25 @@ export default function MobilePricingModal({
   const getFinal = (price: number, discount: number) =>
     price - (price * discount) / 100;
 
-  // -------- SIMPLE TOTAL --------
+  /* ---------------- SIMPLE TOTAL ---------------- */
   const simpleTotal = useMemo(() => {
     if (!simple) return 0;
     return getFinal(simple.basePrice, simple.discountPercent);
   }, [simple]);
 
-  // -------- DYNAMIC TOTAL --------
+  /* ---------------- DYNAMIC TOTAL ---------------- */
   const dynamicTotal = useMemo(() => {
     if (!dynamic) return 0;
 
-    return dynamic.pricingCategoryDtos?.reduce((sum: number, cat: any) => {
-      // SINGLE → auto included (first option)
+    return dynamic.pricingCategoryDtos.reduce((sum: number, cat: any) => {
+      // SINGLE → auto include
       if (cat.pricingCategoryType === "SINGLE") {
         const opt = cat.pricingCategoryOptionDTOs?.[0];
         if (!opt) return sum;
         return sum + getFinal(opt.price, opt.discount);
       }
 
-      // MULTI → based on selected
+      // MULTI → selected
       const selected = selectedOptions[cat.categoryName];
       if (!selected) return sum;
 
@@ -49,28 +53,39 @@ export default function MobilePricingModal({
     }, 0);
   }, [dynamic, selectedOptions]);
 
-  // -------- ADD ONS TOTAL --------
-  const addOnTotal = selectedAddOns.reduce((sum, n) => {
-    const add = addOns.find((a: any) => a.name === n);
-    return sum + (add?.charge || add?.price || 0);
-  }, 0);
+  /* ---------------- ADD ONS TOTAL ---------------- */
+  const addOnTotal = useMemo(() => {
+    return selectedAddOns.reduce((sum, name) => {
+      const add = addOns.find((a: any) => a.name === name);
+      return sum + (add?.charge || add?.price || 0);
+    }, 0);
+  }, [selectedAddOns, addOns]);
 
-  const finalPrice =
+  /* ---------------- RAW FINAL ---------------- */
+  const rawFinalPrice =
     (options?.tripPricingType === "SIMPLE" ? simpleTotal : dynamicTotal) +
     addOnTotal;
 
-  // button enable logic
-  const hasMulti =
-    dynamic?.pricingCategoryDtos?.some(
-      (c: any) => c.pricingCategoryType === "MULTI"
-    ) ?? false;
+  /* ---------------- GST (18%) ---------------- */
+  const finalPrice = useMemo(() => {
+    if (options?.includesGst) {
+      return Math.round(rawFinalPrice + rawFinalPrice * 0.18);
+    }
+    return Math.round(rawFinalPrice);
+  }, [rawFinalPrice, options?.includesGst]);
 
-  const isButtonEnabled =
-    options?.tripPricingType === "SIMPLE"
-      ? true
-      : hasMulti
-        ? Object.keys(selectedOptions).length > 0
-        : true;
+  /* ---------------- BUTTON ENABLE ---------------- */
+  // Mobile me kabhi disable nahi hoga
+  const isButtonEnabled = true;
+
+  /* ---------------- SUBMIT ---------------- */
+  const handleRequestInvite = () => {
+    onRequestInvite({
+      options: selectedOptions,
+      addOns: selectedAddOns,
+      finalPrice,
+    });
+  };
 
   return (
     <div className="lg:hidden fixed inset-0 bg-black/50 flex items-end z-50">
@@ -86,19 +101,15 @@ export default function MobilePricingModal({
         </div>
 
         <div className="p-6 space-y-4">
-          {/* TOTAL DISPLAY */}
+          {/* TOTAL */}
           <div className="flex justify-between border-b pb-3">
-            <p className="font-medium text-sm">
-              Total
-            </p>
-
+            <p className="text-sm font-medium">Total</p>
             <span className="font-bold text-orange-500">
-              ₹{(finalPrice || 0).toLocaleString()}
+              ₹{finalPrice.toLocaleString()}
             </span>
           </div>
 
-
-          {/* -------- SIMPLE -------- */}
+          {/* SIMPLE */}
           {options?.tripPricingType === "SIMPLE" && (
             <div className="flex justify-between border-b pb-3">
               <div className="flex gap-2">
@@ -107,11 +118,9 @@ export default function MobilePricingModal({
                   <p className="text-sm font-medium">
                     {TRIP_DETAILS.PRICING_MODAL.BASE_PACKAGE}
                   </p>
-
                   {simple?.discountPercent ? (
                     <p className="text-xs text-green-600">
-                      {simple.discountPercent}% {TRIP_DETAILS.PRICING_MODAL.OFF} —{" "}
-                      {simple.discountValidUntil}
+                      {simple.discountPercent}% OFF
                     </p>
                   ) : (
                     <p className="text-xs text-gray-500">
@@ -127,10 +136,10 @@ export default function MobilePricingModal({
             </div>
           )}
 
-          {/* -------- DYNAMIC -------- */}
+          {/* DYNAMIC */}
           {options?.tripPricingType === "DYNAMIC" &&
-            dynamic?.pricingCategoryDtos?.map((cat: any, i: number) => {
-              // SINGLE visible
+            dynamic?.pricingCategoryDtos.map((cat: any, i: number) => {
+              // SINGLE
               if (cat.pricingCategoryType === "SINGLE") {
                 const opt = cat.pricingCategoryOptionDTOs?.[0];
                 if (!opt) return null;
@@ -157,7 +166,7 @@ export default function MobilePricingModal({
                 );
               }
 
-              // MULTI radio
+              // MULTI
               return (
                 <div
                   key={i}
@@ -165,7 +174,7 @@ export default function MobilePricingModal({
                 >
                   <p className="text-sm font-medium">{cat.categoryName}</p>
 
-                  {cat.pricingCategoryOptionDTOs?.map(
+                  {cat.pricingCategoryOptionDTOs.map(
                     (opt: any, idx: number) => {
                       const checked =
                         selectedOptions[cat.categoryName]?.name === opt.name;
@@ -173,28 +182,18 @@ export default function MobilePricingModal({
                       return (
                         <label
                           key={idx}
-                          className="flex justify-between items-center border rounded-xl p-3"
+                          onClick={() =>
+                            setSelectedOptions((prev: any) => ({
+                              ...prev,
+                              [cat.categoryName]: opt,
+                            }))
+                          }
+                          className={`flex justify-between items-center border rounded-xl p-3 cursor-pointer ${checked
+                              ? "border-orange-400 bg-orange-50"
+                              : ""
+                            }`}
                         >
-                          <div className="flex gap-3">
-                            <input
-                              type="radio"
-                              name={cat.categoryName}
-                              checked={checked}
-                              onChange={() =>
-                                setSelectedOptions((prev: any) => ({
-                                  ...prev,
-                                  [cat.categoryName]: opt,
-                                }))
-                              }
-                            />
-                            <div>
-                              <p className="text-sm font-medium">{opt.name}</p>
-                              <p className="text-xs text-gray-500">
-                                ₹{opt.price} — {opt.discount}% OFF
-                              </p>
-                            </div>
-                          </div>
-
+                          <p className="text-sm">{opt.name}</p>
                           <span className="font-semibold">
                             ₹{getFinal(opt.price, opt.discount)}
                           </span>
@@ -206,7 +205,7 @@ export default function MobilePricingModal({
               );
             })}
 
-          {/* -------- ADD ONS -------- */}
+          {/* ADD ONS */}
           {addOns.length > 0 && (
             <div className="bg-gray-50 rounded-xl p-4 border space-y-3">
               <p className="text-sm font-medium">Add-ons</p>
@@ -214,29 +213,19 @@ export default function MobilePricingModal({
               {addOns.map((a: any, i: number) => (
                 <label
                   key={i}
-                  className="flex justify-between items-center border rounded-xl p-3"
+                  onClick={() =>
+                    setSelectedAddOns((prev) =>
+                      prev.includes(a.name)
+                        ? prev.filter((n) => n !== a.name)
+                        : [...prev, a.name]
+                    )
+                  }
+                  className={`flex justify-between items-center border rounded-xl p-3 cursor-pointer ${selectedAddOns.includes(a.name)
+                      ? "border-orange-400 bg-orange-50"
+                      : ""
+                    }`}
                 >
-                  <div className="flex gap-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedAddOns.includes(a.name)}
-                      onChange={() =>
-                        setSelectedAddOns((prev) =>
-                          prev.includes(a.name)
-                            ? prev.filter((n) => n !== a.name)
-                            : [...prev, a.name]
-                        )
-                      }
-                    />
-
-                    <div>
-                      <p className="text-sm">{a.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {a.description || ""}
-                      </p>
-                    </div>
-                  </div>
-
+                  <p className="text-sm">{a.name}</p>
                   <span className="font-semibold">
                     ₹{(a.charge || a.price || 0).toLocaleString()}
                   </span>
@@ -255,12 +244,8 @@ export default function MobilePricingModal({
 
           {/* BUTTON */}
           <button
-            disabled={!isButtonEnabled}
-            onClick={onRequestInvite}
-            className={`w-full py-3 rounded-lg flex items-center justify-center gap-2 ${isButtonEnabled
-              ? "bg-orange-500 text-white"
-              : "bg-gray-200 text-gray-400"
-              }`}
+            onClick={handleRequestInvite}
+            className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-orange-500 text-white"
           >
             <Send className="w-4 h-4" />
             {TRIP_DETAILS.PRICING_MODAL.REQUEST_INVITE}

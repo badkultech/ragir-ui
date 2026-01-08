@@ -67,22 +67,19 @@ export default function DesktopSidebar({
     return sum + (add?.charge || 0);
   }, 0);
 
-  const finalPrice =
+  const includesGst = pricing?.includesGst === true;
+  const applyGst = (amount: number) =>
+    includesGst ? amount + amount * 0.18 : amount;
+
+
+  const baseTotal =
     (pricing?.tripPricingType === "SIMPLE" ? simpleFinal : dynamicTotal) +
     addOnTotal;
 
-  // button enable
-  const hasMulti =
-    dynamic?.pricingCategoryDtos?.some(
-      (c: any) => c.pricingCategoryType === "MULTI"
-    ) ?? false;
+  const finalPrice = applyGst(baseTotal);
 
-  const isButtonEnabled =
-    pricing?.tripPricingType === "SIMPLE"
-      ? true
-      : hasMulti
-        ? Object.keys(selectedOptions).length > 0
-        : true;
+
+  const isButtonEnabled = true;
 
   return (
     <div className="hidden lg:block lg:col-span-1">
@@ -125,6 +122,12 @@ export default function DesktopSidebar({
                 {simple.discountPercent}% OFF (₹{simple.basePrice})
               </p>
             )}
+            {includesGst && (
+              <p className="text-xs text-gray-500">
+                *Price includes 18% GST
+              </p>
+            )}
+
           </div>
 
           {/* DYNAMIC ONLY */}
@@ -178,25 +181,51 @@ export default function DesktopSidebar({
                         return (
                           <label
                             key={idx}
-                            className="flex justify-between items-center p-3 rounded-xl border cursor-pointer"
+                            onClick={() =>
+                              setSelectedOptions((prev: any) => ({
+                                ...prev,
+                                [cat.categoryName]: opt,
+                              }))
+                            }
+                            className={`
+      flex justify-between items-center p-3 rounded-xl border cursor-pointer
+      transition-all
+      ${checked ? "border-orange-400 bg-orange-50" : "hover:bg-gray-50"}
+    `}
                           >
-                            <div className="flex gap-3 items-start">
-                              <input
-                                type="radio"
-                                name={cat.categoryName}
-                                checked={checked}
-                                onChange={() =>
-                                  setSelectedOptions((prev: any) => ({
-                                    ...prev,
-                                    [cat.categoryName]: opt,
-                                  }))
+                            <div className="flex items-start gap-3">
+                              {/* CUSTOM RADIO (NO onClick here) */}
+                              <div
+                                className="w-5 h-5 rounded-full flex items-center justify-center mt-1"
+                                style={
+                                  checked
+                                    ? {
+                                      border: "2px solid transparent",
+                                      background: `
+                  linear-gradient(white, white) padding-box,
+                  linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A) border-box
+                `,
+                                    }
+                                    : {
+                                      border: "2px solid #D1D5DB",
+                                      background: "white",
+                                    }
                                 }
-                              />
+                              >
+                                {checked && (
+                                  <div
+                                    className="w-2.5 h-2.5 rounded-full"
+                                    style={{
+                                      background:
+                                        "linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                                    }}
+                                  />
+                                )}
+                              </div>
 
+                              {/* TEXT */}
                               <div>
-                                <p className="font-semibold text-sm">
-                                  {opt.name}
-                                </p>
+                                <p className="font-semibold text-sm">{opt.name}</p>
                                 <p className="text-xs text-gray-500">
                                   ₹{opt.price} — {opt.discount}% OFF
                                 </p>
@@ -204,12 +233,10 @@ export default function DesktopSidebar({
                             </div>
 
                             <p className="font-semibold text-sm">
-                              ₹{getOptionFinalPrice(
-                                opt.price,
-                                opt.discount
-                              )}
+                              ₹{getOptionFinalPrice(opt.price, opt.discount)}
                             </p>
                           </label>
+
                         );
                       }
                     )}
@@ -225,20 +252,55 @@ export default function DesktopSidebar({
                   {addOns.map((add: any, i: number) => (
                     <label
                       key={i}
-                      className="flex justify-between items-center p-3 rounded-xl border cursor-pointer"
+                      onClick={() =>
+                        setSelectedAddOns((prev) =>
+                          prev.includes(add.name)
+                            ? prev.filter((n) => n !== add.name)
+                            : [...prev, add.name]
+                        )
+                      }
+                      className={`
+      flex justify-between items-center p-3 rounded-xl border cursor-pointer
+      transition-all
+      ${selectedAddOns.includes(add.name)
+                          ? "border-orange-400 bg-orange-50"
+                          : "hover:bg-gray-50"
+                        }
+    `}
                     >
-                      <div className="flex gap-3 items-start">
-                        <input
-                          type="checkbox"
-                          checked={selectedAddOns.includes(add.name)}
-                          onChange={() =>
-                            setSelectedAddOns((prev) =>
-                              prev.includes(add.name)
-                                ? prev.filter((n) => n !== add.name)
-                                : [...prev, add.name]
-                            )
+                      <div className="flex items-start gap-3">
+                        {/* CUSTOM CHECKBOX */}
+                        <div
+                          className="w-5 h-5 rounded-md flex items-center justify-center mt-1"
+                          style={
+                            selectedAddOns.includes(add.name)
+                              ? {
+                                background:
+                                  "linear-gradient(90deg, #FEA901, #FD6E34, #FE336A, #FD401A)",
+                                border: "1px solid transparent",
+                              }
+                              : {
+                                background: "white",
+                                border: "1.5px solid #D1D5DB",
+                              }
                           }
-                        />
+                        >
+                          {selectedAddOns.includes(add.name) && (
+                            <svg
+                              viewBox="0 0 24 24"
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="white"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+
+                        {/* TEXT */}
                         <p className="text-sm">{add.name}</p>
                       </div>
 
@@ -246,6 +308,7 @@ export default function DesktopSidebar({
                         ₹{add.charge}
                       </p>
                     </label>
+
                   ))}
                 </div>
               )}
@@ -269,8 +332,8 @@ export default function DesktopSidebar({
               })
             }
             className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium ${isButtonEnabled
-                ? "bg-orange-500 text-white"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-orange-500 text-white"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
             <Send className="w-4 h-4" />

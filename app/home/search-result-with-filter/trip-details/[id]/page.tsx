@@ -2,31 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-
-/* Sections */
 import HeroSection from "@/components/homePage/trip-details/HeroSection";
 import TripHeader from "@/components/homePage/trip-details/TripHeader";
 import TripInfoCards from "@/components/homePage/trip-details/TripInfoCards";
 import TripHighlights from "@/components/homePage/trip-details/TripHighlights";
 import DayWiseItinerary from "@/components/homePage/trip-details/DayWiseItinerary";
-import IncludedSection from "@/components/homePage/trip-details/IncludedSection";
 import ExcludedSection from "@/components/homePage/trip-details/ExcludedSection";
 import FAQSection from "@/components/homePage/trip-details/FAQSection";
 import DesktopSidebar from "@/components/homePage/trip-details/DesktopSidebar";
 import MobilePricingBar from "@/components/homePage/trip-details/MobilePricingBar";
-
-/* Modals */
 import PricingDetailsModal from "@/components/homePage/trip-details/modal/PricingDetailsModal";
 import ReportModal from "@/components/homePage/trip-details/modal/ReportModal";
 import AskQuestionModal from "@/components/homePage/trip-details/modal/AskQuestionModal";
 import LeaderProfileModal from "@/components/homePage/trip-details/modal/LeaderProfileModal";
 import MobilePricingModal from "@/components/homePage/trip-details/modal/MobilePricingModal";
-
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { Footer } from "@/components/search-results/footer";
 import { useTripDetailsQuery } from "@/lib/services/trip-search";
-
 import { TRIP_DETAILS } from "@/lib/constants/strings";
+import OrganizerProfileModal from "@/components/homePage/trip-details/modal/OrganizerProfileModal";
 
 export default function TripDetailsPage() {
   const { id } = useParams();
@@ -39,6 +33,7 @@ export default function TripDetailsPage() {
   const [activeDay, setActiveDay] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [showAsk, setShowAsk] = useState(false);
+  const [showLeader, setShowLeader] = useState(false);
   const [showOrganizer, setShowOrganizer] = useState(false);
   const [showMobilePricing, setShowMobilePricing] = useState(false);
   const [showPricingDetails, setShowPricingDetails] = useState(false);
@@ -77,7 +72,7 @@ export default function TripDetailsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <MainHeader logoText={trip?.name || TRIP_DETAILS.PAGE.DEFAULT_LOGO} isLoggedIn />
+      <MainHeader isLoggedIn />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -94,6 +89,7 @@ export default function TripDetailsPage() {
 
               <TripHeader
                 onOpenOrganizer={() => setShowOrganizer(true)}
+                onOpenLeader={() => setShowLeader(true)}
                 moods={trip?.moodTags || []}
                 tripTitle={trip?.name}
                 providerName={organizer?.organizerName}
@@ -126,14 +122,6 @@ export default function TripDetailsPage() {
                 activeDay={activeDay}
                 setActiveDay={setActiveDay}
                 activities={activities}
-              />
-
-
-              <IncludedSection
-                transfers={payload.tripTransferResponseList}
-                meals={payload.tripMealResponseList}
-                stays={payload.tripStayResponseList}
-                activities={payload.tripActivityResponseList}
               />
 
               <ExcludedSection items={exclusions?.details || []} />
@@ -184,9 +172,9 @@ export default function TripDetailsPage() {
           tripPublicId={trip?.publicId}
         />
       )}
-      {showOrganizer && (
+      {showLeader && (
         <LeaderProfileModal
-          onClose={() => setShowOrganizer(false)}
+          onClose={() => setShowLeader(false)}
           leader={trip?.groupLeaders?.[0]}
         />
       )}
@@ -195,12 +183,21 @@ export default function TripDetailsPage() {
         <MobilePricingModal
           options={pricing}
           onClose={() => setShowMobilePricing(false)}
-          onRequestInvite={() => {
+          onRequestInvite={(data) => {
+            setSelectedPricing(data);
             setShowMobilePricing(false);
             setShowPricingDetails(true);
           }}
         />
+
       )}
+      {showOrganizer && (
+        <OrganizerProfileModal
+          organizer={organizer}
+          onClose={() => setShowOrganizer(false)}
+        />
+      )}
+
     </div>
   );
 }

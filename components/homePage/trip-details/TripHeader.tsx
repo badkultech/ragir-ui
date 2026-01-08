@@ -10,6 +10,7 @@ interface TripHeaderProps {
   providerName?: string;
   organizerName?: string;
   cities?: string[];
+  onOpenLeader: () => void;
 }
 function normalizeMood(mood: string) {
   switch (mood.toLowerCase()) {
@@ -64,6 +65,7 @@ function formatCity(city: string) {
 
 export default function TripHeader({
   onOpenOrganizer,
+  onOpenLeader,
   moods = [],
   tripTitle = TRIP_DETAILS.HEADER.TRIP_TITLE_DEFAULT,
   providerName = TRIP_DETAILS.HEADER.PROVIDER_DEFAULT,
@@ -110,7 +112,7 @@ export default function TripHeader({
             <div>
               <p className="font-semibold">{providerName}</p>
 
-              <button className="text-xs text-orange-500">
+              <button className="text-xs text-orange-500" onClick={onOpenOrganizer}>
                 {TRIP_DETAILS.HEADER.MORE_DETAILS} <ArrowRight className="inline w-3 h-3" />
               </button>
             </div>
@@ -127,7 +129,7 @@ export default function TripHeader({
               <p className="font-semibold">{organizerName}</p>
 
               <button
-                onClick={onOpenOrganizer}
+                onClick={onOpenLeader}
                 className="text-xs text-orange-500"
               >
                 {TRIP_DETAILS.HEADER.VIEW_PROFILE} <ArrowRight className="inline w-3 h-3" />
