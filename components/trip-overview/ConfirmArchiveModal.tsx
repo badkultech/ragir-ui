@@ -8,8 +8,26 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useUpdateTripStatusMutation } from "@/lib/services/organizer/trip/my-trips";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
-export default function ConfirmArchiveModal({ open, onClose }: any) {
+export default function ConfirmArchiveModal({ open, onClose, tripId }: any) {
+  const organizationId = useOrganizationId();
+  const [updateTripStatus] = useUpdateTripStatusMutation();
+
+  const handleArchive = async () => {
+    try {
+      await updateTripStatus({
+        organizationId,
+        tripId,
+        status: "ARCHIVED",
+      }).unwrap();
+
+      onClose();
+    } catch (error) {
+      console.error("Failed to archive trip", error);
+    }
+  };
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm rounded-2xl">
@@ -23,7 +41,7 @@ export default function ConfirmArchiveModal({ open, onClose }: any) {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button className="bg-yellow-600 hover:bg-yellow-700">Archive</Button>
+          <Button className="bg-yellow-600 hover:bg-yellow-700" onClick={handleArchive}>Archive</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

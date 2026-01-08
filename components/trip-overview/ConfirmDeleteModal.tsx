@@ -8,8 +8,38 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useUpdateTripStatusMutation } from "@/lib/services/organizer/trip/my-trips";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
 
-export default function ConfirmDeleteModal({ open, onClose }: any) {
+type ConfirmDeleteModalProps = {
+  open: boolean;
+  onClose: () => void;
+  tripId: string;
+};
+
+export default function ConfirmDeleteModal({
+  open,
+  onClose,
+  tripId,
+}: ConfirmDeleteModalProps) {
+  const [updateTripStatus, { isLoading }] =
+    useUpdateTripStatusMutation();
+  const organizationId = useOrganizationId();
+
+  const handleDelete = async () => {
+    try {
+      await updateTripStatus({
+        organizationId,
+        tripId,
+        status: "DELETED",
+      }).unwrap();
+
+      onClose();
+    } catch (error) {
+      console.error("Failed to delete trip", error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm rounded-2xl p-6">
@@ -24,21 +54,23 @@ export default function ConfirmDeleteModal({ open, onClose }: any) {
         </p>
 
         <DialogFooter className="flex justify-end gap-3 pt-6">
-          {/* Cancel button */}
+          {/* Cancel */}
           <Button
             variant="outline"
             onClick={onClose}
+            disabled={isLoading}
             className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-lg px-5 py-2 text-sm font-medium"
           >
             Cancel
           </Button>
 
-          {/* Delete button */}
+          {/* Delete */}
           <Button
-            onClick={onClose}
+            onClick={handleDelete}
+            disabled={isLoading}
             className="bg-[#FF3B00] hover:bg-[#e63500] text-white rounded-lg px-5 py-2 text-sm font-medium"
           >
-            Delete
+            {isLoading ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

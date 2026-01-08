@@ -18,8 +18,19 @@ export const tripAPI = baseAPI.injectEndpoints({
       transformResponse: (res: ApiResponse<TripFilterResponse>) => res.data,
       providesTags: () => [TAGS.myTrips],
     }),
+    updateTripStatus: builder.mutation<
+      void,
+      { organizationId: string; tripId: string; status: string }
+    >({
+      query: ({ organizationId, tripId, status }) => ({
+        url: `/org/${organizationId}/trip/${tripId}/updateStatus`,
+        method: "PUT",
+        body: { tripStatus: status },
+      }),
+      invalidatesTags: () => [TAGS.myTrips],
+    }),
   }),
 });
 
-export const { useGetFilteredTripsQuery } = tripAPI;
+export const { useGetFilteredTripsQuery, useUpdateTripStatusMutation } = tripAPI;
 export type { TripListItem } from "./types";

@@ -17,7 +17,7 @@ export default function OrganizerTripsPage() {
 
       {/* Main Section */}
       <div className="flex-1 flex flex-col">
-        <AppHeader title="Library" onMenuClick={() => setSidebarOpen(true)} />
+        <AppHeader title="My Trips" onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="flex-1 p-6 md:p-8">
           <TripOverviewPage />

@@ -8,9 +8,11 @@ import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { format } from "date-fns";
 import { useGetFilteredTripsQuery, TripListItem } from "@/lib/services/organizer/trip/my-trips";
+import ConfirmArchiveModal from "./ConfirmArchiveModal";
 
 export default function TripOverviewPage() {
   const organizationId = useOrganizationId();
+  const [selectedTripId, setSelectedTripId] = useState<string>("");
 
   const [activeTab, setActiveTab] = useState<
     "upcoming" | "past" | "draft" | "archived" | "deleted"
@@ -61,6 +63,7 @@ export default function TripOverviewPage() {
   const totalPages = data?.totalPages ?? 1;
 
   const [openDelete, setOpenDelete] = useState(false);
+  const [openArchive, setOpenArchive] = useState(false);
 
   return (
     <div className="p-6 space-y-6">
@@ -89,6 +92,7 @@ export default function TripOverviewPage() {
         sortDir={sortDir}
         setSortDir={setSortDir}
         loading={isFetching}
+
       />
 
       {/* Trip Cards */}
@@ -123,8 +127,14 @@ export default function TripOverviewPage() {
               queries: trip.queriesCount ?? 0,
               leads: trip.leadsCount ?? 0,
             }}
-            onDelete={() => setOpenDelete(true)}
-            onArchive={() => {/* Archive functionality to be implemented */ }}
+            onDelete={() => {
+              setSelectedTripId(trip.tripPublicId);
+              setOpenDelete(true);
+            }}
+            onArchive={() => {
+              setSelectedTripId(trip.tripPublicId);
+              setOpenArchive(true);
+            }}
           />
         ))}
       </div>
@@ -151,7 +161,13 @@ export default function TripOverviewPage() {
 
       <ConfirmDeleteModal
         open={openDelete}
+        tripId={selectedTripId}
         onClose={() => setOpenDelete(false)}
+      />
+      <ConfirmArchiveModal
+        open={openArchive}
+        tripId={selectedTripId}
+        onClose={() => setOpenArchive(false)}
       />
     </div>
   );
