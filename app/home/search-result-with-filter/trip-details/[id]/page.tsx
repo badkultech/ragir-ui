@@ -67,8 +67,29 @@ export default function TripDetailsPage() {
 
   const heroImage =
     payload?.images?.length ? payload.images[0].url : undefined;
-
   const sidebarImages = payload?.images || [];
+
+const tripName = trip?.name;
+const duration = itinerary?.totalDays
+    ? `${itinerary?.totalDays} Days`
+    : "";
+const dates =
+  trip?.startDate && trip?.endDate
+    ? `${trip.startDate} → ${trip.endDate}`
+    : "";
+let price = "";
+
+if (pricing?.tripPricingType === "SIMPLE") {
+  const base = pricing.simplePricingRequest?.basePrice || 0;
+  const discount = pricing.simplePricingRequest?.discountPercent || 0;
+  const final = base - (base * discount) / 100;
+  price = `₹${Math.round(final).toLocaleString()} / person`;
+}
+
+if (pricing?.tripPricingType === "DYNAMIC") {
+  price = "Dynamic pricing (based on options)";
+}
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -168,7 +189,17 @@ export default function TripDetailsPage() {
         />
       )}
 
-      {showAsk && <AskQuestionModal tripPublicId={trip?.publicId} onClose={() => setShowAsk(false)} />}
+      {showAsk && (
+  <AskQuestionModal
+    onClose={() => setShowAsk(false)}
+    tripPublicId={trip?.publicId}
+    tripName={tripName}
+    duration={duration}
+    dates={dates}
+    price={price}
+  />
+)}
+
       {showReport && (
         <ReportModal
           onClose={() => setShowReport(false)}
@@ -194,6 +225,7 @@ export default function TripDetailsPage() {
 
       {showMobilePricing && (
         <MobilePricingModal
+          onAsk={() => setShowAsk(true)}
           options={pricing}
           onClose={() => setShowMobilePricing(false)}
           onRequestInvite={(data) => {

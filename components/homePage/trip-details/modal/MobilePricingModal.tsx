@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { X, Bike, Send, CheckCircle2 } from "lucide-react";
+import { X, Bike, Send, CheckCircle2, MessageCircle } from "lucide-react";
 import { TRIP_DETAILS } from "@/lib/constants/strings";
 
 export default function MobilePricingModal({
   options,
   onClose,
   onRequestInvite,
+  onAsk,
 }: {
   options: any;
+  onAsk: () => void;
   onClose: () => void;
   onRequestInvite: (data: {
     options: any;
@@ -86,6 +88,11 @@ export default function MobilePricingModal({
       finalPrice,
     });
   };
+  const handleAsk = () => {
+    onClose();   // pricing modal close
+    onAsk();     // query modal open
+  };
+
 
   return (
     <div className="lg:hidden fixed inset-0 bg-black/50 flex items-end z-50">
@@ -189,8 +196,8 @@ export default function MobilePricingModal({
                             }))
                           }
                           className={`flex justify-between items-center border rounded-xl p-3 cursor-pointer ${checked
-                              ? "border-orange-400 bg-orange-50"
-                              : ""
+                            ? "border-orange-400 bg-orange-50"
+                            : ""
                             }`}
                         >
                           <p className="text-sm">{opt.name}</p>
@@ -221,8 +228,8 @@ export default function MobilePricingModal({
                     )
                   }
                   className={`flex justify-between items-center border rounded-xl p-3 cursor-pointer ${selectedAddOns.includes(a.name)
-                      ? "border-orange-400 bg-orange-50"
-                      : ""
+                    ? "border-orange-400 bg-orange-50"
+                    : ""
                     }`}
                 >
                   <p className="text-sm">{a.name}</p>
@@ -249,6 +256,13 @@ export default function MobilePricingModal({
           >
             <Send className="w-4 h-4" />
             {TRIP_DETAILS.PRICING_MODAL.REQUEST_INVITE}
+          </button>
+          <button
+            onClick={handleAsk}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-orange-500 text-orange-500 font-medium"
+          >
+            <MessageCircle className="w-4 h-4" />
+            {TRIP_DETAILS.SIDEBAR.SEND_QUERY}
           </button>
         </div>
       </div>
