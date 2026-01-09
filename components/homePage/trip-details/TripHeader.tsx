@@ -88,6 +88,14 @@ export default function TripHeader({
             );
           })}
         </div>
+        {/* 👇 mobile icons here */}
+        <div className="flex gap-3 mb-3 md:hidden">
+          {[Bookmark, Heart, Share2].map((Icon, i) => (
+            <button key={i} className="p-2 rounded-full border">
+              <Icon className="w-5 h-5" />
+            </button>
+          ))}
+        </div>
 
         {/* title */}
         <h1 className="text-2xl md:text-3xl font-bold mb-4">
@@ -159,9 +167,9 @@ export default function TripHeader({
       </div>
 
       {/* action icons */}
-      <div className="flex md:mt-12 md:mr-4 gap-2">
+      <div className=" hidden md:flex md:mt-12 md:mr-4 gap-2">
         {[Bookmark, Heart, Share2].map((Icon, i) => (
-          <button key={i} className="p-2 hover:text-gray-600 text-black">
+          <button key={i} className="p-2 hover:text-gray-600 text-black rounded-full border">
             <Icon className="w-5 h-5" />
           </button>
         ))}

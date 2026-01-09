@@ -14,7 +14,7 @@ interface DesktopSidebarProps {
     addOns: string[];
     finalPrice: number;
   }) => void;
-
+  
 }
 
 export default function DesktopSidebar({
