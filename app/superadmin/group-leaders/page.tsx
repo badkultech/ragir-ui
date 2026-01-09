@@ -186,7 +186,7 @@ export default function GroupLeadersPage() {
                                                     {!leader.promotion ? (
                                                         <button
                                                             onClick={() => handlePromote(leader)}
-                                                            className="text-yellow-600 hover:text-yellow-800"
+                                                            className="text-yellow-600 hover:text-yellow-800 cursor-pointer"
                                                             title="Promote Leader"
                                                             type="button"
                                                         >
@@ -195,7 +195,7 @@ export default function GroupLeadersPage() {
                                                     ) : (
                                                         <button
                                                             onClick={() => handleDeactivate(leader)}
-                                                            className="text-red-600 hover:text-red-800"
+                                                            className="text-red-600 hover:text-red-800 cursor-pointer"
                                                             title="Deactivate Promotion"
                                                             type="button"
                                                         >

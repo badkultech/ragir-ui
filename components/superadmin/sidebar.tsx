@@ -11,6 +11,8 @@ import {
   X,
   Shuffle,
   MapPinPlusInside,
+  Group,
+  Users,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { LogoutButton } from "../common/LogoutButton";
@@ -47,7 +49,7 @@ const nav: NavItem[] = [
   {
     label: "Group Leader",
     href: "/superadmin/group-leaders",
-    icon: Shuffle
+    icon: Users
   },
   {
     label: "Switch Organization",

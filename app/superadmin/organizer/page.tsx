@@ -311,7 +311,8 @@ export default function OrganizationsPage() {
                                 onClick={() =>
                                   openModal("activate", org.publicId, org.email)
                                 }
-                                className="text-green-600 hover:text-green-900 disabled:text-gray-400"
+                                className={`text-green-600 hover:text-green-900 disabled:text-gray-400 ${org.status === "ACTIVE" ? "cursor-not-allowed" : "cursor-pointer"
+                                  }`}
                                 disabled={org.status === "ACTIVE"}
                               >
                                 <UserCheck className="w-4 h-4" />
@@ -324,7 +325,8 @@ export default function OrganizationsPage() {
                                     org.email
                                   )
                                 }
-                                className="text-red-600 hover:text-red-900 disabled:text-gray-400"
+                                className={`text-red-600 hover:text-red-900 disabled:text-gray-400 ${org.status !== "ACTIVE" ? "cursor-not-allowed" : "cursor-pointer"
+                                  }`}
                                 disabled={org.status !== "ACTIVE"}
                               >
                                 <UserX className="w-4 h-4" />
@@ -333,7 +335,8 @@ export default function OrganizationsPage() {
                                 onClick={() =>
                                   openModal("resend", org.publicId, org.email)
                                 }
-                                className="text-blue-600 hover:text-blue-900 disabled:text-gray-400"
+                                className={`text-blue-600 hover:text-blue-900 disabled:text-gray-400 ${org.status !== "PENDING" ? "cursor-not-allowed" : "cursor-pointer"
+                                  }`}
                                 disabled={org.status !== "PENDING"}
                               >
                                 <Mail className="w-4 h-4" />

@@ -257,8 +257,8 @@ export default function Dashboard() {
           }
           disabled={isActive || isPending}
           className={`transition-colors ${isActive || isPending
-            ? "text-gray-400 cursor-not-allowed"
-            : "text-green-600 hover:text-green-900"
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-green-600 hover:text-green-900 cursor-pointer"
             }`}
           title={
             isActive
@@ -281,8 +281,8 @@ export default function Dashboard() {
           }
           disabled={!isActive}
           className={`transition-colors ${!isActive
-            ? "text-gray-400 cursor-not-allowed"
-            : "text-red-600 hover:text-red-900"
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-red-600 hover:text-red-900 cursor-pointer"
             }`}
           title={
             !isActive
@@ -303,8 +303,8 @@ export default function Dashboard() {
           }
           disabled={!isPending}
           className={`transition-colors ${!isPending
-            ? "text-gray-400 cursor-not-allowed"
-            : "text-blue-600 hover:text-blue-900"
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-blue-600 hover:text-blue-900 cursor-pointer"
             }`}
           title={
             !isPending
