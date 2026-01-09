@@ -1,70 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/components/search-results/header";
 import { SearchResultsTripCard } from "@/components/search-results/search-results-trip-card";
 import { AdvancedFilters } from "@/components/search-results/advanced-filters";
 import { DesktopFilterBar } from "@/components/search-results/desktop-filter-bar";
 import { DesktopFilterSidebar } from "@/components/search-results/desktop-filter-sidebar";
 import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
-import { FilterTags } from "@/components/search-results/filter-tags";
 import NoTripsFound from "@/components/search-results/NoTripsFound";
 import { useSearchPublicTripsQuery } from "@/lib/services/trip-search";
-const trips = [
-  {
-    id: 1,
-    title: "Himalayan Adventure Trek",
-    provider: "Mountain Trails",
-    location: "Himachal Pradesh, Leh, Nubra Valley",
-    subLocation: "+2 more",
-    rating: 4.8,
-    days: "5D/4N",
-    dates: "15 Dec - 20 Dec",
-    discount: 0,
-    price: 12999,
-    badges: ["Adventure"],
-    image: "/hampi-ruins-temples.png",
-  }, {
-    id: 2,
-    title: "Himalayans Adventure Trek",
-    provider: "Mountain Trails",
-    location: "Himachal Pradesh, Leh, Nubra Valley",
-    subLocation: "+2 more",
-    rating: 4.8,
-    days: "5D/4N",
-    dates: "15 Dec - 20 Dec",
-    price: 12999,
-    discount: 10,
-    badges: ["trekking"],
-    image: "/hampi-ruins-temples.png",
-  }, {
-    id: 3,
-    title: "Himalayan Adventure Trek",
-    provider: "Mountain Trails",
-    location: "Himachal Pradesh, Leh, Nubra Valley",
-    subLocation: "+2 more",
-    rating: 4.8,
-    days: "5D/4N",
-    dates: "15 Dec - 20 Dec",
-    price: 12999,
-    badges: ["wellness"],
-    image: "/hampi-ruins-temples.png",
-  }, {
-    id: 4,
-    title: "Himalayan Adventure Trek",
-    provider: "Mountain Trails",
-    location: "Himachal Pradesh, Leh, Nubra Valley",
-    subLocation: "+2 more",
-    rating: 4.8,
-    days: "5D/4N",
-    dates: "15 Dec - 20 Dec",
-    price: 12999,
-    discount: 20,
-    badges: ["skygaze"],
-    image: "/hampi-ruins-temples.png",
-  },
-];
 
 const calculateDuration = (startDate: string, endDate: string) => {
   if (!startDate || !endDate) return "-D/-N";
@@ -79,27 +24,39 @@ const calculateDuration = (startDate: string, endDate: string) => {
 
 export default function SearchResultsWithFilters() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const moodsFromUrl = searchParams.get("moods");
-  const destinationFromUrl = searchParams.get("destinationTags");
-  const regionFromUrl = searchParams.get("region");
-  const yearFromUrl = searchParams.get("year");
-  const monthFromUrl = searchParams.get("month");
-
   const moodsAll = searchParams.getAll("moods");
 
   // ---------- INITIAL API CRITERIA ----------
   const [criteria, setCriteria] = useState<any>({
-    month: monthFromUrl ? Number(monthFromUrl) : undefined,
-    year: yearFromUrl ? Number(yearFromUrl) : undefined,
-    destinationTags: destinationFromUrl
-      ? [destinationFromUrl.toLowerCase().replace(/\s+/g, "_")]
-      : [],
-    moods:
-      moodsAll.length > 0
-        ? moodsAll.map((m) => m.replace("-", "_").toLowerCase())
-        : [],
+    month: undefined,
+    year: undefined,
+    destinationTags: [],
+    moods: [],
   });
+
+
+  useEffect(() => {
+    const destination = searchParams.get("destinationTags");
+    const moodsAll = searchParams.getAll("moods");
+    const year = searchParams.get("year");
+    const month = searchParams.get("month");
+
+    setCriteria((prev: any) => ({
+      ...prev,
+      destinationTags: destination
+        ? [destination.toLowerCase().replace(/\s+/g, "_")]
+        : [],
+      moods:
+        moodsAll.length > 0
+          ? moodsAll.map((m) => m.replace("-", "_").toLowerCase())
+          : [],
+      year: year ? Number(year) : undefined,
+      month: month ? Number(month) : undefined,
+    }));
+  }, [searchParams]);
 
   // ---------- UI FILTER TAGS ----------
   let parsedMoods: string[] = moodsAll;
@@ -110,24 +67,35 @@ export default function SearchResultsWithFilters() {
     } catch { }
   }
 
-  const [filters, setFilters] = useState(() => {
+  const [filters, setFilters] = useState<
+    { id: number; label: string }[]
+  >([]);
+  useEffect(() => {
     let list: { id: number; label: string }[] = [];
     let id = 1;
 
-    parsedMoods.forEach((m) => list.push({ id: id++, label: m }));
+    searchParams.getAll("moods").forEach((m) => {
+      list.push({ id: id++, label: m });
+    });
 
-    if (destinationFromUrl)
-      list.push({ id: id++, label: `Destination: ${destinationFromUrl}` });
+    const destination = searchParams.get("destinationTags");
+    if (destination) {
+      list.push({
+        id: id++,
+        label: `Destination: ${destination}`,
+      });
+    }
+    const year = searchParams.get("year");
+    if (year) {
+      list.push({ id: id++, label: `Year: ${year}` });
+    }
+    const month = searchParams.get("month");
+    if (month) {
+      list.push({ id: id++, label: `Month: ${month}` });
+    }
+    setFilters(list);
+  }, [searchParams]);
 
-    if (regionFromUrl)
-      list.push({ id: id++, label: `Region: ${regionFromUrl}` });
-
-    if (yearFromUrl) list.push({ id: id++, label: `Year: ${yearFromUrl}` });
-
-    if (monthFromUrl) list.push({ id: id++, label: `Month: ${monthFromUrl}` });
-
-    return list;
-  });
 
   // ---------- API CALL ----------
   const { data, isLoading, error } = useSearchPublicTripsQuery({
@@ -145,57 +113,31 @@ export default function SearchResultsWithFilters() {
     const filterToRemove = filters.find((f) => f.id === id);
     if (!filterToRemove) return;
 
-    // Update UI filters
-    setFilters((prev) => prev.filter((f) => f.id !== id));
+    const params = new URLSearchParams(searchParams.toString());
+    const label = filterToRemove.label.toLowerCase();
 
-    // Update API criteria based on which filter was removed
-    setCriteria((prev: any) => {
-      const newCriteria = { ...prev };
-      const label = filterToRemove.label.toLowerCase();
+    // mood
+    if (["adventure", "trekking", "wellness", "skygaze", "beach", "spiritual"].some(m => label.includes(m))) {
+      params.delete("moods");
+    }
 
-      // Check if it's a mood filter
-      const moodTypes = ['adventure', 'trekking', 'wellness', 'skygaze', 'cultural', 'wildlife', 'beach', 'spiritual'];
-      if (moodTypes.some(mood => label.includes(mood))) {
-        const moodToRemove = label.replace(/\s+/g, '_');
-        newCriteria.moods = (prev.moods || []).filter((m: string) => m !== moodToRemove);
-      }
-      // Check if it's a destination filter
-      else if (label.startsWith('destination:')) {
-        const destination = label.replace('destination:', '').trim().toLowerCase().replace(/\s+/g, '_');
-        newCriteria.destinationTags = (prev.destinationTags || []).filter((d: string) => d !== destination);
-      }
-      // Check if it's a region filter
-      else if (label.startsWith('region:')) {
-        delete newCriteria.region;
-      }
-      // Check if it's a year filter
-      else if (label.startsWith('year:')) {
-        delete newCriteria.year;
-      }
-      // Check if it's a month filter
-      else if (label.startsWith('month:')) {
-        delete newCriteria.month;
-      }
-      // Check if it's a duration filter
-      else if (label.includes('days')) {
-        delete newCriteria.minDays;
-        delete newCriteria.maxDays;
-      }
+    // destination
+    if (label.startsWith("destination:")) {
+      params.delete("destinationTags");
+    }
 
-      return newCriteria;
-    });
+    if (label.startsWith("year:")) params.delete("year");
+    if (label.startsWith("month:")) params.delete("month");
+
+    router.push(`/home/search-result-with-filter?${params.toString()}`);
   };
+
+
 
   const clearAllFilters = () => {
-    setFilters([]);
-    // Reset criteria to empty state
-    setCriteria({
-      month: undefined,
-      year: undefined,
-      destinationTags: [],
-      moods: [],
-    });
+    router.push("/home/search-result-with-filter");
   };
+
 
   const [showFilters, setShowFilters] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -243,50 +185,27 @@ export default function SearchResultsWithFilters() {
               isOpen={showFilters}
               onClose={() => setShowFilters(false)}
               onApply={(data: any) => {
-                setCriteria((prev: any) => ({
-                  ...prev,
-
-                  // moods - keep original case, just replace spaces
-                  moods: data.moods?.map((m: string) =>
-                    m.replace(/\s+/g, "_")
-                  ) || [],
-
-                  // destinations - keep original case, just replace spaces
-                  destinationTags: data.destinations?.map((d: string) =>
-                    d.replace(/\s+/g, "_")
-                  ) || [],
-
-                  // duration
-                  ...(data.duration === "3-5 Days" && { minDays: 3, maxDays: 5 }),
-                  ...(data.duration === "6-7 Days" && { minDays: 6, maxDays: 7 }),
-                  ...(data.duration === "7+ Days" && { minDays: 7 }),
-
-                  // age (if present)
-                  ...(data.minAge && { minAge: Number(data.minAge) }),
-                  ...(data.maxAge && { maxAge: Number(data.maxAge) }),
-
-                  // budget -> API (only set if non-zero)
-                  ...(data.minBudget && data.minBudget > 0 && { minBudget: Number(data.minBudget) }),
-                  ...(data.maxBudget && data.maxBudget > 0 && { maxBudget: Number(data.maxBudget) }),
-                }));
-
-                // TAGS UI (same)
-                const selectedTags = [
-                  ...data.moods,
-                  data.duration,
-                  data.occupancy,
-                  data.groupType,
-                  ...data.destinations,
-                  ...data.departureCities,
-                ].filter(Boolean);
-
-                setFilters(
-                  selectedTags.map((tag: string, index: number) => ({
-                    id: index + 1,
-                    label: tag,
-                  }))
+                const params = new URLSearchParams();
+                data.moods?.forEach((m: string) =>
+                  params.append("moods", m.toLowerCase().replace(/\s+/g, "_"))
                 );
-
+                data.destinations?.forEach((d: string) =>
+                  params.append("destinationTags", d.toLowerCase().replace(/\s+/g, "_"))
+                );
+                if (data.duration === "3-5 Days") {
+                  params.set("minDays", "3");
+                  params.set("maxDays", "5");
+                }
+                if (data.duration === "6-7 Days") {
+                  params.set("minDays", "6");
+                  params.set("maxDays", "7");
+                }
+                if (data.duration === "7+ Days") {
+                  params.set("minDays", "7");
+                }
+                if (data.minBudget) params.set("minBudget", String(data.minBudget));
+                if (data.maxBudget) params.set("maxBudget", String(data.maxBudget));
+                router.push(`/home/search-result-with-filter?${params.toString()}`);
                 setShowFilters(false);
               }}
 
@@ -354,13 +273,9 @@ export default function SearchResultsWithFilters() {
             onApplyFilters={(data: any) => {
               setCriteria((prev: any) => ({
                 ...prev,
-
-                // moods - keep original case, just replace spaces
                 moods: data.moods?.map((m: string) =>
                   m.replace(/\s+/g, "_")
                 ) || [],
-
-                // destinations - keep original case, just replace spaces
                 destinationTags: data.destinations?.map((d: string) =>
                   d.replace(/\s+/g, "_")
                 ) || [],
@@ -368,30 +283,11 @@ export default function SearchResultsWithFilters() {
                 ...(data.duration === "3-5 Days" && { minDays: 3, maxDays: 5 }),
                 ...(data.duration === "6-7 Days" && { minDays: 6, maxDays: 7 }),
                 ...(data.duration === "7+ Days" && { minDays: 7 }),
-
                 ...(data.minAge && { minAge: Number(data.minAge) }),
                 ...(data.maxAge && { maxAge: Number(data.maxAge) }),
-
-                // budget -> API (only set if non-zero)
                 ...(data.minBudget && data.minBudget > 0 && { minBudget: Number(data.minBudget) }),
                 ...(data.maxBudget && data.maxBudget > 0 && { maxBudget: Number(data.maxBudget) }),
               }));
-
-              const selectedTags = [
-                ...data.moods,
-                data.duration,
-                data.occupancy,
-                data.groupType,
-                ...data.destinations,
-                ...data.departureCities,
-              ].filter(Boolean);
-
-              setFilters(
-                selectedTags.map((tag: string, index: number) => ({
-                  id: index + 1,
-                  label: tag,
-                }))
-              );
 
               setShowFilters(false);
             }}
