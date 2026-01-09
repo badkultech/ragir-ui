@@ -12,6 +12,7 @@ import { TRIP_DETAILS } from "@/lib/constants/strings";
 interface TripHeaderProps {
   onOpenOrganizer: () => void;
   onOpenLeader: () => void;
+  onOpenInviteFriends: () => void;
   moods?: string[];
   tripTitle?: string;
   providerName?: string;
@@ -60,6 +61,7 @@ function formatCity(city: string) {
 
 export default function TripHeader({
   onOpenOrganizer,
+  onOpenInviteFriends,
   onOpenLeader,
   moods = [],
   tripTitle = TRIP_DETAILS.HEADER.TRIP_TITLE_DEFAULT,
@@ -90,12 +92,21 @@ export default function TripHeader({
         </div>
         {/* 👇 mobile icons here */}
         <div className="flex gap-3 mb-3 md:hidden">
-          {[Bookmark, Heart, Share2].map((Icon, i) => (
-            <button key={i} className="p-2 rounded-full border">
-              <Icon className="w-5 h-5" />
-            </button>
-          ))}
+          {[Bookmark, Heart, Share2].map((Icon, i) => {
+            const isShare = Icon === Share2;
+
+            return (
+              <button
+                key={i}
+                onClick={isShare ? onOpenInviteFriends : undefined}
+                className="p-2 rounded-full border"
+              >
+                <Icon className="w-5 h-5" />
+              </button>
+            );
+          })}
         </div>
+
 
         {/* title */}
         <h1 className="text-2xl md:text-3xl font-bold mb-4">
@@ -167,13 +178,22 @@ export default function TripHeader({
       </div>
 
       {/* action icons */}
-      <div className=" hidden md:flex md:mt-12 md:mr-4 gap-2">
-        {[Bookmark, Heart, Share2].map((Icon, i) => (
-          <button key={i} className="p-2 hover:text-gray-600 text-black rounded-full border">
-            <Icon className="w-5 h-5" />
-          </button>
-        ))}
+      <div className="hidden md:flex md:mt-12 md:mr-4 gap-2">
+        {[Bookmark, Heart, Share2].map((Icon, i) => {
+          const isShare = Icon === Share2;
+
+          return (
+            <button
+              key={i}
+              onClick={isShare ? onOpenInviteFriends : undefined}
+              className="p-2 rounded-full border hover:text-gray-600"
+            >
+              <Icon className="w-5 h-5" />
+            </button>
+          );
+        })}
       </div>
+
     </div>
   );
 }
