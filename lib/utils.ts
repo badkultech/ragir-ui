@@ -257,6 +257,7 @@ export const ROUTES = {
   },
   ADMIN: {
     FORGOT_PASSWORD: '/admin/forgot-password',
+    RESET_PASSWORD: '/admin/reset-password',
   },
 } as const;
 
