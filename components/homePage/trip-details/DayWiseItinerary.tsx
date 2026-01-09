@@ -36,7 +36,7 @@ export default function DayWiseItinerary({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto">
+      <div className="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
         {dayTabs.map((day, i) => (
           <button
             key={i}

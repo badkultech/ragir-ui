@@ -3,6 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import { moodMap } from "@/components/search-results/mood-tag";
+import { useRouter } from "next/navigation";
+
+type ExploreDestination = {
+  title: string;
+  trips: number;
+  img: string;
+};
 
 export default function NoTripsFound() {
   const moodsList = [
@@ -23,17 +30,29 @@ export default function NoTripsFound() {
     "Camping",
     "Spiritual",
   ];
-
-  // ⭐ Multiple selection support
-  const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
-
-  const toggleMood = (mood: string) => {
-    setSelectedMoods((prev) =>
-      prev.includes(mood)
-        ? prev.filter((m) => m !== mood) // remove
-        : [...prev, mood] // add
+  const [exploreDestinations, setExploreDestinations] = useState<ExploreDestination[]>([
+    { title: "Himachal Pradesh", trips: 12, img: "/explore-himachal.jpg" },
+    { title: "Rajasthan", trips: 12, img: "/explore-rajasthan.jpg" },
+    { title: "Kerala", trips: 12, img: "/explore-kerala.jpg" },
+    { title: "Goa", trips: 12, img: "/explore-goa.jpg" },
+  ]);
+  const router = useRouter();
+  const handleMoodClick = (mood: string) => {
+    router.push(
+      `/home/search-result-with-filter?moods=${mood
+        .toLowerCase()
+        .replace(/\s+/g, "_")}`
     );
   };
+  const handleDestinationClick = (destination: string) => {
+    router.push(
+      `/home/search-result-with-filter?destinationTags=${destination
+        .toLowerCase()
+        .replace(/\s+/g, "_")}`
+    );
+  };
+
+
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-16">
@@ -56,13 +75,12 @@ export default function NoTripsFound() {
 
         {/* Dummy Explore Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {[
-            { title: "Himachal Pradesh", trips: 12, img: "/explore-himachal.jpg" },
-            { title: "Rajasthan", trips: 12, img: "/explore-rajasthan.jpg" },
-            { title: "Kerala", trips: 12, img: "/explore-kerala.jpg" },
-            { title: "Goa", trips: 12, img: "/explore-goa.jpg" },
-          ].map((item, i) => (
-            <div key={i} className="rounded-xl overflow-hidden shadow bg-white cursor-pointer">
+          {exploreDestinations.map((item, i) => (
+            <div
+              key={i}
+              onClick={() => handleDestinationClick(item.title)}
+              className="rounded-xl overflow-hidden shadow bg-white cursor-pointer"
+            >
               <div className="relative h-24 w-full">
                 <Image src={item.img} alt={item.title} fill className="object-cover" />
               </div>
@@ -74,6 +92,7 @@ export default function NoTripsFound() {
           ))}
         </div>
 
+
         {/* Search by Mood */}
         <h3 className="text-base font-semibold text-[#2d2d2d] mb-3">Search by Mood</h3>
 
@@ -83,12 +102,12 @@ export default function NoTripsFound() {
             const Icon = moodData.icon;
             const GradientBG = moodData.bg;
 
-            const isSelected = selectedMoods.includes(mood);
+            const isSelected = false;
 
             return (
               <button
                 key={i}
-                onClick={() => toggleMood(mood)}
+                onClick={() => handleMoodClick(mood)}
                 className={`
                   relative px-4 py-2 rounded-full text-sm flex items-center gap-2 
                   border cursor-pointer overflow-hidden transition-all
