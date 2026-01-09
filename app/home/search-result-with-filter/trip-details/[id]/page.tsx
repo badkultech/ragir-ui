@@ -21,6 +21,8 @@ import { Footer } from "@/components/search-results/footer";
 import { useTripDetailsQuery } from "@/lib/services/trip-search";
 import { TRIP_DETAILS } from "@/lib/constants/strings";
 import OrganizerProfileModal from "@/components/homePage/trip-details/modal/OrganizerProfileModal";
+import InviteFriendsModal from "@/components/homePage/trip-details/modal/InviteFriendsModal";
+import SendInvitationModal from "@/components/homePage/trip-details/modal/SendInvitationModal";
 
 export default function TripDetailsPage() {
   const { id } = useParams();
@@ -42,6 +44,10 @@ export default function TripDetailsPage() {
     addOns: [],
     finalPrice: 0,
   });
+  const [showInviteFriends, setShowInviteFriends] = useState(false);
+  const [showSendInvitation, setShowSendInvitation] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+
 
   const { data, isLoading, error } = useTripDetailsQuery(id as string);
   if (isLoading) return <p>{TRIP_DETAILS.PAGE.LOADING}</p>;
@@ -69,26 +75,26 @@ export default function TripDetailsPage() {
     payload?.images?.length ? payload.images[0].url : undefined;
   const sidebarImages = payload?.images || [];
 
-const tripName = trip?.name;
-const duration = itinerary?.totalDays
+  const tripName = trip?.name;
+  const duration = itinerary?.totalDays
     ? `${itinerary?.totalDays} Days`
     : "";
-const dates =
-  trip?.startDate && trip?.endDate
-    ? `${trip.startDate} → ${trip.endDate}`
-    : "";
-let price = "";
+  const dates =
+    trip?.startDate && trip?.endDate
+      ? `${trip.startDate} → ${trip.endDate}`
+      : "";
+  let price = "";
 
-if (pricing?.tripPricingType === "SIMPLE") {
-  const base = pricing.simplePricingRequest?.basePrice || 0;
-  const discount = pricing.simplePricingRequest?.discountPercent || 0;
-  const final = base - (base * discount) / 100;
-  price = `₹${Math.round(final).toLocaleString()} / person`;
-}
+  if (pricing?.tripPricingType === "SIMPLE") {
+    const base = pricing.simplePricingRequest?.basePrice || 0;
+    const discount = pricing.simplePricingRequest?.discountPercent || 0;
+    const final = base - (base * discount) / 100;
+    price = `₹${Math.round(final).toLocaleString()} / person`;
+  }
 
-if (pricing?.tripPricingType === "DYNAMIC") {
-  price = "Dynamic pricing (based on options)";
-}
+  if (pricing?.tripPricingType === "DYNAMIC") {
+    price = "Dynamic pricing (based on options)";
+  }
 
 
   return (
@@ -111,6 +117,7 @@ if (pricing?.tripPricingType === "DYNAMIC") {
               <TripHeader
                 onOpenOrganizer={() => setShowOrganizer(true)}
                 onOpenLeader={() => setShowLeader(true)}
+                onOpenInviteFriends={() => setShowInviteFriends(true)}
                 moods={trip?.moodTags || []}
                 tripTitle={trip?.name}
                 providerName={organizer?.organizerName}
@@ -190,15 +197,15 @@ if (pricing?.tripPricingType === "DYNAMIC") {
       )}
 
       {showAsk && (
-  <AskQuestionModal
-    onClose={() => setShowAsk(false)}
-    tripPublicId={trip?.publicId}
-    tripName={tripName}
-    duration={duration}
-    dates={dates}
-    price={price}
-  />
-)}
+        <AskQuestionModal
+          onClose={() => setShowAsk(false)}
+          tripPublicId={trip?.publicId}
+          tripName={tripName}
+          duration={duration}
+          dates={dates}
+          price={price}
+        />
+      )}
 
       {showReport && (
         <ReportModal
@@ -221,6 +228,31 @@ if (pricing?.tripPricingType === "DYNAMIC") {
           }}
         />
       )}
+
+      {showInviteFriends && (
+        <InviteFriendsModal
+          onClose={() => setShowInviteFriends(false)}
+          onNext={(email) => {
+            setInviteEmail(email);
+            setShowInviteFriends(false);
+            setShowSendInvitation(true);
+          }}
+        />
+      )}
+
+      {showSendInvitation && (
+        <SendInvitationModal
+          email={inviteEmail}
+          trip={{
+            name: tripName,
+            duration: duration,
+            dates: dates,
+            price: price,
+          }}
+          onClose={() => setShowSendInvitation(false)}
+        />
+      )}
+
 
 
       {showMobilePricing && (
