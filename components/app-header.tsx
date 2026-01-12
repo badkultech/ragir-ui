@@ -1,7 +1,7 @@
 "use client";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { Menu } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Menu } from "lucide-react";
 
 // Profile dropdowns
 import { SuperAdminProfileDropdown } from "./profileDropdowns/superAdminProfileDropdown";
@@ -15,12 +15,14 @@ import { UserNotificationDropdown } from "./notificationDropdowns/userNotificati
 import { ManagerNotificationDropdown } from "./notificationDropdowns/managerNotificationDropdown";
 import { DefaultNotificationDropdown } from "./notificationDropdowns/defaultNotificationDropdown";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { useRouter } from "next/navigation";
 
 type AppHeaderProps = {
   title?: string;
   showAvatar?: boolean;
   showLogo?: boolean;
-  onMenuClick?: () => void; // 👈 new prop
+  onMenuClick?: () => void;
+  showBackArrow?: boolean;
 };
 
 // Define props interface outside component to avoid conflicts
@@ -35,9 +37,11 @@ export function AppHeader({
   showAvatar = true,
   showLogo = false,
   onMenuClick,
+  showBackArrow = false,
 }: AppHeaderProps) {
   const { userData } = useSelector(selectAuthState);
   const organizationId = useOrganizationId();
+  const router = useRouter();
 
   // Lookup objects for role-based components
   const PROFILE_DROPDOWNS: Record<string, React.FC> = {
@@ -73,6 +77,15 @@ export function AppHeader({
           <div className="flex items-center">
             <img src="/logo.png" alt="Ragir" className="h-8" />
           </div>
+        )}
+        
+        {showBackArrow && (
+          <button
+            onClick={() => router.back()}
+            className="p-2 rounded-md hover:bg-gray-100 "
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-700" />
+          </button>
         )}
 
         {/* Title */}
