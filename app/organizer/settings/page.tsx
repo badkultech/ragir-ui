@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +17,12 @@ import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { useChangePasswordMutation } from "@/lib/services/login";
 import { showApiError, showSuccess, showError } from "@/lib/utils/toastHelpers";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import { useLazyGetOrganizerProfileQuery } from "@/lib/services/organizer";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { organizerState, setLogoFile, setProfile } from "../-organizer-slice";
+import { EMPTY_DOCUMENT } from "@/hooks/useDocumentsManager";
 
 export default function SettingsPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -36,6 +40,31 @@ export default function SettingsPage() {
     const [changePassword, { isLoading }] = useChangePasswordMutation();
     const { userData } = useSelector(selectAuthState);
     const email = userData?.email ?? "";
+    const organizationId = useOrganizationId();
+    const dispatch = useDispatch();
+    const { profile, logoFile } = useSelector(organizerState);
+    const [getOrgProfile, { isLoading: getOrgProfileLoading }] = useLazyGetOrganizerProfileQuery();
+
+    useEffect(() => {
+        if (!organizationId) return;
+
+        getOrgProfile({ organizationId }).then((res) => {
+            if (!res?.data) return;
+
+            const data = res.data;
+
+            dispatch(
+                setProfile({
+                    organizerName: data.organizerName ?? "",
+                    tagline: data.tagline ?? "",
+                    description: data.description ?? "",
+                    mobileNumber: data.mobileNumber ?? "",
+                })
+            );
+
+            dispatch(setLogoFile(data.displayPicture ?? EMPTY_DOCUMENT));
+        });
+    }, [organizationId]);
 
     // 🧠 password rule checks
     // ✅ Password strength & validation rules
@@ -118,10 +147,11 @@ export default function SettingsPage() {
                             {/* Image Upload */}
                             <div className="flex flex-col sm:flex-row items-center gap-4">
                                 <img
-                                    src="/images/profile.png"
+                                    src={logoFile?.url || "/images/profile.png"}
                                     alt="Profile"
                                     className="w-20 h-20 rounded-full object-cover"
                                 />
+
                                 <div>
                                     <Button
                                         variant="outline"
@@ -138,19 +168,10 @@ export default function SettingsPage() {
 
                             {/* Input Fields */}
                             <div className="grid sm:grid-cols-2 gap-4">
-                                <Input
-                                    placeholder="Organization Name"
-                                    defaultValue="Ragir Adventures"
-                                />
-                                <Input
-                                    placeholder="Contact Person"
-                                    defaultValue="Rahul Sharma"
-                                />
-                                <Input
-                                    placeholder="Email Address"
-                                    defaultValue="rahul@ragir.in"
-                                />
-                                <Input placeholder="Phone No." defaultValue="+91 98765 43210" />
+                                <Input placeholder="Organizer Name" value={profile.organizerName} onChange={(e) => dispatch(setProfile({ ...profile, organizerName: e.target.value }))} />
+                                <Input placeholder="Tagline" value={profile.tagline} onChange={(e) => dispatch(setProfile({ ...profile, tagline: e.target.value }))} />
+                                <Input placeholder="Description" value={profile.description} onChange={(e) => dispatch(setProfile({ ...profile, description: e.target.value }))} />
+                                <Input placeholder="Mobile Number" value={profile.mobileNumber} onChange={(e) => dispatch(setProfile({ ...profile, mobileNumber: e.target.value }))} />
                             </div>
                         </CardContent>
                     </Card>
