@@ -265,7 +265,13 @@ export default function PricingPage() {
       // COMMON FIELDS
       fd.append("includesGst", gst === "includes" ? "true" : "false");
       fd.append("depositRequiredPercent", String(Number(depositPercent || 0)));
-      fd.append("creditOptions", credit.card ? "CREDIT_CARD" : "EMI");
+      // CREDIT OPTIONS (SAFE)
+      if (credit.card) {
+        fd.append("creditOptions", "CREDIT_CARD");
+      } else if (credit.emi) {
+        fd.append("creditOptions", "EMI");
+      }
+
       fd.append("cancellationPolicy", policy || "");
       fd.append("tripPricingType", mode === "simple" ? "SIMPLE" : "DYNAMIC");
 
@@ -564,7 +570,7 @@ export default function PricingPage() {
                     {errors.depositPercent && (
                       <p className="text-red-500 text-xs">{errors.depositPercent}</p>
                     )}
-                    <Label>Credit Options</Label>
+                    <Label>EMI Options</Label>
                     <CreditOptions value={credit} onChange={setCredit} />
 
                     <Label>Cancellation Policy</Label>
