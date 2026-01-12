@@ -124,7 +124,7 @@ export default function ReviewPage() {
         description: "Your trip has been submitted successfully.",
       });
 
-      router.push('/organizer');
+      router.push('/organizer/dashboard');
     } catch (e) {
       console.error('Review submit error:', e);
       toast({
