@@ -1,12 +1,16 @@
 "use client";
 
 import { X, Info } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TRIP_DETAILS } from "@/lib/constants/strings";
 import { useCreatePublicTripQueryMutation } from "@/lib/services/organizer/trip/queries";
 import { Input } from "@/components/ui/input";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import { toast } from "@/hooks/use-toast";
+import { useGetTravelerProfileQuery } from "@/lib/services/user";
+import { useAuthActions } from "@/hooks/useAuthActions";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
+
 
 export default function AskQuestionModal({
   onClose,
@@ -23,6 +27,8 @@ export default function AskQuestionModal({
   price?: string;
   dates?: string;
 }) {
+  const { isLoggedIn, userData } = useAuthActions();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -30,6 +36,8 @@ export default function AskQuestionModal({
     category: "",
     query: "",
   });
+
+  const organizationId = useOrganizationId();
 
   const [createQuery, { isLoading }] =
     useCreatePublicTripQueryMutation();
@@ -39,6 +47,31 @@ export default function AskQuestionModal({
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  const { data: travelerProfile } = useGetTravelerProfileQuery(
+    {
+      organizationId: organizationId,
+      userPublicId: userData?.userPublicId!,
+    },
+    {
+      skip: !isLoggedIn || !userData?.userPublicId,
+    }
+  );
+
+  useEffect(() => {
+    if (!travelerProfile) return;
+
+    setForm((prev) => ({
+      ...prev,
+      name:
+        [travelerProfile.firstName, travelerProfile.lastName]
+          .filter(Boolean)
+          .join(" ") || prev.name,
+      email: travelerProfile.email || prev.email,
+      phone: travelerProfile.mobileNumber || prev.phone,
+    }));
+  }, [travelerProfile]);
+
 
   const handleSubmit = async () => {
     if (!form.query.trim()) return;

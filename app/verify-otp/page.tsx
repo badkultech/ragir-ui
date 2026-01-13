@@ -13,8 +13,11 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "@/lib/slices/auth";
 import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { useAuthGuardContext } from "@/context/AuthGuardContext";
 
 export default function VerifyOTPPage() {
+  const { resumePendingAction, clearPendingAction } = useAuthGuardContext(); // 🔥 ADDED
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,27 +75,39 @@ export default function VerifyOTPPage() {
         identifier: phoneNumber,
         otp: otp.join(""),
         type: "MOBILE",
-        userPublicId: userPublicId,
+        userPublicId,
       }).unwrap();
 
       if (result.accessToken && result.refreshToken) {
         localStorage.setItem("accessToken", result.accessToken);
         localStorage.setItem("refreshToken", result.refreshToken);
       }
+
       dispatch(
         setCredentials({
           accessToken: result.accessToken || null,
           refreshToken: result.refreshToken || null,
         })
       );
-      router.replace("/traveler/profile");
+
+      resumePendingAction();
+
+      const redirectUrl = sessionStorage.getItem("postLoginRedirect");
+
+      if (redirectUrl) {
+        sessionStorage.removeItem("postLoginRedirect");
+        router.replace(redirectUrl);   // 🔥 GO BACK TO TRIP PAGE
+      } else {
+        router.back(); // fallback (keeps existing behavior)
+      }
+      // 🔥 KEEP YOUR FLOW
     } catch (err) {
-      console.error("❌ OTP validation failed", err);
       showApiError(err as FetchBaseQueryError);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleResendOtp = async () => {
     if (!phoneNumber) return;
@@ -113,7 +128,11 @@ export default function VerifyOTPPage() {
     }
   };
 
-  const handleBack = () => router.back();
+  const handleBack = () => {
+    clearPendingAction();             // 🔥 ADDED (OPTIONAL SAFETY)
+    router.back();
+  };
+
 
   return (
     <div
@@ -180,7 +199,7 @@ export default function VerifyOTPPage() {
                 )}
               </div>
 
-              <div className="space-y-3">
+              <div className="flex gap-3">
                 <GradientButton
                   variant="secondary"
                   onClick={handleBack}
@@ -193,12 +212,12 @@ export default function VerifyOTPPage() {
                 <GradientButton
                   onClick={handleVerify}
                   disabled={otp.some((digit) => !digit)} // disables if any digit is empty
-                  className={`flex items-center justify-center gap-2 ${otp.some((digit) => !digit)
+                  className={`flex items-center justify-center gap-2 flex-1 ${otp.some((digit) => !digit)
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                     }`}
                 >
-                  Verify and Continue
+                  Verify and continue
                   <ArrowRight className="h-5 w-5" />
                 </GradientButton>
               </div>

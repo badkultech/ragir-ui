@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import HeroSection from "@/components/homePage/trip-details/HeroSection";
 import TripHeader from "@/components/homePage/trip-details/TripHeader";
@@ -24,8 +24,8 @@ import OrganizerProfileModal from "@/components/homePage/trip-details/modal/Orga
 import InviteFriendsModal from "@/components/homePage/trip-details/modal/InviteFriendsModal";
 import SendInvitationModal from "@/components/homePage/trip-details/modal/SendInvitationModal";
 import { useAuthActions } from "@/hooks/useAuthActions";
-import { menuItems, userMenuItems, notificationsData } from "@/app/home/constants";
-import { showError } from "@/lib/utils/toastHelpers";
+import { notificationsData } from "@/app/home/constants";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 
 export default function TripDetailsPage() {
@@ -36,6 +36,8 @@ export default function TripDetailsPage() {
     addOns: string[];
     finalPrice: number;
   };
+
+
   const [activeDay, setActiveDay] = useState(0);
   const [showReport, setShowReport] = useState(false);
   const [showAsk, setShowAsk] = useState(false);
@@ -56,7 +58,7 @@ export default function TripDetailsPage() {
   const [notificationsList, setNotificationsList] = useState(notificationsData);
   const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
 
-
+  const { requireAuth } = useAuthGuard(isLoggedIn);
   const { data, isLoading, error } = useTripDetailsQuery(id as string);
   if (isLoading) return <p>{TRIP_DETAILS.PAGE.LOADING}</p>;
   if (error) return <p>{TRIP_DETAILS.PAGE.ERROR}</p>;
@@ -132,13 +134,9 @@ export default function TripDetailsPage() {
                 onOpenOrganizer={() => setShowOrganizer(true)}
                 onOpenLeader={() => setShowLeader(true)}
                 onOpenInviteFriends={() => {
-                  if (!isLoggedIn) {
-                    showError("Please login to continue");
-                    setAuthStep("PHONE");
-                    return;
-                  }
-
-                  setShowInviteFriends(true);
+                  requireAuth(() => {
+                    setShowInviteFriends(true);
+                  });
                 }}
                 moods={trip?.moodTags || []}
                 tripTitle={trip?.name}
@@ -190,28 +188,21 @@ export default function TripDetailsPage() {
 
             {/* RIGHT */}
             <DesktopSidebar
-              onAsk={() => {
-                if (!isLoggedIn) {
-                  setAuthStep("PHONE");
-                  return;
-                }
-                setShowAsk(true);
-              }}
+              onAsk={() =>
+                requireAuth(() => {
+                  setShowAsk(true);
+                })
+              }
+
               pricing={pricing}
               images={sidebarImages}
-              onRequestInvite={(data) => {
-                if (!isLoggedIn) {
-                  showError("Please login to continue");
-                  setAuthStep("PHONE");
-                  return;
-                }
-
-                setSelectedPricing(data);
-                setShowPricingDetails(true);
-              }}
-
+              onRequestInvite={(data) =>
+                requireAuth(() => {
+                  setSelectedPricing(data);
+                  setShowPricingDetails(true);
+                })
+              }
             />
-
           </div>
         </div>
       </main>
@@ -293,19 +284,19 @@ export default function TripDetailsPage() {
 
       {showMobilePricing && (
         <MobilePricingModal
-          onAsk={() => {
-            if (!isLoggedIn) {
-              setAuthStep("PHONE");
-              return;
-            }
-            setShowAsk(true);
-          }}
+          onAsk={() =>
+            requireAuth(() => {
+              setShowAsk(true);
+            })
+          }
           options={pricing}
           onClose={() => setShowMobilePricing(false)}
           onRequestInvite={(data) => {
-            setSelectedPricing(data);
-            setShowMobilePricing(false);
-            setShowPricingDetails(true);
+            requireAuth(() => {
+              setSelectedPricing(data);
+              setShowMobilePricing(false);
+              setShowPricingDetails(true);
+            })
           }}
         />
 

@@ -5,6 +5,7 @@ import HydratedAuth from "@/components/AuthLoader";
 import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { AuthGuardProvider } from "@/context/AuthGuardContext";
 
 export const metadata = {
   title: "Ragir - Organizer Dashboard",
@@ -33,10 +34,12 @@ export default function RootLayout({
       <body className={`${poppins.variable} ${barlow.variable} font-poppins antialiased`}>
         <ReduxProvider>
           <HydratedAuth>
-            {children}
-            <Analytics />
-            <SpeedInsights />
-            <Toaster />
+            <AuthGuardProvider>
+              {children}
+              <Analytics />
+              <SpeedInsights />
+              <Toaster />
+            </AuthGuardProvider>
           </HydratedAuth>
         </ReduxProvider>
       </body>

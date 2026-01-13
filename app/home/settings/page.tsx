@@ -11,7 +11,6 @@ import SecurityTab from "@/components/search-results/settings/SecurityTab";
 import LogoutModal from "@/components/search-results/settings/LogoutModal";
 import DeactivateModal from "@/components/search-results/settings/DeactivateModal";
 import DeleteModal from "@/components/search-results/settings/DeleteModal";
-import { useRouter } from "next/navigation";
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { menuItems, notificationsData, userMenuItems } from "../constants";
 
