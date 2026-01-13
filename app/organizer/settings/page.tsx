@@ -22,6 +22,7 @@ import { selectAuthState } from "@/lib/slices/auth";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useGetTravelerProfileQuery, useUpdateTravelerProfileFormMutation } from "@/lib/services/user";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useCreateOrganizationPreferenceMutation, useGetOrganizationPreferenceQuery, useUpdateOrganizationPreferenceMutation } from "@/lib/services/organizer/organizationPreference";
 
 export default function SettingsPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -98,6 +99,30 @@ export default function SettingsPage() {
     const [updateTravelerProfile, { isLoading: isUpdating }] =
         useUpdateTravelerProfileFormMutation();
 
+        const {
+  data: orgPreference,
+  isLoading: orgPrefLoading,
+} = useGetOrganizationPreferenceQuery(
+  organizationId ? { organizationId } : skipToken
+);
+const [createOrgPreference, { isLoading: creatingPref }] =
+  useCreateOrganizationPreferenceMutation();
+
+const [updateOrgPreference, { isLoading: updatingPref }] =
+  useUpdateOrganizationPreferenceMutation();
+
+
+useEffect(() => {
+  if (!orgPreference) return;
+
+  setOrganizationPreferences({
+    language: orgPreference.language,
+    currency: orgPreference.currency,
+    timezone: orgPreference.timezone,
+    dateFormat: orgPreference.dateFormat,
+  });
+}, [orgPreference]);
+
 
     useEffect(() => {
         if (!travelerProfile) return;
@@ -137,6 +162,35 @@ export default function SettingsPage() {
             showApiError(error);
         }
     };
+
+    const handleSaveOrganizationPreference = async () => {
+  if (!organizationId) return;
+
+  try {
+    if (orgPreference?.id) {
+      // ✅ UPDATE (PUT)
+      await updateOrgPreference({
+        organizationId,
+        body: {
+          id: orgPreference.id,
+          ...organizationPreferences,
+        },
+      }).unwrap();
+
+      showSuccess("Organization preferences updated");
+    } else {
+      // ✅ CREATE (POST)
+      await createOrgPreference({
+        organizationId,
+        body: organizationPreferences,
+      }).unwrap();
+
+      showSuccess("Organization preferences saved");
+    }
+  } catch (error) {
+    showApiError(error);
+  }
+};
 
 
     const [changePassword, { isLoading }] = useChangePasswordMutation();
@@ -387,14 +441,7 @@ export default function SettingsPage() {
 
                             {/* Save Button */}
                             <div className="flex justify-end">
-                                <Button
-                                    onClick={() => {
-                                        // call save preferences API
-                                        console.log("Saving preferences:", organizationPreferences);
-                                    }}
-                                >
-                                    Save Preferences
-                                </Button>
+                                <Button onClick={handleSaveOrganizationPreference} disabled={creatingPref || updatingPref} > {creatingPref || updatingPref ? "Saving..." : "Save Preferences"} </Button>
                             </div>
                         </CardContent>
                     </Card>

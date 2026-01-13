@@ -9,6 +9,7 @@ export const TAGS = {
   users: 'users',
   admins: 'admins',
   organizations: 'organizations',
+  organizationPreference: 'organizationPreference',
   orgs: 'org',
   trip: 'trip',
   myTrips: 'myTrips',

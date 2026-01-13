@@ -78,6 +78,9 @@ export const ENDPOINTS = {
   ORGANIZATION_SUSPEND: (publicId: string) => `/org/${publicId}/deactivate`,
   ORGANIZATION_RESEND_INVITE: (publicId: string) =>
     `/org/${publicId}/resend-invite`,
+  ORGANIZATION_PREFERENCE: (organizationId: string) =>
+  `/org/${organizationId}/organization-preference`,
+
 
   // Notifications
   USER_NOTIFICATIONS: (organizationId: string, userId: string) =>
