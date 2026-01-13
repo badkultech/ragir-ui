@@ -167,17 +167,7 @@ export default function SettingsPage() {
                     {/* Header */}
                     <div className="flex justify-between items-center">
                         <h1 className="text-2xl font-semibold">Settings</h1>
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="outline"
-                                className="border-gray-300 text-gray-700 hover:bg-gray-100"
-                            >
-                                Discard
-                            </Button>
-                            <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                                Save Changes
-                            </Button>
-                        </div>
+
                     </div>
 
                     {/* Profile Settings */}
@@ -215,11 +205,14 @@ export default function SettingsPage() {
                                 <Input placeholder="Description" value={profile.description} onChange={(e) => dispatch(setProfile({ ...profile, description: e.target.value }))} />
                                 <Input placeholder="Mobile Number" value={profile.mobileNumber} onChange={(e) => dispatch(setProfile({ ...profile, mobileNumber: e.target.value }))} />
                             </div>
+                            <div className="flex items-center gap-3 justify-end">
+                                <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+                                    Save Changes
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
 
-                    {/* Notification Preferences */}
-                    {/* Notification Preferences */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Notification Preferences</CardTitle>
@@ -251,11 +244,22 @@ export default function SettingsPage() {
                                     />
                                 </div>
                             ))}
+
+                            {/* Save Button */}
+                            <div className="flex justify-end">
+                                <Button
+                                    onClick={() => {
+                                        // call save preferences API
+                                        console.log("Saving preferences:", organizationPreferences);
+                                    }}
+                                >
+                                    Save Preferences
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
 
 
-                    {/* Account Preferences */}
                     {/* Account Preferences */}
                     <Card>
                         <CardHeader>
