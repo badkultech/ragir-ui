@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Header } from "@/components/search-results/header";
 import { SearchResultsTripCard } from "@/components/search-results/search-results-trip-card";
 import { AdvancedFilters } from "@/components/search-results/advanced-filters";
 import { DesktopFilterBar } from "@/components/search-results/desktop-filter-bar";
@@ -10,6 +9,7 @@ import { DesktopFilterSidebar } from "@/components/search-results/desktop-filter
 import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
 import NoTripsFound from "@/components/search-results/NoTripsFound";
 import { useSearchPublicTripsQuery } from "@/lib/services/trip-search";
+import { AppHeader } from "@/components/app-header";
 
 const calculateDuration = (startDate: string, endDate: string) => {
   if (!startDate || !endDate) return "-D/-N";
@@ -156,7 +156,7 @@ export default function SearchResultsWithFilters() {
   return (
     <>
       <div className="min-h-screen bg-[#f5f3f0]">
-        <Header title="Search Results" />
+        <AppHeader title="Search Results" showBackArrow={true} />
 
         {/* DESKTOP FILTER BAR */}
         <DesktopFilterBar
@@ -239,13 +239,14 @@ export default function SearchResultsWithFilters() {
                       dates={`${trip.startDate} — ${trip.endDate}`}
                       price={trip.startingPrice || 0}
                       image={
-                        trip.bannerImageUrl ||
+                        trip.document?.url ||
                         "/hampi-ruins-temples.png"
                       }
-                      badges={[
-                        ...(trip.moodTags || []),
-                        ...(trip.destinationTags || []),
-                      ]}
+
+                  badges={[
+                    ...(trip.moodTags || []),
+                    ...(trip.destinationTags || []),
+                  ]}
                     />
                   ))}
                 </div>

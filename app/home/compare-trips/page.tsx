@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
-import { Header } from "@/components/search-results/header"
+import { AppHeader } from "@/components/app-header"
 
 interface TripData {
     id: number
@@ -87,7 +87,7 @@ export default function CompareTripsPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <Header title="Compare Trips" />
+            <AppHeader title="Compare Trips" showBackArrow={true} />
 
             {/* Comparison Table */}
             <main className="max-w-6xl mx-auto p-4 md:p-6 overflow-x-auto">

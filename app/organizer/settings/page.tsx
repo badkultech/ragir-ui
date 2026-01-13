@@ -29,8 +29,50 @@ export default function SettingsPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [bookingAlerts, setBookingAlerts] = useState(true);
-    const [queryAlerts, setQueryAlerts] = useState(true);
+    type NotificationPreference = {
+        categoryCode: "NEW_BOOKING" | "NEW_QUERY" | "NEW_LEAD";
+        title: string;
+        description: string;
+        channel: "IN_APP";
+        enabled: boolean;
+    };
+    type OrganizationPreference = {
+        language: string;
+        currency: string;
+        timezone: string;
+        dateFormat: string;
+    };
+
+    const [organizationPreferences, setOrganizationPreferences] = useState<OrganizationPreference>({
+        language: "English",
+        currency: "INR",
+        timezone: "IST",
+        dateFormat: "DD/MM/YYYY",
+    });
+    const [preferences, setPreferences] = useState<NotificationPreference[]>([
+        {
+            categoryCode: "NEW_LEAD",
+            title: "New Lead Alerts",
+            description: "Get notified when someone creates a lead",
+            channel: "IN_APP",
+            enabled: true,
+        },
+        {
+            categoryCode: "NEW_BOOKING",
+            title: "New Booking Alerts",
+            description: "Get notified when someone books a trip",
+            channel: "IN_APP",
+            enabled: true,
+        },
+        {
+            categoryCode: "NEW_QUERY",
+            title: "Query Notifications",
+            description: "Receive alerts for new user queries",
+            channel: "IN_APP",
+            enabled: true,
+        },
+    ]);
+
 
     // password states
     const [currentPassword, setCurrentPassword] = useState("");
@@ -125,17 +167,7 @@ export default function SettingsPage() {
                     {/* Header */}
                     <div className="flex justify-between items-center">
                         <h1 className="text-2xl font-semibold">Settings</h1>
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="outline"
-                                className="border-gray-300 text-gray-700 hover:bg-gray-100"
-                            >
-                                Discard
-                            </Button>
-                            <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                                Save Changes
-                            </Button>
-                        </div>
+
                     </div>
 
                     {/* Profile Settings */}
@@ -173,81 +205,165 @@ export default function SettingsPage() {
                                 <Input placeholder="Description" value={profile.description} onChange={(e) => dispatch(setProfile({ ...profile, description: e.target.value }))} />
                                 <Input placeholder="Mobile Number" value={profile.mobileNumber} onChange={(e) => dispatch(setProfile({ ...profile, mobileNumber: e.target.value }))} />
                             </div>
+                            <div className="flex items-center gap-3 justify-end">
+                                <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+                                    Save Changes
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
 
-                    {/* Notification Preferences */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Notification Preferences</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="font-medium text-gray-800">New Booking Alerts</p>
-                                    <p className="text-sm text-gray-500">
-                                        Get notified when someone books a trip
-                                    </p>
-                                </div>
-                                <Switch
-                                    checked={bookingAlerts}
-                                    onCheckedChange={setBookingAlerts}
-                                />
-                            </div>
 
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="font-medium text-gray-800">
-                                        Query Notifications
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        Receive alerts for new user queries
-                                    </p>
+                        <CardContent className="space-y-4">
+                            {preferences.map((pref) => (
+                                <div
+                                    key={`${pref.categoryCode}-${pref.channel}`}
+                                    className="flex items-center justify-between"
+                                >
+                                    <div>
+                                        <p className="font-medium text-gray-800">{pref.title}</p>
+                                        <p className="text-sm text-gray-500">{pref.description}</p>
+                                    </div>
+
+                                    <Switch
+                                        checked={pref.enabled}
+                                        onCheckedChange={(checked) =>
+                                            setPreferences((prev) =>
+                                                prev.map((p) =>
+                                                    p.categoryCode === pref.categoryCode &&
+                                                        p.channel === pref.channel
+                                                        ? { ...p, enabled: checked }
+                                                        : p
+                                                )
+                                            )
+                                        }
+                                    />
                                 </div>
-                                <Switch
-                                    checked={queryAlerts}
-                                    onCheckedChange={setQueryAlerts}
-                                />
+                            ))}
+
+                            {/* Save Button */}
+                            <div className="flex justify-end">
+                                <Button
+                                    onClick={() => {
+                                        // call save preferences API
+                                        console.log("Saving preferences:", organizationPreferences);
+                                    }}
+                                >
+                                    Save Preferences
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
+
 
                     {/* Account Preferences */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Account Preferences</CardTitle>
                         </CardHeader>
-                        <CardContent className="grid sm:grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-sm font-medium mb-2">Language</p>
-                                <Select defaultValue="English">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Language" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="English">English</SelectItem>
-                                        <SelectItem value="Hindi">Hindi</SelectItem>
-                                    </SelectContent>
-                                </Select>
+
+                        <CardContent className="space-y-6">
+                            <div className="grid sm:grid-cols-2 gap-4">
+                                {/* Language */}
+                                <div>
+                                    <p className="text-sm font-medium mb-2">Language</p>
+                                    <Select
+                                        value={organizationPreferences.language}
+                                        onValueChange={(value) =>
+                                            setOrganizationPreferences((prev) => ({ ...prev, language: value }))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Language" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="English">English</SelectItem>
+                                            <SelectItem value="Hindi">Hindi</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Time Zone */}
+                                <div>
+                                    <p className="text-sm font-medium mb-2">Time Zone</p>
+                                    <Select
+                                        value={organizationPreferences.timezone}
+                                        onValueChange={(value) =>
+                                            setOrganizationPreferences((prev) => ({ ...prev, timezone: value }))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Time Zone" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="IST">IST (GMT +5:30)</SelectItem>
+                                            <SelectItem value="UTC">UTC</SelectItem>
+                                            <SelectItem value="PST">PST (GMT -8:00)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Currency */}
+                                <div>
+                                    <p className="text-sm font-medium mb-2">Currency</p>
+                                    <Select
+                                        value={organizationPreferences.currency}
+                                        onValueChange={(value) =>
+                                            setOrganizationPreferences((prev) => ({ ...prev, currency: value }))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Currency" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="INR">INR (₹)</SelectItem>
+                                            <SelectItem value="USD">USD ($)</SelectItem>
+                                            <SelectItem value="EUR">EUR (€)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Date Format */}
+                                <div>
+                                    <p className="text-sm font-medium mb-2">Date Format</p>
+                                    <Select
+                                        value={organizationPreferences.dateFormat}
+                                        onValueChange={(value) =>
+                                            setOrganizationPreferences((prev) => ({ ...prev, dateFormat: value }))
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Date Format" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                                            <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                                            <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
 
-                            <div>
-                                <p className="text-sm font-medium mb-2">Time Zone</p>
-                                <Select defaultValue="IST">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Time Zone" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="IST">IST (GMT +5:30 AM)</SelectItem>
-                                        <SelectItem value="UTC">UTC</SelectItem>
-                                        <SelectItem value="PST">PST (GMT -8:00)</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                            {/* Save Button */}
+                            <div className="flex justify-end">
+                                <Button
+                                    onClick={() => {
+                                        // call save preferences API
+                                        console.log("Saving preferences:", organizationPreferences);
+                                    }}
+                                >
+                                    Save Preferences
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Security */}
+
+
                     {/* Security */}
                     <Card>
                         <CardHeader>
