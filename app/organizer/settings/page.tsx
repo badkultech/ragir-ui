@@ -19,10 +19,9 @@ import { useChangePasswordMutation } from "@/lib/services/login";
 import { showApiError, showSuccess, showError } from "@/lib/utils/toastHelpers";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
-import { useLazyGetOrganizerProfileQuery } from "@/lib/services/organizer";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { organizerState, setLogoFile, setProfile } from "../-organizer-slice";
-import { EMPTY_DOCUMENT } from "@/hooks/useDocumentsManager";
+import { useGetTravelerProfileQuery, useUpdateTravelerProfileFormMutation } from "@/lib/services/user";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function SettingsPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -78,36 +77,69 @@ export default function SettingsPage() {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-
-    const [changePassword, { isLoading }] = useChangePasswordMutation();
+    const [name, setName] = useState("");
+    const [tagline, setTagline] = useState("");
+    const [email, setEmail] = useState("");
+    const [mobileNumber, setMobileNumber] = useState("");
+    const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
     const { userData } = useSelector(selectAuthState);
-    const email = userData?.email ?? "";
     const organizationId = useOrganizationId();
-    const dispatch = useDispatch();
-    const { profile, logoFile } = useSelector(organizerState);
-    const [getOrgProfile, { isLoading: getOrgProfileLoading }] = useLazyGetOrganizerProfileQuery();
+    const {
+        data: travelerProfile,
+        isLoading: travelerProfileLoading,
+    } = useGetTravelerProfileQuery(
+        organizationId && userData?.userPublicId
+            ? {
+                organizationId,
+                userPublicId: userData.userPublicId,
+            }
+            : skipToken
+    );
+    const [updateTravelerProfile, { isLoading: isUpdating }] =
+        useUpdateTravelerProfileFormMutation();
+
 
     useEffect(() => {
-        if (!organizationId) return;
+        if (!travelerProfile) return;
 
-        getOrgProfile({ organizationId }).then((res) => {
-            if (!res?.data) return;
+        setName(
+            `${travelerProfile.firstName ?? ""} ${travelerProfile.lastName ?? ""}`.trim()
+        );
+        setTagline(travelerProfile.tagline ?? "");
+        setEmail(travelerProfile.email ?? "");
+        setMobileNumber(travelerProfile.mobileNumber ?? "");
+        setProfileImageUrl(travelerProfile.profileImageUrl ?? null);
 
-            const data = res.data;
 
-            dispatch(
-                setProfile({
-                    organizerName: data.organizerName ?? "",
-                    tagline: data.tagline ?? "",
-                    description: data.description ?? "",
-                    mobileNumber: data.mobileNumber ?? "",
-                })
-            );
+    }, [travelerProfile]);
 
-            dispatch(setLogoFile(data.displayPicture ?? EMPTY_DOCUMENT));
-        });
-    }, [organizationId]);
+    const handleUpdateProfile = async () => {
+        try {
+            if (!organizationId || !userData?.userPublicId) return;
 
+            const [firstName, ...rest] = name.trim().split(" ");
+            const lastName = rest.join(" ");
+
+            await updateTravelerProfile({
+                organizationId,
+                userPublicId: userData.userPublicId,
+                body: {
+                    firstName: firstName || null,
+                    lastName: lastName || null,
+                    tagline: tagline || null,
+                    email: email || null,
+                    mobileNumber: mobileNumber || null,
+                },
+            }).unwrap();
+
+            showSuccess("Profile updated successfully");
+        } catch (error) {
+            showApiError(error);
+        }
+    };
+
+
+    const [changePassword, { isLoading }] = useChangePasswordMutation();
     // 🧠 password rule checks
     // ✅ Password strength & validation rules
     const rules = useMemo(() => {
@@ -179,7 +211,7 @@ export default function SettingsPage() {
                             {/* Image Upload */}
                             <div className="flex flex-col sm:flex-row items-center gap-4">
                                 <img
-                                    src={logoFile?.url || "/images/profile.png"}
+                                    src={profileImageUrl || "/images/profile.png"}
                                     alt="Profile"
                                     className="w-20 h-20 rounded-full object-cover"
                                 />
@@ -200,15 +232,20 @@ export default function SettingsPage() {
 
                             {/* Input Fields */}
                             <div className="grid sm:grid-cols-2 gap-4">
-                                <Input placeholder="Organizer Name" value={profile.organizerName} onChange={(e) => dispatch(setProfile({ ...profile, organizerName: e.target.value }))} />
-                                <Input placeholder="Tagline" value={profile.tagline} onChange={(e) => dispatch(setProfile({ ...profile, tagline: e.target.value }))} />
-                                <Input placeholder="Description" value={profile.description} onChange={(e) => dispatch(setProfile({ ...profile, description: e.target.value }))} />
-                                <Input placeholder="Mobile Number" value={profile.mobileNumber} onChange={(e) => dispatch(setProfile({ ...profile, mobileNumber: e.target.value }))} />
+                                <Input placeholder="Organizer Name" value={name} onChange={(e) => setName(e.target.value)} />
+                                <Input placeholder="Tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} />
+                                <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <Input placeholder="Mobile Number" value={mobileNumber} onChange={(e) => setMobileNumber(e.target.value)} />
                             </div>
                             <div className="flex items-center gap-3 justify-end">
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                                    Save Changes
+                                <Button
+                                    onClick={handleUpdateProfile}
+                                    disabled={isUpdating}
+                                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                                >
+                                    {isUpdating ? "Saving..." : "Save Changes"}
                                 </Button>
+
                             </div>
                         </CardContent>
                     </Card>
