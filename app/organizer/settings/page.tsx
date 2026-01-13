@@ -23,6 +23,7 @@ import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useGetTravelerProfileQuery, useUpdateTravelerProfileFormMutation } from "@/lib/services/user";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useCreateOrganizationPreferenceMutation, useGetOrganizationPreferenceQuery, useUpdateOrganizationPreferenceMutation } from "@/lib/services/organizer/organizationPreference";
+import { useGetOrganizationNotificationPreferencesQuery, useSaveOrganizationNotificationPreferenceMutation } from "@/lib/services/superadmin/notification";
 
 export default function SettingsPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -99,29 +100,50 @@ export default function SettingsPage() {
     const [updateTravelerProfile, { isLoading: isUpdating }] =
         useUpdateTravelerProfileFormMutation();
 
-        const {
-  data: orgPreference,
-  isLoading: orgPrefLoading,
-} = useGetOrganizationPreferenceQuery(
-  organizationId ? { organizationId } : skipToken
-);
-const [createOrgPreference, { isLoading: creatingPref }] =
-  useCreateOrganizationPreferenceMutation();
+    const {
+        data: orgPreference,
+        isLoading: orgPrefLoading,
+    } = useGetOrganizationPreferenceQuery(
+        organizationId ? { organizationId } : skipToken
+    );
+    const [createOrgPreference, { isLoading: creatingPref }] =
+        useCreateOrganizationPreferenceMutation();
 
-const [updateOrgPreference, { isLoading: updatingPref }] =
-  useUpdateOrganizationPreferenceMutation();
+    const [updateOrgPreference, { isLoading: updatingPref }] =
+        useUpdateOrganizationPreferenceMutation();
+    const {
+        data: orgNotificationPreferences,
+        isLoading: orgNotificationPrefLoading,
+    } = useGetOrganizationNotificationPreferencesQuery(
+        organizationId ? { organizationId } : skipToken
+    );
+
+    const [
+        saveOrgNotificationPreference,
+        { isLoading: savingNotificationPref },
+    ] = useSaveOrganizationNotificationPreferenceMutation();
 
 
-useEffect(() => {
-  if (!orgPreference) return;
+    const CATEGORY_ID_MAP: Record<
+        "NEW_LEAD" | "NEW_BOOKING" | "NEW_QUERY",
+        number
+    > = {
+        NEW_LEAD: 1,
+        NEW_BOOKING: 2,
+        NEW_QUERY: 3,
+    };
 
-  setOrganizationPreferences({
-    language: orgPreference.language,
-    currency: orgPreference.currency,
-    timezone: orgPreference.timezone,
-    dateFormat: orgPreference.dateFormat,
-  });
-}, [orgPreference]);
+
+    useEffect(() => {
+        if (!orgPreference) return;
+
+        setOrganizationPreferences({
+            language: orgPreference.language,
+            currency: orgPreference.currency,
+            timezone: orgPreference.timezone,
+            dateFormat: orgPreference.dateFormat,
+        });
+    }, [orgPreference]);
 
 
     useEffect(() => {
@@ -137,6 +159,22 @@ useEffect(() => {
 
 
     }, [travelerProfile]);
+    useEffect(() => {
+        if (!orgNotificationPreferences?.length) return;
+
+        setPreferences((prev) =>
+            prev.map((p) => {
+                const apiPref = orgNotificationPreferences.find(
+                    (x) =>
+                        x.categoryCode === p.categoryCode &&
+                        x.channel === p.channel
+                );
+
+                return apiPref ? { ...p, enabled: apiPref.enabled } : p;
+            })
+        );
+    }, [orgNotificationPreferences]);
+
 
     const handleUpdateProfile = async () => {
         try {
@@ -164,33 +202,61 @@ useEffect(() => {
     };
 
     const handleSaveOrganizationPreference = async () => {
-  if (!organizationId) return;
+        if (!organizationId) return;
 
-  try {
-    if (orgPreference?.id) {
-      // ✅ UPDATE (PUT)
-      await updateOrgPreference({
-        organizationId,
-        body: {
-          id: orgPreference.id,
-          ...organizationPreferences,
-        },
-      }).unwrap();
+        try {
+            if (orgPreference?.id) {
+                // ✅ UPDATE (PUT)
+                await updateOrgPreference({
+                    organizationId,
+                    body: {
+                        id: orgPreference.id,
+                        ...organizationPreferences,
+                    },
+                }).unwrap();
 
-      showSuccess("Organization preferences updated");
-    } else {
-      // ✅ CREATE (POST)
-      await createOrgPreference({
-        organizationId,
-        body: organizationPreferences,
-      }).unwrap();
+                showSuccess("Organization preferences updated");
+            } else {
+                // ✅ CREATE (POST)
+                await createOrgPreference({
+                    organizationId,
+                    body: organizationPreferences,
+                }).unwrap();
 
-      showSuccess("Organization preferences saved");
-    }
-  } catch (error) {
-    showApiError(error);
-  }
-};
+                showSuccess("Organization preferences saved");
+            }
+        } catch (error) {
+            showApiError(error);
+        }
+    };
+
+    const handleSaveNotificationPreferences = async () => {
+        if (!organizationId) return;
+
+        try {
+            await Promise.all(
+                preferences.map((pref) =>
+                    saveOrgNotificationPreference({
+                        organizationId,
+                        body: {
+                            organizationId: Number(organizationId), 
+                            categoryId: CATEGORY_ID_MAP[pref.categoryCode],
+                            categoryCode: pref.categoryCode,
+                            categoryName: pref.title,
+                            channel: pref.channel,
+                            enabled: pref.enabled,
+                        },
+                    }).unwrap()
+                )
+            );
+
+            showSuccess("Notification preferences updated");
+        } catch (error) {
+            showApiError(error);
+        }
+    };
+
+
 
 
     const [changePassword, { isLoading }] = useChangePasswordMutation();
@@ -339,13 +405,12 @@ useEffect(() => {
                             {/* Save Button */}
                             <div className="flex justify-end">
                                 <Button
-                                    onClick={() => {
-                                        // call save preferences API
-                                        console.log("Saving preferences:", organizationPreferences);
-                                    }}
+                                    onClick={handleSaveNotificationPreferences}
+                                    disabled={savingNotificationPref}
                                 >
-                                    Save Preferences
+                                    {savingNotificationPref ? "Saving..." : "Save Preferences"}
                                 </Button>
+
                             </div>
                         </CardContent>
                     </Card>

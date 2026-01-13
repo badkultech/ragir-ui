@@ -79,7 +79,7 @@ export const ENDPOINTS = {
   ORGANIZATION_RESEND_INVITE: (publicId: string) =>
     `/org/${publicId}/resend-invite`,
   ORGANIZATION_PREFERENCE: (organizationId: string) =>
-  `/org/${organizationId}/organization-preference`,
+    `/org/${organizationId}/organization-preference`,
 
 
   // Notifications
@@ -91,6 +91,8 @@ export const ENDPOINTS = {
     id: number,
   ) =>
     `/org/${organizationId}/user/${userId}/user-notifications-status/${id}/seen`,
+  ORGANIZATION_NOTIFICATION_PREFERENCE: (organizationId: string) =>
+    `/org/${organizationId}/notification-preference`,
   ORGANIZATION_PROFILE: (organizationId: string) =>
     `/org/${organizationId}/profile`,
   ORGANIZER: {

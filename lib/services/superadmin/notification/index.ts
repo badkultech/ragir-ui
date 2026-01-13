@@ -2,7 +2,11 @@
 import { baseAPI } from "../..";
 import { ApiResponse } from "@/lib/services/common-types";
 import { ENDPOINTS } from "@/lib/utils";
-import { NotificationStatus } from "./types";
+import {
+  NotificationStatus,
+  OrganizationNotificationPreference,
+  OrganizationNotificationPreferenceRequest,
+} from "./types";
 
 export const notificationAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
@@ -31,7 +35,7 @@ export const notificationAPI = baseAPI.injectEndpoints({
     }),
 
     markNotificationAsSeen: builder.mutation<
-      NotificationStatus, // you may adjust return type to match DTO
+      NotificationStatus,
       { organizationId: string; userId: string; id: number }
     >({
       query: ({ organizationId, userId, id }) => ({
@@ -40,10 +44,45 @@ export const notificationAPI = baseAPI.injectEndpoints({
       }),
       invalidatesTags: ["notifications"],
     }),
+
+    /* ================= ORGANIZATION NOTIFICATION PREFERENCES ================= */
+
+    getOrganizationNotificationPreferences: builder.query<
+      OrganizationNotificationPreference[],
+      { organizationId: string }
+    >({
+      query: ({ organizationId }) => ({
+        url: ENDPOINTS.ORGANIZATION_NOTIFICATION_PREFERENCE(organizationId),
+        method: "GET",
+      }),
+      transformResponse: (
+        response: ApiResponse<OrganizationNotificationPreference[]>
+      ) => response.data,
+      providesTags: ["organizationNotificationPreference"],
+    }),
+
+    saveOrganizationNotificationPreference: builder.mutation<
+      OrganizationNotificationPreference,
+      { organizationId: string; body: OrganizationNotificationPreferenceRequest }
+    >({
+      query: ({ organizationId, body }) => ({
+        url: ENDPOINTS.ORGANIZATION_NOTIFICATION_PREFERENCE(organizationId),
+        method: "POST",
+        body,
+      }),
+      transformResponse: (
+        response: ApiResponse<OrganizationNotificationPreference>
+      ) => response.data,
+      invalidatesTags: ["organizationNotificationPreference"],
+    }),
   }),
 });
 
 export const {
   useGetUserNotificationsQuery,
   useMarkNotificationAsSeenMutation,
+  // org notification preferences
+  useGetOrganizationNotificationPreferencesQuery,
+  useLazyGetOrganizationNotificationPreferencesQuery,
+  useSaveOrganizationNotificationPreferenceMutation,
 } = notificationAPI;
