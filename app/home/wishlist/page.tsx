@@ -1,9 +1,8 @@
 "use client"
 
 import { Heart, MapPin, Calendar, Clock, Users, Plane, Star, Sun } from "lucide-react"
-import { useState } from "react"
-import { Header } from "@/components/search-results/header"
 import { WishlistTrip, WishlistTripCard } from "@/components/search-results/wishlist-tripcard"
+import { AppHeader } from "@/components/app-header"
 
 
 
@@ -76,7 +75,7 @@ export default function WishlistPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <Header title="Wishlist" />
+            <AppHeader title="Wishlist" showBackArrow={true} />
 
             {/* Wishlist Grid */}
             <main className="max-w-6xl mx-auto p-4 md:p-6">
