@@ -23,6 +23,10 @@ import { TRIP_DETAILS } from "@/lib/constants/strings";
 import OrganizerProfileModal from "@/components/homePage/trip-details/modal/OrganizerProfileModal";
 import InviteFriendsModal from "@/components/homePage/trip-details/modal/InviteFriendsModal";
 import SendInvitationModal from "@/components/homePage/trip-details/modal/SendInvitationModal";
+import { useAuthActions } from "@/hooks/useAuthActions";
+import { menuItems, userMenuItems, notificationsData } from "@/app/home/constants";
+import { showError } from "@/lib/utils/toastHelpers";
+
 
 export default function TripDetailsPage() {
   const { id } = useParams();
@@ -47,6 +51,10 @@ export default function TripDetailsPage() {
   const [showInviteFriends, setShowInviteFriends] = useState(false);
   const [showSendInvitation, setShowSendInvitation] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const { isLoggedIn, handleLogout } = useAuthActions();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [notificationsList, setNotificationsList] = useState(notificationsData);
+  const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
 
 
   const { data, isLoading, error } = useTripDetailsQuery(id as string);
@@ -99,7 +107,13 @@ export default function TripDetailsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <MainHeader isLoggedIn />
+      <MainHeader isLoggedIn={isLoggedIn}
+        onLoginClick={() => setAuthStep("PHONE")}
+        onMenuOpen={() => setIsMenuOpen(true)}
+        notifications={notificationsList}
+        onUpdateNotifications={setNotificationsList}
+        variant="edge"
+      />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -117,7 +131,15 @@ export default function TripDetailsPage() {
               <TripHeader
                 onOpenOrganizer={() => setShowOrganizer(true)}
                 onOpenLeader={() => setShowLeader(true)}
-                onOpenInviteFriends={() => setShowInviteFriends(true)}
+                onOpenInviteFriends={() => {
+                  if (!isLoggedIn) {
+                    showError("Please login to continue");
+                    setAuthStep("PHONE");
+                    return;
+                  }
+
+                  setShowInviteFriends(true);
+                }}
                 moods={trip?.moodTags || []}
                 tripTitle={trip?.name}
                 providerName={organizer?.organizerName}
@@ -168,14 +190,28 @@ export default function TripDetailsPage() {
 
             {/* RIGHT */}
             <DesktopSidebar
-              onAsk={() => setShowAsk(true)}
+              onAsk={() => {
+                if (!isLoggedIn) {
+                  setAuthStep("PHONE");
+                  return;
+                }
+                setShowAsk(true);
+              }}
               pricing={pricing}
               images={sidebarImages}
               onRequestInvite={(data) => {
+                if (!isLoggedIn) {
+                  showError("Please login to continue");
+                  setAuthStep("PHONE");
+                  return;
+                }
+
                 setSelectedPricing(data);
                 setShowPricingDetails(true);
               }}
+
             />
+
           </div>
         </div>
       </main>
@@ -257,7 +293,13 @@ export default function TripDetailsPage() {
 
       {showMobilePricing && (
         <MobilePricingModal
-          onAsk={() => setShowAsk(true)}
+          onAsk={() => {
+            if (!isLoggedIn) {
+              setAuthStep("PHONE");
+              return;
+            }
+            setShowAsk(true);
+          }}
           options={pricing}
           onClose={() => setShowMobilePricing(false)}
           onRequestInvite={(data) => {

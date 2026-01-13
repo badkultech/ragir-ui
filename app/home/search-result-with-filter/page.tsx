@@ -10,6 +10,9 @@ import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
 import NoTripsFound from "@/components/search-results/NoTripsFound";
 import { useSearchPublicTripsQuery } from "@/lib/services/trip-search";
 import { AppHeader } from "@/components/app-header";
+import { MainHeader } from "@/components/search-results/MainHeader";
+import { menuItems, userMenuItems, notificationsData } from "../constants"
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 const calculateDuration = (startDate: string, endDate: string) => {
   if (!startDate || !endDate) return "-D/-N";
@@ -25,7 +28,10 @@ const calculateDuration = (startDate: string, endDate: string) => {
 export default function SearchResultsWithFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
-
+  const { isLoggedIn, handleLogout } = useAuthActions();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [notificationsList, setNotificationsList] = useState(notificationsData);
+  const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
   const moodsFromUrl = searchParams.get("moods");
   const moodsAll = searchParams.getAll("moods");
 
@@ -156,7 +162,12 @@ export default function SearchResultsWithFilters() {
   return (
     <>
       <div className="min-h-screen bg-[#f5f3f0]">
-        <AppHeader title="Search Results" showBackArrow={true} />
+        <MainHeader isLoggedIn={isLoggedIn}
+          onLoginClick={() => setAuthStep("PHONE")}
+          onMenuOpen={() => setIsMenuOpen(true)}
+          notifications={notificationsList}
+          onUpdateNotifications={setNotificationsList}
+          variant="edge" />
 
         {/* DESKTOP FILTER BAR */}
         <DesktopFilterBar
@@ -243,10 +254,10 @@ export default function SearchResultsWithFilters() {
                         "/hampi-ruins-temples.png"
                       }
 
-                  badges={[
-                    ...(trip.moodTags || []),
-                    ...(trip.destinationTags || []),
-                  ]}
+                      badges={[
+                        ...(trip.moodTags || []),
+                        ...(trip.destinationTags || []),
+                      ]}
                     />
                   ))}
                 </div>
