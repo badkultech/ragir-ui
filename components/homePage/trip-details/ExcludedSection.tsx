@@ -25,11 +25,12 @@ export default function ExcludedSection({
             key={i}
             className="flex items-center gap-3 bg-[#F7F7F7] p-2 rounded-lg"
           >
-            <Ban className="w-5 h-5 text-red-500" />
+            <Ban className="w-5 h-5 text-red-500 shrink-0" />
             <span className="text-sm text-gray-500">
               {item?.name || "--"}
             </span>
           </div>
+
         ))}
       </div>
     </div>
