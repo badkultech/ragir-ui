@@ -10,6 +10,7 @@ interface PricingSummaryProps {
   addOns?: { id: string; name: string; charge: number }[];
   gstMode?: 'includes' | 'excludes';
   depositPercent?: string | number;
+  depositUnit?: 'percent' | 'flat';
   creditOptions?: { card: boolean; emi: boolean };
 }
 
@@ -20,6 +21,7 @@ export function PricingSummary({
   addOns = [],
   gstMode = 'excludes',
   depositPercent = '0',
+  depositUnit = 'percent',
   creditOptions = { card: false, emi: false }
 }: PricingSummaryProps) {
 
@@ -162,7 +164,12 @@ export function PricingSummary({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-500">Deposit Required</span>
-              <span className="font-medium">{depositPercent || 0}%</span>
+              <span className="font-medium">
+                {depositUnit === "percent"
+                  ? `${depositPercent || 0}%`
+                  : formatPrice(Number(depositPercent || 0))
+                }
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-500">Payment Options</span>

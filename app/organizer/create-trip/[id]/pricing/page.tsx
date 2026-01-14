@@ -108,7 +108,20 @@ export default function PricingPage() {
 
     // COMMON FIELDS
     setGst(pricingData.includesGst ? "includes" : "excludes");
-    setDepositPercent(String(pricingData.depositRequiredPercent ?? ""));
+    // ----- Restore Deposit (Percent OR Amount) -----
+    if (pricingData.depositRequiredPercent != null) {
+      // % based deposit
+      setDepositUnit("percent");
+      setDepositPercent(String(pricingData.depositRequiredPercent));
+    } else if (pricingData.depositRequiredAmount != null) {
+      // ₹ based deposit
+      setDepositUnit("flat");
+      setDepositPercent(String(pricingData.depositRequiredAmount));
+    } else {
+      // nothing set
+      setDepositPercent("");
+    }
+
     setCredit({
       card: pricingData.creditOptions === "CREDIT_CARD",
       emi: pricingData.creditOptions === "EMI",
@@ -223,11 +236,17 @@ export default function PricingPage() {
     if (!policy) e.policy = "Cancellation policy is required";
 
     // Deposit validation
-    if (depositUnit === "percent") {
-      if (depositPercent === "") {
-        e.depositPercent = "Deposit is required";
-      } else if (Number(depositPercent) < 0 || Number(depositPercent) > 100) {
-        e.depositPercent = "Deposit must be between 0–100%";
+    if (depositPercent === "") {
+      e.depositPercent = "Deposit is required";
+    } else {
+      if (depositUnit === "percent") {
+        if (Number(depositPercent) < 0 || Number(depositPercent) > 100) {
+          e.depositPercent = "Deposit must be between 0–100%";
+        }
+      } else {
+        if (Number(depositPercent) <= 0) {
+          e.depositPercent = "Deposit amount must be greater than 0";
+        }
       }
     }
 
@@ -264,7 +283,20 @@ export default function PricingPage() {
 
       // COMMON FIELDS
       fd.append("includesGst", gst === "includes" ? "true" : "false");
-      fd.append("depositRequiredPercent", String(Number(depositPercent || 0)));
+      // DEPOSIT (percent OR flat amount)
+      if (depositUnit === "percent") {
+        fd.append(
+          "depositRequiredPercent",
+          String(Number(depositPercent || 0))
+        );
+      } else {
+        fd.append(
+          "depositRequiredAmount",
+          String(Number(depositPercent || 0))
+        );
+      }
+
+
       // CREDIT OPTIONS (SAFE)
       if (credit.card) {
         fd.append("creditOptions", "CREDIT_CARD");
@@ -597,6 +629,7 @@ export default function PricingPage() {
                 addOns={addOns}
                 gstMode={gst}
                 depositPercent={depositPercent}
+                depositUnit={depositUnit}
                 creditOptions={credit}
               />
             </div>
