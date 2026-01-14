@@ -86,6 +86,8 @@ export default function SettingsPage() {
     const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
     const { userData } = useSelector(selectAuthState);
     const organizationId = useOrganizationId();
+    const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+
     const {
         data: travelerProfile,
         isLoading: travelerProfileLoading,
@@ -192,6 +194,7 @@ export default function SettingsPage() {
                     tagline: tagline || null,
                     email: email || null,
                     mobileNumber: mobileNumber || null,
+                    profileImage: profileImageFile ?? null,
                 },
             }).unwrap();
 
@@ -239,7 +242,7 @@ export default function SettingsPage() {
                     saveOrgNotificationPreference({
                         organizationId,
                         body: {
-                            organizationId: Number(organizationId), 
+                            organizationId: Number(organizationId),
                             categoryId: CATEGORY_ID_MAP[pref.categoryCode],
                             categoryCode: pref.categoryCode,
                             categoryName: pref.title,
@@ -256,6 +259,15 @@ export default function SettingsPage() {
         }
     };
 
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setProfileImageFile(file);
+
+        const previewUrl = URL.createObjectURL(file);
+        setProfileImageUrl(previewUrl);
+    };
 
 
 
@@ -336,19 +348,34 @@ export default function SettingsPage() {
                                     className="w-20 h-20 rounded-full object-cover"
                                 />
 
-                                <div>
+                                <div className="flex flex-col gap-2">
                                     <Button
+                                        type="button"
                                         variant="outline"
-                                        className="flex items-center gap-2 border-gray-300 text-gray-700"
+                                        className="flex items-center gap-2"
+                                        asChild
                                     >
-                                        <Upload className="w-4 h-4" />
-                                        Upload New Image
+                                        <label htmlFor="profileImage">
+                                            <Upload className="w-4 h-4" />
+                                            Upload New Image
+                                        </label>
                                     </Button>
-                                    <p className="text-xs text-gray-500 mt-1">
+
+                                    <input
+                                        id="profileImage"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageUpload}
+                                    />
+
+                                    <p className="text-xs text-gray-500">
                                         PNG, JPG up to 10MB
                                     </p>
                                 </div>
+
                             </div>
+
 
                             {/* Input Fields */}
                             <div className="grid sm:grid-cols-2 gap-4">
