@@ -4,6 +4,7 @@ import { formatTag } from "@/lib/utils/tagFormatter";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import DOMPurify from "dompurify";
 
 type TripCardProps = {
     image: string;
@@ -115,9 +116,12 @@ export function TripCard({
                 </div>
 
                 {description && (
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                        {description}
-                    </p>
+                    <div
+                        className="text-sm text-gray-600 line-clamp-2 break-words"
+                        dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(description),
+                        }}
+                    />
                 )}
             </CardContent>
         </Card>
