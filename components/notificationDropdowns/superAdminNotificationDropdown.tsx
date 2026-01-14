@@ -30,17 +30,28 @@ export function SuperAdminNotificationDropdown({
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const {
-    data = { unreadCount: 0, notifications: [] },
-    isLoading,
-    isError,
-    refetch,
-  } = useGetUserNotificationsQuery(
+  const { unreadCount } = useGetUserNotificationsQuery(
     { organizationId, userId },
     {
       refetchOnMountOrArgChange: false,
       refetchOnFocus: false,
       refetchOnReconnect: false,
+
+      selectFromResult: ({ data }) => ({
+        unreadCount: data?.unreadCount ?? 0,
+      }),
+    }
+  );
+
+  const {
+    data = { unreadCount: 0, notifications: [] },
+    isLoading,
+    isError,
+  } = useGetUserNotificationsQuery(
+    { organizationId, userId },
+    {
+      skip: unreadCount === 0, // ⬅️ KEY LINE
+      pollingInterval: 30_000,
     }
   );
 
@@ -62,7 +73,6 @@ export function SuperAdminNotificationDropdown({
           markAsSeen({ organizationId, userId, id: n.id }).unwrap()
         )
       );
-      refetch();
     } catch (e) {
       console.error("Failed to mark all as read", e);
     }
@@ -79,7 +89,6 @@ export function SuperAdminNotificationDropdown({
       open={menuOpen}
       onOpenChange={(open) => {
         setMenuOpen(open);
-        if (open) refetch();
       }}
     >
       <DropdownMenuTrigger asChild>
@@ -87,7 +96,6 @@ export function SuperAdminNotificationDropdown({
           variant="ghost"
           size="sm"
           className="relative rounded-full h-10 w-10 flex items-center justify-center bg-orange-50 hover:bg-orange-100 transition"
-          onClick={() => refetch()}
         >
           <Bell className="h-5 w-5 text-orange-600" />
           {!isLoading && data.unreadCount > 0 && (

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,12 +9,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell } from "lucide-react";
 
-import { useRouter } from "next/navigation";
-import { getDashboardPath } from "@/lib/utils";
-import {
-  useGetUserNotificationsQuery,
-  useMarkNotificationAsSeenMutation,
-} from "@/lib/services/superadmin/notification";
 
 interface NotificationDropdownProps {
   organizationId: string;

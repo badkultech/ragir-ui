@@ -208,11 +208,17 @@ export default function OrganizerProfilePage() {
 
                       {testimonialScreenshotFile ? (
                         <div className='border-l-4 bg-white rounded-lg border-orange-400 p-4 mb-6'>
-                          <img
-                            src={testimonialScreenshotFile.url ?? ''}
-                            alt='Cover'
-                            className='w-full h-20 rounded-xl object-cover'
-                          />
+                          {testimonialScreenshotFile.url ? (
+                            <img
+                              src={testimonialScreenshotFile.url}
+                              alt='Cover'
+                              className='w-full h-20 rounded-xl object-cover'
+                            />
+                          ) : (
+                            <p className='text-gray-500'>
+                              No testimonial image available.
+                            </p>
+                          )}
                         </div>
                       ) : (
                         <p className='text-gray-500'>

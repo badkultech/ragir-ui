@@ -11,28 +11,31 @@ import {
 export const notificationAPI = baseAPI.injectEndpoints({
   endpoints: (builder) => ({
     getUserNotifications: builder.query<
-      { unreadCount: number; notifications: any[] },
+      NotificationStatus,
       { organizationId: string; userId: string }
     >({
       query: ({ organizationId, userId }) =>
         ENDPOINTS.USER_NOTIFICATIONS(organizationId, userId),
-      transformResponse: (response: any) => {
-        const notifications = response?.data || [];
-        const unreadCount = notifications.filter((n: any) => !n.isSeen).length;
+
+      transformResponse: (response: ApiResponse<any[]>): NotificationStatus => {
+        const notifications = response?.data ?? [];
 
         return {
-          unreadCount,
-          notifications: notifications.map((n: any) => ({
+          unreadCount: notifications.filter((n) => !n.isSeen).length,
+          notifications: notifications.map((n) => ({
             id: n.id,
-            title: n.notification?.title,
-            message: n.notification?.message,
-            sentAt: n.sentAt,
+            title: n.notification?.title ?? "",
+            message: n.notification?.message ?? "",
+            type: n.notification?.type ?? "info",
             isSeen: n.isSeen,
+            sentAt: n.sentAt,
           })),
         };
       },
+
       providesTags: ["notifications"],
     }),
+
 
     markNotificationAsSeen: builder.mutation<
       NotificationStatus,

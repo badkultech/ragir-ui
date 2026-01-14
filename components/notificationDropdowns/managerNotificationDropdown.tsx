@@ -29,19 +29,32 @@ export function ManagerNotificationDropdown({
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { unreadCount } = useGetUserNotificationsQuery(
+    { organizationId, userId },
+    {
+      refetchOnMountOrArgChange: false,
+      refetchOnFocus: false,
+      refetchOnReconnect: false,
+
+      selectFromResult: ({ data }) => ({
+        unreadCount: data?.unreadCount ?? 0,
+      }),
+    }
+  );
+
   const {
     data = { unreadCount: 0, notifications: [] },
     isLoading,
     isError,
-    refetch,
-  } = useGetUserNotificationsQuery({ organizationId, userId }
-    , {
-      // ✅ These options prevent refetching on each mount or navigation
-      refetchOnMountOrArgChange: false,
-      refetchOnFocus: false,
-      refetchOnReconnect: false,
+  } = useGetUserNotificationsQuery(
+    { organizationId, userId },
+    {
+      skip: unreadCount === 0, // ⬅️ KEY LINE
+      pollingInterval: 30_000,
     }
   );
+
+
 
   const [markAsSeen] = useMarkNotificationAsSeenMutation();
 
@@ -64,7 +77,6 @@ export function ManagerNotificationDropdown({
       open={menuOpen}
       onOpenChange={(open) => {
         setMenuOpen(open);
-        if (open) refetch();
       }}
     >
       <DropdownMenuTrigger asChild>
@@ -72,7 +84,6 @@ export function ManagerNotificationDropdown({
           variant="ghost"
           size="sm"
           className="relative rounded-full h-10 w-10 flex items-center justify-center bg-blue-100 hover:bg-blue-200 transition"
-          onClick={() => refetch()}
         >
           <Bell className="h-6 w-6 text-blue-600" />
           {!isLoading && data.unreadCount > 0 && (

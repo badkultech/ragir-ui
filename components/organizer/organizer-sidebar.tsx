@@ -86,7 +86,7 @@ const nav: NavItem[] = [
   { label: 'Queries', href: ROUTES.ORGANIZER.QUERIES_ALL, icon: TextSearch },
 
   // { label: 'Team Members', href: ROUTES.ORGANIZER.TEAM, icon: UserRoundPlus },
-  { label: 'Support Center', href: ROUTES.ORGANIZER.SUPPORT, icon: Headphones },
+  // { label: 'Support Center', href: ROUTES.ORGANIZER.SUPPORT, icon: Headphones },
   // { label: 'Billing', href: ROUTES.ORGANIZER.BILLING, icon: CreditCard },
   { label: 'Settings', href: ROUTES.ORGANIZER.SETTINGS, icon: Settings },
 ];

@@ -29,12 +29,31 @@ export function UserNotificationDropdown({
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { unreadCount } = useGetUserNotificationsQuery(
+    { organizationId, userId },
+    {
+      refetchOnMountOrArgChange: false,
+      refetchOnFocus: false,
+      refetchOnReconnect: false,
+
+      selectFromResult: ({ data }) => ({
+        unreadCount: data?.unreadCount ?? 0,
+      }),
+    }
+  );
+
   const {
     data = { unreadCount: 0, notifications: [] },
     isLoading,
     isError,
-    refetch,
-  } = useGetUserNotificationsQuery({ organizationId, userId });
+  } = useGetUserNotificationsQuery(
+    { organizationId, userId },
+    {
+      skip: unreadCount === 0, // ⬅️ KEY LINE
+      pollingInterval: 30_000,
+    }
+  );
+
 
   const [markAsSeen] = useMarkNotificationAsSeenMutation();
 
@@ -57,7 +76,6 @@ export function UserNotificationDropdown({
       open={menuOpen}
       onOpenChange={(open) => {
         setMenuOpen(open);
-        if (open) refetch();
       }}
     >
       <DropdownMenuTrigger asChild>
@@ -65,7 +83,6 @@ export function UserNotificationDropdown({
           variant="ghost"
           size="sm"
           className="relative rounded-full h-10 w-10 flex items-center justify-center bg-blue-100 hover:bg-blue-200 transition"
-          onClick={() => refetch()}
         >
           <Bell className="h-6 w-6 text-blue-600" />
           {!isLoading && data.unreadCount > 0 && (
@@ -78,74 +95,95 @@ export function UserNotificationDropdown({
 
       <DropdownMenuContent
         align="end"
-        className="w-96 max-h-[28rem] overflow-y-auto rounded-2xl shadow-lg p-0"
+        className="w-[90vw] sm:w-96 max-h-[32rem] p-0 rounded-2xl shadow-xl"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-          <h3 className="font-semibold text-lg text-gray-800">Notifications</h3>
-          {!isLoading && data.unreadCount > 0 && (
-            <span className="text-xs text-blue-600 font-medium">
-              {data.unreadCount} new
-            </span>
+        <div className="sticky top-0 z-10 bg-white flex items-center justify-between px-4 py-3 border-b">
+          <div>
+            <h3 className="font-semibold text-base text-gray-900">
+              Notifications
+            </h3>
+            {!isLoading && (
+              <p className="text-xs text-gray-500">
+                {data.unreadCount} unread notifications
+              </p>
+            )}
+          </div>
+
+          {data.unreadCount > 0 && (
+            <button className="text-xs font-medium text-orange-500 hover:underline">
+              Mark all as read
+            </button>
           )}
         </div>
 
         {/* Content */}
-        <div className="divide-y divide-gray-100">
+        <div className="overflow-y-auto max-h-[22rem] divide-y">
           {isLoading && (
-            <div className="p-4 text-sm text-gray-500 text-center">
+            <div className="p-4 text-sm text-center text-gray-500">
               Loading notifications...
             </div>
           )}
 
           {isError && (
-            <div className="p-4 text-sm text-red-500 text-center">
+            <div className="p-4 text-sm text-center text-red-500">
               Failed to load notifications
             </div>
           )}
 
-          {data.notifications.length
-            ? data.notifications.map((n) => (
-                <div
-                  key={n.id}
-                  onClick={() => handleMarkAsSeen(n.id)}
-                  className={`px-4 py-3 transition hover:bg-gray-50 cursor-pointer ${
-                    n.isSeen ? "bg-white" : "bg-blue-50"
-                  }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium text-gray-900">{n.title}</p>
-                      <p className="text-sm text-gray-600 mt-0.5">
-                        {n.message}
-                      </p>
-                    </div>
-                    {!n.isSeen && (
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></span>
-                    )}
+          {!isLoading &&
+            data.notifications.map((n) => (
+              <div
+                key={n.id}
+                onClick={() => handleMarkAsSeen(n.id)}
+                className={`flex gap-3 px-4 py-3 cursor-pointer transition
+            ${n.isSeen ? "bg-white" : "bg-orange-50 hover:bg-orange-100"}
+          `}
+              >
+                {/* Icon / Avatar */}
+                <div className="flex-shrink-0">
+                  <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                    {/* Replace later with type-based icon */}
+                    <Bell className="h-4 w-4" />
                   </div>
+                </div>
+
+                {/* Text */}
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900 leading-snug">
+                    {n.title}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">
+                    {n.message}
+                  </p>
                   {n.sentAt && (
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-[11px] text-gray-400 mt-1">
                       {new Date(n.sentAt).toLocaleString()}
                     </p>
                   )}
                 </div>
-              ))
-            : !isLoading && (
-                <div className="p-6 text-center text-sm text-gray-500">
-                  🎉 You’re all caught up!
-                  <p className="mt-1">No new notifications</p>
-                </div>
-              )}
+
+                {/* Unread dot */}
+                {!n.isSeen && (
+                  <span className="mt-2 h-2 w-2 rounded-full bg-orange-500 flex-shrink-0" />
+                )}
+              </div>
+            ))}
+
+          {!isLoading && data.notifications.length === 0 && (
+            <div className="p-6 text-center text-sm text-gray-500">
+              🎉 You’re all caught up
+            </div>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 border-t border-gray-200 text-center">
+        <div className="sticky bottom-0 bg-white border-t px-4 py-2 text-center">
           <button
-            className="text-sm font-medium text-blue-600 hover:underline"
             onClick={handleViewAll}
+            className="text-sm font-medium text-orange-500 hover:underline"
           >
-            View all notifications
+            Show more
           </button>
         </div>
       </DropdownMenuContent>
