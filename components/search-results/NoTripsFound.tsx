@@ -108,36 +108,30 @@ export default function NoTripsFound() {
               <button
                 key={i}
                 onClick={() => handleMoodClick(mood)}
-                className={`
-                  relative px-4 py-2 rounded-full text-sm flex items-center gap-2 
-                  border cursor-pointer overflow-hidden transition-all
-                  ${isSelected ? "border-transparent text-white" : "bg-white border-[#e4e4e4] text-[#2d2d2d]"}
-                `}
+                className="
+    relative px-4 py-2 rounded-full text-sm flex items-center gap-2
+    border border-transparent cursor-pointer overflow-hidden
+    text-white transition-all
+  "
               >
-
-                {/* Gradient background WHEN selected */}
-                {isSelected && GradientBG && (
+                {/* Gradient background ALWAYS */}
+                {GradientBG && (
                   <div className="absolute inset-0 opacity-90 pointer-events-none">
-                    <GradientBG width="200" height="60" />
+                    <GradientBG />
                   </div>
                 )}
 
                 {/* Icon */}
                 <span className="relative z-10 flex items-center">
-                  {Icon && (
-                    <Icon
-                      className="w-4 h-4"
-                      fill={isSelected ? "white" : "black"}
-                    />
-                  )}
+                  {Icon && <Icon className="w-4 h-4" fill="white" />}
                 </span>
 
                 {/* Label */}
                 <span className="relative z-10 font-medium">
                   {mood}
                 </span>
-
               </button>
+
             );
           })}
         </div>

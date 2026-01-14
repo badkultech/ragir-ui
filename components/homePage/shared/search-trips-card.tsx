@@ -75,7 +75,7 @@ export function SearchTripsCard() {
       if (destinationTags.trim()) {
         params.append(
           "destinationTags",
-          destinationTags.trim().toUpperCase().replace(/\s+/g, "_")
+          destinationTags.trim().toLowerCase().replace(/\s+/g, "_")
         );
       } else {
         params.append(

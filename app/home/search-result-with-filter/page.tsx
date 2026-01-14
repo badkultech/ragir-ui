@@ -84,11 +84,17 @@ export default function SearchResultsWithFilters() {
       list.push({ id: id++, label: m });
     });
 
+    const formatFilterLabel = (value: string) => {
+      return value
+      .toLowerCase()
+      .replace(/_/g, " ");
+    };
+
     const destination = searchParams.get("destinationTags");
     if (destination) {
       list.push({
         id: id++,
-        label: `Destination: ${destination}`,
+        label: `Destination: ${formatFilterLabel(destination)}`,
       });
     }
     const year = searchParams.get("year");
