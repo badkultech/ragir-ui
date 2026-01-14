@@ -20,6 +20,7 @@ import {
 import { TripLeadsStatus } from "@/lib/services/organizer/trip/leads/types";
 import { LeadFilters } from "@/components/leads/LeadFilters";
 import { ROUTES } from "@/lib/utils";
+import { sanitizeHtml } from "@/lib/utils/sanitizeHtml";
 
 export default function LeadsPage() {
   const { tripPublicId } = useParams();
@@ -209,9 +210,12 @@ export default function LeadsPage() {
                     </p>
 
                     {/* Message */}
-                    <p className="text-gray-700 mt-4 leading-relaxed">
-                      {message}
-                    </p>
+                    <p
+                      className="text-sm leading-relaxed text-gray-700 break-words"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(message),
+                      }}
+                    />
 
                     {/* Contact row */}
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mt-4">
