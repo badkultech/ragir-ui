@@ -9,6 +9,7 @@ import {
 } from "@/lib/services/organizer/trip/queries";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useEffect, useRef } from "react";
+import { sanitizeHtml } from "@/lib/utils/sanitizeHtml";
 export default function QueryDetail({
   query,
   loggedInUserId,
@@ -47,43 +48,43 @@ export default function QueryDetail({
     userId: query.askedByUserId, // or null
   };
   const fullChat = [initialMessage, ...sortedComments];
-const bottomRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
-useEffect(() => {
-  if (bottomRef.current) {
-    bottomRef.current.scrollIntoView({ behavior: "smooth" });
-  }
-}, [sortedComments]);
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [sortedComments]);
 
-const formatDateDivider = (dateStr: string) => {
-  const date = new Date(dateStr);
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  const formatDateDivider = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
-  const isToday =
-    date.toDateString() === today.toDateString();
+    const isToday =
+      date.toDateString() === today.toDateString();
 
-  const isYesterday =
-    date.toDateString() === yesterday.toDateString();
+    const isYesterday =
+      date.toDateString() === yesterday.toDateString();
 
-  if (isToday) return "Today";
-  if (isYesterday) return "Yesterday";
+    if (isToday) return "Today";
+    if (isYesterday) return "Yesterday";
 
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-};
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
-const needsDivider = (current: string, previous?: string) => {
-  if (!previous) return true;
+  const needsDivider = (current: string, previous?: string) => {
+    if (!previous) return true;
 
-  const d1 = new Date(current).toDateString();
-  const d2 = new Date(previous).toDateString();
-  return d1 !== d2;
-};
+    const d1 = new Date(current).toDateString();
+    const d2 = new Date(previous).toDateString();
+    return d1 !== d2;
+  };
 
 
 
@@ -111,11 +112,10 @@ const needsDivider = (current: string, previous?: string) => {
 
           <div className="flex items-center gap-3">
             <span
-              className={`text-sm px-3 py-1 rounded-full ${
-                comments.some((c) => c.userId === loggedInUserId)
-                  ? "bg-green-100 text-green-800"
-                  : "bg-yellow-100 text-yellow-800"
-              }`}
+              className={`text-sm px-3 py-1 rounded-full ${comments.some((c) => c.userId === loggedInUserId)
+                ? "bg-green-100 text-green-800"
+                : "bg-yellow-100 text-yellow-800"
+                }`}
             >
               {comments.some((c) => c.userId === loggedInUserId)
                 ? "Responded"
@@ -151,7 +151,14 @@ const needsDivider = (current: string, previous?: string) => {
 
                 <div className="flex justify-start">
                   <div className="max-w-[75%] px-4 py-3 rounded-2xl shadow-sm bg-gray-100 text-gray-800 rounded-tl-none">
-                    <p className="text-sm leading-relaxed">{query.question}</p>
+                    {query.question && (
+                      <div
+                        className="text-sm leading-relaxed text-gray-700 break-words"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeHtml(query.question),
+                        }}
+                      />
+                    )}
                     <p className="text-[11px] mt-1 text-gray-400">
                       {new Date(query.createdDate).toLocaleTimeString([], {
                         hour: "2-digit",
@@ -178,24 +185,26 @@ const needsDivider = (current: string, previous?: string) => {
                     )}
 
                     <div
-                      className={`flex ${
-                        isMine ? "justify-end" : "justify-start"
-                      }`}
+                      className={`flex ${isMine ? "justify-end" : "justify-start"
+                        }`}
                     >
                       <div
-                        className={`max-w-[75%] px-4 py-3 rounded-2xl shadow-sm ${
-                          isMine
-                            ? "bg-blue-50 text-gray-800 rounded-tr-none"
-                            : "bg-gray-100 text-gray-800 rounded-tl-none"
-                        }`}
-                      >
-                        <p className="text-sm leading-relaxed">{msg.comment}</p>
-                        <p
-                          className={`text-[11px] mt-1 ${
-                            isMine
-                              ? "text-right text-blue-400"
-                              : "text-gray-400"
+                        className={`max-w-[75%] px-4 py-3 rounded-2xl shadow-sm ${isMine
+                          ? "bg-blue-50 text-gray-800 rounded-tr-none"
+                          : "bg-gray-100 text-gray-800 rounded-tl-none"
                           }`}
+                      >
+                        <div
+                          className="text-sm leading-relaxed text-gray-700 break-words"
+                          dangerouslySetInnerHTML={{
+                            __html: sanitizeHtml(msg.comment),
+                          }}
+                        />
+                        <p
+                          className={`text-[11px] mt-1 ${isMine
+                            ? "text-right text-blue-400"
+                            : "text-gray-400"
+                            }`}
                         >
                           {new Date(msg.createdDate).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -216,7 +225,7 @@ const needsDivider = (current: string, previous?: string) => {
 
         {/* Response Box */}
         <div className="mt-6">
-          <QueryResponseForm onSend={handleSendResponse} onCancel={onBack}/>
+          <QueryResponseForm onSend={handleSendResponse} onCancel={onBack} />
         </div>
       </div>
     </div>
