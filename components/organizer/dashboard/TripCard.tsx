@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/lib/utils/sanitizeHtml";
 
 type TripCardProps = {
     image: string;
@@ -119,7 +120,7 @@ export function TripCard({
                     <div
                         className="text-sm text-gray-600 line-clamp-2 break-words"
                         dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(description),
+                            __html: sanitizeHtml(description),
                         }}
                     />
                 )}
