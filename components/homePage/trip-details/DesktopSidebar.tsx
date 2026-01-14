@@ -14,13 +14,15 @@ interface DesktopSidebarProps {
     addOns: string[];
     finalPrice: number;
   }) => void;
-  
+  onImageClick?: () => void;
+
 }
 
 export default function DesktopSidebar({
   onAsk,
   pricing,
   images,
+  onImageClick,
   onRequestInvite,
 }: DesktopSidebarProps) {
   const simple = pricing?.simplePricingRequest;
@@ -93,6 +95,7 @@ export default function DesktopSidebar({
                 {img?.url ? (
                   <Image
                     src={img.url}
+                    onClick={onImageClick}
                     alt="Trip gallery"
                     width={200}
                     height={150}

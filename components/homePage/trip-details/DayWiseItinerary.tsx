@@ -14,6 +14,7 @@ interface Props {
   activeDay: number;
   setActiveDay: (i: number) => void;
   activities: Activity[];
+  onImageClick?: (index: number) => void;
 }
 
 export default function DayWiseItinerary({
@@ -21,6 +22,7 @@ export default function DayWiseItinerary({
   activeDay,
   setActiveDay,
   activities,
+  onImageClick,
 }: Props) {
   return (
     <div className="bg-white rounded-2xl border p-6">
@@ -66,6 +68,7 @@ export default function DayWiseItinerary({
             {activity.image && (
               <img
                 src={activity.image}
+                onClick={() => onImageClick?.(i)}
                 alt={activity.name || "activity image"}
                 className="w-15 h-15 rounded-lg object-cover border"
               />

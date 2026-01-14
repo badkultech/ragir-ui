@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TripTabs from "./TripTabs";
 import TripFilterBar from "./TripFilterBar";
 import TripCard from "./TripCard";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { format } from "date-fns";
 import { useGetFilteredTripsQuery, TripListItem } from "@/lib/services/organizer/trip/my-trips";
 import ConfirmArchiveModal from "./ConfirmArchiveModal";
 import ConfirmUnarchiveModal from "./ConfirmUnarchiveModal";
 import ConfirmRestoreModal from "./ConfirmRestoreModal";
+import { useSearchParams } from "next/navigation";
+import { startOfMonth, endOfMonth, addMonths, format } from "date-fns";
+
 
 export default function TripOverviewPage() {
   const organizationId = useOrganizationId();
@@ -70,6 +72,42 @@ export default function TripOverviewPage() {
   const [openArchive, setOpenArchive] = useState(false);
   const [openUnarchive, setOpenUnarchive] = useState(false);
   const [openRestore, setOpenRestore] = useState(false);
+  const searchParams = useSearchParams();
+  const monthParam = searchParams.get("month");
+
+  useEffect(() => {
+    if (!monthParam) return;
+
+    let start: Date;
+    let end: Date;
+    const today = new Date();
+
+    if (monthParam === "current") {
+      // ✅ aaj se month end tak
+      start = today;
+      end = endOfMonth(today);
+    }
+    else if (monthParam === "next") {
+      // ✅ next month full range
+      const nextMonth = addMonths(today, 1);
+      start = startOfMonth(nextMonth);
+      end = endOfMonth(nextMonth);
+    }
+    else {
+      return;
+    }
+
+    setDateRange({
+      start: format(start, "yyyy-MM-dd"),
+      end: format(end, "yyyy-MM-dd"),
+    });
+
+    // ✅ UX fixes
+    setPage(0);
+    setActiveTab("upcoming");
+
+  }, [monthParam]);
+
 
 
   return (

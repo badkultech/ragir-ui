@@ -6,12 +6,14 @@ interface HeroSectionProps {
   title?: string;
   location?: string;
   imageUrl?: string;
+  onImageClick?: () => void;
 }
 
 export default function HeroSection({
   title = TRIP_DETAILS.HERO.DEFAULT_TITLE,
   location = "",
   imageUrl,
+  onImageClick,
 }: HeroSectionProps) {
 
   const fallbackImage = "/kerala-backwaters.png";
@@ -25,6 +27,7 @@ export default function HeroSection({
           {imageUrl ? (
             <Image
               src={imageUrl}
+              onClick={onImageClick}
               alt={title}
               width={1200}
               height={400}
