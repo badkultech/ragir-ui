@@ -16,7 +16,7 @@ import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { useAuthActions } from "@/hooks/useAuthActions";
-import { useGetTravelerProfileQuery, useUpdateTravelerProfileFormMutation } from "@/lib/services/user";
+import { useDeactivateUserMutation, useDeleteUserMutation, useGetTravelerProfileQuery, useUpdateTravelerProfileFormMutation } from "@/lib/services/user";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useUserId } from "@/hooks/useUserId";
 import { toast } from "@/hooks/use-toast";
@@ -36,6 +36,9 @@ export default function SettingsPage() {
 
   const [updateProfile, { isLoading: isSaving }] =
     useUpdateTravelerProfileFormMutation();
+  const [deactivateUser] = useDeactivateUserMutation();
+  const [deleteUser] = useDeleteUserMutation();
+
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -150,6 +153,55 @@ export default function SettingsPage() {
     }
   };
 
+  const handleDeactivateAccount = async () => {
+    if (!organizationId || !userPublicId) return;
+
+    try {
+      await deactivateUser({
+        organizationId,
+        publicId: userPublicId,
+      }).unwrap();
+
+      toast({
+        title: "Account Deactivated",
+        description: "Your account has been deactivated successfully",
+      });
+
+      handleLogout(); // logout after deactivate
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Failed",
+        description:
+          error?.data?.message || "Unable to deactivate account",
+      });
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!organizationId || !userPublicId) return;
+
+    try {
+      await deleteUser({
+        organizationId,
+        publicId: userPublicId,
+      }).unwrap();
+
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been deleted successfully",
+      });
+
+      handleLogout(); // logout after delete
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Failed",
+        description:
+          error?.data?.message || "Unable to delete account",
+      });
+    }
+  };
 
 
 
@@ -239,8 +291,10 @@ export default function SettingsPage() {
             onLogout();
           }}
         />
-        <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)} />
-        <DeleteModal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} />
+        <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)}
+          onConfirm={handleDeactivateAccount} />
+        <DeleteModal open={showDeleteModal} onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteAccount} />
 
       </div>
       <SidebarMenu

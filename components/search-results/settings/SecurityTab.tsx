@@ -1,13 +1,7 @@
 "use client";
 
 import { LogOut, UserX, Trash2 } from "lucide-react";
-import { useDeactivateUserMutation, useDeleteUserMutation } from "@/lib/services/user";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "@/lib/slices/auth";
-import { useAuthActions } from "@/hooks/useAuthActions";
-import { showApiError, showSuccess } from "@/lib/utils/toastHelpers";
-import { useOrganizationId } from "@/hooks/useOrganizationId";
-import { useUserId } from "@/hooks/useUserId";
+
 
 interface SecurityTabProps {
   setShowLogoutModal: (v: boolean) => void;
@@ -20,38 +14,7 @@ export default function SecurityTab({
   setShowDeactivateModal,
   setShowDeleteModal,
 }: SecurityTabProps) {
-  const { userData } = useSelector(selectAuthState);
-  const { handleLogout } = useAuthActions();
 
-  const [deactivateUser, { isLoading: isDeactivating }] =
-    useDeactivateUserMutation();
-  const [deleteUser, { isLoading: isDeleting }] =
-    useDeleteUserMutation();
-
-  const organizationId = useOrganizationId()
-  const publicId = useUserId()
-
-  /* ---------------- DEACTIVATE ---------------- */
-  const handleDeactivate = async () => {
-    try {
-      await deactivateUser({ organizationId, publicId }).unwrap();
-      showSuccess("Account deactivated successfully");
-      handleLogout();
-    } catch (err) {
-      showApiError(err as any);
-    }
-  };
-
-  /* ---------------- DELETE ---------------- */
-  const handleDelete = async () => {
-    try {
-      await deleteUser({ organizationId, publicId }).unwrap();
-      showSuccess("Account deleted successfully");
-      handleLogout();
-    } catch (err) {
-      showApiError(err as any);
-    }
-  };
 
   return (
     <div className="w-full">
@@ -79,8 +42,7 @@ export default function SecurityTab({
               </p>
             </div>
             <button
-              onClick={handleDeactivate}
-              disabled={isDeactivating}
+              onClick={() => setShowDeactivateModal(true)}
               className="px-4 py-2 border rounded-lg bg-white"
             >
               Deactivate
@@ -96,8 +58,7 @@ export default function SecurityTab({
               </p>
             </div>
             <button
-              onClick={handleDelete}
-              disabled={isDeleting}
+              onClick={() => setShowDeleteModal(true)}
               className="px-4 py-2 border rounded-lg bg-white text-red-600"
             >
               Delete

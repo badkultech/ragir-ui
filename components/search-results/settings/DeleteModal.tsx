@@ -2,7 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 
-export default function DeleteModal({ open, onClose }: any) {
+export default function DeleteModal({ open, onClose, onConfirm, }: { open: boolean; onClose: () => void; onConfirm: () => void; }) {
   if (!open) return null;
 
   return (
@@ -28,6 +28,7 @@ export default function DeleteModal({ open, onClose }: any) {
 
           {/* DELETE BUTTON */}
           <button
+            onClick={onConfirm}
             className="flex-1 py-3 rounded-lg bg-[#FF4B4B] text-white font-medium flex items-center justify-center gap-2 hover:bg-[#e04343] transition"
           >
             <Trash2 className="w-4 h-4" />
