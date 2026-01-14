@@ -143,6 +143,7 @@ export function SearchResultsTripCard({
               {!showAllLocations && remainingCount > 0 && (
                 <span
                   onClick={(e) => {
+                    e.preventDefault();   // 🔑 THIS STOPS LINK NAVIGATION
                     e.stopPropagation();
                     setShowAllLocations(true);
                   }}
@@ -155,6 +156,7 @@ export function SearchResultsTripCard({
               {showAllLocations && locationList.length > MAX_VISIBLE && (
                 <span
                   onClick={(e) => {
+                    e.preventDefault();   // 🔑 THIS STOPS LINK NAVIGATION
                     e.stopPropagation();
                     setShowAllLocations(false);
                   }}
