@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, Calendar } from "lucide-react";
 import { GradientButton } from "@/components/gradient-button";
+import { useRef } from "react";
 
 interface ProfileTabProps {
   formData: {
@@ -25,9 +26,13 @@ interface ProfileTabProps {
       bio: string;
     }>
   >;
+  onSaveProfile: () => void;
+  isSaving: boolean;
+  profileImageUrl: string | null;
+  onImageSelect: (image: File) => void;
 }
 
-export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
+export default function ProfileTab({ formData, setFormData, profileImageUrl, onSaveProfile, isSaving, onImageSelect }: ProfileTabProps) {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -36,6 +41,8 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const fileRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="space-y-6">
@@ -46,17 +53,33 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
         {/* Profile Image Section */}
         <div className="flex items-center gap-4 mb-8">
           <Avatar className="w-20 h-20 md:w-24 md:h-24">
-            <AvatarImage src="/man-profile.png" />
+            <AvatarImage src={profileImageUrl || "/man-profile.png"} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xl">
               RS
             </AvatarFallback>
           </Avatar>
 
           <div>
-            <button className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
+            >
               <Upload className="w-4 h-4" />
-              <span>Upload New Image</span>
+              Upload New Image
             </button>
+
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onImageSelect(file);
+              }}
+            />
+
             <p className="text-xs text-muted-foreground mt-2">
               PNG, JPG up to 10MB
             </p>
@@ -104,11 +127,13 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
               onChange={handleChange}
               className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#E4E4E4] rounded-lg"
             >
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
-              <option>Prefer not to say</option>
+              <option value="">Select gender</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+              <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
             </select>
+
           </div>
 
           {/* DOB */}
@@ -154,9 +179,14 @@ export default function ProfileTab({ formData, setFormData }: ProfileTabProps) {
 
         {/* Save Button */}
         <div className="mt-8">
-          <GradientButton className="inline-flex items-center gap-2">
-            Save Changes
+          <GradientButton
+            className="inline-flex items-center gap-2"
+            onClick={onSaveProfile}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
           </GradientButton>
+
         </div>
 
       </div>

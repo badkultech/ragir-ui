@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "@/components/search-results/settings/Sidebar";
 import ProfileTab from "@/components/search-results/settings/ProfileTab";
 import CommunicationsTab from "@/components/search-results/settings/CommunicationsTab";
@@ -16,20 +16,143 @@ import { menuItems, notificationsData, userMenuItems } from "../constants";
 
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { useAuthActions } from "@/hooks/useAuthActions";
+import { useGetTravelerProfileQuery, useUpdateTravelerProfileFormMutation } from "@/lib/services/user";
+import { useOrganizationId } from "@/hooks/useOrganizationId";
+import { useUserId } from "@/hooks/useUserId";
+import { toast } from "@/hooks/use-toast";
+import { showSuccess } from "@/lib/utils/toastHelpers";
 
 export default function SettingsPage() {
 
   const [activeTab, setActiveTab] = useState("profile");
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const organizationId = useOrganizationId();
+  const userPublicId = useUserId();
+  const { data, isLoading } = useGetTravelerProfileQuery({
+    organizationId: organizationId,
+    userPublicId: userPublicId,
+  });
+
+  const [updateProfile, { isLoading: isSaving }] =
+    useUpdateTravelerProfileFormMutation();
 
   const [formData, setFormData] = useState({
-    firstName: "Rahul",
-    lastName: "Sharma",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
-    gender: "Male",
+    gender: "",
     dateOfBirth: "",
     bio: "",
   });
+  const formatDateForUI = (date: string | null) => {
+    if (!date) return "";
+
+    // yyyy-mm-dd → dd/mm/yyyy
+    const [yyyy, mm, dd] = date.split("-");
+    if (!yyyy || !mm || !dd) return "";
+
+    return `${dd}/${mm}/${yyyy}`;
+  };
+
+  useEffect(() => {
+    if (!data) return;
+
+    setFormData({
+      firstName: data.firstName ?? "",
+      lastName: data.lastName ?? "",
+      email: data.email ?? "",
+      phone: data.mobileNumber ?? "",
+      gender: data.gender ?? "",
+      dateOfBirth: formatDateForUI(data.dateOfBirth ?? ""),
+      bio: data.bio ?? "",
+    });
+    setProfileImageUrl(data.profileImageUrl ?? null);
+  }, [data]);
+
+  const validateProfileForm = () => {
+    if (!formData.firstName.trim()) {
+      return "First name is required";
+    }
+
+    if (!formData.email.trim()) {
+      return "Email is required";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      return "Enter a valid email address";
+    }
+
+    if (formData.phone && formData.phone.length !== 10) {
+      return "Phone number must be 10 digits";
+    }
+
+    if (formData.dateOfBirth) {
+      const dobRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+      if (!dobRegex.test(formData.dateOfBirth)) {
+        return "Date of birth must be in dd/mm/yyyy format";
+      }
+    }
+
+    return null;
+  };
+
+
+  const formatDateForApi = (date: string) => {
+    if (!date) return null;
+    const [dd, mm, yyyy] = date.split("/");
+    if (!dd || !mm || !yyyy) return null;
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const handleSaveProfile = async () => {
+    if (!organizationId || !userPublicId) return;
+
+    const validationError = validateProfileForm();
+    if (validationError) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: validationError,
+      });
+      return;
+    }
+
+    try {
+      await updateProfile({
+        organizationId,
+        userPublicId,
+        body: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          mobileNumber: formData.phone,
+          gender: formData.gender || null,
+          dateOfBirth: formatDateForApi(formData.dateOfBirth),
+          bio: formData.bio,
+          profileImage: profileImage || undefined,
+        },
+      }).unwrap();
+
+      toast({
+        title: "Success 🎉",
+        description: "Profile updated successfully",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description:
+          error?.data?.message || "Something went wrong while updating profile",
+      });
+    }
+  };
+
+
+
+
 
   const [communications, setCommunications] = useState({
     whatsappUpdates: true,
@@ -76,7 +199,13 @@ export default function SettingsPage() {
             {/* TAB CONTENT */}
             <div className="flex-1">
               {activeTab === "profile" && (
-                <ProfileTab formData={formData} setFormData={setFormData} />
+                <ProfileTab formData={formData} setFormData={setFormData}
+                  profileImageUrl={profileImageUrl}
+                  onImageSelect={(file) => {
+                    setProfileImage(file);
+                    setProfileImageUrl(URL.createObjectURL(file));
+                  }}
+                  onSaveProfile={handleSaveProfile} isSaving={isSaving} />
               )}
 
               {activeTab === "communications" && (
