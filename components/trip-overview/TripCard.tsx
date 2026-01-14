@@ -28,7 +28,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center gap-2 border-gray-200 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg"
+              className="flex items-center justify-center gap-2 border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-50 h-10 flex-grow rounded-lg"
             >
               <PlusCircle size={16} />
               Create Similar Trip
@@ -37,7 +37,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2 border-gray-200 text-gray-800 hover:bg-gray-50 h-10 px-4 rounded-lg"
+                className="flex items-center gap-2 border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-50 h-10 px-4 rounded-lg"
               >
                 <Edit size={15} /> Edit
               </Button>
@@ -46,7 +46,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2 border-yellow-400 text-yellow-600 hover:bg-yellow-50 h-10 px-4 rounded-lg"
+              className="flex items-center gap-2 border-yellow-400 text-yellow-600 cursor-pointer hover:bg-yellow-50 h-10 px-4 rounded-lg"
               onClick={onArchive}
             >
               <Archive size={15} /> Archive
@@ -54,7 +54,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center border border-red-300 text-red-500 hover:bg-red-50 h-10 w-10 rounded-lg"
+              className="flex items-center justify-center border border-red-300 text-red-500 cursor-pointer hover:bg-red-50 h-10 w-10 rounded-lg"
               onClick={onDelete}
             >
               <Trash2 size={18} />
@@ -69,7 +69,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center gap-2 border-gray-200 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg"
+              className="flex items-center justify-center gap-2 border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-50 h-10 flex-grow rounded-lg"
             >
               <PlusCircle size={16} />
               Create Similar Trip
@@ -77,7 +77,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center border border-red-300 text-red-500 hover:bg-red-50 h-10 w-10 rounded-lg"
+              className="flex items-center justify-center border border-red-300 text-red-500 cursor-pointer hover:bg-red-50 h-10 w-10 rounded-lg"
               onClick={onDelete}
             >
               <Trash2 size={18} />
@@ -91,11 +91,11 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
           <>
             {/* Continue Editing — full width button */}
             <Link href={`/organizer/create-trip/${trip.id}`}
-              className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg">
+              className="flex items-center justify-center gap-2 border-gray-300 text-gray-800  hover:bg-gray-50 h-10 flex-grow rounded-lg">
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 hover:bg-gray-50 h-10 flex-grow rounded-lg"
+                className="flex items-center justify-center gap-2 border-gray-300 text-gray-800 cursor-pointer hover:bg-gray-50 h-10 flex-grow rounded-lg"
               >
                 <Edit size={15} /> Continue Editing
               </Button>
@@ -105,7 +105,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center border border-red-300 text-red-500 hover:bg-red-50 h-10 w-10 rounded-lg"
+              className="flex items-center justify-center border border-red-300 text-red-500 cursor-pointer hover:bg-red-50 h-10 w-10 rounded-lg"
               onClick={onDelete}
             >
               <Trash2 size={18} />
@@ -120,7 +120,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center gap-2 border-green-400 text-green-600 hover:bg-green-50 h-10 flex-grow rounded-lg"
+              className="flex items-center justify-center gap-2 border-green-400 text-green-600 cursor-pointer hover:bg-green-50 h-10 flex-grow rounded-lg"
               onClick={onRestore}
             >
               <Undo2 size={15} /> Unarchive
@@ -129,7 +129,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center border border-red-300 text-red-500 hover:bg-red-50 h-10 w-10 rounded-lg"
+              className="flex items-center justify-center border border-red-300 text-red-500 cursor-pointer hover:bg-red-50 h-10 w-10 rounded-lg"
               onClick={onDelete}
             >
               <Trash2 size={18} />
@@ -143,7 +143,7 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center justify-center gap-2 border-green-400 text-green-600 hover:bg-green-50 h-10 rounded-lg"
+            className="flex items-center justify-center gap-2 border-green-400 text-green-600 cursor-pointer hover:bg-green-50 h-10 rounded-lg"
             onClick={onRestore}
           >
             <Undo2 size={15} /> Restore
@@ -202,19 +202,32 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <p className="text-gray-500 text-sm">Views</p>
           </div>
 
-          <div className="rounded-lg bg-blue-50 text-center py-3 relative">
-            <p className="text-lg font-semibold text-blue-700">
-              {trip.queries ?? "00"}
-            </p>
-            <p className="text-gray-500 text-sm">Queries</p>
-          </div>
+          <Link
+            href={`/organizer/queries/trip/${trip.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1"
+          >
+            <div className="rounded-lg bg-blue-50 text-center py-3 relative cursor-pointer hover:bg-blue-100 transition">
+              <p className="text-lg font-semibold text-blue-700">
+                {trip.queries ?? 0}
+              </p>
+              <p className="text-gray-500 text-sm">Queries</p>
+            </div>
+          </Link>
 
-          <div className="rounded-lg bg-green-50 text-center py-3 relative">
-            <p className="text-lg font-semibold text-green-700">
-              {trip.leads ?? "00"}
-            </p>
-            <p className="text-gray-500 text-sm">Leads</p>
-          </div>
+          <Link
+            href={`/organizer/leads/trip/${trip.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1"
+          >
+            <div className="rounded-lg bg-green-50 text-center py-3 cursor-pointer hover:bg-green-100 transition">
+              <p className="text-lg font-semibold text-green-700">
+                {trip.leads ?? 0}
+              </p>
+              <p className="text-gray-500 text-sm">Leads</p>
+            </div>
+          </Link>
+
         </div>
 
         {/* Action Buttons */}

@@ -178,11 +178,17 @@ export default function DashboardMainContent() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold">This Month</h2>
-              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW}>
+              <Link
+                href={{
+                  pathname: ROUTES.ORGANIZER.TRIP_OVERVIEW,
+                  query: { month: "current" },
+                }}
+              >
                 <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
                   View all
                 </Button>
               </Link>
+
             </div>
 
             {currentMonthTrips?.length ? (
@@ -211,11 +217,17 @@ export default function DashboardMainContent() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold">Next Month</h2>
-              <Link href={ROUTES.ORGANIZER.TRIP_OVERVIEW}>
+              <Link
+                href={{
+                  pathname: ROUTES.ORGANIZER.TRIP_OVERVIEW,
+                  query: { month: "next" },
+                }}
+              >
                 <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
                   View all
                 </Button>
               </Link>
+
             </div>
 
             {nextMonthTrips?.length ? (
