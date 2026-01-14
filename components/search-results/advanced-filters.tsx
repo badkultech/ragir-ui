@@ -314,8 +314,7 @@ export function AdvancedFilters({
                       min: Math.min(Number(e.target.value), budgetRange.max - 1),
                     })
                   }
-                  className="absolute w-full top-0 h-8 appearance-none bg-transparent z-20"
-                  style={{ pointerEvents: "auto" }}
+                  className="absolute w-full top-0 h-8 appearance-none bg-transparent z-20 pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:cursor-pointer"
                 />
 
                 {/* MAX RANGE */}
@@ -330,8 +329,7 @@ export function AdvancedFilters({
                       max: Math.max(Number(e.target.value), budgetRange.min + 1),
                     })
                   }
-                  className="absolute w-full top-0 h-8 appearance-none bg-transparent z-30"
-                  style={{ pointerEvents: "auto" }}
+                  className="absolute w-full top-0 h-8 appearance-none bg-transparent z-30 pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:cursor-pointer"
                 />
 
               </div>
