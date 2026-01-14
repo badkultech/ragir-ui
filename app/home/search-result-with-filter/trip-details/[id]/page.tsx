@@ -26,6 +26,7 @@ import SendInvitationModal from "@/components/homePage/trip-details/modal/SendIn
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { notificationsData } from "@/app/home/constants";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { FullImageGalleryModal } from "@/components/library/FullImageGalleryModal";
 
 
 export default function TripDetailsPage() {
@@ -57,6 +58,9 @@ export default function TripDetailsPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notificationsList, setNotificationsList] = useState(notificationsData);
   const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+
 
   const { requireAuth } = useAuthGuard(isLoggedIn);
   const { data, isLoading, error } = useTripDetailsQuery(id as string);
@@ -128,7 +132,12 @@ export default function TripDetailsPage() {
                 title={trip?.name}
                 location={trip?.cityTags?.join(", ")}
                 imageUrl={heroImage}
+                onImageClick={() => {
+                  setGalleryIndex(0);
+                  setGalleryOpen(true);
+                }}
               />
+
 
               <TripHeader
                 onOpenOrganizer={() => setShowOrganizer(true)}
@@ -173,6 +182,10 @@ export default function TripDetailsPage() {
                 activeDay={activeDay}
                 setActiveDay={setActiveDay}
                 activities={activities}
+                onImageClick={() => {
+                  setGalleryIndex(0);
+                  setGalleryOpen(true);
+                }}
               />
 
               <ExcludedSection items={exclusions?.details || []} />
@@ -193,6 +206,11 @@ export default function TripDetailsPage() {
                   setShowAsk(true);
                 })
               }
+
+              onImageClick={() => {
+                setGalleryIndex(0);
+                setGalleryOpen(true);
+              }}
 
               pricing={pricing}
               images={sidebarImages}
@@ -307,6 +325,13 @@ export default function TripDetailsPage() {
           onClose={() => setShowOrganizer(false)}
         />
       )}
+      <FullImageGalleryModal
+        open={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
+        images={sidebarImages}
+        title={tripName}
+      />
+
 
     </div>
   );
