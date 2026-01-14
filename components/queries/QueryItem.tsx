@@ -2,12 +2,13 @@
 
 import { Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { sanitizeHtml } from "@/lib/utils/sanitizeHtml";
 
 export default function QueryItem({ query, onView, onDelete }: any) {
   const isOpen = query.status === "OPEN";
 
   // calculate "n days open"
-  const created = new Date(query.createdDate );
+  const created = new Date(query.createdDate);
   const diff = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24));
 
   return (
@@ -55,9 +56,12 @@ export default function QueryItem({ query, onView, onDelete }: any) {
       </div>
 
       {/* Question */}
-      <div className="text-gray-700 text-[15px] mt-2">
-        {query.question}
-      </div>
+      <div
+        className="text-sm leading-relaxed text-gray-700 break-words"
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(query.question),
+        }}
+      />
 
       {/* Action buttons */}
       <div className="flex justify-end items-center gap-3 mt-3">
