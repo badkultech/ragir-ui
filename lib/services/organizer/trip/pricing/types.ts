@@ -32,6 +32,7 @@ export interface PricingItem {
 
   includesGst: boolean;
   depositRequiredPercent: number;
+  depositRequiredAmount: number;
   creditOptions: string;
   cancellationPolicy: string;
 
