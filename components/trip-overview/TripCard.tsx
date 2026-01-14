@@ -28,7 +28,8 @@ export default function TripCard({ trip, tab, onArchive, onDelete, onRestore }: 
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center justify-center gap-2 border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-50 h-10 flex-grow rounded-lg"
+              disabled={true}
+              className="flex items-center justify-center gap-2 border-gray-200 text-gray-800 cursor-not-allowed hover:bg-gray-50 h-10 flex-grow rounded-lg"
             >
               <PlusCircle size={16} />
               Create Similar Trip
