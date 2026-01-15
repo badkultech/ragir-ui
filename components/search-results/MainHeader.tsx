@@ -4,15 +4,19 @@ import { Menu, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { NotificationsDropdown } from "@/components/search-results/NotificationsDropdown";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
+import { useGetUserNotificationsQuery, useMarkNotificationAsSeenMutation } from "@/lib/services/superadmin/notification";
+import { formatDistanceToNow } from "date-fns";
 
 export function MainHeader({
-  onMenuOpen = () => {},
-  notifications = [],
-  onUpdateNotifications = () => {},
+  onMenuOpen = () => { },
+  notifications: propNotifications = [],
+  onUpdateNotifications = () => { },
   logoText = "",
   logoSrc = "/logo.png",
-  isLoggedIn = false,
-  onLoginClick = () => {},
+  isLoggedIn: propIsLoggedIn,
+  onLoginClick = () => { },
   variant = "edge",
 }: {
   onMenuOpen?: () => void;
@@ -25,6 +29,44 @@ export function MainHeader({
   variant?: "center" | "edge";
 }) {
   const router = useRouter();
+  const { userData, accessToken } = useSelector(selectAuthState);
+
+  const isLoggedIn = propIsLoggedIn !== undefined ? propIsLoggedIn : !!accessToken;
+  const userId = userData?.userPublicId;
+  const organizationId = userData?.organizationPublicId;
+
+  const { data: apiNotificationData, refetch } = useGetUserNotificationsQuery(
+    { organizationId: organizationId as string, userId: userId as string },
+    { skip: !isLoggedIn || !userId || !organizationId }
+  );
+
+  const [markAsSeen] = useMarkNotificationAsSeenMutation();
+
+  const displayNotifications = apiNotificationData?.notifications?.map((n) => ({
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    description: n.message,
+    time: n.sentAt ? formatDistanceToNow(new Date(n.sentAt), { addSuffix: true }) : "",
+    read: n.isSeen,
+  })) || propNotifications;
+
+  const handleUpdateNotifications = async (updatedList: any[]) => {
+    if (apiNotificationData) {
+      updatedList.forEach(async (n) => {
+        const original = apiNotificationData.notifications.find(o => o.id === n.id);
+        if (original && !original.isSeen && n.read) {
+          await markAsSeen({
+            organizationId: organizationId as string,
+            userId: userId as string,
+            id: n.id
+          });
+        }
+      });
+    }
+
+    onUpdateNotifications(updatedList);
+  };
 
   return (
     <header className="w-full sticky top-0 z-30 bg-white border-b border-gray-200">
@@ -90,8 +132,8 @@ export function MainHeader({
               </button>
 
               <NotificationsDropdown
-                notifications={notifications}
-                onUpdateNotifications={onUpdateNotifications}
+                notifications={displayNotifications}
+                onUpdateNotifications={handleUpdateNotifications}
               />
 
               <button
