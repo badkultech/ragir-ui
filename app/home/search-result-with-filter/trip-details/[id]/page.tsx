@@ -100,13 +100,24 @@ export default function TripDetailsPage() {
 
   const currentDay = itinerary?.dayDetailResponseList?.[activeDay];
   const rawActivities = currentDay?.tripItems || [];
+  const rawItems = currentDay?.tripItems || [];
 
-  const activities = rawActivities.map((item: any) => ({
-    time: item.time || item.startTime || item.checkInTime || "--",
-    name: item.name,
-    description: item.description,
-    image: item.documents?.[0]?.url || "",
-  }));
+  const dayDescriptionItem = rawItems.find(
+    (item: any) => item.tripType === "DAY_DESCRIPTION"
+  );
+
+  const dayDescription = dayDescriptionItem?.description || "";
+
+
+  const activities = rawItems
+    .filter((item: any) => item.tripType !== "DAY_DESCRIPTION")
+    .map((item: any) => ({
+      time: item.time || item.startTime || item.checkInTime || "--",
+      name: item.name,
+      description: item.description,
+      image: item.documents?.[0]?.url || "",
+    }));
+
 
   const heroImage =
     payload?.images?.length ? payload.images[0].url : undefined;
@@ -209,8 +220,8 @@ export default function TripDetailsPage() {
                   setGalleryIndex(0);
                   setGalleryOpen(true);
                 }}
-                dayTitle={currentDay?.title || `Day ${activeDay + 1}`}
-                dayDescription={currentDay?.description || ""}
+                dayTitle={`Day ${activeDay + 1}: ${trip?.name}`}
+                dayDescription={dayDescription}
               />
 
               <IncludedSection />
