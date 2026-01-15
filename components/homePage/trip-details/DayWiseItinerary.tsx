@@ -1,6 +1,10 @@
-import { Calendar, Sparkles } from "lucide-react";
-import { TRIP_DETAILS } from "@/lib/constants/strings";
+import { Calendar, MapPin, Clock, Utensils, Hotel, Footprints, Bus, Activity as ActivityIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { sanitizeHtml } from "@/lib/utils/sanitizeHtml";
+
+// Activity components just for icon rendering
+import { Star, Camera, Armchair } from "lucide-react";
+
 interface Activity {
   time?: string;
   name?: string;
@@ -15,6 +19,8 @@ interface Props {
   setActiveDay: (i: number) => void;
   activities: Activity[];
   onImageClick?: (index: number) => void;
+  dayTitle?: string;
+  dayDescription?: string;
 }
 
 export default function DayWiseItinerary({
@@ -23,17 +29,41 @@ export default function DayWiseItinerary({
   setActiveDay,
   activities,
   onImageClick,
+  dayTitle,
+  dayDescription
 }: Props) {
+
+  const getIconForActivity = (name: string = "") => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes("breakfast") || lowerName.includes("dinner") || lowerName.includes("lunch") || lowerName.includes("meal")) {
+      return Utensils;
+    }
+    if (lowerName.includes("hotel") || lowerName.includes("stay") || lowerName.includes("check-in")) {
+      return Hotel;
+    }
+    if (lowerName.includes("bus") || lowerName.includes("transfer") || lowerName.includes("drive") || lowerName.includes("flight")) {
+      return Bus;
+    }
+    if (lowerName.includes("walk") || lowerName.includes("hike") || lowerName.includes("trek") || lowerName.includes("exploration")) {
+      return Footprints;
+    }
+    return ActivityIcon;
+  };
+
+  const renderIcon = (itemIcon: any) => {
+    const Icon = itemIcon;
+    return Icon ? <Icon className="w-4 h-4 text-gray-400" /> : null;
+  };
+
   return (
     <div className="bg-white rounded-2xl border p-6">
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">{TRIP_DETAILS.ITINERARY.TITLE}</h2>
-
-        <button className="flex items-center gap-2 px-4 py-2 border border-orange-500 text-orange-500 rounded-lg text-sm">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold">Day Wise Itinerary</h2>
+        <button className="flex items-center gap-2 px-4 py-2 border border-[#FF7043] text-[#FF7043] rounded-lg text-sm font-medium hover:bg-orange-50 transition-colors">
           <Calendar className="w-4 h-4" />
-          {TRIP_DETAILS.ITINERARY.VIEW_FULL}
+          View Full Itinerary
         </button>
       </div>
 
@@ -43,73 +73,92 @@ export default function DayWiseItinerary({
           <button
             key={i}
             onClick={() => setActiveDay(i)}
-            className={`px-4 py-2 rounded-full text-sm ${activeDay === i
-              ? "bg-orange-500 text-white"
-              : "bg-gray-100 text-gray-600"
-              }`}
+            className={cn(
+              "px-6 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap",
+              activeDay === i
+                ? "bg-[#FF7043] text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            )}
           >
             {day}
           </button>
         ))}
       </div>
 
-      {/* Content */}
-      <div className="space-y-4">
-        {activities.length === 0 && (
-          <p className="text-sm text-gray-500">
-            {TRIP_DETAILS.ITINERARY.EMPTY_DAY}
-          </p>
+      {/* Day Content */}
+      <div className="space-y-6">
+
+        {/* Day Title */}
+        <h3 className="text-lg font-bold text-gray-900">{dayTitle || `Day ${activeDay + 1}`}</h3>
+
+        {/* Gradient Description Box */}
+        {dayDescription && (
+          <div
+            className="p-6 rounded-xl bg-gradient-to-r from-[#9C27B0] to-[#E53935] text-white text-sm leading-relaxed shadow-sm"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(dayDescription) }}
+          />
         )}
 
-        {activities.map((activity, i) => (
-          <div key={i} className="border-l-2 border-orange-500 pl-4 space-y-2">
+        {/* Timeline Items */}
+        <div className="space-y-4">
+          {activities.length === 0 && (
+            <p className="text-sm text-gray-500 italic">No activities listed for this day.</p>
+          )}
 
-            {/* IMAGE */}
-            {activity.image && (
-              <img
-                src={activity.image}
-                onClick={() => onImageClick?.(i)}
-                alt={activity.name || "activity image"}
-                className="w-15 h-15 rounded-lg object-cover border"
-              />
-            )}
+          {activities.map((activity, i) => {
+            const MainIcon = getIconForActivity(activity.name);
+            return (
+              <div key={i} className="flex gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
+                {/* Icon Box */}
+                <div className="shrink-0 w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center">
+                  <MainIcon className="w-6 h-6 text-gray-700" />
+                </div>
 
-            <p className="text-xs text-gray-500">
-              {activity.time || "--"}
-            </p>
+                {/* Content */}
+                <div className="flex-1 space-y-1">
+                  <h4 className="font-bold text-gray-900">{activity.name}</h4>
 
-            <h3 className="font-semibold">
-              {activity.name || TRIP_DETAILS.ITINERARY.ACTIVITY_DEFAULT_NAME}
-            </h3>
+                  {activity.description && (
+                    <div
+                      className="text-sm text-gray-500 leading-relaxed mb-3"
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(activity.description) }}
+                    />
+                  )}
 
+                  {/* Metadata Tags */}
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    {/* Time */}
+                    {activity.time && activity.time !== "--" && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                        <Clock className="w-4 h-4 text-gray-400" />
+                        <span>{activity.time}</span>
+                      </div>
+                    )}
 
+                    {/* Image indicator or other tags can go here */}
+                    {activity.tags?.map((tag, idx) => (
+                      <div key={idx} className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                        <ActivityIcon className="w-4 h-4 text-gray-400" />
+                        <span>{tag}</span>
+                      </div>
+                    ))}
 
-
-            {activity.description && (
-              <div
-                className="text-sm text-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(activity.description),
-                }}
-              />
-            )}
-
-
-            {!!activity.tags?.length && (
-              <div className="flex flex-wrap gap-2">
-                {activity.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-orange-50 text-orange-600"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    {tag}
-                  </span>
-                ))}
+                    {/* View Image Button if image exists */}
+                    {activity.image && (
+                      <button
+                        onClick={() => onImageClick?.(i)}
+                        className="flex items-center gap-1.5 text-xs text-orange-600 font-medium hover:underline"
+                      >
+                        <Camera className="w-4 h-4" />
+                        View Photo
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

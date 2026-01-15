@@ -7,6 +7,7 @@ import TripHeader from "@/components/homePage/trip-details/TripHeader";
 import TripInfoCards from "@/components/homePage/trip-details/TripInfoCards";
 import TripHighlights from "@/components/homePage/trip-details/TripHighlights";
 import DayWiseItinerary from "@/components/homePage/trip-details/DayWiseItinerary";
+import IncludedSection from "@/components/homePage/trip-details/IncludedSection";
 import ExcludedSection from "@/components/homePage/trip-details/ExcludedSection";
 import FAQSection from "@/components/homePage/trip-details/FAQSection";
 import DesktopSidebar from "@/components/homePage/trip-details/DesktopSidebar";
@@ -24,9 +25,12 @@ import OrganizerProfileModal from "@/components/homePage/trip-details/modal/Orga
 import InviteFriendsModal from "@/components/homePage/trip-details/modal/InviteFriendsModal";
 import SendInvitationModal from "@/components/homePage/trip-details/modal/SendInvitationModal";
 import { useAuthActions } from "@/hooks/useAuthActions";
-import { notificationsData } from "@/app/home/constants";
+import { menuItems, notificationsData, userMenuItems } from "@/app/home/constants";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { FullImageGalleryModal } from "@/components/library/FullImageGalleryModal";
+import { SidebarMenu } from "@/components/search-results/SidebarMenu";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 
 export default function TripDetailsPage() {
@@ -60,6 +64,17 @@ export default function TripDetailsPage() {
   const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const { userData } = useSelector(selectAuthState);
+  const user = isLoggedIn
+    ? {
+      name: userData?.firstName
+        ? `${userData.firstName} ${userData.lastName ?? ""}`
+        : "",
+      email: userData?.email as string,
+      profileImage: userData?.profileImageUrl,
+    }
+    : undefined;
+
 
 
   const { requireAuth } = useAuthGuard(isLoggedIn);
@@ -76,7 +91,8 @@ export default function TripDetailsPage() {
   const pricing = payload.tripPricingDTO;
   const organizer = payload.organizerProfileResponse;
 
-  const rawActivities = itinerary?.dayDetailResponseList?.[activeDay]?.tripItems || [];
+  const currentDay = itinerary?.dayDetailResponseList?.[activeDay];
+  const rawActivities = currentDay?.tripItems || [];
 
   const activities = rawActivities.map((item: any) => ({
     time: item.time || item.startTime || item.checkInTime || "--",
@@ -186,7 +202,11 @@ export default function TripDetailsPage() {
                   setGalleryIndex(0);
                   setGalleryOpen(true);
                 }}
+                dayTitle={currentDay?.title || `Day ${activeDay + 1}`}
+                dayDescription={currentDay?.description || ""}
               />
+
+              <IncludedSection />
 
               <ExcludedSection items={exclusions?.details || []} />
 
@@ -330,6 +350,16 @@ export default function TripDetailsPage() {
         onClose={() => setGalleryOpen(false)}
         images={sidebarImages}
         title={tripName}
+      />
+
+      <SidebarMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
+        user={user}
       />
 
 

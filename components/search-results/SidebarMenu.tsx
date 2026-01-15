@@ -9,6 +9,12 @@ interface MenuItem {
   label: string;
   href: string;
 }
+interface User {
+  name: string;
+  email: string;
+  profileImage?: string | null;
+}
+
 
 export function SidebarMenu({
   isOpen,
@@ -17,6 +23,7 @@ export function SidebarMenu({
   userMenuItems,
   onLogout,
   isLoggedIn,
+  user,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -24,6 +31,7 @@ export function SidebarMenu({
   userMenuItems: MenuItem[];
   onLogout: () => void;
   isLoggedIn: boolean;
+  user?: User;
 }) {
   return (
     <div
@@ -73,18 +81,20 @@ export function SidebarMenu({
               {/* User Profile */}
               <div className="flex items-center gap-3 px-4 py-3">
                 <Avatar className="w-10 h-10">
-                  <AvatarImage src="/man-profile.png" />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    DR
+                  <AvatarImage src={user?.profileImage || ""} />
+                  <AvatarFallback>
+                    {user?.name?.[0] || "U"}
                   </AvatarFallback>
                 </Avatar>
+
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    Dirk Russell
+                    {user?.name || "User"}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    dirk@gmail.com
+                    {user?.email}
                   </p>
+
                 </div>
               </div>
 

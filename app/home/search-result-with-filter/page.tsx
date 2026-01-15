@@ -13,6 +13,9 @@ import { AppHeader } from "@/components/app-header";
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { menuItems, userMenuItems, notificationsData } from "../constants"
 import { useAuthActions } from "@/hooks/useAuthActions";
+import { SidebarMenu } from "@/components/search-results/SidebarMenu";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 const calculateDuration = (startDate: string, endDate: string) => {
   if (!startDate || !endDate) return "-D/-N";
@@ -34,6 +37,17 @@ export default function SearchResultsWithFilters() {
   const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
   const moodsFromUrl = searchParams.get("moods");
   const moodsAll = searchParams.getAll("moods");
+  const { userData } = useSelector(selectAuthState);
+  const user = isLoggedIn
+    ? {
+      name: userData?.firstName
+        ? `${userData.firstName} ${userData.lastName ?? ""}`
+        : "",
+      email: userData?.email as string,
+      profileImage: userData?.profileImageUrl,
+    }
+    : undefined;
+
 
   // ---------- INITIAL API CRITERIA ----------
   const [criteria, setCriteria] = useState<any>({
@@ -86,8 +100,8 @@ export default function SearchResultsWithFilters() {
 
     const formatFilterLabel = (value: string) => {
       return value
-      .toLowerCase()
-      .replace(/_/g, " ");
+        .toLowerCase()
+        .replace(/_/g, " ");
     };
 
     const destination = searchParams.get("destinationTags");
@@ -357,6 +371,16 @@ export default function SearchResultsWithFilters() {
           </div>
         </div>
       )}
+      <SidebarMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
+        user={user}
+      />
+
     </>
   );
 }

@@ -90,7 +90,7 @@ export function SearchTripsCard() {
       selectedMoods.forEach(m =>
         params.append(
           "moods",
-          m.replace("-", "_").toUpperCase()
+          m.replace("-", "_").toLowerCase()
         )
       );
     }
