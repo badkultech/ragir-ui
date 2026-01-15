@@ -9,13 +9,15 @@ import { DesktopFilterSidebar } from "@/components/search-results/desktop-filter
 import { MobileBottomBar } from "@/components/search-results/mobile-bottom-bar";
 import NoTripsFound from "@/components/search-results/NoTripsFound";
 import { useSearchPublicTripsQuery } from "@/lib/services/trip-search";
-import { AppHeader } from "@/components/app-header";
 import { MainHeader } from "@/components/search-results/MainHeader";
 import { menuItems, userMenuItems, notificationsData } from "../constants"
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import { FloatingRoleActions } from "@/components/common/FloatingRoleActions";
+import { Overlay } from "@/components/common/Overlay";
+import { SearchTripsCard } from "@/components/homePage/shared/search-trips-card";
 
 const calculateDuration = (startDate: string, endDate: string) => {
   if (!startDate || !endDate) return "-D/-N";
@@ -38,6 +40,8 @@ export default function SearchResultsWithFilters() {
   const moodsFromUrl = searchParams.get("moods");
   const moodsAll = searchParams.getAll("moods");
   const { userData } = useSelector(selectAuthState);
+  const userType = userData?.userType;
+  const [showSearchOverlay, setShowSearchOverlay] = useState(false);
   const user = isLoggedIn
     ? {
       name: userData?.firstName
@@ -380,7 +384,20 @@ export default function SearchResultsWithFilters() {
         isLoggedIn={isLoggedIn}
         user={user}
       />
-
+      <FloatingRoleActions
+        isLoggedIn={isLoggedIn}
+        userType={userType}
+        hiddenActions={["PUBLISH", "EDIT"]}
+        onModifySearch={() => {
+          setShowSearchOverlay(true);
+        }}
+      />
+      <Overlay
+        open={showSearchOverlay}
+        onClose={() => setShowSearchOverlay(false)}
+      >
+        <SearchTripsCard />
+      </Overlay>
     </>
   );
 }
