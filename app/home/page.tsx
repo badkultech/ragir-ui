@@ -20,6 +20,8 @@ import { OTPVerificationModal } from "@/components/auth/OTPVerificationModal";
 import { RegisterModal } from "@/components/auth/RegisterModal";
 
 import { menuItems, userMenuItems, notificationsData } from "./constants";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 
 export default function Home() {
@@ -34,6 +36,18 @@ export default function Home() {
   const onLogout = () => {
     handleLogout(() => setIsMenuOpen(false));
   };
+
+  const { userData } = useSelector(selectAuthState);
+  const user = isLoggedIn
+    ? {
+      name: userData?.firstName
+        ? `${userData.firstName} ${userData.lastName ?? ""}`
+        : "",
+      email: userData?.email as string,
+      profileImage: userData?.profileImageUrl,
+    }
+    : undefined;
+
 
   return (
     <main className="min-h-screen relative">
@@ -60,6 +74,7 @@ export default function Home() {
         userMenuItems={userMenuItems}
         onLogout={onLogout}
         isLoggedIn={isLoggedIn}
+        user={user}
       />
 
       {/* PHONE ENTRY MODAL */}

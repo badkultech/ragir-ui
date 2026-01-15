@@ -25,9 +25,12 @@ import OrganizerProfileModal from "@/components/homePage/trip-details/modal/Orga
 import InviteFriendsModal from "@/components/homePage/trip-details/modal/InviteFriendsModal";
 import SendInvitationModal from "@/components/homePage/trip-details/modal/SendInvitationModal";
 import { useAuthActions } from "@/hooks/useAuthActions";
-import { notificationsData } from "@/app/home/constants";
+import { menuItems, notificationsData, userMenuItems } from "@/app/home/constants";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { FullImageGalleryModal } from "@/components/library/FullImageGalleryModal";
+import { SidebarMenu } from "@/components/search-results/SidebarMenu";
+import { useSelector } from "react-redux";
+import { selectAuthState } from "@/lib/slices/auth";
 
 
 export default function TripDetailsPage() {
@@ -61,6 +64,17 @@ export default function TripDetailsPage() {
   const [authStep, setAuthStep] = useState<"PHONE" | "OTP" | "REGISTER" | null>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const { userData } = useSelector(selectAuthState);
+  const user = isLoggedIn
+    ? {
+      name: userData?.firstName
+        ? `${userData.firstName} ${userData.lastName ?? ""}`
+        : "",
+      email: userData?.email as string,
+      profileImage: userData?.profileImageUrl,
+    }
+    : undefined;
+
 
 
   const { requireAuth } = useAuthGuard(isLoggedIn);
@@ -336,6 +350,16 @@ export default function TripDetailsPage() {
         onClose={() => setGalleryOpen(false)}
         images={sidebarImages}
         title={tripName}
+      />
+
+      <SidebarMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        menuItems={menuItems}
+        userMenuItems={userMenuItems}
+        onLogout={handleLogout}
+        isLoggedIn={isLoggedIn}
+        user={user}
       />
 
 
