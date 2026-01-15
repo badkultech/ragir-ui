@@ -31,10 +31,15 @@ import { FullImageGalleryModal } from "@/components/library/FullImageGalleryModa
 import { SidebarMenu } from "@/components/search-results/SidebarMenu";
 import { useSelector } from "react-redux";
 import { selectAuthState } from "@/lib/slices/auth";
+import { FloatingRoleActions } from "@/components/common/FloatingRoleActions";
+import { Overlay } from "@/components/common/Overlay";
+import { SearchTripsCard } from "@/components/homePage/shared/search-trips-card";
+import { useRouter } from "next/navigation";
 
 
 export default function TripDetailsPage() {
   const { id } = useParams();
+  const router = useRouter();
 
   type SelectedPricing = {
     options: Record<string, any>;
@@ -65,6 +70,8 @@ export default function TripDetailsPage() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const { userData } = useSelector(selectAuthState);
+  const userType = userData?.userType;
+  const [showSearchOverlay, setShowSearchOverlay] = useState(false);
   const user = isLoggedIn
     ? {
       name: userData?.firstName
@@ -361,7 +368,22 @@ export default function TripDetailsPage() {
         isLoggedIn={isLoggedIn}
         user={user}
       />
-
+      <FloatingRoleActions
+        isLoggedIn={isLoggedIn}
+        userType={userType}
+        onModifySearch={() => {
+          setShowSearchOverlay(true);
+        }}
+        onEditTrip={() =>
+          router.push(`/organizer/create-trip/${trip.publicId}`)
+        }
+      />
+      <Overlay
+        open={showSearchOverlay}
+        onClose={() => setShowSearchOverlay(false)}
+      >
+        <SearchTripsCard />
+      </Overlay>
 
     </div>
   );
