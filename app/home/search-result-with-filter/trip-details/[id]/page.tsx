@@ -7,6 +7,7 @@ import TripHeader from "@/components/homePage/trip-details/TripHeader";
 import TripInfoCards from "@/components/homePage/trip-details/TripInfoCards";
 import TripHighlights from "@/components/homePage/trip-details/TripHighlights";
 import DayWiseItinerary from "@/components/homePage/trip-details/DayWiseItinerary";
+import IncludedSection from "@/components/homePage/trip-details/IncludedSection";
 import ExcludedSection from "@/components/homePage/trip-details/ExcludedSection";
 import FAQSection from "@/components/homePage/trip-details/FAQSection";
 import DesktopSidebar from "@/components/homePage/trip-details/DesktopSidebar";
@@ -76,7 +77,8 @@ export default function TripDetailsPage() {
   const pricing = payload.tripPricingDTO;
   const organizer = payload.organizerProfileResponse;
 
-  const rawActivities = itinerary?.dayDetailResponseList?.[activeDay]?.tripItems || [];
+  const currentDay = itinerary?.dayDetailResponseList?.[activeDay];
+  const rawActivities = currentDay?.tripItems || [];
 
   const activities = rawActivities.map((item: any) => ({
     time: item.time || item.startTime || item.checkInTime || "--",
@@ -186,7 +188,11 @@ export default function TripDetailsPage() {
                   setGalleryIndex(0);
                   setGalleryOpen(true);
                 }}
+                dayTitle={currentDay?.title || `Day ${activeDay + 1}`}
+                dayDescription={currentDay?.description || ""}
               />
+
+              <IncludedSection />
 
               <ExcludedSection items={exclusions?.details || []} />
 
