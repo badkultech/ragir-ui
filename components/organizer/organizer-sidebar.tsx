@@ -256,7 +256,7 @@ export function OrganizerSidebar({
         </nav>
 
         <div className="mt-auto p-4">
-          <LogoutButton />
+          <LogoutButton redirectPath="/organizer/login" />
         </div>
       </aside>
     </>

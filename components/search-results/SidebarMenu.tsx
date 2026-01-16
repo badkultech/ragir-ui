@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { X, LogOut, LucideIcon } from "lucide-react";
+import { X, LucideIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { LogoutButton } from "../common/LogoutButton";
 
 interface MenuItem {
   icon: LucideIcon;
@@ -116,13 +117,9 @@ export function SidebarMenu({
               <div className="my-4 border-t border-border" />
 
               {/* Logout Button */}
-              <button
-                onClick={onLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-primary text-primary rounded-full hover:bg-primary/5 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="text-sm font-medium">Log Out</span>
-              </button>
+              <LogoutButton
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-primary text-primary rounded-full hover:bg-primary/5 transition-colors text-sm"
+              />
             </>
           )}
 

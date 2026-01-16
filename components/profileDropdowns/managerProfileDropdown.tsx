@@ -8,12 +8,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LogoutButton } from "../common/LogoutButton";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { getDashboardPath } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function ManagerProfileDropdown() {
-  const { userData, handleLogout, router } = useAuthActions();
+  const { userData, router } = useAuthActions();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -53,11 +54,7 @@ export function ManagerProfileDropdown() {
           My Dashboard
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => handleLogout(undefined, "/superadmin/login")}
-        >
-          Log out
-        </DropdownMenuItem>
+        <LogoutButton variant="dropdown" redirectPath="/superadmin/login" />
       </DropdownMenuContent>
     </DropdownMenu>
   );

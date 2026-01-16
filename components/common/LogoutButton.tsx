@@ -4,13 +4,14 @@ import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { LogoutModal } from "@/components/organizer/LogoutModal";
+import { cn } from "@/lib/utils";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
 interface LogoutButtonProps {
   variant?: "dropdown" | "button";
   className?: string;
+  redirectPath?: string;
 }
-
-import { useAuthActions } from "@/hooks/useAuthActions";
 
 /**
  * Universal Logout Button:
@@ -21,15 +22,18 @@ import { useAuthActions } from "@/hooks/useAuthActions";
 export const LogoutButton = ({
   variant = "button",
   className = "",
+  redirectPath = "/login",
 }: LogoutButtonProps) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { handleLogout } = useAuthActions();
 
   const handleConfirmLogout = () => {
-    handleLogout(() => setShowLogoutModal(false));
+    handleLogout(() => setShowLogoutModal(false), redirectPath);
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     // Small delay ensures dropdown closes before modal opens
     setTimeout(() => setShowLogoutModal(true), 150);
   };
@@ -39,7 +43,10 @@ export const LogoutButton = ({
       <>
         <DropdownMenuItem
           onClick={handleOpenModal}
-          className={`text-red-600 font-medium hover:text-red-700 ${className}`}
+          className={cn(
+            "text-red-600 font-medium hover:text-red-700 cursor-pointer",
+            className
+          )}
         >
           Log out
         </DropdownMenuItem>
@@ -58,7 +65,10 @@ export const LogoutButton = ({
     <>
       <button
         onClick={() => setShowLogoutModal(true)}
-        className={`flex items-center gap-2 text-red-600 font-medium hover:text-red-700 transition cursor-pointer ${className}`}
+        className={cn(
+          "flex items-center gap-2 text-red-600 font-medium hover:text-red-700 transition cursor-pointer",
+          className
+        )}
       >
         <LogOut className="w-5 h-5" />
         <span>Log Out</span>

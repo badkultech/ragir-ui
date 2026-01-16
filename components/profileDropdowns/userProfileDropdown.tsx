@@ -11,9 +11,10 @@ import {
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { getDashboardPath } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { LogoutButton } from "../common/LogoutButton";
 
 export function UserProfileDropdown() {
-  const { userData, handleLogout, router } = useAuthActions();
+  const { userData, router } = useAuthActions();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -53,11 +54,7 @@ export function UserProfileDropdown() {
           My Dashboard
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => handleLogout()}
-        >
-          Log out
-        </DropdownMenuItem>
+        <LogoutButton variant="dropdown" />
       </DropdownMenuContent>
     </DropdownMenu>
   );

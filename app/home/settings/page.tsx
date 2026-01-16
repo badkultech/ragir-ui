@@ -8,7 +8,7 @@ import PreferencesTab from "@/components/search-results/settings/PreferencesTab"
 import SupportTab from "@/components/search-results/settings/SupportTab";
 import LegalTab from "@/components/search-results/settings/LegalTab";
 import SecurityTab from "@/components/search-results/settings/SecurityTab";
-import LogoutModal from "@/components/search-results/settings/LogoutModal";
+import { LogoutModal } from "@/components/organizer/LogoutModal";
 import DeactivateModal from "@/components/search-results/settings/DeactivateModal";
 import DeleteModal from "@/components/search-results/settings/DeleteModal";
 import { MainHeader } from "@/components/search-results/MainHeader";
@@ -226,7 +226,9 @@ export default function SettingsPage() {
   const onLogout = () => {
     handleLogout(() => setSidebarOpen(false));
   };
-
+const handleConfirmLogout = () => {
+    handleLogout(() => setShowLogoutModal(false));
+  };
 
   return (
     <>
@@ -286,10 +288,7 @@ export default function SettingsPage() {
         <LogoutModal
           open={showLogoutModal}
           onClose={() => setShowLogoutModal(false)}
-          onLogout={() => {
-            setShowLogoutModal(false);
-            onLogout();
-          }}
+          onConfirm={handleConfirmLogout}
         />
         <DeactivateModal open={showDeactivateModal} onClose={() => setShowDeactivateModal(false)}
           onConfirm={handleDeactivateAccount} />
