@@ -156,6 +156,7 @@ export const tripQueryAPI = baseAPI.injectEndpoints({
         res.data,
       invalidatesTags: (_result, _err, args) => [
         { type: TAGS.tripQueryComments, id: args.queryId },
+        { type: TAGS.tripQueries },
       ],
     }),
   }),

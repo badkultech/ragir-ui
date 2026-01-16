@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { LazyImage } from "@/components/ui/lazyImage";
 import { TRIP_DETAILS } from "@/lib/constants/strings";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
@@ -25,14 +25,15 @@ export default function HeroSection({
       <div className="hidden lg:block">
         <div className="h-96 rounded-2xl overflow-hidden relative">
           {imageUrl ? (
-            <Image
-              src={imageUrl}
-              onClick={onImageClick}
-              alt={title}
-              width={1200}
-              height={400}
-              className="object-cover"
-            />
+            <div onClick={onImageClick} className="cursor-pointer">
+              <LazyImage
+                src={imageUrl}
+                alt={title}
+                width={1200}
+                height={400}
+                className="object-cover"
+              />
+            </div>
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
               No image available
@@ -46,7 +47,7 @@ export default function HeroSection({
       <div className="lg:hidden">
         <div className="col-span-2 h-64 rounded-2xl overflow-hidden">
           {imageUrl ? (
-            <Image
+            <LazyImage
               src={imageUrl}
               alt={title}
               width={1200}

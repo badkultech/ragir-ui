@@ -129,12 +129,15 @@ export default function SearchResultsWithFilters() {
 
 
   // ---------- API CALL ----------
-  const { data, isLoading, error } = useSearchPublicTripsQuery({
+  const { data, isLoading, isFetching, error } = useSearchPublicTripsQuery({
     criteria,
     pageable: { page: 0, size: 10 },
   });
 
   const apiTrips = data?.content || [];
+
+  // Show skeleton when initially loading OR when refetching (e.g., filter changes)
+  const isLoadingData = isLoading || isFetching;
 
 
 
@@ -249,15 +252,52 @@ export default function SearchResultsWithFilters() {
 
             {/* RESULTS */}
             <div className="flex-1 ">
-              {isLoading && <p>Loading trips...</p>}
+              {isLoadingData && (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="bg-white rounded-[20px] overflow-hidden border border-[#eaeaea] flex flex-col">
+                      {/* Image skeleton */}
+                      <div className="relative h-40 md:h-52 w-full bg-gray-200 animate-pulse" />
+
+                      {/* Content skeleton */}
+                      <div className="p-4 flex flex-col gap-3">
+                        {/* Title & Rating */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="h-6 bg-gray-200 rounded animate-pulse flex-1" />
+                          <div className="h-6 w-12 bg-gray-200 rounded animate-pulse" />
+                        </div>
+
+                        {/* Organizer */}
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
+                          <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex flex-col gap-2 mt-2">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-full" />
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex items-end justify-between mt-3">
+                          <div className="h-6 w-20 bg-gray-200 rounded animate-pulse" />
+                          <div className="h-10 w-24 bg-gray-200 rounded-lg animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {error && (
                 <p className="text-red-500">Failed to load trips</p>
               )}
 
-              {!isLoading && apiTrips.length === 0 && <NoTripsFound />}
+              {!isLoadingData && apiTrips.length === 0 && <NoTripsFound />}
 
-              {apiTrips.length > 0 && (
+              {!isLoadingData && apiTrips.length > 0 && (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {apiTrips.map((trip: any) => (
                     <SearchResultsTripCard

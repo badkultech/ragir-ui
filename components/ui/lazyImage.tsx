@@ -7,6 +7,7 @@ export const LazyImage = ({
   className = "",
   width = 400,
   height = 400,
+  fill,
   ...rest
 }: {
   src: string;
@@ -14,6 +15,7 @@ export const LazyImage = ({
   className?: string;
   width?: number;
   height?: number;
+  fill?: boolean;
 }) => {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -49,6 +51,11 @@ export const LazyImage = ({
     };
   }, [src]);
 
+  // Determine Image props based on fill mode
+  const imageProps = fill
+    ? { fill: true }
+    : { width, height };
+
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {/* Mini loader */}
@@ -68,12 +75,11 @@ export const LazyImage = ({
         ref={imgRef}
         src={src}
         alt={alt}
-        height={height}
-        width={width}
         unoptimized
         loading="lazy"
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-10 ${loaded ? "opacity-100" : "opacity-0"
-          }`}
+        className={`object-cover transition-opacity duration-500 z-10 ${fill ? "absolute inset-0 w-full h-full" : ""
+          } ${loaded ? "opacity-100" : "opacity-0"}`}
+        {...imageProps}
         {...rest}
       />
     </div>
