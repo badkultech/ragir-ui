@@ -1,30 +1,29 @@
-"use client"
+"use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import Image from "next/image"
-import { AppHeader } from "@/components/app-header"
-import { useDispatch, useSelector } from "react-redux"
-import { RootState } from "@/lib/slices/store"
-import { useTripDetailsQuery } from "@/lib/services/trip-search"
-import { Star } from "lucide-react"
-import { useEffect } from "react"
-import { addToCompare, clearCompare } from "@/lib/slices/compareSlice"
-import { useRouter } from "next/navigation"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
+import { AppHeader } from "@/components/app-header";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/lib/slices/store";
+import { useTripDetailsQuery } from "@/lib/services/trip-search";
+import { Star } from "lucide-react";
+import { useEffect } from "react";
+import { clearCompare } from "@/lib/slices/compareSlice";
 
 interface TripData {
-    id: string
-    name: string
-    organiser: string
-    organiserAvatar: string
-    region: string
-    route: string
-    duration: string
-    travelDates: string
-    moods: string[]
-    rating: number
-    avgGroupSize: string
-    startingPrice: number
-    image: string
+    id: string;
+    name: string;
+    organiser: string;
+    organiserAvatar: string;
+    region: string;
+    route: string;
+    duration: string;
+    travelDates: string;
+    moods: string[];
+    rating: number;
+    avgGroupSize: string;
+    startingPrice: number;
+    image: string;
 }
 
 const attributes = [
@@ -40,46 +39,40 @@ const attributes = [
     { key: "avgGroupSize", label: "Avg. Group Size" },
     { key: "startingPrice", label: "Starting Price" },
     { key: "bookNow", label: "Book Now" },
-]
+];
+
+import { useRouter } from "next/navigation";
 
 export default function CompareTripsPage() {
-
     const dispatch = useDispatch();
     const router = useRouter();
 
+    /** ✅ get compare items (objects) */
+    const compareItems = useSelector(
+        (state: RootState) => state.compare.items
+    );
 
-    useEffect(() => {
-        const saved = JSON.parse(
-            localStorage.getItem("compareTrips") || "[]"
-        );
+    /** ✅ max 3 queries (RTK rule safe) */
+    const q1 = useTripDetailsQuery(compareItems[0]?.id!, {
+        skip: !compareItems[0],
+    });
 
-        saved.forEach((id: string) => {
-            dispatch(addToCompare(id));
-        });
-    }, [dispatch]);
+    const q2 = useTripDetailsQuery(compareItems[1]?.id!, {
+        skip: !compareItems[1],
+    });
 
-    // get compare trips from redux store
-    const compareTripIds = useSelector(
-        (state: RootState) => state.compare.tripIds
-    )
-    const q1 = useTripDetailsQuery(compareTripIds[0]!, {
-        skip: !compareTripIds[0],
-    })
-    const q2 = useTripDetailsQuery(compareTripIds[1]!, {
-        skip: !compareTripIds[1],
-    })
-    const q3 = useTripDetailsQuery(compareTripIds[2]!, {
-        skip: !compareTripIds[2],
-    })
+    const q3 = useTripDetailsQuery(compareItems[2]?.id!, {
+        skip: !compareItems[2],
+    });
 
-    const isLoading = q1.isLoading || q2.isLoading || q3.isLoading
+    const isLoading = q1.isLoading || q2.isLoading || q3.isLoading;
 
-    const tripsFromApi = [q1.data, q2.data, q3.data].filter(Boolean)
+    const tripsFromApi = [q1.data, q2.data, q3.data].filter(Boolean);
 
     const tripsToCompare: TripData[] = tripsFromApi.map((payload: any) => {
-        const trip = payload.tripResponse
-        const itinerary = payload.tripItineraryResponse
-        const organizer = payload.organizerProfileResponse
+        const trip = payload.tripResponse;
+        const itinerary = payload.tripItineraryResponse;
+        const organizer = payload.organizerProfileResponse;
 
         return {
             id: trip.publicId,
@@ -96,15 +89,19 @@ export default function CompareTripsPage() {
             startingPrice:
                 payload.tripPricingDTO?.simplePricingRequest?.basePrice || 0,
             image: payload.images?.[0]?.url || "/placeholder.svg",
-        }
-    })
+        };
+    });
 
     return (
         <div className="min-h-screen bg-background">
-            <AppHeader title="Compare Trips" showBackArrow onBack={() => {
-                dispatch(clearCompare());
-                router.back();
-            }} />
+            <AppHeader
+                title="Compare Trips"
+                showBackArrow
+                onBack={() => {
+                    dispatch(clearCompare());
+                    router.back();
+                }}
+            />
 
             <main className="max-w-6xl mx-auto p-4 md:p-6 overflow-x-auto">
                 {isLoading ? (
@@ -117,7 +114,6 @@ export default function CompareTripsPage() {
                                     <th className="text-left py-4 px-4 bg-[#F7F7F7] rounded-tl-xl font-medium text-black text-sm w-[160px]">
                                         Attribute
                                     </th>
-
 
                                     {tripsToCompare.map((trip) => (
                                         <th
@@ -137,32 +133,30 @@ export default function CompareTripsPage() {
                                 </tr>
                             </thead>
 
-
                             <tbody>
                                 {attributes.map((attr, rowIndex) => (
-                                    <tr
-                                        key={attr.key}
-
-                                    >
+                                    <tr key={attr.key}>
                                         <td
                                             className={`py-4 px-4 font-medium text-black text-sm w-[160px] bg-[#F7F7F7]
-  ${rowIndex !== attributes.length - 1 ? "border-b border-gray-300" : ""}`}
+                      ${rowIndex !== attributes.length - 1
+                                                    ? "border-b border-gray-300"
+                                                    : ""
+                                                }`}
                                         >
                                             {attr.label}
                                         </td>
-
-
 
                                         {tripsToCompare.map((trip) => (
                                             <td
                                                 key={trip.id}
                                                 className={`py-4 px-4 text-sm
-  ${rowIndex !== attributes.length - 1 ? "border-b border-gray-200" : ""}`}
+                        ${rowIndex !== attributes.length - 1
+                                                        ? "border-b border-gray-200"
+                                                        : ""
+                                                    }`}
                                             >
-
-
-
                                                 {attr.key === "name" && trip.name}
+
                                                 {attr.key === "organiser" && (
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="w-6 h-6">
@@ -172,11 +166,13 @@ export default function CompareTripsPage() {
                                                         <span>{trip.organiser}</span>
                                                     </div>
                                                 )}
+
                                                 {attr.key === "region" && trip.region}
                                                 {attr.key === "route" && trip.route}
                                                 {attr.key === "duration" && trip.duration}
                                                 {attr.key === "travelDates" && trip.travelDates}
                                                 {attr.key === "moods" && trip.moods.join(", ")}
+
                                                 {attr.key === "rating" && (
                                                     <div className="flex items-center gap-1">
                                                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -185,17 +181,18 @@ export default function CompareTripsPage() {
                                                 )}
 
                                                 {attr.key === "avgGroupSize" && trip.avgGroupSize}
+
                                                 {attr.key === "startingPrice" && (
                                                     <span className="font-bold">
                                                         ₹{trip.startingPrice.toLocaleString()}
                                                     </span>
                                                 )}
+
                                                 {attr.key === "bookNow" && (
                                                     <button className="w-full px-6 py-2.5 bg-[#FF804C] text-white text-sm font-medium rounded-lg hover:opacity-90 transition">
                                                         Book Now
                                                     </button>
                                                 )}
-
                                             </td>
                                         ))}
                                     </tr>
@@ -206,5 +203,5 @@ export default function CompareTripsPage() {
                 )}
             </main>
         </div>
-    )
+    );
 }

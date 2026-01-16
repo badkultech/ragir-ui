@@ -1,32 +1,40 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface CompareItem {
+    id: string;
+    image: string;
+}
+
 interface CompareState {
-    tripIds: string[];
+    items: CompareItem[];
 }
 
 const initialState: CompareState = {
-    tripIds: [],
+    items:
+        typeof window !== "undefined"
+            ? JSON.parse(localStorage.getItem("compareTrips") || "[]")
+            : [],
 };
 
 const compareSlice = createSlice({
     name: "compare",
     initialState,
     reducers: {
-        addToCompare: (state, action: PayloadAction<string>) => {
-            if (state.tripIds.includes(action.payload)) return;
-            if (state.tripIds.length >= 3) return;
+        addToCompare: (state, action: PayloadAction<CompareItem>) => {
+            if (state.items.find(i => i.id === action.payload.id)) return;
+            if (state.items.length >= 3) return;
 
-            state.tripIds.push(action.payload);
-            localStorage.setItem("compareTrips", JSON.stringify(state.tripIds));
+            state.items.push(action.payload);
+            localStorage.setItem("compareTrips", JSON.stringify(state.items));
         },
 
         removeFromCompare: (state, action: PayloadAction<string>) => {
-            state.tripIds = state.tripIds.filter(id => id !== action.payload);
-            localStorage.setItem("compareTrips", JSON.stringify(state.tripIds));
+            state.items = state.items.filter(i => i.id !== action.payload);
+            localStorage.setItem("compareTrips", JSON.stringify(state.items));
         },
 
         clearCompare: (state) => {
-            state.tripIds = [];
+            state.items = [];
             localStorage.removeItem("compareTrips");
         },
     },
