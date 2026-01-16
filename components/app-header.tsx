@@ -23,6 +23,7 @@ type AppHeaderProps = {
   showLogo?: boolean;
   onMenuClick?: () => void;
   showBackArrow?: boolean;
+  onBack?: () => void;
 };
 
 // Define props interface outside component to avoid conflicts
@@ -37,6 +38,7 @@ export function AppHeader({
   showAvatar = true,
   showLogo = false,
   onMenuClick,
+  onBack,
   showBackArrow = false,
 }: AppHeaderProps) {
   const { userData } = useSelector(selectAuthState);
@@ -78,10 +80,16 @@ export function AppHeader({
             <img src="/logo.png" alt="Ragir" className="h-8" />
           </div>
         )}
-        
+
         {showBackArrow && (
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              if (onBack) {
+                onBack();
+              } else {
+                router.back();
+              }
+            }}
             className="p-2 rounded-md hover:bg-gray-100 "
           >
             <ChevronLeft className="w-6 h-6 text-gray-700" />

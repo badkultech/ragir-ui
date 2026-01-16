@@ -3,9 +3,16 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
 import { AppHeader } from "@/components/app-header"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "@/lib/slices/store"
+import { useTripDetailsQuery } from "@/lib/services/trip-search"
+import { Star } from "lucide-react"
+import { useEffect } from "react"
+import { addToCompare, clearCompare } from "@/lib/slices/compareSlice"
+import { useRouter } from "next/navigation"
 
 interface TripData {
-    id: number
+    id: string
     name: string
     organiser: string
     organiserAvatar: string
@@ -19,54 +26,6 @@ interface TripData {
     startingPrice: number
     image: string
 }
-
-const tripsToCompare: TripData[] = [
-    {
-        id: 1,
-        name: "Himalayan Adventure Trek",
-        organiser: "Mountain Trails",
-        organiserAvatar: "/man-profile.png",
-        region: "Rajasthan",
-        route: "Delhi → Delhi",
-        duration: "5D/4N",
-        travelDates: "15 Dec - 20 Dec",
-        moods: ["Adventure", "Trekking"],
-        rating: 4.8,
-        avgGroupSize: "~15 people",
-        startingPrice: 12999,
-        image: "/hampi-ruins-temples.png",
-    },
-    {
-        id: 2,
-        name: "Himalayan Adventure Trek",
-        organiser: "Mountain Trails",
-        organiserAvatar: "/man-profile.png",
-        region: "Rajasthan",
-        route: "Delhi → Delhi",
-        duration: "5D/4N",
-        travelDates: "15 Dec - 20 Dec",
-        moods: ["Adventure", "Trekking"],
-        rating: 4.8,
-        avgGroupSize: "~15 people",
-        startingPrice: 12999,
-        image: "/himalayan-trekking-adventure-mountains.jpg",
-    },
-    {
-        id: 3,
-        name: "Himalayan Adventure Trek",
-        organiser: "Mountain Trails",
-        organiserAvatar: "/man-profile.png",
-        region: "Rajasthan",
-        route: "Delhi → Delhi",
-        duration: "5D/4N",
-        travelDates: "15 Dec - 20 Dec",
-        moods: ["Adventure", "Trekking"],
-        rating: 4.8,
-        avgGroupSize: "~15 people",
-        startingPrice: 12999,
-        image: "/himalayan-trekking-adventure-mountains.jpg",
-    },
-]
 
 const attributes = [
     { key: "image", label: "" },
@@ -84,78 +43,167 @@ const attributes = [
 ]
 
 export default function CompareTripsPage() {
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+
+    useEffect(() => {
+        const saved = JSON.parse(
+            localStorage.getItem("compareTrips") || "[]"
+        );
+
+        saved.forEach((id: string) => {
+            dispatch(addToCompare(id));
+        });
+    }, [dispatch]);
+
+    // get compare trips from redux store
+    const compareTripIds = useSelector(
+        (state: RootState) => state.compare.tripIds
+    )
+    const q1 = useTripDetailsQuery(compareTripIds[0]!, {
+        skip: !compareTripIds[0],
+    })
+    const q2 = useTripDetailsQuery(compareTripIds[1]!, {
+        skip: !compareTripIds[1],
+    })
+    const q3 = useTripDetailsQuery(compareTripIds[2]!, {
+        skip: !compareTripIds[2],
+    })
+
+    const isLoading = q1.isLoading || q2.isLoading || q3.isLoading
+
+    const tripsFromApi = [q1.data, q2.data, q3.data].filter(Boolean)
+
+    const tripsToCompare: TripData[] = tripsFromApi.map((payload: any) => {
+        const trip = payload.tripResponse
+        const itinerary = payload.tripItineraryResponse
+        const organizer = payload.organizerProfileResponse
+
+        return {
+            id: trip.publicId,
+            name: trip.name,
+            organiser: organizer?.organizerName || "-",
+            organiserAvatar: organizer?.displayPicture?.url || "",
+            region: trip.cityTags?.[0] || "-",
+            route: `${itinerary?.startPoint} → ${itinerary?.endPoint}`,
+            duration: `${itinerary?.totalDays}D/${itinerary?.totalDays - 1}N`,
+            travelDates: `${trip.startDate} - ${trip.endDate}`,
+            moods: trip.moodTags || [],
+            rating: trip.rating || 4.5,
+            avgGroupSize: `${trip.minGroupSize}-${trip.maxGroupSize}`,
+            startingPrice:
+                payload.tripPricingDTO?.simplePricingRequest?.basePrice || 0,
+            image: payload.images?.[0]?.url || "/placeholder.svg",
+        }
+    })
+
     return (
         <div className="min-h-screen bg-background">
-            {/* Header */}
-            <AppHeader title="Compare Trips" showBackArrow={true} />
+            <AppHeader title="Compare Trips" showBackArrow onBack={() => {
+                dispatch(clearCompare());
+                router.back();
+            }} />
 
-            {/* Comparison Table */}
             <main className="max-w-6xl mx-auto p-4 md:p-6 overflow-x-auto">
-                <div className="min-w-[600px]">
-                    <table className="w-full">
-                        <thead>
-                            <tr>
-                                <th className="text-left py-4 px-4 bg-muted/30 rounded-tl-xl font-medium text-muted-foreground text-sm w-[140px]">
-                                    Attribute
-                                </th>
-                                {tripsToCompare.map((trip) => (
-                                    <th key={trip.id} className="py-4 px-4 bg-muted/30 last:rounded-tr-xl"></th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {attributes.map((attr, rowIndex) => (
-                                <tr key={attr.key} className={rowIndex % 2 === 0 ? "bg-background" : "bg-muted/20"}>
-                                    {/* Attribute Label */}
-                                    <td className="py-4 px-4 font-medium text-muted-foreground text-sm align-middle">{attr.label}</td>
+                {isLoading ? (
+                    <p className="text-center">Loading...</p>
+                ) : (
+                    <div className="min-w-[600px]">
+                        <table className="w-full border-collapse table-fixed">
+                            <thead>
+                                <tr>
+                                    <th className="text-left py-4 px-4 bg-[#F7F7F7] rounded-tl-xl font-medium text-black text-sm w-[160px]">
+                                        Attribute
+                                    </th>
 
-                                    {/* Trip Values */}
+
                                     {tripsToCompare.map((trip) => (
-                                        <td key={trip.id} className="py-4 px-4 text-sm text-foreground align-middle">
-                                            {attr.key === "image" && (
-                                                <div className="relative w-full h-32 rounded-xl overflow-hidden">
-                                                    <Image src={trip.image || "/placeholder.svg"} alt={trip.name} fill className="object-cover" />
-                                                </div>
-                                            )}
-                                            {attr.key === "name" && <span className="font-medium">{trip.name}</span>}
-                                            {attr.key === "organiser" && (
-                                                <div className="flex items-center gap-2">
-                                                    <Avatar className="w-6 h-6">
-                                                        <AvatarImage src={trip.organiserAvatar || "/placeholder.svg"} />
-                                                        <AvatarFallback className="bg-muted text-xs">MT</AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="text-muted-foreground">{trip.organiser}</span>
-                                                </div>
-                                            )}
-                                            {attr.key === "region" && trip.region}
-                                            {attr.key === "route" && trip.route}
-                                            {attr.key === "duration" && trip.duration}
-                                            {attr.key === "travelDates" && trip.travelDates}
-                                            {attr.key === "moods" && <span className="text-muted-foreground">Moods</span>}
-                                            {attr.key === "rating" && (
-                                                <div className="flex items-center gap-1">
-                                                    <svg className="w-4 h-4 text-amber-400 fill-amber-400" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                    <span>{trip.rating}</span>
-                                                </div>
-                                            )}
-                                            {attr.key === "avgGroupSize" && trip.avgGroupSize}
-                                            {attr.key === "startingPrice" && (
-                                                <span className="font-bold text-base">₹{trip.startingPrice.toLocaleString()}</span>
-                                            )}
-                                            {attr.key === "bookNow" && (
-                                                <button className="px-6 py-2.5 bg-gradient-to-r from-[#f4a261] to-[#e07a5f] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity">
-                                                    Book Now
-                                                </button>
-                                            )}
-                                        </td>
+                                        <th
+                                            key={trip.id}
+                                            className="py-4 px-4 bg-muted/30 last:rounded-tr-xl"
+                                        >
+                                            <div className="relative w-full h-28 rounded-xl overflow-hidden">
+                                                <Image
+                                                    src={trip.image}
+                                                    alt={trip.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        </th>
                                     ))}
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+
+
+                            <tbody>
+                                {attributes.map((attr, rowIndex) => (
+                                    <tr
+                                        key={attr.key}
+
+                                    >
+                                        <td
+                                            className={`py-4 px-4 font-medium text-black text-sm w-[160px] bg-[#F7F7F7]
+  ${rowIndex !== attributes.length - 1 ? "border-b border-gray-300" : ""}`}
+                                        >
+                                            {attr.label}
+                                        </td>
+
+
+
+                                        {tripsToCompare.map((trip) => (
+                                            <td
+                                                key={trip.id}
+                                                className={`py-4 px-4 text-sm
+  ${rowIndex !== attributes.length - 1 ? "border-b border-gray-200" : ""}`}
+                                            >
+
+
+
+                                                {attr.key === "name" && trip.name}
+                                                {attr.key === "organiser" && (
+                                                    <div className="flex items-center gap-2">
+                                                        <Avatar className="w-6 h-6">
+                                                            <AvatarImage src={trip.organiserAvatar} />
+                                                            <AvatarFallback>OR</AvatarFallback>
+                                                        </Avatar>
+                                                        <span>{trip.organiser}</span>
+                                                    </div>
+                                                )}
+                                                {attr.key === "region" && trip.region}
+                                                {attr.key === "route" && trip.route}
+                                                {attr.key === "duration" && trip.duration}
+                                                {attr.key === "travelDates" && trip.travelDates}
+                                                {attr.key === "moods" && trip.moods.join(", ")}
+                                                {attr.key === "rating" && (
+                                                    <div className="flex items-center gap-1">
+                                                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                                                        <span className="font-medium">{trip.rating}</span>
+                                                    </div>
+                                                )}
+
+                                                {attr.key === "avgGroupSize" && trip.avgGroupSize}
+                                                {attr.key === "startingPrice" && (
+                                                    <span className="font-bold">
+                                                        ₹{trip.startingPrice.toLocaleString()}
+                                                    </span>
+                                                )}
+                                                {attr.key === "bookNow" && (
+                                                    <button className="w-full px-6 py-2.5 bg-[#FF804C] text-white text-sm font-medium rounded-lg hover:opacity-90 transition">
+                                                        Book Now
+                                                    </button>
+                                                )}
+
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </main>
         </div>
     )

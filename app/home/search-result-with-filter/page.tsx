@@ -18,6 +18,7 @@ import { selectAuthState } from "@/lib/slices/auth";
 import { FloatingRoleActions } from "@/components/common/FloatingRoleActions";
 import { Overlay } from "@/components/common/Overlay";
 import { SearchTripsCard } from "@/components/homePage/shared/search-trips-card";
+import { FloatingCompareBadge } from "@/components/homePage/shared/FloatingCompareBadge";
 
 const calculateDuration = (startDate: string, endDate: string) => {
   if (!startDate || !endDate) return "-D/-N";
@@ -398,6 +399,7 @@ export default function SearchResultsWithFilters() {
       >
         <SearchTripsCard />
       </Overlay>
+      <FloatingCompareBadge />
     </>
   );
 }
