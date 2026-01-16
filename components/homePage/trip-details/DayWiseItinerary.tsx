@@ -23,6 +23,39 @@ interface Props {
   dayDescription?: string;
 }
 
+// Helper function to format time to 12-hour AM/PM format without seconds
+const formatTime = (timeStr?: string): string => {
+  if (!timeStr || timeStr === "--") return "--";
+
+  try {
+    // Handle array format [hours, minutes, seconds]
+    if (Array.isArray(timeStr)) {
+      const hours = parseInt(timeStr[0]);
+      const minutes = parseInt(timeStr[1]);
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      return `${displayHours}:${String(minutes).padStart(2, '0')} ${period}`;
+    }
+
+    // Handle string format "HH:MM:SS" or "HH:MM"
+    const timeParts = timeStr.split(':');
+    if (timeParts.length >= 2) {
+      const hours = parseInt(timeParts[0]);
+      const minutes = parseInt(timeParts[1]);
+
+      if (isNaN(hours) || isNaN(minutes)) return timeStr;
+
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      return `${displayHours}:${String(minutes).padStart(2, '0')} ${period}`;
+    }
+
+    return timeStr;
+  } catch (error) {
+    return timeStr || "--";
+  }
+};
+
 export default function DayWiseItinerary({
   dayTabs,
   activeDay,
@@ -131,7 +164,7 @@ export default function DayWiseItinerary({
                     {activity.time && activity.time !== "--" && (
                       <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
                         <Clock className="w-4 h-4 text-gray-400" />
-                        <span>{activity.time}</span>
+                        <span>{formatTime(activity.time)}</span>
                       </div>
                     )}
 
