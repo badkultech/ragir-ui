@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Grid3X3,
   Plus,
@@ -72,6 +72,7 @@ type SidebarProps = {
 export function Sidebar({ showLogo = true, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState<Record<string, boolean>>({});
+  const router = useRouter();
 
   const isActive = (href?: string) =>
     href
@@ -108,7 +109,7 @@ export function Sidebar({ showLogo = true, isOpen, onClose }: SidebarProps) {
       >
         {/* Header section */}
         <div className="flex items-center justify-between p-4 md:hidden">
-          {showLogo && <img src="/logo.png" alt="Ragir" className="h-8" />}
+          {showLogo && <img src="/logo.png" alt="Ragir" className="h-8 cursor-pointer" onClick={() => router.push("/home")} />}
           <button
             onClick={onClose}
             className="p-2 rounded-md hover:bg-gray-100"
@@ -119,7 +120,7 @@ export function Sidebar({ showLogo = true, isOpen, onClose }: SidebarProps) {
 
         {showLogo && (
           <div className="hidden md:block p-6 border-b border-gray-100">
-            <img src="/logo.png" alt="Ragir" className="h-8" />
+            <img src="/logo.png" alt="Ragir" className="h-8 cursor-pointer" onClick={() => router.push("/home")} />
           </div>
         )}
 

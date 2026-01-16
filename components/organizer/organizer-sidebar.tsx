@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutGrid,
   CircleUser,
@@ -103,6 +103,7 @@ export function OrganizerSidebar({
   onClose,
 }: OrganizerSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState<Record<string, boolean>>({
     ['Library']: false,
   });
@@ -142,7 +143,7 @@ export function OrganizerSidebar({
       >
         {/* Mobile close button */}
         <div className="flex items-center justify-between p-3 md:hidden">
-          {showLogo && <img src="/logo.png" alt="Ragir" className="h-7" />}
+          {showLogo && <img src="/logo.png" alt="Ragir" className="h-7 cursor-pointer" onClick={() => router.push("/home")} />}
           <button
             onClick={onClose}
             className="p-2 rounded-md hover:bg-gray-100"
@@ -154,7 +155,8 @@ export function OrganizerSidebar({
         {/* Logo (desktop) */}
         {showLogo && (
           <div className="hidden md:block p-4 border-b border-gray-100">
-            <img src="/logo.png" alt="Ragir" className="h-7" />
+            <img src="/logo.png" alt="Ragir" className="h-7 cursor-pointer"
+            onClick={() => router.push("/home")} />
           </div>
         )}
 

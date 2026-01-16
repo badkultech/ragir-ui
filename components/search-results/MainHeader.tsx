@@ -98,7 +98,8 @@ export function MainHeader({
               alt="Logo"
               width={96}
               height={37}
-              className="w-[96px] h-[37px]"
+              className="w-[96px] h-[37px] cursor-pointer"
+              onClick={() => router.push("/home")}
             />
           )}
         </div>
