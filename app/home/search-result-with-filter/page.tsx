@@ -265,6 +265,11 @@ export default function SearchResultsWithFilters() {
                       id={trip.publicId}
                       title={trip.name}
                       provider={trip.organizerName || "—"}
+                      route={
+                        trip.startPoint && trip.endPoint
+                          ? `${trip.startPoint} → ${trip.endPoint}`
+                          : undefined
+                      }
                       location={
                         trip.cityTags?.join(", ") ||
                         trip.destinationTags?.join(", ") ||
@@ -273,7 +278,7 @@ export default function SearchResultsWithFilters() {
                       rating={trip.rating || 4.5}
                       days={calculateDuration(trip.startDate, trip.endDate)}
                       dates={`${trip.startDate} — ${trip.endDate}`}
-                      price={trip.startingPrice || 0}
+                      price={trip.startingFrom || 0}
                       image={
                         trip.document?.url ||
                         "/hampi-ruins-temples.png"

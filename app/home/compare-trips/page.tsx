@@ -69,6 +69,33 @@ export default function CompareTripsPage() {
 
     const tripsFromApi = [q1.data, q2.data, q3.data].filter(Boolean);
 
+    const getStartingPrice = (pricing: any): number => {
+        // ✅ SIMPLE PRICING (as it is)
+        if (pricing?.simplePricingRequest?.basePrice) {
+            return pricing.simplePricingRequest.basePrice;
+        }
+
+        // ✅ DYNAMIC PRICING → sum of minimum of each category
+        if (pricing?.dynamicPricingRequest?.pricingCategoryDtos) {
+            return pricing.dynamicPricingRequest.pricingCategoryDtos.reduce(
+                (total: number, category: any) => {
+                    const optionPrices =
+                        category.pricingCategoryOptionDTOs?.map((opt: any) => opt.price) || [];
+
+                    if (optionPrices.length === 0) return total;
+
+                    const minPriceOfCategory = Math.min(...optionPrices);
+                    return total + minPriceOfCategory;
+                },
+                0
+            );
+        }
+
+        return 0;
+    };
+
+
+
     const tripsToCompare: TripData[] = tripsFromApi.map((payload: any) => {
         const trip = payload.tripResponse;
         const itinerary = payload.tripItineraryResponse;
@@ -86,8 +113,7 @@ export default function CompareTripsPage() {
             moods: trip.moodTags || [],
             rating: trip.rating || 4.5,
             avgGroupSize: `${trip.minGroupSize}-${trip.maxGroupSize}`,
-            startingPrice:
-                payload.tripPricingDTO?.simplePricingRequest?.basePrice || 0,
+            startingPrice: getStartingPrice(payload.tripPricingDTO),
             image: payload.images?.[0]?.url || "/placeholder.svg",
         };
     });

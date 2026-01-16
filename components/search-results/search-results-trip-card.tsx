@@ -230,7 +230,7 @@ export function SearchResultsTripCard({
               </div>
 
               <span className="text-[13px] text-gray-700 font-medium">
-                {route || "Delhi → Delhi"}
+                {route || "__ → __"}
               </span>
             </div>
 
