@@ -42,4 +42,5 @@ export const TAGS = {
   trips: "Trips",
   groupLeaders: 'GroupLeaders',
   DestinationMaster: 'DestinationMaster',
+  wishlist: 'wishlist',
 } as const;

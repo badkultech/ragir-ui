@@ -2,12 +2,13 @@
 
 import Image from "next/image"
 import { Heart, MapPin, Calendar, Clock, Users, Star } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { moodMap } from "@/components/search-results/mood-tag"
 import Link from "next/link"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "@/lib/slices/store"
 import { addToCompare, removeFromCompare } from "@/lib/slices/compareSlice"
+import { useAddTripToWishlistMutation, useRemoveTripFromWishlistMutation } from "@/lib/services/wishlist"
 
 interface SearchResultsTripCardProps {
   id: string
@@ -23,6 +24,7 @@ interface SearchResultsTripCardProps {
   image: string
   isFavorite?: boolean
   route?: string
+  onRemoveFromWishlist?: () => void
 }
 
 export function SearchResultsTripCard({
@@ -39,9 +41,16 @@ export function SearchResultsTripCard({
   route,
   id,
   isFavorite = false,
+  onRemoveFromWishlist,
 }: SearchResultsTripCardProps) {
 
   const [favorite, setFavorite] = useState(isFavorite)
+  const [addToWishlist] = useAddTripToWishlistMutation()
+  const [removeFromWishlist] = useRemoveTripFromWishlistMutation()
+
+  useEffect(() => {
+    setFavorite(isFavorite)
+  }, [isFavorite])
   const [showAllLocations, setShowAllLocations] = useState(false);
   const locationList = location
     .split(",")
@@ -138,10 +147,24 @@ export function SearchResultsTripCard({
 
           {/* Favorite Button */}
           <button
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
-              setFavorite(!favorite);
+
+              const newFavoriteState = !favorite;
+              setFavorite(newFavoriteState);
+
+              try {
+                if (newFavoriteState) {
+                  await addToWishlist({ tripId: id }).unwrap();
+                } else {
+                  await removeFromWishlist({ tripId: id }).unwrap();
+                  onRemoveFromWishlist?.();
+                }
+              } catch (err) {
+                console.error("Failed to update wishlist:", err);
+                setFavorite(favorite); // Revert on error
+              }
             }}
             className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-sm z-10"
           >
