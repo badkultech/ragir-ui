@@ -3,6 +3,8 @@
 import { Heart, MapPin, Calendar, Clock, Users, Plane, Star, Sun } from "lucide-react"
 import { WishlistTrip, WishlistTripCard } from "@/components/search-results/wishlist-tripcard"
 import { AppHeader } from "@/components/app-header"
+import { SearchResultsTripCard } from "@/components/search-results/search-results-trip-card"
+import { MainHeader } from "@/components/search-results/MainHeader"
 
 
 
@@ -75,14 +77,30 @@ export default function WishlistPage() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <AppHeader title="Wishlist" showBackArrow={true} />
+            <MainHeader variant="center" />
 
             {/* Wishlist Grid */}
             <main className="max-w-6xl mx-auto p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {wishlistTrips.map((trip) => (
-                        <WishlistTripCard key={trip.id} trip={trip} />
+                        <SearchResultsTripCard
+                            key={trip.id}
+                            id={String(trip.id)}
+                            title={trip.title}
+                            provider={trip.provider}
+                            location={trip.location}
+                            subLocation={trip.subLocation}
+                            rating={trip.rating}
+                            days={trip.days}
+                            dates={trip.dates}
+                            price={trip.price}
+                            badges={trip.badges}
+                            image={trip.image}
+                            route={trip.route}
+                            isFavorite={true}
+                        />
                     ))}
+
                 </div>
             </main>
         </div>
