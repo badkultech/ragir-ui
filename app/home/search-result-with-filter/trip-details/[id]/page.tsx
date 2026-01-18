@@ -35,6 +35,7 @@ import { FloatingRoleActions } from "@/components/common/FloatingRoleActions";
 import { Overlay } from "@/components/common/Overlay";
 import { SearchTripsCard } from "@/components/homePage/shared/search-trips-card";
 import { useRouter } from "next/navigation";
+import ScreenLoader from "@/components/common/ScreenLoader";
 
 
 export default function TripDetailsPage() {
@@ -86,7 +87,10 @@ export default function TripDetailsPage() {
 
   const { requireAuth } = useAuthGuard(isLoggedIn);
   const { data, isLoading, error } = useTripDetailsQuery(id as string);
-  if (isLoading) return <p>{TRIP_DETAILS.PAGE.LOADING}</p>;
+
+  if (isLoading) {
+    return <ScreenLoader />;
+  }
   if (error) return <p>{TRIP_DETAILS.PAGE.ERROR}</p>;
   if (!data) return <p>{TRIP_DETAILS.PAGE.NOT_FOUND}</p>;
 
