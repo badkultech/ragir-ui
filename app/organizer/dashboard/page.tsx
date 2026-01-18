@@ -2,29 +2,24 @@
 import { useState } from "react";
 import {
   Card,
-  CardHeader,
   CardContent,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Plus,
-  Bell,
-  MapPin,
   UsersRound,
   MessageSquare,
-  FileStack,
 } from "lucide-react";
 import { OrganizerSidebar } from "@/components/organizer/organizer-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { LibraryIcon } from "@/components/library/SvgComponents/Icons";
 import { CreateTripModal } from "@/components/trip/CreateTripModal";
 import Link from "next/link";
-import { useGetAllTripQueriesCountQuery } from "@/lib/services/organizer/trip/queries";
 import { useOrganizationId } from "@/hooks/useOrganizationId";
 import { useGetOrganizationDashboardQuery } from "@/lib/services/organizer/dashboard";
 import { ROUTES } from "@/lib/utils";
 import { TripCard } from "@/components/organizer/dashboard/TripCard";
+import ScreenLoader from "@/components/common/ScreenLoader";
 
 
 function EmptyMonthState({ label }: { label: string }) {
@@ -64,6 +59,10 @@ export default function DashboardMainContent() {
   } = useGetOrganizationDashboardQuery(organizationId, {
     skip: !organizationId,
   });
+
+  if (!organizationId || isDashboardLoading) {
+    return <ScreenLoader />;
+  }
 
   // choose values: prioritize dashboard values, fallback to existing query / defaults
   const totalLeads = dashboard?.totalLeads ?? 0;
